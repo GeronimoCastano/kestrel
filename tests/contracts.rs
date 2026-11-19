@@ -232,10 +232,20 @@ fn codes(source: &str) -> Vec<&'static str> {
     checked(source).diagnostics.iter().map(|d| d.code).collect()
 }
 
+fn has_z3() -> bool {
+    std::process::Command::new("z3")
+        .arg("-version")
+        .output()
+        .is_ok_and(|o| o.status.success())
+}
+
 const POSITIVE: &str = "theorem positive(n : Int) : n > 0 requires h : n >= 1 { smt }\nfunction half(n : Int) : Int requires positive(n) = n / 2\n";
 
 #[test]
 fn whole_number_bounds_are_tightened_for_proofs() {
+    if !has_z3() {
+        return;
+    }
     // Over the whole numbers, `x > 0` is `x >= 1`, so a loop or an if on `> 0` proves the call.
     assert_eq!(
         statuses(&format!(

@@ -37,6 +37,11 @@ jobs:
       - name: Run Clippy
         run: cargo clippy --all-targets -- -D warnings
 
+      # The proof suite exercises the optional `smt` bridge. Without a solver
+      # those tests skip, so install it here to keep that path covered.
+      - name: Install Z3
+        run: brew install z3
+
       - name: Run the test suite
         run: cargo test
 
