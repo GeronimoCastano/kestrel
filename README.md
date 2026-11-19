@@ -56,6 +56,8 @@ print("Hello, Kestrel!")
 Hello, Kestrel!
 ```
 
+That is the whole setup. [SYNTAX.md](SYNTAX.md) documents every form.
+
 ## What it looks like
 
 <p align="center">
@@ -474,6 +476,7 @@ that pin it down.
 
 | File | Contents |
 |---|---|
+| [SYNTAX.md](SYNTAX.md) | The language, form by form, with an example for each |
 | [MATH.md](MATH.md) | Proof kernel, tactics, and how to add a theory |
 | [KESNET.md](KESNET.md) | Deep learning library |
 | [mathlib/README.md](mathlib/README.md) | A checked library of basic mathematics |
