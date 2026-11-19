@@ -74,5 +74,8 @@ jobs:
         with:
           node-version: "20"
 
+      - name: Install Z3
+        run: brew install z3
+
       - name: Run the Node tests
         run: node --test test/*.test.js

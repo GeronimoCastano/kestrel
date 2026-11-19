@@ -3,7 +3,14 @@ const assert = require('assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { spawnSync } = require('child_process');
 const { CheckDaemon } = require('../out/daemon');
+// The `smt` tactic needs a solver. Without one the proofs stay incomplete, so
+// the trust markers this test checks never appear.
+if (spawnSync('z3', ['-version']).status !== 0) {
+  console.log('no z3 on PATH; skipping the SMT trust test');
+  return;
+}
 const root = fs.mkdtempSync(path.join(os.tmpdir(), 'kestrel-editor-goals-'));
 const compiler = path.resolve(__dirname, '../../../target/release/kestrel');
 const daemon = new CheckDaemon(compiler, root);
