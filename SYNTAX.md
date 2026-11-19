@@ -736,11 +736,30 @@ print([3, 1, 2].isEmpty())             // false
 
 ## Standard data structures
 
+```kestrel
+let stack := Stack[Int]()
+stack.push(1)
+stack.push(2)
+print(stack.peek())
+print(stack.pop())
+
+let queue := Queue[String]()
+queue.enqueue("a")
+queue.enqueue("b")
+print(queue.dequeue())
+
+let heap := MinHeap[Int]()
+heap.push(3)
+heap.push(1)
+print(heap.pop())
+```
+
 - Stack, Queue, MinHeap and MaxHeap are available in every program without an import. Each keeps its items in an Array.
 - A Stack offers push, pop, peek and size. Its peek gives a read-only view of the top value.
 - A Queue offers enqueue, which adds at the back, dequeue, which removes and returns the front item, and first, which gives a read-only view of the front item. Nothing else.
 - MinHeap and MaxHeap take a Comparable item type and offer push, pop, peek and size. Pop removes the smallest or largest item.
 - A program cannot declare a class with one of these names.
+
 ## Opaque C pointers
 
 ```kestrel
