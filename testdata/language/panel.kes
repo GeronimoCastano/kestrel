@@ -1,0 +1,13 @@
+class Square {
+    public final side : double
+    new(side : double) { this.side = side }
+    public function area() : double = this.side * this.side
+}
+class Panel {
+    public final square : &Square
+    new(square : Square) { this.square = square }
+    public function area() : double = this.square.area()
+}
+let sq := Square(2.0)
+let p := Panel(sq)
+p.area()

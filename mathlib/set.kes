@@ -1,0 +1,469 @@
+// The algebra of proof-level sets over an abstract universe U. Membership and
+// subset are the only primitives; union, intersection, complement, the family
+// operators and the finite sets unfold to ordinary logic one step at a time.
+
+/// Every set is a subset of itself: $A \subseteq A$.
+public theorem subsetRefl[U](A : Set[U]) : A ⊆ A by {
+    intro x
+    intro h
+    exact h
+}
+
+/// Subset is transitive: $A \subseteq B \to B \subseteq C \to A \subseteq C$.
+public theorem subsetTrans[U](A : Set[U], B : Set[U], C : Set[U],
+                              h1 : A ⊆ B, h2 : B ⊆ C) : A ⊆ C by {
+    intro x
+    intro h
+    have h3 := h1(h)
+    exact h2(h3)
+}
+
+/// Subset is antisymmetric: $A \subseteq B \to B \subseteq A \to A = B$.
+public theorem subsetAntisymm[U](A : Set[U], B : Set[U],
+                                 h1 : A ⊆ B, h2 : B ⊆ A) : A = B by {
+    ext
+    exact h1
+    exact h2
+}
+
+/// The empty set is a subset of every set: $\emptyset \subseteq A$.
+public theorem emptySubset[U](A : Set[U]) : ∅ ⊆ A by {
+    intro x
+    intro h
+    exfalso
+    exact h
+}
+
+/// A set contained in the empty set is empty: $A \subseteq \emptyset \to A = \emptyset$.
+public theorem subsetEmpty[U](A : Set[U], h : A ⊆ ∅) : A = ∅ by {
+    ext
+    exact h
+    exact emptySubset(A)
+}
+
+/// Union commutes: $A \cup B = B \cup A$.
+public theorem unionComm[U](A : Set[U], B : Set[U]) : A ∪ B = B ∪ A by {
+    ext
+    { intro x
+      intro h
+      cases h
+      { right
+        exact hl }
+      { left
+        exact hr } }
+    { intro x
+      intro h
+      cases h
+      { right
+        exact hl }
+      { left
+        exact hr } }
+}
+
+/// Union associates: $(A \cup B) \cup C = A \cup (B \cup C)$.
+public theorem unionAssoc[U](A : Set[U], B : Set[U], C : Set[U]) :
+        (A ∪ B) ∪ C = A ∪ (B ∪ C) by {
+    ext
+    { intro x
+      intro h
+      cases h
+      { cases hl
+        { left
+          exact hll }
+        { right
+          left
+          exact hlr } }
+      { right
+        right
+        exact hr } }
+    { intro x
+      intro h
+      cases h
+      { left
+        left
+        exact hl }
+      { cases hr
+        { left
+          right
+          exact hrl }
+        { right
+          exact hrr } } }
+}
+
+/// Union is idempotent: $A \cup A = A$.
+public theorem unionIdem[U](A : Set[U]) : A ∪ A = A by {
+    ext
+    { intro x
+      intro h
+      cases h
+      { exact hl }
+      { exact hr } }
+    { intro x
+      intro h
+      left
+      exact h }
+}
+
+/// The empty set is the left identity of union: $A \cup \emptyset = A$.
+public theorem unionEmptyL[U](A : Set[U]) : A ∪ ∅ = A by {
+    ext
+    { intro x
+      intro h
+      cases h
+      { exact hl }
+      { exfalso
+        exact hr } }
+    { intro x
+      intro h
+      left
+      exact h }
+}
+
+/// The empty set is the right identity of union: $\emptyset \cup A = A$.
+public theorem unionEmptyR[U](A : Set[U]) : ∅ ∪ A = A by {
+    ext
+    { intro x
+      intro h
+      cases h
+      { exfalso
+        exact hl }
+      { exact hr } }
+    { intro x
+      intro h
+      right
+      exact h }
+}
+
+/// Intersection commutes: $A \cap B = B \cap A$.
+public theorem interComm[U](A : Set[U], B : Set[U]) : A ∩ B = B ∩ A by {
+    ext
+    { intro x
+      intro h
+      constructor
+      exact h.right
+      exact h.left }
+    { intro x
+      intro h
+      constructor
+      exact h.right
+      exact h.left }
+}
+
+/// Intersection associates: $(A \cap B) \cap C = A \cap (B \cap C)$.
+public theorem interAssoc[U](A : Set[U], B : Set[U], C : Set[U]) :
+        (A ∩ B) ∩ C = A ∩ (B ∩ C) by {
+    ext
+    { intro x
+      intro h
+      constructor
+      exact h.left.left
+      constructor
+      exact h.left.right
+      exact h.right }
+    { intro x
+      intro h
+      constructor
+      constructor
+      exact h.left
+      exact h.right.left
+      exact h.right.right }
+}
+
+/// Intersection is idempotent: $A \cap A = A$.
+public theorem interIdem[U](A : Set[U]) : A ∩ A = A by {
+    ext
+    { intro x
+      intro h
+      exact h.left }
+    { intro x
+      intro h
+      constructor
+      exact h
+      exact h }
+}
+
+/// The empty set is the left identity of intersection: $A \cap \emptyset = \emptyset$.
+public theorem interEmptyL[U](A : Set[U]) : A ∩ ∅ = ∅ by {
+    ext
+    { intro x
+      intro h
+      exact h.right }
+    { intro x
+      intro h
+      exfalso
+      exact h }
+}
+
+/// The empty set is the right identity of intersection: $\emptyset \cap A = \emptyset$.
+public theorem interEmptyR[U](A : Set[U]) : ∅ ∩ A = ∅ by {
+    ext
+    { intro x
+      intro h
+      exact h.left }
+    { intro x
+      intro h
+      exfalso
+      exact h }
+}
+
+/// Intersection distributes over union: $A \cap (B \cup C) = (A \cap B) \cup (A \cap C)$.
+public theorem interDistribUnion[U](A : Set[U], B : Set[U], C : Set[U]) :
+        A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C) by {
+    ext
+    { intro x
+      intro h
+      have hbc := h.right
+      cases hbc
+      { left
+        constructor
+        exact h.left
+        exact hbcl }
+      { right
+        constructor
+        exact h.left
+        exact hbcr } }
+    { intro x
+      intro h
+      cases h
+      { constructor
+        exact hl.left
+        left
+        exact hl.right }
+      { constructor
+        exact hr.left
+        right
+        exact hr.right } }
+}
+
+/// Union distributes over intersection: $A \cup (B \cap C) = (A \cup B) \cap (A \cup C)$.
+public theorem unionDistribInter[U](A : Set[U], B : Set[U], C : Set[U]) :
+        A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C) by {
+    ext
+    { intro x
+      intro h
+      cases h
+      { constructor
+        left
+        exact hl
+        left
+        exact hl }
+      { constructor
+        right
+        exact hr.left
+        right
+        exact hr.right } }
+    { intro x
+      intro h
+      have hab := h.left
+      have hac := h.right
+      cases hab
+      { left
+        exact habl }
+      { cases hac
+        { left
+          exact hacl }
+        { right
+          constructor
+          exact habr
+          exact hacr } } }
+}
+
+/// A set is contained in its union on the left: $A \subseteq A \cup B$.
+public theorem subsetUnionL[U](A : Set[U], B : Set[U]) : A ⊆ A ∪ B by {
+    intro x
+    intro h
+    left
+    exact h
+}
+
+/// A set is contained in its union on the right: $B \subseteq A \cup B$.
+public theorem subsetUnionR[U](A : Set[U], B : Set[U]) : B ⊆ A ∪ B by {
+    intro x
+    intro h
+    right
+    exact h
+}
+
+/// An intersection is contained in its left side: $A \cap B \subseteq A$.
+public theorem interSubsetL[U](A : Set[U], B : Set[U]) : A ∩ B ⊆ A by {
+    intro x
+    intro h
+    exact h.left
+}
+
+/// An intersection is contained in its right side: $A \cap B \subseteq B$.
+public theorem interSubsetR[U](A : Set[U], B : Set[U]) : A ∩ B ⊆ B by {
+    intro x
+    intro h
+    exact h.right
+}
+
+/// A set inside two sets is inside their intersection: $C \subseteq A \to C \subseteq B \to C \subseteq A \cap B$.
+public theorem subsetInter[U](A : Set[U], B : Set[U], C : Set[U],
+                              h1 : C ⊆ A, h2 : C ⊆ B) : C ⊆ A ∩ B by {
+    intro x
+    intro h
+    constructor
+    exact h1(h)
+    exact h2(h)
+}
+
+/// Complement is an involution: $(A^c)^c = A$.
+public theorem complCompl[U](A : Set[U]) : Aᶜᶜ = A by {
+    ext
+    { intro x
+      intro h
+      byContra hx
+      apply h
+      exact hx }
+    { intro x
+      intro hx
+      intro h
+      exact h(hx) }
+}
+
+/// De Morgan for union: $(A \cup B)^c = A^c \cap B^c$.
+public theorem complUnion[U](A : Set[U], B : Set[U]) :
+        (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ by {
+    ext
+    { intro x
+      intro h
+      constructor
+      { intro ha
+        apply h
+        left
+        exact ha }
+      { intro hb
+        apply h
+        right
+        exact hb } }
+    { intro x
+      intro h
+      intro hu
+      cases hu
+      { exact h.left(hul) }
+      { exact h.right(hur) } }
+}
+
+/// De Morgan for intersection: $(A \cap B)^c = A^c \cup B^c$.
+public theorem complInter[U](A : Set[U], B : Set[U]) :
+        (A ∩ B)ᶜ = Aᶜ ∪ Bᶜ by {
+    ext
+    { intro x
+      intro h
+      byContra hc
+      have ha : x ∈ A by {
+          byContra hna
+          apply hc
+          left
+          exact hna
+      }
+      have hb : x ∈ B by {
+          byContra hnb
+          apply hc
+          right
+          exact hnb
+      }
+      apply h
+      constructor
+      exact ha
+      exact hb }
+    { intro x
+      intro h
+      intro hab
+      cases h
+      { exact hl(hab.left) }
+      { exact hr(hab.right) } }
+}
+
+/// Membership in a singleton is equality: $x \in \{a\} \leftrightarrow x = a$.
+public theorem memSingleton[U](x : U, a : U) : (x ∈ {a}) ↔ x = a by {
+    rfl
+}
+
+/// Membership in a pair is a disjunction: $x \in \{a,b\} \leftrightarrow x = a \lor x = b$.
+public theorem memPair[U](x : U, a : U, b : U) :
+        (x ∈ {a, b}) ↔ (x = a or x = b) by {
+    rfl
+}
+
+/// Nothing is in the empty set: $\lnot (x \in \emptyset)$.
+public theorem memEmpty[U](x : U) : (x ∈ ∅) ↔ false by {
+    rfl
+}
+
+/// A singleton is inside a set exactly when its element is: $\{a\} \subseteq S \leftrightarrow a \in S$.
+public theorem singletonSubset[U](a : U, S : Set[U]) :
+        ({a} ⊆ S) ↔ a ∈ S by {
+    constructor
+    { intro h
+      apply h
+      rfl }
+    { intro h
+      intro x
+      intro hx
+      have hxa : x = a := hx
+      rw [hxa]
+      exact h }
+}
+
+/// The powerset builder holds exactly the subsets: $B \in \{A : \mathrm{Set}[U] \mid A \subseteq S\} \leftrightarrow B \subseteq S$.
+public theorem memPowerset[U](B : Set[U], S : Set[U]) :
+        (B ∈ {A : Set[U] | A ⊆ S}) ↔ B ⊆ S by {
+    rfl
+}
+
+/// Membership in a family union is an existential: $x \in \bigcup_0 F \leftrightarrow \exists A, A \in F \land x \in A$.
+public theorem memUnion0[U](F : Set[Set[U]], x : U) :
+        (x ∈ ⋃₀ F) ↔ (exists A : Set[U], A ∈ F and x ∈ A) by {
+    rfl
+}
+
+/// Membership in a family intersection is a universal: $x \in \bigcap_0 F \leftrightarrow \forall A, A \in F \to x \in A$.
+public theorem memInter0[U](F : Set[Set[U]], x : U) :
+        (x ∈ ⋂₀ F) ↔ (forall A : Set[U], A ∈ F -> x ∈ A) by {
+    rfl
+}
+
+/// A member of a family contributes its elements to the family union: $A \in F \to x \in A \to x \in \bigcup_0 F$.
+public theorem familyUnionIntro[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F,
+                                   x : U, hx : x ∈ A) : x ∈ ⋃₀ F by {
+    exists A
+    constructor
+    exact hF
+    exact hx
+}
+
+/// Every family member is a subset of the family union: $A \in F \to A \subseteq \bigcup_0 F$.
+public theorem familyUnionSubset[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F) :
+        A ⊆ ⋃₀ F by {
+    intro x
+    intro hx
+    exists A
+    constructor
+    exact hF
+    exact hx
+}
+
+/// The family intersection is a subset of every member: $A \in F \to \bigcap_0 F \subseteq A$.
+public theorem familyInterSubset[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F) :
+        ⋂₀ F ⊆ A by {
+    intro x
+    intro hx
+    apply hx
+    exact hF
+}
+
+/// A set inside every family member is inside the family intersection:
+/// $(\forall A, A \in F \to C \subseteq A) \to C \subseteq \bigcap_0 F$.
+public theorem subsetFamilyInter[U](F : Set[Set[U]], C : Set[U],
+                                    h : forall A : Set[U], A ∈ F -> C ⊆ A) :
+        C ⊆ ⋂₀ F by {
+    intro x
+    intro hx
+    intro A
+    intro hF
+    have hCA := h(A)
+    have hx2 := hCA(hF)
+    exact hx2(hx)
+}

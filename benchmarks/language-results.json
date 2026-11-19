@@ -1,0 +1,226 @@
+{
+  "machine": "arm64 macOS-27.0.1-arm64-arm-64bit",
+  "versions": {
+    "clang": "Apple clang version 21.0.0 (clang-2100.4.1.1)",
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+    "python": "Python 3.11.4",
+    "kestrel": "Kestrel compiler (compiler and native session)"
+  },
+  "runs": 5,
+  "benchmarks": {
+    "numeric": {
+      "kestrel": {
+        "seconds": 0.1207859170390293,
+        "minimum_seconds": 0.12019033404067159,
+        "peak_bytes": 1736704,
+        "compile_seconds": 0.15737162507139146
+      },
+      "rust": {
+        "seconds": 0.10348758311010897,
+        "minimum_seconds": 0.10240762494504452,
+        "peak_bytes": 1900544,
+        "compile_seconds": 0.10237158299423754
+      },
+      "python": {
+        "seconds": 7.9528022919548675,
+        "minimum_seconds": 7.94815958396066,
+        "peak_bytes": 14860288,
+        "compile_seconds": 0.0
+      }
+    },
+    "collections": {
+      "kestrel": {
+        "seconds": 0.07947866700123996,
+        "minimum_seconds": 0.07755583303514868,
+        "peak_bytes": 112115712,
+        "compile_seconds": 0.18275362497661263
+      },
+      "rust": {
+        "seconds": 0.09067641699220985,
+        "minimum_seconds": 0.08911970804911107,
+        "peak_bytes": 144818176,
+        "compile_seconds": 0.20464733301196247
+      },
+      "python": {
+        "seconds": 0.1956515839556232,
+        "minimum_seconds": 0.19403791695367545,
+        "peak_bytes": 379977728,
+        "compile_seconds": 0.0
+      }
+    },
+    "strings": {
+      "kestrel": {
+        "seconds": 0.03222866705618799,
+        "minimum_seconds": 0.03146137506701052,
+        "peak_bytes": 18776064,
+        "compile_seconds": 0.14948437502607703
+      },
+      "rust": {
+        "seconds": 0.06593008292838931,
+        "minimum_seconds": 0.06544116593431681,
+        "peak_bytes": 18989056,
+        "compile_seconds": 0.10761679103597999
+      },
+      "python": {
+        "seconds": 0.18144908302929252,
+        "minimum_seconds": 0.17894595791585743,
+        "peak_bytes": 198410240,
+        "compile_seconds": 0.0
+      }
+    },
+    "trees": {
+      "kestrel": {
+        "seconds": 0.7983280000044033,
+        "minimum_seconds": 0.7966202918905765,
+        "peak_bytes": 35422208,
+        "compile_seconds": 0.19257233291864395
+      },
+      "rust": {
+        "seconds": 2.7112828750396147,
+        "minimum_seconds": 2.692785375053063,
+        "peak_bytes": 35602432,
+        "compile_seconds": 0.10623291705269367
+      },
+      "python": {
+        "seconds": 5.818198041990399,
+        "minimum_seconds": 5.803429333027452,
+        "peak_bytes": 48529408,
+        "compile_seconds": 0.0
+      }
+    },
+    "channels": {
+      "kestrel": {
+        "seconds": 0.07321462500840425,
+        "minimum_seconds": 0.07068083400372416,
+        "peak_bytes": 1867776,
+        "compile_seconds": 0.214864999987185
+      },
+      "rust": {
+        "seconds": 0.06660033308435231,
+        "minimum_seconds": 0.0637526250211522,
+        "peak_bytes": 2179072,
+        "compile_seconds": 0.4957241249503568
+      },
+      "python": {
+        "seconds": 0.36259737506043166,
+        "minimum_seconds": 0.3618965831119567,
+        "peak_bytes": 173817856,
+        "compile_seconds": 0.0
+      }
+    },
+    "objects": {
+      "kestrel": {
+        "seconds": 0.021733333938755095,
+        "minimum_seconds": 0.02069041703362018,
+        "peak_bytes": 71270400,
+        "compile_seconds": 0.16401441697962582
+      },
+      "rust": {
+        "seconds": 0.054955583065748215,
+        "minimum_seconds": 0.05426716594956815,
+        "peak_bytes": 76791808,
+        "compile_seconds": 0.11427487502805889
+      },
+      "python": {
+        "seconds": 1.3511392920045182,
+        "minimum_seconds": 1.3452780829975381,
+        "peak_bytes": 253558784,
+        "compile_seconds": 0.0
+      }
+    },
+    "functional": {
+      "kestrel": {
+        "seconds": 0.009449500008486211,
+        "minimum_seconds": 0.008463416947051883,
+        "peak_bytes": 1687552,
+        "compile_seconds": 0.13621787505690008
+      },
+      "rust": {
+        "seconds": 0.009670792031101882,
+        "minimum_seconds": 0.008950707968324423,
+        "peak_bytes": 1851392,
+        "compile_seconds": 0.10303999995812774
+      },
+      "python": {
+        "seconds": 0.3407898750156164,
+        "minimum_seconds": 0.33437599998433143,
+        "peak_bytes": 337330176,
+        "compile_seconds": 0.0
+      }
+    },
+    "sorting": {
+      "kestrel": {
+        "seconds": 0.028268209076486528,
+        "minimum_seconds": 0.02507366705685854,
+        "peak_bytes": 20086784,
+        "compile_seconds": 0.16656066698487848
+      },
+      "rust": {
+        "seconds": 0.03394275007303804,
+        "minimum_seconds": 0.03330891707446426,
+        "peak_bytes": 20103168,
+        "compile_seconds": 0.16447770805098116
+      },
+      "python": {
+        "seconds": 0.7974907499738038,
+        "minimum_seconds": 0.7927592920605093,
+        "peak_bytes": 115933184,
+        "compile_seconds": 0.0
+      }
+    },
+    "arrays": {
+      "kestrel": {
+        "seconds": 0.015609540976583958,
+        "minimum_seconds": 0.014380250009708107,
+        "peak_bytes": 43909120,
+        "compile_seconds": 0.1442107919137925
+      },
+      "rust": {
+        "seconds": 0.0157232090132311,
+        "minimum_seconds": 0.014300667098723352,
+        "peak_bytes": 44089344,
+        "compile_seconds": 0.1076830419478938
+      },
+      "python": {
+        "seconds": 0.6558286669896916,
+        "minimum_seconds": 0.6495842080330476,
+        "peak_bytes": 189169664,
+        "compile_seconds": 0.0
+      }
+    },
+    "matflat": {
+      "kestrel": {
+        "seconds": 0.01353508303873241,
+        "minimum_seconds": 0.012042707996442914,
+        "peak_bytes": 9633792,
+        "compile_seconds": 0.1599020001012832
+      },
+      "rust": {
+        "seconds": 0.013798207975924015,
+        "minimum_seconds": 0.011508416966535151,
+        "peak_bytes": 9781248,
+        "compile_seconds": 0.12626862502656877
+      },
+      "python": {
+        "seconds": 1.0891102079767734,
+        "minimum_seconds": 1.0883983749663457,
+        "peak_bytes": 54149120,
+        "compile_seconds": 0.0
+      }
+    },
+    "bigint": {
+      "kestrel": {
+        "seconds": 2.7855104580521584,
+        "minimum_seconds": 2.783912125043571,
+        "peak_bytes": 3702784,
+        "compile_seconds": 0.18680991604924202
+      },
+      "python": {
+        "seconds": 3.8611028749728575,
+        "minimum_seconds": 3.848524042055942,
+        "peak_bytes": 23150592,
+        "compile_seconds": 0.0
+      }
+    }
+  }
+}

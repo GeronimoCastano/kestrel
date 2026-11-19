@@ -1,0 +1,38 @@
+// Allocation of many small objects: the Benchmarks Game binary-trees program.
+enum Tree {
+    Leaf
+    Node(Tree, Tree)
+}
+
+function make(depth : Int) : Tree =
+    if depth == 0 then Node(Leaf, Leaf) else Node(make(depth - 1), make(depth - 1))
+
+function check(t : Tree) : Int = match t {
+    Leaf => 0,
+    Node(l, r) => 1 + check(l) + check(r),
+}
+
+function power(n : Int) : Int {
+    let mut result := 1
+    for (let i : Int = 0; i < n; i = i + 1) {
+        result = result * 2
+    }
+    result
+}
+
+function run(maxDepth : Int) : void with Effects {
+    let stretch := maxDepth + 1
+    print(f"stretch tree of depth {stretch}\t check: {check(make(stretch))}")
+    let longLived := make(maxDepth)
+    for (let depth : Int = 4; depth <= maxDepth; depth = depth + 2) {
+        let iterations := power(maxDepth - depth + 4)
+        let mut total := 0
+        for (let i : Int = 0; i < iterations; i = i + 1) {
+            total = total + check(make(depth))
+        }
+        print(f"{iterations}\t trees of depth {depth}\t check: {total}")
+    }
+    print(f"long lived tree of depth {maxDepth}\t check: {check(longLived)}")
+}
+
+run(18)

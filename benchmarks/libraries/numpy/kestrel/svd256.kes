@@ -1,0 +1,15 @@
+import std.linalg
+
+let n := 256
+let reps := 170
+let A := Tensor.generate((n, n), (i, j) => ((i * 13 + j * 7) % 89).toDouble() / 10.0)
+let mut singularTotal := 0.0
+let mut residualTotal := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    let svd := linalg.svd(A)
+    singularTotal = singularTotal + svd.s.sum()
+    let S := Tensor.generate((n, n), (i, j) => if i == j then svd.s[i] else 0.0)
+    residualTotal = residualTotal + (svd.u @ S @ svd.vt - A).norm()
+}
+print(f"{singularTotal:.6f}")
+print(f"{residualTotal:.6f}")

@@ -1,0 +1,39 @@
+// A tiny transformer encoder classifier over two short sequences.
+// Run with: kestrel run examples/kesnettransformer.kes
+import std.kesnet.{TransformerEncoderLayer, Linear, CrossEntropyLoss, accuracy}
+import std.kesnet.optim.{Adam}
+
+Variable.seed(9)
+let tokens := Tensor([
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+    0.0, 0.0, 1.0, 0.0,
+    0.0, 0.0, 0.0, 1.0,
+    1.0, 0.0, 0.0, 0.0,
+    0.0, 1.0, 0.0, 0.0,
+], shape = (2, 3, 4))
+let inputs := Variable.fromTensor(tokens)
+let labels := Variable.fromArray([0.0, 1.0].toArray(), (2,))
+let transformer := TransformerEncoderLayer(4, 2, 8, 0.0)
+let head := Linear(4, 2)
+let lossFunction := CrossEntropyLoss()
+
+let mut trainable : Array[Variable] = Array.empty()
+for (parameter in transformer.parameters()) { trainable.append(parameter) }
+for (parameter in head.parameters()) { trainable.append(parameter) }
+let mut optimizer := Adam(trainable.toList(), 0.02)
+for (epoch in range(80)) {
+    // Average the sequence axis, then classify. The head is linear, so the
+    // transformer output is pooled first through a separate Variable chain.
+    let encoded := transformer.forward(inputs)
+    let pooled := encoded.mean(1)
+    let logits := head.forward(pooled)
+    let loss := lossFunction.forward(logits, labels)
+    optimizer.zeroGrad()
+    loss.backward()
+    optimizer.step()
+    if epoch % 20 == 0 { print(f"epoch {epoch}: loss {loss.item()}") }
+}
+let encoded := transformer.forward(inputs)
+let logits := head.forward(encoded.mean(1))
+print(f"accuracy {accuracy(logits, labels)}")

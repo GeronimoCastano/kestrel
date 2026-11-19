@@ -1,0 +1,9 @@
+/target/
+__pycache__/
+.DS_Store
+
+# Build output and local artifacts
+*.vsix
+__pycache__/
+node_modules/
+*.egg-info/

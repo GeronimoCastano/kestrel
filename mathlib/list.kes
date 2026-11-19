@@ -1,0 +1,291 @@
+// Lists: append, length, reversal, map, filter, fold, sum and concatenation.
+// Every function is total and structurally recursive, and the theorems are
+// ordinary inductions.
+
+import nat.{addAssoc, addComm}
+
+/// Append is the list monoid operation.
+public theorem appendNilL[T](ys : List[T]) : [] + ys = ys by {
+    rfl
+}
+
+/// An append with the empty list on the right changes nothing.
+public theorem appendNilR[T](xs : List[T]) : xs + [] = xs by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// Append associates: $(xs + ys) + zs = xs + (ys + zs)$.
+public theorem appendAssoc[T](xs : List[T], ys : List[T], zs : List[T]) :
+        (xs + ys) + zs = xs + (ys + zs) by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// A concatenation is empty exactly when both parts are empty.
+public theorem appendEqNil[T](xs : List[T], ys : List[T]) :
+        (xs + ys = []) ↔ (xs = [] and ys = []) by {
+    induction xs {
+        [] => {
+            constructor
+            { intro h
+              constructor
+              { rfl }
+              { exact h } }
+            { intro h
+              exact h.right }
+        }
+        [x, ..rest] ih => {
+            constructor
+            { intro h
+              exact absurd(h) }
+            { intro h
+              exact absurd(h.left) }
+        }
+    }
+}
+
+/// The length of a list, as a Nat.
+public function lengthList[T](xs : List[T]) : Nat = match xs {
+    [] => Zero,
+    [x, ..rest] => Succ(lengthList(rest)),
+}
+
+/// An empty list has length zero: $|[]| = 0$.
+public theorem lengthNil[T]() : lengthList([]) = 0 by {
+    rfl
+}
+
+/// A cons adds one: $|[x, ..xs]| = 1 + |xs|$.
+public theorem lengthCons[T](x : T, xs : List[T]) :
+        lengthList([x] + xs) = Succ(lengthList(xs)) by {
+    rfl
+}
+
+/// Length distributes over append: $|xs + ys| = |xs| + |ys|$.
+public theorem lengthAppend[T](xs : List[T], ys : List[T]) :
+        lengthList(xs + ys) = lengthList(xs) + lengthList(ys) by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// The reversal of a cons is the reversal of the tail plus the head.
+public theorem reverseCons[T](x : T, xs : List[T]) :
+        ([x] + xs).reversed() = xs.reversed() + [x] by {
+    rfl
+}
+
+/// Reversal turns an append around: $(xs + ys)^R = y^R + x^R$.
+public theorem reverseAppend[T](xs : List[T], ys : List[T]) :
+        (xs + ys).reversed() = ys.reversed() + xs.reversed() by {
+    induction xs {
+        [] => {
+            have h := appendNilR(ys.reversed())
+            exact symm(h)
+        }
+        [x, ..rest] ih => { simp [ih, appendAssoc] }
+    }
+}
+
+/// Reversal is an involution: $(x^R)^R = x$.
+public theorem reverseReverse[T](xs : List[T]) : xs.reversed().reversed() = xs by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => {
+            have h := reverseAppend(rest.reversed(), [x])
+            simp [h, ih]
+        }
+    }
+}
+
+/// Length is preserved by reversal: $|x^R| = |x|$.
+public theorem lengthReverse[T](xs : List[T]) :
+        lengthList(xs.reversed()) = lengthList(xs) by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => {
+            have ha := lengthAppend(rest.reversed(), [x])
+            rw [ha]
+            rw [ih]
+            have hc := addComm(lengthList(rest), 1)
+            rw [hc]
+            rfl
+        }
+    }
+}
+
+/// Map a function over a list.
+public function mapList[T : Copy, U : Copy](f : (T) -> U, xs : List[T]) : List[U] = match xs {
+    [] => [],
+    [y, ..rest] => [f(y)] + mapList(f, rest),
+}
+
+/// Mapping over the empty list is empty.
+public theorem mapNil[T : Copy, U : Copy](f : (T) -> U) : mapList(f, []) = [] by {
+    rfl
+}
+
+/// Mapping a cons applies the function to the head.
+public theorem mapCons[T : Copy, U : Copy](f : (T) -> U, x : T, xs : List[T]) :
+        mapList(f, [x] + xs) = [f(x)] + mapList(f, xs) by {
+    rfl
+}
+
+/// Mapping distributes over append: $\mathrm{map}(f, xs+ys) = \mathrm{map}(f,xs) + \mathrm{map}(f,ys)$.
+public theorem mapAppend[T : Copy, U : Copy](f : (T) -> U, xs : List[T], ys : List[T]) :
+        mapList(f, xs + ys) = mapList(f, xs) + mapList(f, ys) by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// A mapped length is the original length: $|\mathrm{map}(f,xs)| = |xs|$.
+public theorem lengthMap[T : Copy, U : Copy](f : (T) -> U, xs : List[T]) :
+        lengthList(mapList(f, xs)) = lengthList(xs) by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// Mapping twice composes: $\mathrm{map}(f, \mathrm{map}(g, xs)) = \mathrm{map}(f \circ g, xs)$.
+public theorem mapMap[T : Copy, U : Copy, V : Copy](f : (U) -> V, g : (T) -> U,
+                                                    xs : List[T]) :
+        mapList(f, mapList(g, xs)) = mapList((x : T) => f(g(x)), xs) by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// Mapping the identity leaves a list alone: $\mathrm{map}(x \mapsto x, xs) = xs$.
+public theorem mapId[T : Copy](xs : List[T]) :
+        mapList((x : T) => x, xs) = xs by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// Keep the elements that satisfy a predicate.
+public function filterList[T : Copy](p : (T) -> Bool, xs : List[T]) : List[T] = match xs {
+    [] => [],
+    [y, ..rest] => if p(y) { [y] + filterList(p, rest) } else { filterList(p, rest) },
+}
+
+/// Filtering the empty list is empty.
+public theorem filterNil[T : Copy](p : (T) -> Bool) : filterList(p, []) = [] by {
+    rfl
+}
+
+/// Filtering distributes over append.
+public theorem filterAppend[T : Copy](p : (T) -> Bool, xs : List[T], ys : List[T]) :
+        filterList(p, xs + ys) = filterList(p, xs) + filterList(p, ys) by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => {
+            byCases h : p(x)
+            { rw [h]
+              simp [ih] }
+            { rw [h]
+              simp [ih] }
+        }
+    }
+}
+
+/// A constantly true filter keeps the list.
+public theorem filterTrue[T : Copy](xs : List[T]) :
+        filterList((x : T) => true, xs) = xs by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// A constantly false filter drops everything.
+public theorem filterFalse[T : Copy](xs : List[T]) :
+        filterList((x : T) => false, xs) = [] by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih] }
+    }
+}
+
+/// A right fold over a list.
+public function foldList[T](op : (T, T) -> T, e : T, xs : List[T]) : T = match xs {
+    [] => e,
+    [x, ..rest] => op(x, foldList(op, e, rest)),
+}
+
+/// Folding the empty list gives the unit.
+public theorem foldNil[T](op : (T, T) -> T, e : T) : foldList(op, e, []) = e by {
+    rfl
+}
+
+/// Folding a cons applies the operation to the head and the folded tail.
+public theorem foldCons[T](op : (T, T) -> T, e : T, x : T, xs : List[T]) :
+        foldList(op, e, [x] + xs) = op(x, foldList(op, e, xs)) by {
+    simp [appendNilL]
+}
+
+/// A fold over an associative operation is independent of bracketing.
+public theorem foldAppend[T](op : (T, T) -> T, e : T,
+                             hIdL : forall a : T, op(e, a) = a,
+                             hAssoc : forall a : T, forall b : T, forall c : T,
+                                      op(op(a, b), c) = op(a, op(b, c)),
+                             xs : List[T], ys : List[T]) :
+        foldList(op, e, xs + ys) = op(foldList(op, e, xs), foldList(op, e, ys)) by {
+    induction xs {
+        [] => { simp [hIdL] }
+        [x, ..rest] ih => { simp [← hAssoc, ih] }
+    }
+}
+
+/// The sum of a list of naturals.
+public function sumList(xs : List[Nat]) : Nat = match xs {
+    [] => Zero,
+    [x, ..rest] => x + sumList(rest),
+}
+
+/// The empty sum is zero: $\sum [] = 0$.
+public theorem sumNil() : sumList([]) = Zero by {
+    rfl
+}
+
+/// Sums distribute over append: $\sum (xs + ys) = \sum xs + \sum ys$.
+public theorem sumAppend(xs : List[Nat], ys : List[Nat]) :
+        sumList(xs + ys) = sumList(xs) + sumList(ys) by {
+    induction xs {
+        [] => { rfl }
+        [x, ..rest] ih => { simp [ih, addAssoc] }
+    }
+}
+
+/// Concatenate a list of lists.
+public function concatList[T : Copy](xss : List[List[T]]) : List[T] = match xss {
+    [] => [],
+    [xs, ..rest] => xs + concatList(rest),
+}
+
+/// Concatenation starts with the first list.
+public theorem concatCons[T : Copy](xs : List[T], rest : List[List[T]]) :
+        concatList([xs] + rest) = xs + concatList(rest) by {
+    rfl
+}
+
+/// Count the elements equal to a value, using a Boolean equality.
+public function countList[T](eq : (T, T) -> Bool, x : T, xs : List[T]) : Nat = match xs {
+    [] => Zero,
+    [y, ..rest] => if eq(x, y) {
+        Succ(countList(eq, x, rest))
+    } else {
+        countList(eq, x, rest)
+    },
+}

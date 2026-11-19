@@ -1,0 +1,5 @@
+class Square {
+    has Text
+    public final side : double
+    new(side : double) { this.side = side }
+}

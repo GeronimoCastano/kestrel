@@ -1,0 +1,6 @@
+// Checking needs optional Z3; the kernel checks these linear certificates.
+theorem positive(n : Int) : n > 0 requires h : n >= 1 { smt }
+
+theorem successor(n : Nat) : (n + 1) > n { smt }
+
+theorem predecessor(n : Nat) : (if n == Zero then Zero else n - 1) <= n { smt }

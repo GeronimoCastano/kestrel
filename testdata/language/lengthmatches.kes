@@ -1,0 +1,29 @@
+enum Vec[T](n : Nat) {
+    Nil : Vec[T](0)
+    Cons(x : T, xs : Vec[T](n)) : Vec[T](n + 1)
+}
+
+function rebuild(move xs : Vec[T](n + m), left : Vec[T](n), right : Vec[T](m)) : Vec[T](n + m) = match xs {
+    Nil => Nil,
+    Cons(x, rest) => Cons(x, rest),
+}
+
+function sameTails(move a : Vec[T](n + m), move b : Vec[T](n + m), left : Vec[T](n)) : Vec[T](n + m) = match a {
+    Nil => b,
+    Cons(x, rest) => match b {
+        Cons(_, more) => Cons(x, more),
+    },
+}
+
+function size(xs : Vec[T](n)) : Nat = match xs {
+    Nil => 0,
+    Cons(_, rest) => size(rest) + 1,
+}
+
+let left : Vec[Int](1) = Cons(1, Nil)
+let right : Vec[Int](2) = Cons(2, Cons(3, Nil))
+let values : Vec[Int](3) = Cons(4, Cons(5, Cons(6, Nil)))
+let rebuilt : Vec[Int](3) = rebuild(values, left, right)
+let other : Vec[Int](3) = Cons(7, Cons(8, Cons(9, Nil)))
+let paired : Vec[Int](3) = sameTails(rebuilt, other, left)
+print(size(paired))

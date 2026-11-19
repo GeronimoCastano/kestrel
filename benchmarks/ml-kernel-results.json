@@ -1,0 +1,56 @@
+{
+  "repetitions": 100,
+  "runs": 3,
+  "workloads": {
+    "kmeans20k": {
+      "kestrel_seconds": 0.00345438804990151,
+      "python_seconds": 0.0049374326569677305,
+      "ratio": 0.6996324385359788
+    },
+    "knnpredict5k": {
+      "kestrel_seconds": 0.004236778617140395,
+      "python_seconds": 0.003738143928160872,
+      "ratio": 1.1333909818782302
+    },
+    "linearregression20k": {
+      "kestrel_seconds": 0.0006118665867946064,
+      "python_seconds": 0.003982125425175058,
+      "ratio": 0.1536532684094721
+    },
+    "logisticregression20k": {
+      "kestrel_seconds": 0.013256997060538693,
+      "python_seconds": 0.013826005062031927,
+      "ratio": 0.958845089457127
+    },
+    "metrics100k": {
+      "kestrel_seconds": 0.0009074785342120161,
+      "python_seconds": 0.03755740276796536,
+      "ratio": 0.02416244115224206
+    },
+    "minmaxscaler100k": {
+      "kestrel_seconds": 0.004938823647204448,
+      "python_seconds": 0.005775783667246802,
+      "ratio": 0.855091522075425
+    },
+    "pca10k": {
+      "kestrel_seconds": 0.000564228546937382,
+      "python_seconds": 0.0006431843544535264,
+      "ratio": 0.877242338111243
+    },
+    "polynomialfeatures20k": {
+      "kestrel_seconds": 0.0016727718792742853,
+      "python_seconds": 0.0035562499995446866,
+      "ratio": 0.47037522094578654
+    },
+    "standardscaler100k": {
+      "kestrel_seconds": 0.007735500424968625,
+      "python_seconds": 0.009870444859537964,
+      "ratio": 0.7837033218916867
+    },
+    "traintestsplit50k": {
+      "kestrel_seconds": 0.001102276938976814,
+      "python_seconds": 0.0017202037076155345,
+      "ratio": 0.6407827945591039
+    }
+  }
+}

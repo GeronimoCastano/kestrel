@@ -1,0 +1,43 @@
+// scatter20k: 20,000 scatter points with per-point sizes.
+import std.kesplot as plt
+import std.math.{sin}
+import c "stdlib.h"
+
+function quote(text : String) : String = "'" + text.replace("'", "'\\''") + "'"
+
+function reportSize(path : String) : void or Error with Effects {
+    let sizePath := path + ".size"
+    let status := unsafe { system("wc -c < " + quote(path) + " > " + quote(sizePath)) }
+    if status.toInt() != 0 { return Error("cannot measure " + path) }
+    using reader := open(sizePath)? {
+        let line := reader.readLine()?
+        print(parseInt(line.trim())?)
+    }
+}
+
+function main() : void or Error with Effects {
+    let n := 20000
+    let xs : Array[double] = Array.empty()
+    let ys : Array[double] = Array.empty()
+    let sizes : Array[double] = Array.empty()
+    for (i in range(n)) {
+        let uBase := sin(i.toDouble() * 12.9898 + 78.233) * 43758.5453
+        let vBase := sin(i.toDouble() * 39.3467 + 11.135) * 24634.6345
+        let u := uBase - floor(uBase)
+        let v := vBase - floor(vBase)
+        xs.append(10.0 * u)
+        ys.append(10.0 * v)
+        sizes.append(2.0 + (i % 10).toDouble() * 2.0)
+    }
+
+    let fig := plt.Figure(width = 8.0, height = 6.0)
+    fig.scatter(xs.toList(), ys.toList(), sizes.toList(), label = "points", marker = "o", alpha = 0.8)
+    fig.title("20,000 scatter points")
+    fig.xLabel("x")
+    fig.yLabel("y")
+    fig.legend("upper right")
+
+    fig.save("/tmp/plotbench/kestrel_scatter20k.svg")?
+    reportSize("/tmp/plotbench/kestrel_scatter20k.svg")?
+}
+main()

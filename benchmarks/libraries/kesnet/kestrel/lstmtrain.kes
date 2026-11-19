@@ -1,0 +1,30 @@
+// LSTM training benchmark: sequence 16, batch 16, input 32, hidden 64; the last
+// hidden state is projected to one output; Adam, MSE.
+import std.kesnet.{LSTM, Linear, mseLoss}
+import std.kesnet.optim.{Adam}
+
+Variable.seed(4)
+let sequence := Tensor.generate((16, 16, 32), (t, n, f) => (((t * 41 + n * 23 + f * 13) % 101).toDouble() - 50.0) / 50.0)
+let targets := Tensor.generate((16, 1), (i, j) => (((i * 37 + j * 11) % 89).toDouble() - 44.0) / 44.0)
+let inputs := Variable.fromTensor(sequence)
+let expected := Variable.fromTensor(targets)
+
+let recurrent := LSTM(32, 64)
+let head := Linear(64, 1)
+let mut trainable : Array[Variable] = Array.empty()
+for (parameter in recurrent.parameters()) { trainable.append(parameter) }
+for (parameter in head.parameters()) { trainable.append(parameter) }
+let mut optimizer := Adam(trainable.toList(), 0.005)
+let mut finalLoss := 0.0
+
+for (step in range(680)) {
+    let hidden := recurrent.forward(inputs)
+    let prediction := head.forward(hidden[-1])
+    let loss := mseLoss(prediction, expected)
+    optimizer.zeroGrad()
+    loss.backward()
+    optimizer.step()
+    finalLoss = loss.item()
+}
+
+print(f"{finalLoss:.6f}")

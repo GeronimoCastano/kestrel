@@ -1,0 +1,16 @@
+// Complex numbers are an imported standard-library class.
+import std.complex.{Complex}
+
+let z := Complex(3.0, 4.0)
+let w := 1.0 + 2.0 * Complex.i()
+print(z + w)
+print(z * w)
+print(z / w)
+print(z.abs())
+print(z.arg())
+print(z.conjugate())
+print(z.normSquared())
+print(z == Complex(3.0, 4.0))
+print(z.text())
+print(Complex.zero())
+print(Complex.one())

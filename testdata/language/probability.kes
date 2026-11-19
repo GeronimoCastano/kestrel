@@ -1,0 +1,22 @@
+// Probability distributions can be objects or used directly through static
+// methods. "shape" turns one draw into a tensor.
+import std.prob.{Normal, Bernoulli, Binomial, Poisson, Gamma}
+import std.random.{Rng, seed}
+
+let normal := Normal.create(mean = 0.0, sigma = 1.0)
+print(normal.sigma)
+print(normal.pdf(0.0) > 0.0)
+print(normal.cdf(0.0))
+
+let rng := Rng.seeded(42)
+print(Normal.sample(rng, mean = 0.0, sigma = 1.0, shape = 5).shape())
+print(Bernoulli.sample(rng, p = 0.5, shape = (2, 3)).shape())
+print(Binomial.sample(rng, trials = 10, p = 0.3, shape = 4).count())
+print(Poisson.cdf(k = 2, lambda = 2.4) > 0.5)
+print(Gamma.pdf(x = 1.0, alpha = 2.0, beta = 1.0) > 0.0)
+
+seed(42)
+let first := Normal.sample(mean = 0.0, sigma = 1.0)
+seed(42)
+let second := Normal.sample(mean = 0.0, sigma = 1.0)
+print(first == second)

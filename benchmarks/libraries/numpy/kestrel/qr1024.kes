@@ -1,0 +1,19 @@
+import std.linalg
+
+let n := 1024
+let reps := 25
+let A := Tensor.generate((n, n), (i, j) => if i == j then 4.0 else 0.01)
+let identity := Tensor.generate((n, n), (i, j) => if i == j then 1.0 else 0.0)
+let mut traceTotal := 0.0
+let mut residualTotal := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    let qr := linalg.qr(A)
+    let mut trace := 0.0
+    for (let i : Int = 0; i < n; i = i + 1) {
+        trace = trace + qr.r[i, i]
+    }
+    traceTotal = traceTotal + trace
+    residualTotal = residualTotal + (qr.q.T @ qr.q - identity).norm()
+}
+print(f"{traceTotal:.6f}")
+print(f"{residualTotal:.6f}")

@@ -1,0 +1,30 @@
+// Every built-in plotting style on the same data. Run with:
+//     kestrel run examples/kesplotstyles.kes
+// It writes kesplot-style-*.svg in the current directory.
+import std.kesplot.{Figure, Style}
+import std.math.{sin, cos}
+
+function fileName(name : String) : String =
+    name.replace("+", "-plus-").replace("/", "-").replace(" ", "-")
+
+function one(name : String) : void or Error with Effects {
+    let style := Style.byName(name)?
+    let fig := Figure(4.2, 3.0, style)
+    let xs := [i.toDouble() / 12.0 for i in range(85)]
+    fig.plot(xs, [sin(x) for x in xs], label = "sin", marker = "o", markerSize = 3.0)
+    fig.plot(xs, [cos(x) for x in xs], label = "cos", lineStyle = "--")
+    fig.title(name)
+    fig.xLabel("x")
+    fig.yLabel("y")
+    fig.legend()
+    fig.grid(true)
+    fig.save("kesplot-style-" + fileName(name) + ".svg")?
+    print(name)
+}
+
+function main() : void or Error with Effects {
+    for (name in Style.names()) {
+        one(name)?
+    }
+}
+main()?

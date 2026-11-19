@@ -1,0 +1,30 @@
+// Arithmetic operators on a class: each operator names its trait in `has`
+// and the class writes the matching method (Q87).
+class Vector {
+    has Addable, Subtractable, Multipliable, Divisible, RightMultipliable[double]
+    public final x : double
+    public final y : double
+    new(x : double, y : double) {
+        this.x = x
+        this.y = y
+    }
+    public function add(other : Vector) : Vector = Vector(this.x + other.x, this.y + other.y)
+    public function subtract(other : Vector) : Vector = Vector(this.x - other.x, this.y - other.y)
+    public function multiply(k : double) : Vector = Vector(this.x * k, this.y * k)
+    public function divide(k : double) : Vector = Vector(this.x / k, this.y / k)
+    public function rightMultiply(k : double) : Vector = Vector(k * this.x, k * this.y)
+}
+
+let a := Vector(1.0, 2.0)
+let b := Vector(3.0, 5.0)
+let c := (a + b) - Vector(1.0, 1.0)
+print(c.x)
+print(c.y)
+let d := (c * 2.0) / 4.0
+print(d.x)
+let e := 3.0 * a
+print(e.y)
+print("ab" + "cd")
+let n : Nat = 2
+print(n + 3)
+print(1 + 2 * 3)

@@ -1,0 +1,42 @@
+// Virtual dispatch through boxed trait values: build many objects of three
+// classes (two levels of inheritance), keep them in a List, then sum areas.
+trait Measured { function area() : double }
+
+class Shape {
+    has Measured
+    public var scale : double
+    new(scale : double) { this.scale = scale }
+    public function area() : double = this.scale
+}
+
+class Rectangle extends Shape {
+    public var width : double
+    public var height : double
+    new(width : double, height : double) {
+        this.width = width
+        this.height = height
+        this.scale = 1.0
+    }
+    @override public function area() : double = this.width * this.height * this.scale
+}
+
+class Square extends Rectangle {
+    new(side : double) {
+        this.width = side
+        this.height = side
+        this.scale = 1.0
+    }
+    @override public function area() : double = this.width * this.width * this.scale
+}
+
+function make(i : Int) : Box[dyn Measured] =
+    if i % 3 == 0 then box(Shape(1.0))
+    else if i % 3 == 1 then box(Rectangle(2.0, 3.0))
+    else box(Square(4.0))
+
+let shapes := Array.generate(2000000, i => make(i))
+let mut total := 0.0
+for (shape in shapes) {
+    total = total + shape.area()
+}
+print(f"{total:.1f}")

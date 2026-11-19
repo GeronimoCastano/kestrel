@@ -1,0 +1,6 @@
+import testdata.language.cycleexpr.{Expr, eval}
+import testdata.language.cycleblock.{Block}
+
+let inner := Expr.Group(Block.Then(Expr.Lit(2), Block.Done))
+let program := Expr.Group(Block.Then(Expr.Lit(1), Block.Then(inner, Block.Then(Expr.Lit(4), Block.Done))))
+print(eval(program))

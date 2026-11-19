@@ -1,0 +1,20 @@
+let n := 4096
+let reps := 80
+let A := Tensor.filled((n, n), 1.5)
+let mut total := 0.0
+let mut meanTotal := 0.0
+let mut minTotal := 0.0
+let mut maxTotal := 0.0
+let mut axisTotal := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    total = total + A.sum()
+    meanTotal = meanTotal + A.mean()
+    minTotal = minTotal + A.min()
+    maxTotal = maxTotal + A.max()
+    axisTotal = axisTotal + A.sum(axis = 0).sum()
+}
+print(f"{total:.6f}")
+print(f"{meanTotal:.6f}")
+print(f"{minTotal:.6f}")
+print(f"{maxTotal:.6f}")
+print(f"{axisTotal:.6f}")

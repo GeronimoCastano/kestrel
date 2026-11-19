@@ -1,0 +1,32 @@
+// A one-layer LSTM reads a short sequence and predicts a scalar from its last
+// hidden state. Run with: kestrel run examples/kesnetrnn.kes
+import std.kesnet.{LSTM, Linear, mseLoss}
+import std.kesnet.optim.{Adam}
+
+Variable.seed(13)
+let sequence := Tensor([
+    1.0, 0.0, 0.5, 1.0, 1.5, 0.0,
+    0.0, 1.0, 0.5, 0.0, 1.5, 1.0,
+], shape = (3, 2, 2))
+let inputs := Variable.fromTensor(sequence)
+let expected := Variable.fromArray([3.0, 3.0].toArray(), (2, 1))
+
+let recurrent := LSTM(2, 8)
+let head := Linear(8, 1)
+let mut trainable : Array[Variable] = Array.empty()
+for (parameter in recurrent.parameters()) { trainable.append(parameter) }
+for (parameter in head.parameters()) { trainable.append(parameter) }
+let mut optimizer := Adam(trainable.toList(), 0.03)
+
+for (epoch in range(300)) {
+    let hidden := recurrent.forward(inputs)
+    let last := hidden[-1]
+    let prediction := head.forward(last)
+    let loss := mseLoss(prediction, expected)
+    optimizer.zeroGrad()
+    loss.backward()
+    optimizer.step()
+    if epoch % 75 == 0 { print(f"epoch {epoch}: loss {loss.item()}") }
+}
+let hidden := recurrent.forward(inputs)
+print(head.forward(hidden[-1]).data())

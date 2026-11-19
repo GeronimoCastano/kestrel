@@ -1,0 +1,57 @@
+// A mixed-type sales analysis written entirely in Kestrel.
+// region and drink are text, units are whole numbers, price and discount are doubles,
+// member is a Bool, and two discounts are missing.
+import std.kesdas.{Series, DataFrame}
+
+function main() : void or Error with Effects {
+    let sales := DataFrame([
+        Series(["north", "south", "north", "east", "south", "north", "east", "south"], name = "region"),
+        Series(["coffee", "tea", "coffee", "coffee", "tea", "tea", "coffee", "tea"], name = "drink"),
+        Series([12, 8, 15, 6, 10, 9, 7, 14], name = "units"),
+        Series([3.5, 2.75, 3.5, 3.5, 2.75, 2.75, 3.5, 2.75], name = "price"),
+        Series([0.1, 0.0 / 0.0, 0.0, 0.15, 0.0 / 0.0, 0.05, 0.0, 0.1], name = "discount"),
+        Series([true, false, true, false, true, false, true, false], name = "member"),
+    ])
+
+    print("=== raw mixed frame")
+    print(sales)
+    print(sales.dtypes())
+
+    // Missing discounts become zero before the arithmetic.
+    let clean := sales.fillNa(0.0)
+    let units := clean.col("units")?
+    let price := clean.col("price")?
+    let discount := clean.col("discount")?
+    let multiplier := discount.multiply(-1.0).add(1.0)
+    let withGross := clean.assign("gross", units * price)
+    let enriched := withGross.assign("net", units * price * multiplier)
+
+    print("=== derived columns")
+    print(enriched.head(4))
+
+    print("=== numeric summary")
+    print(enriched.describe())
+
+    print("=== grouped by region")
+    let byRegion := enriched.groupBy("region")?
+    print(byRegion.agg([("units", "sum"), ("net", "sum")]))
+    print(byRegion.transformAll("mean"))
+
+    print("=== member orders only, largest first")
+    let memberOrders := enriched.filter(enriched.col("member")?)
+    print(memberOrders.sortValues("net", ascending = false)?)
+
+    print("=== region by drink net sales")
+    print(enriched.pivotTable("region", "drink", "net", "sum")?)
+
+    print("=== long form and a rolling average")
+    print(enriched.select(["region", "units", "net"])?.melt(idVars = ["region"], valueVars = ["units", "net"])?)
+    print(enriched.select(["units", "net"])?.rolling(3).mean())
+
+    print("=== correlations")
+    print(enriched.select(["units", "price", "net"])?.corr())
+
+    print("=== region counts")
+    print(enriched.valueCounts("region")?)
+}
+main()?

@@ -1,0 +1,15 @@
+trait Source {
+    type Item
+    function next() : Option[Item]
+}
+
+class Counter { has Source
+    public final value : Int
+    new(value : Int) { this.value = value }
+    public function next() : Option[Int] = Some(this.value)
+}
+
+function read[T : Source(Item = Int)](source : T) : Int =
+    match source.next() { Some(n) => n, None => 0, }
+
+print(read(Counter(7)))

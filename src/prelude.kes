@@ -1,0 +1,316 @@
+// The standard data structures. The compiler loads this file into every program, so these
+// names need no import. Each one keeps its items in an Array (Q112).
+
+// A class takes part in brackets by naming these traits: `g[k]` calls at(k), and
+// `g[k] = v` calls setAt(k, v) with the same mut permission as an Array slot.
+public trait Indexable[Key, Item] {
+    function at(key : Key) : Item
+}
+
+public trait MutableIndexable[Key, Item] {
+    has Indexable[Key, Item]
+    public mut function setAt(key : Key, value : Item) : void
+}
+
+public class Stack[T] {
+    private var items : Array[T]
+
+    new() {
+        this.items = Array.empty()
+    }
+
+    public function size() : Int = this.items.length()
+
+    public function peek() : Option[&T] = this.items.get(this.items.length() - 1)
+
+    public mut function push(move value : T) : void {
+        this.items.append(value)
+    }
+
+    public mut function pop() : Option[T] {
+        return this.items.pop()
+    }
+}
+
+public class Queue[T] {
+    private var items : Array[T]
+
+    new() {
+        this.items = Array.empty()
+    }
+
+    public function first() : Option[&T] = this.items.get(0)
+
+    public mut function enqueue(move value : T) : void {
+        this.items.append(value)
+    }
+
+    // dequeue removes the front item. The items behind it each move one slot forward.
+    public mut function dequeue() : Option[T] {
+        let last := this.items.length() - 1
+        for (i in range(last)) {
+            this.items.swap(i, i + 1)
+        }
+        return this.items.pop()
+    }
+}
+
+public class MinHeap[T : Comparable] {
+    private var items : Array[T]
+
+    new() {
+        this.items = Array.empty()
+    }
+
+    public function size() : Int = this.items.length()
+
+    public function peek() : Option[&T] = this.items.get(0)
+
+    public mut function push(move value : T) : void {
+        this.items.append(value)
+        let mut i := this.items.length() - 1
+        while i > 0 {
+            let parent := (i - 1) / 2
+            if this.items[i].compare(this.items[parent]) < 0 {
+                this.items.swap(i, parent)
+                i = parent
+            } else {
+                break
+            }
+        }
+    }
+
+    public mut function pop() : Option[T] {
+        let last := this.items.length() - 1
+        if last < 0 {
+            return None
+        }
+        this.items.swap(0, last)
+        let top := this.items.pop()
+        let count := this.items.length()
+        let mut i := 0
+        while i < count {
+            let left := 2 * i + 1
+            let right := left + 1
+            let mut smallest := i
+            if left < count && this.items[left].compare(this.items[smallest]) < 0 {
+                smallest = left
+            }
+            if right < count && this.items[right].compare(this.items[smallest]) < 0 {
+                smallest = right
+            }
+            if smallest == i {
+                break
+            }
+            this.items.swap(i, smallest)
+            i = smallest
+        }
+        return top
+    }
+}
+
+public class MaxHeap[T : Comparable] {
+    private var items : Array[T]
+
+    new() {
+        this.items = Array.empty()
+    }
+
+    public function size() : Int = this.items.length()
+
+    public function peek() : Option[&T] = this.items.get(0)
+
+    public mut function push(move value : T) : void {
+        this.items.append(value)
+        let mut i := this.items.length() - 1
+        while i > 0 {
+            let parent := (i - 1) / 2
+            if this.items[i].compare(this.items[parent]) > 0 {
+                this.items.swap(i, parent)
+                i = parent
+            } else {
+                break
+            }
+        }
+    }
+
+    public mut function pop() : Option[T] {
+        let last := this.items.length() - 1
+        if last < 0 {
+            return None
+        }
+        this.items.swap(0, last)
+        let top := this.items.pop()
+        let count := this.items.length()
+        let mut i := 0
+        while i < count {
+            let left := 2 * i + 1
+            let right := left + 1
+            let mut largest := i
+            if left < count && this.items[left].compare(this.items[largest]) > 0 {
+                largest = left
+            }
+            if right < count && this.items[right].compare(this.items[largest]) > 0 {
+                largest = right
+            }
+            if largest == i {
+                break
+            }
+            this.items.swap(i, largest)
+            i = largest
+        }
+        return top
+    }
+}
+
+// A double-ended queue: two stacks. When one end runs out, half of the other stack moves
+// over, so each operation takes amortized O(1) time from either end.
+public class Deque[T] {
+    private var front : Array[T]
+    private var back : Array[T]
+
+    new() {
+        this.front = Array.empty()
+        this.back = Array.empty()
+    }
+
+    public function size() : Int = this.front.length() + this.back.length()
+
+    public function isEmpty() : Bool = this.size() == 0
+
+    public mut function pushFront(move value : T) : void {
+        this.front.append(value)
+    }
+
+    public mut function pushBack(move value : T) : void {
+        this.back.append(value)
+    }
+
+    public mut function popFront() : Option[T] {
+        if this.front.length() == 0 {
+            this.refill(true)
+        }
+        return this.front.pop()
+    }
+
+    public mut function popBack() : Option[T] {
+        if this.back.length() == 0 {
+            this.refill(false)
+        }
+        return this.back.pop()
+    }
+
+    // Moves the older half of the other stack, reversed, to the empty end.
+    private mut function refill(toFront : Bool) : void {
+        let source := if toFront then this.back.length() else this.front.length()
+        let keep := source / 2
+        let spare : Array[T] = Array.empty()
+        for (i in range(keep)) {
+            match if toFront then this.back.pop() else this.front.pop() {
+                Some(v) => {
+                    spare.append(v)
+                },
+                None => {},
+            }
+        }
+        for (i in range(source - keep)) {
+            match if toFront then this.back.pop() else this.front.pop() {
+                Some(v) => {
+                    if toFront {
+                        this.front.append(v)
+                    } else {
+                        this.back.append(v)
+                    }
+                },
+                None => {},
+            }
+        }
+        for (i in range(keep)) {
+            match spare.pop() {
+                Some(v) => {
+                    if toFront {
+                        this.back.append(v)
+                    } else {
+                        this.front.append(v)
+                    }
+                },
+                None => {},
+            }
+        }
+    }
+}
+
+// Counts how often each item appears.
+public class Counter[T : Equals + Copy] {
+    private var counts : MutMap[T, Int]
+    private var order : Array[T]
+
+    new() {
+        this.counts = MutMap()
+        this.order = Array.empty()
+    }
+
+    public mut function add(item : T) : void {
+        match this.counts.get(item) {
+            Some(n) => {
+                this.counts.put(item, n + 1)
+            },
+            None => {
+                this.order.append(item)
+                this.counts.put(item, 1)
+            },
+        }
+    }
+
+    public mut function addAll(items : List[T]) : void {
+        for (item in items) {
+            this.add(item)
+        }
+    }
+
+    public function count(item : T) : Int = match this.counts.get(item) {
+        Some(n) => n,
+        None => 0,
+    }
+
+    public function distinctCount() : Int = this.order.length()
+
+    // The `n` most common items with their counts; ties keep first-seen order.
+    public function mostCommon(n : Int) : List[(T, Int)] {
+        let pairs := [(item, this.count(item)) for item in this.order]
+        return pairs.sorted(key = p => -p[1]).take(n)
+    }
+}
+
+// A set of small non-negative Ints, one bit each.
+public class BitSet {
+    private var words : Array[Int]
+
+    new() {
+        this.words = Array.empty()
+    }
+
+    public mut function add(n : Int) : void {
+        while this.words.length() <= n / 62 {
+            this.words.append(0)
+        }
+        this.words[n / 62] = this.words[n / 62] | (1 << (n % 62))
+    }
+
+    public mut function remove(n : Int) : void {
+        if n >= 0 && n / 62 < this.words.length() {
+            this.words[n / 62] = this.words[n / 62] & ~(1 << (n % 62))
+        }
+    }
+
+    public function contains(n : Int) : Bool =
+        n >= 0 && n / 62 < this.words.length() && (this.words[n / 62] & (1 << (n % 62))) != 0
+
+    public function size() : Int {
+        let mut total := 0
+        for (word in this.words) {
+            total += word.popCount()
+        }
+        return total
+    }
+}

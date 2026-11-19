@@ -1,0 +1,7 @@
+private function hidden(n : Nat) : Nat = n
+public function identity(n : Nat) : Nat = hidden(n)
+
+public function add(a : Nat, b : Nat) : Nat = match a {
+    Zero => b,
+    Succ(k) => Succ(add(k, b)),
+}

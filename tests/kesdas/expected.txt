@@ -1,0 +1,1017 @@
+=== series
+0    3
+1    1
+2    2
+3    5
+4    4
+Name: n, dtype: int64
+=== series float
+0    1.50
+1    2.25
+2    3.00
+Name: f, dtype: float64
+=== series add scalar
+0    13
+1    11
+2    12
+3    15
+4    14
+Name: n, dtype: int64
+=== series mul float
+0    4.5
+1    1.5
+2    3.0
+3    7.5
+4    6.0
+Name: n, dtype: float64
+=== series div
+0    1.5
+1    0.5
+2    1.0
+3    2.5
+4    2.0
+Name: n, dtype: float64
+=== series neg
+0   -3
+1   -1
+2   -2
+3   -5
+4   -4
+Name: n, dtype: int64
+=== series compare
+0     True
+1    False
+2    False
+3     True
+4     True
+Name: n, dtype: bool
+=== series sort
+1    1
+2    2
+0    3
+4    4
+3    5
+Name: n, dtype: int64
+=== series sort desc
+3    5
+4    4
+0    3
+2    2
+1    1
+Name: n, dtype: int64
+=== series head
+0    3
+1    1
+Name: n, dtype: int64
+=== series tail
+3    5
+4    4
+Name: n, dtype: int64
+=== series cumsum
+0     3
+1     4
+2     6
+3    11
+4    15
+Name: n, dtype: int64
+=== series diff
+0    NaN
+1   -2.0
+2    1.0
+3    3.0
+4   -1.0
+Name: n, dtype: float64
+=== series shift
+0    NaN
+1    NaN
+2    3.0
+3    1.0
+4    2.0
+Name: n, dtype: float64
+=== series rolling mean
+0      NaN
+1    1.875
+2    2.625
+Name: f, dtype: float64
+=== series describe
+count    5.000000
+mean     3.000000
+std      1.581139
+min      1.000000
+25%      2.000000
+50%      3.000000
+75%      4.000000
+max      5.000000
+Name: n, dtype: float64
+=== series sum
+15
+=== series mean
+3.0
+=== series std
+1.5811388300841898
+=== series median
+3.0
+=== series quantile
+2.0
+=== series min
+1
+=== series max
+3.0
+=== series idxmax
+3
+=== series rank
+0    3.0
+1    1.0
+2    2.0
+3    5.0
+4    4.0
+Name: n, dtype: float64
+=== series pct_change
+0         NaN
+1    0.500000
+2    0.333333
+Name: f, dtype: float64
+=== series round
+0    1.2
+1    5.7
+dtype: float64
+=== series isin
+0    False
+1     True
+2     True
+3    False
+4    False
+Name: n, dtype: bool
+=== series between
+0     True
+1    False
+2     True
+3    False
+4     True
+Name: n, dtype: bool
+=== series clip
+0    3
+1    2
+2    2
+3    4
+4    4
+Name: n, dtype: int64
+=== series filter
+0    3
+3    5
+4    4
+Name: n, dtype: int64
+=== series str upper
+0    A
+1    B
+2    A
+3    C
+4    B
+5    A
+Name: k, dtype: str
+=== series str len
+0    1
+1    1
+2    1
+3    1
+4    1
+5    1
+Name: k, dtype: int64
+=== series value_counts
+k
+a    3
+b    2
+c    1
+Name: count, dtype: int64
+=== series unique
+0    a
+1    b
+2    c
+Name: k, dtype: str
+=== series nunique
+3
+=== series astype float
+0    3.0
+1    1.0
+2    2.0
+3    5.0
+4    4.0
+Name: n, dtype: float64
+=== frame
+   k  v    w
+0  a  1  1.5
+1  b  2  2.5
+2  a  3  3.5
+3  c  4  4.5
+4  b  5  5.5
+5  a  6  6.5
+=== frame head
+   k  v    w
+0  a  1  1.5
+1  b  2  2.5
+=== frame tail
+   k  v    w
+4  b  5  5.5
+5  a  6  6.5
+=== frame shape
+(6, 3)
+=== frame sum numeric
+v    21.0
+w    24.0
+dtype: float64
+=== frame mean numeric
+v    3.5
+w    4.0
+dtype: float64
+=== frame describe
+              v         w
+count  6.000000  6.000000
+mean   3.500000  4.000000
+std    1.870829  1.870829
+min    1.000000  1.500000
+25%    2.250000  2.750000
+50%    3.500000  4.000000
+75%    4.750000  5.250000
+max    6.000000  6.500000
+=== frame corr
+     v    w
+v  1.0  1.0
+w  1.0  1.0
+=== frame sort
+   k  v    w
+5  a  6  6.5
+4  b  5  5.5
+3  c  4  4.5
+2  a  3  3.5
+1  b  2  2.5
+0  a  1  1.5
+=== frame sort two
+   k  v    w
+3  c  4  4.5
+4  b  5  5.5
+1  b  2  2.5
+5  a  6  6.5
+2  a  3  3.5
+0  a  1  1.5
+=== frame filter
+   k  v    w
+3  c  4  4.5
+4  b  5  5.5
+5  a  6  6.5
+=== frame drop
+   k  v
+0  a  1
+1  b  2
+2  a  3
+3  c  4
+4  b  5
+5  a  6
+=== frame rename
+   k  value    w
+0  a      1  1.5
+1  b      2  2.5
+2  a      3  3.5
+3  c      4  4.5
+4  b      5  5.5
+5  a      6  6.5
+=== frame assign
+   k  v    w   z
+0  a  1  1.5   2
+1  b  2  2.5   4
+2  a  3  3.5   6
+3  c  4  4.5   8
+4  b  5  5.5  10
+5  a  6  6.5  12
+=== frame set_index
+   v    w
+k        
+a  1  1.5
+b  2  2.5
+a  3  3.5
+c  4  4.5
+b  5  5.5
+a  6  6.5
+=== frame reset_index
+   k  v    w
+0  a  1  1.5
+1  b  2  2.5
+2  a  3  3.5
+3  c  4  4.5
+4  b  5  5.5
+5  a  6  6.5
+=== groupby sum
+    v     w
+k          
+a  10  11.5
+b   7   8.0
+c   4   4.5
+=== groupby mean
+          v         w
+k                    
+a  3.333333  3.833333
+b  3.500000  4.000000
+c  4.000000  4.500000
+=== groupby count
+   v  w
+k      
+a  3  3
+b  2  2
+c  1  1
+=== groupby size
+k
+a    3
+b    2
+c    1
+dtype: int64
+=== groupby max
+   v    w
+k        
+a  6  6.5
+b  5  5.5
+c  4  4.5
+=== groupby agg
+   v_sum    w_mean
+k                 
+a     10  3.833333
+b      7  4.000000
+c      4  4.500000
+=== pivot
+v    1    2    3    4    5    6
+k                              
+a  1.5  NaN  3.5  NaN  NaN  6.5
+b  NaN  2.5  NaN  NaN  5.5  NaN
+c  NaN  NaN  NaN  4.5  NaN  NaN
+=== duplicated
+0    False
+1    False
+2     True
+3    False
+4     True
+5     True
+Name: k, dtype: bool
+=== drop duplicates
+   k  v    w
+0  a  1  1.5
+1  b  2  2.5
+3  c  4  4.5
+=== nlargest
+   k  v    w
+5  a  6  6.5
+4  b  5  5.5
+=== csv
+k,v,w
+a,1,1.5
+b,2,2.5
+a,3,3.5
+c,4,4.5
+b,5,5.5
+a,6,6.5
+
+=== series head negative
+0    3
+1    1
+2    2
+Name: n, dtype: int64
+=== series tail negative
+2    2
+3    5
+4    4
+Name: n, dtype: int64
+=== series any
+true
+=== series all
+true
+=== series sem
+0.7071067811865476
+=== series skew
+0.0
+=== series kurt
+-1.2000000000000002
+=== series quantiles
+0.25    2.0
+0.75    4.0
+Name: n, dtype: float64
+=== series rank dense
+0    3.0
+1    1.0
+2    2.0
+3    5.0
+4    4.0
+Name: n, dtype: float64
+=== series rank pct
+0    0.6
+1    0.2
+2    0.4
+3    1.0
+4    0.8
+Name: n, dtype: float64
+=== series duplicated last
+0     True
+1     True
+2     True
+3    False
+4    False
+5    False
+Name: k, dtype: bool
+=== series drop duplicates none
+3    c
+Name: k, dtype: str
+=== series value counts normalize
+k
+a    0.500000
+b    0.333333
+c    0.166667
+Name: proportion, dtype: float64
+=== series value counts unsorted
+k
+a    3
+b    2
+c    1
+Name: count, dtype: int64
+=== series interpolate
+0    1.0
+1    2.0
+2    3.0
+3    3.0
+Name: m, dtype: float64
+=== series ffill
+0    1.0
+1    1.0
+2    3.0
+Name: m, dtype: float64
+=== series bfill
+0    1.0
+1    3.0
+2    3.0
+Name: m, dtype: float64
+=== series where
+0    3
+1    0
+2    0
+3    5
+4    4
+Name: n, dtype: int64
+=== series mask
+0    0
+1    1
+2    2
+3    0
+4    0
+Name: n, dtype: int64
+=== series corr
+1.0
+=== series cov
+2.5
+=== series concat
+0    3.00
+1    1.00
+2    2.00
+3    5.00
+4    4.00
+0    1.50
+1    2.25
+2    3.00
+dtype: float64
+=== series map values
+0      A
+1      B
+2      A
+3    NaN
+4      B
+5      A
+Name: k, dtype: str
+=== frame head negative
+   k  v    w
+0  a  1  1.5
+1  b  2  2.5
+2  a  3  3.5
+3  c  4  4.5
+=== frame tail negative
+   k  v    w
+2  a  3  3.5
+3  c  4  4.5
+4  b  5  5.5
+5  a  6  6.5
+=== frame at
+3
+=== frame iat
+3
+=== frame any
+k    True
+v    True
+w    True
+dtype: bool
+=== frame all
+k    True
+v    True
+w    True
+dtype: bool
+=== frame prod
+v     720.000000
+w    2111.484375
+dtype: float64
+=== frame sem
+v    0.763763
+w    0.763763
+dtype: float64
+=== frame skew
+v    0.0
+w    0.0
+dtype: float64
+=== frame kurt
+v   -1.2
+w   -1.2
+dtype: float64
+=== frame quantile
+v    3.5
+w    4.0
+Name: 0.5, dtype: float64
+=== frame quantiles
+         v     w
+0.25  2.25  2.75
+0.75  4.75  5.25
+=== frame cov
+     v    w
+v  3.5  3.5
+w  3.5  3.5
+=== frame corrwith
+v    1.0
+w    1.0
+dtype: float64
+=== frame value counts
+k
+a    3
+b    2
+c    1
+Name: count, dtype: int64
+=== frame duplicated last
+0    False
+1    False
+2    False
+3    False
+4    False
+5    False
+dtype: bool
+=== frame sort multi ascending
+   k  v    w
+3  c  4  4.5
+1  b  2  2.5
+4  b  5  5.5
+0  a  1  1.5
+2  a  3  3.5
+5  a  6  6.5
+=== frame select dtypes
+   v    w
+0  1  1.5
+1  2  2.5
+2  3  3.5
+3  4  4.5
+4  5  5.5
+5  6  6.5
+=== frame round
+   v    w
+0  1  1.5
+1  2  2.5
+2  3  3.5
+3  4  4.5
+4  5  5.5
+5  6  6.5
+=== frame abs
+   v    w
+0  1  1.5
+1  2  2.5
+2  3  3.5
+3  4  4.5
+4  5  5.5
+5  6  6.5
+=== frame clip
+   v    w
+0  2  2.0
+1  2  2.5
+2  3  3.5
+3  4  4.5
+4  5  5.0
+5  5  5.0
+=== frame shift
+     v    w
+0  NaN  NaN
+1  1.0  1.5
+2  2.0  2.5
+3  3.0  3.5
+4  4.0  4.5
+5  5.0  5.5
+=== frame diff
+     v    w
+0  NaN  NaN
+1  1.0  1.0
+2  1.0  1.0
+3  1.0  1.0
+4  1.0  1.0
+5  1.0  1.0
+=== frame pct change
+          v         w
+0       NaN       NaN
+1  1.000000  0.666667
+2  0.500000  0.400000
+3  0.333333  0.285714
+4  0.250000  0.222222
+5  0.200000  0.181818
+=== frame cumsum
+    v     w
+0   1   1.5
+1   3   4.0
+2   6   7.5
+3  10  12.0
+4  15  17.5
+5  21  24.0
+=== frame rank
+     v    w
+0  1.0  1.0
+1  2.0  2.0
+2  3.0  3.0
+3  4.0  4.0
+4  5.0  5.0
+5  6.0  6.0
+=== frame replace
+   k  v    w
+0  z  1  1.5
+1  b  2  2.5
+2  z  3  3.5
+3  c  4  4.5
+4  b  5  5.5
+5  z  6  6.5
+=== frame insert
+   k  x  v    w
+0  a  9  1  1.5
+1  b  8  2  2.5
+2  a  7  3  3.5
+3  c  6  4  4.5
+4  b  5  5  5.5
+5  a  4  6  6.5
+=== frame pivot
+v    1    2    3    4    5    6
+k                              
+a  1.5  NaN  3.5  NaN  NaN  6.5
+b  NaN  2.5  NaN  NaN  5.5  NaN
+c  NaN  NaN  NaN  4.5  NaN  NaN
+=== frame crosstab
+v  1  2  3  4  5  6
+k                  
+a  1  0  1  0  0  1
+b  0  1  0  0  1  0
+c  0  0  0  1  0  0
+=== frame get dummies
+   v    w    k_a    k_b    k_c
+0  1  1.5   True  False  False
+1  2  2.5  False   True  False
+2  3  3.5   True  False  False
+3  4  4.5  False  False   True
+4  5  5.5  False   True  False
+5  6  6.5   True  False  False
+=== frame melt
+    k variable  value
+0   a        v    1.0
+1   b        v    2.0
+2   a        v    3.0
+3   c        v    4.0
+4   b        v    5.0
+5   a        v    6.0
+6   a        w    1.5
+7   b        w    2.5
+8   a        w    3.5
+9   c        w    4.5
+10  b        w    5.5
+11  a        w    6.5
+=== frame concat columns
+   k  v    w   x
+0  a  1  1.5  10
+1  b  2  2.5  20
+2  a  3  3.5  30
+3  c  4  4.5  40
+4  b  5  5.5  50
+5  a  6  6.5  60
+=== csv separator
+k;v;w
+a;1;1.5
+b;2;2.5
+a;3;3.5
+c;4;4.5
+b;5;5.5
+a;6;6.5
+
+=== string count
+0    1
+1    0
+2    1
+3    0
+4    0
+5    1
+Name: k, dtype: int64
+=== string find
+0   -1
+1    0
+2   -1
+3   -1
+4    0
+5   -1
+Name: k, dtype: int64
+=== string center
+0     a 
+1     b 
+2     a 
+3     c 
+4     b 
+5     a 
+Name: k, dtype: str
+=== string zfill
+0    00a
+1    00b
+2    00a
+3    00c
+4    00b
+5    00a
+Name: k, dtype: str
+=== string slice replace
+0    Q
+1    Q
+2    Q
+3    Q
+4    Q
+5    Q
+Name: k, dtype: str
+=== string strip leading
+0     a
+1    b 
+Name: p, dtype: str
+=== string split to frame
+   0
+0  a
+1  b
+2  a
+3  c
+4  b
+5  a
+=== groupby head
+   k  v    w
+0  a  1  1.5
+1  b  2  2.5
+2  a  3  3.5
+3  c  4  4.5
+4  b  5  5.5
+=== groupby tail
+   k  v    w
+3  c  4  4.5
+4  b  5  5.5
+5  a  6  6.5
+=== groupby nth
+   k  v    w
+2  a  3  3.5
+4  b  5  5.5
+=== groupby cumcount
+0    0
+1    0
+2    1
+3    0
+4    1
+5    2
+dtype: int64
+=== groupby ngroup
+0    0
+1    1
+2    0
+3    2
+4    1
+5    0
+dtype: int64
+=== groupby get group
+   k  v    w
+0  a  1  1.5
+2  a  3  3.5
+5  a  6  6.5
+=== groupby transform all
+          v         w
+0  3.333333  3.833333
+1  3.500000  4.000000
+2  3.333333  3.833333
+3  4.000000  4.500000
+4  3.500000  4.000000
+5  3.333333  3.833333
+=== groupby shift
+0    NaN
+1    NaN
+2    1.0
+3    NaN
+4    2.0
+5    3.0
+Name: v, dtype: float64
+=== groupby diff
+0    NaN
+1    NaN
+2    2.0
+3    NaN
+4    3.0
+5    3.0
+Name: v, dtype: float64
+=== groupby pct change
+0    NaN
+1    NaN
+2    2.0
+3    NaN
+4    1.5
+5    1.0
+Name: v, dtype: float64
+=== groupby sem
+          v         w
+k                    
+a  1.452966  1.452966
+b  1.500000  1.500000
+c       NaN       NaN
+=== groupby skew
+          v         w
+k                    
+a  0.585583  0.585583
+b       NaN       NaN
+c       NaN       NaN
+=== groupby kurt
+    v   w
+k        
+a NaN NaN
+b NaN NaN
+c NaN NaN
+=== groupby all
+      v     w
+k            
+a  True  True
+b  True  True
+c  True  True
+=== groupby any
+      v     w
+k            
+a  True  True
+b  True  True
+c  True  True
+=== groupby quantile
+     v    w
+k          
+a  3.0  3.5
+b  3.5  4.0
+c  4.0  4.5
+=== frame rolling
+     v    w
+0  NaN  NaN
+1  1.5  2.0
+2  2.5  3.0
+3  3.5  4.0
+4  4.5  5.0
+5  5.5  6.0
+=== merge inner
+   k  v    w   x
+0  a  1  1.5  10
+1  b  2  2.5  20
+2  a  3  3.5  10
+3  b  5  5.5  20
+4  a  6  6.5  10
+=== merge left
+   k  v    w     x
+0  a  1  1.5  10.0
+1  b  2  2.5  20.0
+2  a  3  3.5  10.0
+3  c  4  4.5   NaN
+4  b  5  5.5  20.0
+5  a  6  6.5  10.0
+=== merge right
+   k    v    w   x
+0  a  1.0  1.5  10
+1  a  3.0  3.5  10
+2  a  6.0  6.5  10
+3  b  2.0  2.5  20
+4  b  5.0  5.5  20
+5  d  NaN  NaN  40
+=== merge outer
+   k    v    w     x
+0  a  1.0  1.5  10.0
+1  a  3.0  3.5  10.0
+2  a  6.0  6.5  10.0
+3  b  2.0  2.5  20.0
+4  b  5.0  5.5  20.0
+5  c  4.0  4.5   NaN
+6  d  NaN  NaN  40.0
+=== merge suffixes
+   k    v    w     x
+0  a  1.0  1.5  10.0
+1  a  3.0  3.5  10.0
+2  a  6.0  6.5  10.0
+3  b  2.0  2.5  20.0
+4  b  5.0  5.5  20.0
+5  c  4.0  4.5   NaN
+6  d  NaN  NaN  40.0
+=== frame dropna
+     a    b
+3  3.0  3.0
+=== frame dropna all
+     a    b
+0  1.0  NaN
+1  NaN  2.0
+3  3.0  3.0
+=== frame dropna thresh
+     a    b
+3  3.0  3.0
+=== frame dropna subset
+     a    b
+1  NaN  2.0
+3  3.0  3.0
+=== groupby cumsum
+0     1
+1     2
+2     4
+3     4
+4     7
+5    10
+Name: v, dtype: int64
+=== groupby cummax
+0    1
+1    2
+2    3
+3    4
+4    5
+5    6
+Name: v, dtype: int64
+=== groupby rank
+0    1.0
+1    1.0
+2    2.0
+3    1.0
+4    2.0
+5    3.0
+Name: v, dtype: float64
+=== series clip int
+0    3
+1    2
+2    2
+3    4
+4    4
+Name: n, dtype: int64
+=== series repeat
+0    3
+0    3
+1    1
+1    1
+2    2
+2    2
+3    5
+3    5
+4    4
+4    4
+Name: n, dtype: int64
+=== series is unique
+true
+=== series is monotonic
+false
+=== frame idxmax
+v    5
+w    5
+dtype: int64
+=== frame mode
+     k  v
+0    a  1
+1  NaN  2
+2  NaN  3
+3  NaN  4
+4  NaN  5
+5  NaN  6
+=== frame expanding mean
+     v    w
+0  1.0  1.5
+1  1.5  2.0
+2  2.0  2.5
+3  2.5  3.0
+4  3.0  3.5
+5  3.5  4.0
+=== frame ewm mean
+          v         w
+0  1.000000  1.500000
+1  1.666667  2.166667
+2  2.428571  2.928571
+3  3.266667  3.766667
+4  4.161290  4.661290
+5  5.095238  5.595238
+=== frame ewm adjusted false
+         v        w
+0  1.00000  1.50000
+1  1.50000  2.00000
+2  2.25000  2.75000
+3  3.12500  3.62500
+4  4.06250  4.56250
+5  5.03125  5.53125
+=== frame transpose
+     0    1    2    3    4    5
+v  1.0  2.0  3.0  4.0  5.0  6.0
+w  1.5  2.5  3.5  4.5  5.5  6.5
+=== frame corr missing
+          a         b
+a  1.000000  0.981981
+b  0.981981  1.000000
+=== frame cov missing
+          a         b
+a  1.666667  3.000000
+b  3.000000  9.333333

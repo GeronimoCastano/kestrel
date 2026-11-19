@@ -1,0 +1,27 @@
+// kesplot: matplotlib-style plotting for Kestrel. Run with:
+//     kestrel run examples/kesplot.kes
+// It writes kesplot-example.svg in the current directory.
+import std.kesplot as plt
+import std.kesdas.{Series, DataFrame}
+
+function main() : void or Error with Effects {
+    // A Kesdas frame is the ordinary input. Column names become legend labels.
+    let sales := DataFrame([
+        Series(["jan", "feb", "mar", "apr", "may", "jun"], name = "month"),
+        Series([120, 80, 95, 60, 140, 170], name = "north"),
+        Series([90, 110, 105, 130, 125, 160], name = "south"),
+    ])
+
+    let fig := plt.Figure(style = plt.Style.science())
+    fig.plotFrame(sales, x = "month", y = ["north", "south"], marker = "o")?
+    fig.annotate("peak", 4.0, 140.0, 2.8, 155.0, color = "C3")
+    fig.title("Monthly sales")
+    fig.xLabel("month")
+    fig.yLabel("orders")
+    fig.legend("upper left")
+    fig.save("kesplot-example.svg")?
+    print("kesplot wrote kesplot-example.svg")
+    print(fig.text())
+}
+
+main()?

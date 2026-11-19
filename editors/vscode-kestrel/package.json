@@ -1,0 +1,300 @@
+{
+  "name": "kestrel",
+  "displayName": "Kestrel",
+  "description": "Kestrel language support: highlighting, completions, hover, go to definition, inlay hints, live proof goals, quick fixes, and compiler errors as you type.",
+  "version": "0.4.2",
+  "publisher": "kestrel-lang",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "kestrel",
+        "aliases": [
+          "Kestrel",
+          "kestrel"
+        ],
+        "extensions": [
+          ".kes"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./images/kestrel-file.png",
+          "dark": "./images/kestrel-file.png"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "kestrel",
+        "scopeName": "source.kestrel",
+        "path": "./syntaxes/kestrel.tmLanguage.json"
+      }
+    ],
+    "configuration": {
+      "title": "Kestrel",
+      "properties": {
+        "kestrel.compilerPath": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Path to the `kestrel` compiler that checks files. Empty runs `kestrel` from the `PATH`. A Cargo checkout's release binary is preferred over its debug binary when it is at least as new, because checks are several times faster.",
+          "order": 1
+        },
+        "kestrel.checkOnType.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Check each Kestrel file with the compiler as you type. When off, a file is checked when you save it.",
+          "order": 2
+        },
+        "kestrel.checkOnType.pauseMs": {
+          "type": "number",
+          "default": 60,
+          "minimum": 0,
+          "maximum": 5000,
+          "markdownDescription": "How long to wait after your last keystroke before checking, in milliseconds. The checker keeps the standard library warm, so this usually needs to cover only typing bursts.",
+          "order": 3
+        },
+        "kestrel.useServer": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Keep one `kestrel serve` process per package folder, so the standard library is checked once instead of on every edit. Turn off to run one compiler process per check (older compilers without `serve` fall back automatically).",
+          "order": 4
+        },
+        "kestrel.inlayHints.parameterNames": {
+          "type": "string",
+          "enum": [
+            "always",
+            "cursorLine",
+            "off"
+          ],
+          "enumDescriptions": [
+            "Show parameter names at every call.",
+            "Show them only on the line the cursor is on, so long calls stay quiet.",
+            "Never show parameter names."
+          ],
+          "default": "always",
+          "markdownDescription": "When to show the gray parameter names at call arguments, such as `value =`. Run **Kestrel: Cycle Parameter Name Hints** to switch between modes.",
+          "order": 5
+        },
+        "kestrel.inlayHints.parameterNameStyle": {
+          "type": "string",
+          "enum": [
+            "equals",
+            "colon"
+          ],
+          "enumDescriptions": [
+            "`value = 3`",
+            "`value: 3`"
+          ],
+          "default": "equals",
+          "markdownDescription": "How a parameter name is written before its argument.",
+          "order": 6
+        },
+        "kestrel.inlayHints.skipMatchingNames": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Hide a parameter name when the argument is already a name of the same spelling, as in `value(value)`.",
+          "order": 7
+        },
+        "kestrel.inlayHints.minimumArguments": {
+          "type": "number",
+          "default": 1,
+          "minimum": 1,
+          "maximum": 10,
+          "markdownDescription": "Show parameter names only for calls with at least this many arguments.",
+          "order": 8
+        },
+        "kestrel.inlayHints.types": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Show gray inferred types after `let` and `var` names, such as `tree : Node[Int]`.",
+          "order": 9
+        },
+        "kestrel.proofState.enabled": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Show the live proof state in the Kestrel sidebar while the cursor is inside a theorem."
+        },
+        "kestrel.proofState.math": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Typeset proof-state propositions with TeX. An operator such as `∪` or `⋃₀` then keeps its own glyph and colour instead of sharing the editor's monospace face, where it is drawn at the height of a letter and can read as a variable."
+        },
+        "kestrel.proofState.mathSymbols": {
+          "type": "object",
+          "default": {},
+          "additionalProperties": {
+            "type": "string"
+          },
+          "markdownDescription": "Extra TeX replacements for math mode, such as `{ \"⊕\": \"\\\\oplus\" }`. The key is the character as the checker prints it and the value is TeX. Only appearance changes; the checker never reads this table."
+        },
+        "kestrel.expandSymbols": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Expand `\\in`, `\\mem`, `\\subseteq`, `\\cup`, `\\cap`, `\\compl`, `\\forall`, `\\exists`, `\\to`, `\\larr`, `\\leftarrow`, `\\ot`, `\\iff`, `\\land`, `\\lor`, `\\not`, `\\neg`, `\\notin`, `\\ge`, `\\le` and `\\ne` into their symbols when you type a space. The parser also accepts these spellings directly."
+        }
+      }
+    },
+    "semanticTokenScopes": [
+      {
+        "language": "kestrel",
+        "scopes": {
+          "parameter": [
+            "variable.parameter.kestrel"
+          ],
+          "variable": [
+            "variable.other.kestrel"
+          ]
+        }
+      }
+    ],
+    "snippets": [
+      {
+        "language": "kestrel",
+        "path": "./snippets/kestrel.json"
+      }
+    ],
+    "configurationDefaults": {
+      "[kestrel]": {
+        "editor.quickSuggestions": {
+          "other": true,
+          "comments": false,
+          "strings": false
+        },
+        "editor.suggest.enabled": true,
+        "editor.suggestOnTriggerCharacters": true,
+        "editor.parameterHints.enabled": true,
+        "editor.suggest.showFunctions": true,
+        "editor.suggest.showClasses": true,
+        "editor.suggest.showInterfaces": true,
+        "editor.suggest.showEnums": true,
+        "editor.suggest.showConstants": true,
+        "editor.suggest.showVariables": true,
+        "editor.suggest.showProperties": true,
+        "editor.suggest.showKeywords": true,
+        "editor.suggest.showSnippets": true,
+        "editor.suggest.showTypeParameters": true,
+        "editor.suggest.showMethods": true,
+        "editor.inlayHints.enabled": "on",
+        "editor.inlayHints.padding": true
+      }
+    },
+    "commands": [
+      {
+        "command": "kestrel.cycleParameterNames",
+        "title": "Cycle Parameter Name Hints",
+        "category": "Kestrel"
+      },
+      {
+        "command": "kestrel.showProofState",
+        "title": "Kestrel: Show Proof State"
+      },
+      {
+        "command": "kestrel.refreshProofState",
+        "title": "Kestrel: Refresh Proof State",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "kestrel.proofStateMathOn",
+        "title": "Kestrel: Use Printed Propositions",
+        "icon": "$(symbol-operator)"
+      },
+      {
+        "command": "kestrel.proofStateMathOff",
+        "title": "Kestrel: Use Typeset Propositions",
+        "icon": "$(code)"
+      }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "kestrel",
+          "title": "Kestrel",
+          "icon": "images/kestrel-view.svg"
+        }
+      ]
+    },
+    "views": {
+      "kestrel": [
+        {
+          "type": "webview",
+          "id": "kestrel.proofState",
+          "name": "Proof State"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "kestrel.proofStateMathOn",
+          "when": "view == kestrel.proofState && kestrel.proofStateMath",
+          "group": "navigation"
+        },
+        {
+          "command": "kestrel.proofStateMathOff",
+          "when": "view == kestrel.proofState && !kestrel.proofStateMath",
+          "group": "navigation"
+        },
+        {
+          "command": "kestrel.refreshProofState",
+          "when": "view == kestrel.proofState",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "kestrel.refreshProofState",
+          "when": "false"
+        }
+      ]
+    }
+  },
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:kestrel",
+    "onView:kestrel.proofState",
+    "onCommand:kestrel.showProofState",
+    "onCommand:kestrel.proofStateMathOn",
+    "onCommand:kestrel.proofStateMathOff"
+  ],
+  "keywords": [
+    "kestrel",
+    "language",
+    "syntax",
+    "completion",
+    "quick fix",
+    "code actions",
+    "inlay hints",
+    "parameter hints",
+    "compiler",
+    "diagnostics"
+  ],
+  "galleryBanner": {
+    "color": "#1d2331",
+    "theme": "dark"
+  },
+  "icon": "images/icon.png",
+  "devDependencies": {
+    "@mathjax/mathjax-tex-font": "4.1.3",
+    "@mathjax/src": "4.1.3",
+    "esbuild": "0.28.2",
+    "playwright-core": "1.58.2"
+  },
+  "scripts": {
+    "build": "node build/math.js",
+    "test": "node --test test/*.test.js",
+    "test:vscode": "node build/test-vscode.js",
+    "vscode:prepublish": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GeronimoCastano/kestrel.git",
+    "directory": "editors/vscode-kestrel"
+  }
+}

@@ -1,0 +1,26 @@
+class Counter {
+    public var label : String
+
+    new(label : String, start : Int) {
+        this.label = label
+        final this.start : Int := start
+        var this.hits : Int := 0
+    }
+
+    new(label : String) {
+        this.label = label
+        this.start = 0
+        this.hits = 0
+    }
+
+    public function value() : Int = this.start + this.hits
+
+    public mut function bump() : void {
+        this.hits = this.hits + 1
+    }
+}
+
+let mut counter := Counter("visits", 10)
+counter.bump()
+print(f"{counter.label}: {counter.value()}")
+print(Counter("fresh").value())

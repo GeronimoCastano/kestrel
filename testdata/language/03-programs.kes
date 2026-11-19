@@ -1,0 +1,6 @@
+// report.kes: a script, so it runs top to bottom
+let mut total := 0
+for (let i : Int = 1; i <= 3; i = i + 1) {
+    total = total + i
+}
+f"total is {total}"

@@ -1,0 +1,461 @@
+// Natural-number arithmetic over the built-in Nat. Every definition is total
+// and structurally recursive, and matches on the argument the lemmas reduce
+// first: subNat matches on the subtrahend, and the order functions on the right
+// side.
+
+/// Truncated subtraction: $a - b$ with a floor at zero.
+public function subNat(a : Nat, b : Nat) : Nat = match b {
+    Zero => a,
+    Succ(k) => match a {
+        Zero => Zero,
+        Succ(j) => subNat(j, k),
+    },
+}
+
+/// Exponentiation by repeated multiplication.
+public function powNat(x : Nat, n : Nat) : Nat = match n {
+    Zero => 1,
+    Succ(k) => x * powNat(x, k),
+}
+
+/// The Boolean order: `leNat(a, b)` is true exactly when $a \le b$.
+public function leNat(a : Nat, b : Nat) : Bool = match b {
+    Zero => match a {
+        Zero => true,
+        Succ(_) => false,
+    },
+    Succ(j) => match a {
+        Zero => true,
+        Succ(k) => leNat(k, j),
+    },
+}
+
+/// The Boolean strict order: `ltNat(a, b)` is true exactly when $a < b$.
+public function ltNat(a : Nat, b : Nat) : Bool = match b {
+    Zero => false,
+    Succ(j) => match a {
+        Zero => true,
+        Succ(k) => ltNat(k, j),
+    },
+}
+
+/// The smaller of two naturals, by cases on both arguments.
+public function minNat(a : Nat, b : Nat) : Nat = match a {
+    Zero => Zero,
+    Succ(k) => match b {
+        Zero => Zero,
+        Succ(j) => Succ(minNat(k, j)),
+    },
+}
+
+/// The larger of two naturals, by cases on both arguments.
+public function maxNat(a : Nat, b : Nat) : Nat = match a {
+    Zero => b,
+    Succ(k) => match b {
+        Zero => Succ(k),
+        Succ(j) => Succ(maxNat(k, j)),
+    },
+}
+
+/// The predecessor, with a floor at zero.
+public function predNat(n : Nat) : Nat = match n {
+    Zero => Zero,
+    Succ(k) => k,
+}
+
+/// Zero is the left identity of addition: $0 + n = n$.
+public theorem addZeroL(n : Nat) : Zero + n = n by {
+    rfl
+}
+
+/// Zero is the right identity of addition: $n + 0 = n$.
+@simp
+public theorem addZeroR(n : Nat) : n + Zero = n by {
+    induction n {
+        Zero => { rfl }
+        Succ(k) ih => { simp [ih] }
+    }
+}
+
+/// A successor may be peeled from the left of an addition: $(n+1) + m = (n+m)+1$.
+public theorem addSuccL(n : Nat, m : Nat) : Succ(n) + m = Succ(n + m) by {
+    rfl
+}
+
+/// A successor may be peeled from the right of an addition: $n + (m+1) = (n+m)+1$.
+@simp
+public theorem addSuccR(n : Nat, m : Nat) : n + Succ(m) = Succ(n + m) by {
+    induction n {
+        Zero => { rfl }
+        Succ(k) ih => { simp [ih] }
+    }
+}
+
+/// Addition associates: $(a+b)+c = a+(b+c)$.
+public theorem addAssoc(a : Nat, b : Nat, c : Nat) : (a + b) + c = a + (b + c) by {
+    induction a {
+        Zero => { rfl }
+        Succ(k) ih => { simp [ih] }
+    }
+}
+
+/// Addition commutes: $a + b = b + a$.
+public theorem addComm(a : Nat, b : Nat) : a + b = b + a by {
+    induction a {
+        Zero => { simp }
+        Succ(k) ih => {
+            rw [addSuccR]
+            rw [ih]
+            rfl
+        }
+    }
+}
+
+/// Addition is cancellative on the left: $a + b = a + c \to b = c$.
+public theorem addCancelL(a : Nat, b : Nat, c : Nat) :
+        a + b = a + c -> b = c by {
+    induction a {
+        Zero => { intro h
+                  exact h }
+        Succ(k) ih => {
+            intro h
+            cases h
+            exact ih(h0)
+        }
+    }
+}
+
+/// Addition is cancellative on the right: $b + a = c + a \to b = c$.
+public theorem addCancelR(a : Nat, b : Nat, c : Nat) :
+        b + a = c + a -> b = c by {
+    intro h
+    have h1 := addComm(b, a)
+    have h2 := addComm(c, a)
+    have h3 : a + b = c + a := trans(symm(h1), h)
+    have h4 : a + b = a + c := trans(h3, h2)
+    have hc := addCancelL(a, b, c)
+    exact hc(h4)
+}
+
+/// Zero absorbs multiplication on the left: $0 \cdot n = 0$.
+public theorem mulZeroL(n : Nat) : Zero * n = Zero by {
+    rfl
+}
+
+/// Zero absorbs multiplication on the right: $n \cdot 0 = 0$.
+@simp
+public theorem mulZeroR(n : Nat) : n * Zero = Zero by {
+    induction n {
+        Zero => { rfl }
+        Succ(k) ih => { simp [ih] }
+    }
+}
+
+/// One is the left identity of multiplication: $1 \cdot n = n$.
+public theorem mulOneL(n : Nat) : 1 * n = n by {
+    simp
+}
+
+/// One is the right identity of multiplication: $n \cdot 1 = n$.
+@simp
+public theorem mulOneR(n : Nat) : n * 1 = n by {
+    induction n {
+        Zero => { rfl }
+        Succ(k) ih => { simp [ih] }
+    }
+}
+
+/// Multiplication by a successor on the right: $a \cdot (b+1) = a + a \cdot b$.
+public theorem mulSuccR(a : Nat, b : Nat) : a * Succ(b) = a + a * b by {
+    induction a {
+        Zero => { rfl }
+        Succ(k) ih => {
+            rw [ih]
+            rw [← addAssoc]
+            have h := addComm(b, k)
+            rw [h]
+            rfl
+        }
+    }
+}
+
+/// Multiplication distributes over addition on the right: $(a+b) \cdot c = a \cdot c + b \cdot c$.
+public theorem mulDistribRight(a : Nat, b : Nat, c : Nat) :
+        (a + b) * c = a * c + b * c by {
+    induction a {
+        Zero => { rfl }
+        Succ(k) ih => {
+            rw [ih]
+            rw [addAssoc]
+            rfl
+        }
+    }
+}
+
+/// Multiplication commutes: $a \cdot b = b \cdot a$.
+public theorem mulComm(a : Nat, b : Nat) : a * b = b * a by {
+    induction a {
+        Zero => { simp }
+        Succ(k) ih => {
+            rw [mulSuccR]
+            rw [ih]
+            rfl
+        }
+    }
+}
+
+/// Multiplication associates: $(a \cdot b) \cdot c = a \cdot (b \cdot c)$.
+public theorem mulAssoc(a : Nat, b : Nat, c : Nat) :
+        (a * b) * c = a * (b * c) by {
+    induction a {
+        Zero => { rfl }
+        Succ(k) ih => {
+            rw [mulDistribRight]
+            rw [ih]
+            rfl
+        }
+    }
+}
+
+/// Multiplication distributes over addition on the left: $a \cdot (b+c) = a \cdot b + a \cdot c$.
+public theorem mulDistribLeft(a : Nat, b : Nat, c : Nat) :
+        a * (b + c) = a * b + a * c by {
+    trans ((b + c) * a)
+    { exact mulComm(a, b + c) }
+    trans (b * a + c * a)
+    { exact mulDistribRight(b, c, a) }
+    have hba := mulComm(b, a)
+    rw [hba]
+    have hca := mulComm(c, a)
+    rw [hca]
+    rfl
+}
+
+/// Any number to the zeroth power is one: $x^0 = 1$.
+public theorem powNatZero(x : Nat) : powNat(x, Zero) = 1 by {
+    rfl
+}
+
+/// The successor power equation: $x^{n+1} = x \cdot x^n$.
+public theorem powNatSucc(x : Nat, n : Nat) :
+        powNat(x, Succ(n)) = x * powNat(x, n) by {
+    rfl
+}
+
+/// Any number to the first power is itself: $x^1 = x$.
+public theorem powNatOne(x : Nat) : powNat(x, 1) = x by {
+    simp
+}
+
+/// Powers add: $x^{m+n} = x^m \cdot x^n$.
+public theorem powNatAdd(x : Nat, m : Nat, n : Nat) :
+        powNat(x, m + n) = powNat(x, m) * powNat(x, n) by {
+    induction m {
+        Zero => { simp }
+        Succ(k) ih => {
+            rw [ih]
+            rw [mulAssoc]
+            rfl
+        }
+    }
+}
+
+/// Powers multiply: $(x^m)^n = x^{m \cdot n}$.
+public theorem powNatMul(x : Nat, m : Nat, n : Nat) :
+        powNat(powNat(x, m), n) = powNat(x, m * n) by {
+    induction n {
+        Zero => { rw [mulZeroR]
+                  rfl }
+        Succ(k) ih => {
+            rw [ih]
+            rw [mulSuccR]
+            rw [powNatAdd]
+            rfl
+        }
+    }
+}
+
+/// Subtracting zero leaves a number alone: $a - 0 = a$.
+public theorem subNatZeroR(a : Nat) : subNat(a, Zero) = a by {
+    rfl
+}
+
+/// Zero minus anything is zero: $0 - b = 0$.
+public theorem subNatZeroL(b : Nat) : subNat(Zero, b) = Zero by {
+    induction b {
+        Zero => { rfl }
+        Succ(k) ih => { rfl }
+    }
+}
+
+/// A number minus itself is zero: $a - a = 0$.
+public theorem subNatSelf(a : Nat) : subNat(a, a) = Zero by {
+    induction a {
+        Zero => { rfl }
+        Succ(k) ih => { simp [ih] }
+    }
+}
+
+/// The predecessor of zero is zero: $\mathrm{pred}(0) = 0$.
+public theorem predNatZero() : predNat(Zero) = Zero by {
+    rfl
+}
+
+/// The predecessor of a successor is the number: $\mathrm{pred}(n+1) = n$.
+public theorem predNatSucc(n : Nat) : predNat(Succ(n)) = n by {
+    rfl
+}
+
+/// The Boolean order is reflexive: $\mathrm{leNat}(a,a) = \mathrm{true}$.
+public theorem leNatRefl(a : Nat) : leNat(a, a) = true by {
+    induction a {
+        Zero => { rfl }
+        Succ(k) ih => { simp [ih] }
+    }
+}
+
+/// Every natural is above zero: $\mathrm{leNat}(0,b) = \mathrm{true}$.
+public theorem leNatZeroL(b : Nat) : leNat(Zero, b) = true by {
+    induction b {
+        Zero => { rfl }
+        Succ(k) ih => { rfl }
+    }
+}
+
+/// The Boolean order peels a successor from both sides: $\mathrm{leNat}(a+1,b+1) = \mathrm{leNat}(a,b)$.
+public theorem leNatSuccR(a : Nat, b : Nat) :
+        leNat(Succ(a), Succ(b)) = leNat(a, b) by {
+    rfl
+}
+
+/// The Boolean order is total: $\mathrm{leNat}(a,b) \lor \mathrm{leNat}(b,a)$.
+public theorem leNatTotal(a : Nat, b : Nat) : (leNat(a, b) || leNat(b, a)) = true by {
+    induction a generalizing b {
+        Zero => {
+            intro b
+            induction b {
+                Zero => { rfl }
+                Succ(j) ihb => { rfl }
+            }
+        }
+        Succ(k) ih => {
+            intro b
+            induction b {
+                Zero => { rfl }
+                Succ(j) ihb => {
+                    have h := ih(j)
+                    exact h
+                }
+            }
+        }
+    }
+}
+
+/// The Boolean order is transitive.
+public theorem leNatTrans(a : Nat, b : Nat, c : Nat) :
+        leNat(a, b) = true -> leNat(b, c) = true -> leNat(a, c) = true by {
+    induction a generalizing b, c {
+        Zero => {
+            intro h1
+            intro h2
+            simp [leNatZeroL]
+        }
+        Succ(k) ih => {
+            intro b
+            intro c
+            intro h1
+            intro h2
+            cases b {
+                Zero => {
+                    exact absurd(h1)
+                }
+                Succ(j) => {
+                    cases c {
+                        Zero => {
+                            exact absurd(h2)
+                        }
+                        Succ(l) => {
+                            have hkj : leNat(k, j) = true := h1
+                            have hjl : leNat(j, l) = true := h2
+                            have hkl := ih(j, l, hkj, hjl)
+                            exact hkl
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The Boolean order is antisymmetric.
+public theorem leNatAntisymm(a : Nat, b : Nat) :
+        leNat(a, b) = true -> leNat(b, a) = true -> a = b by {
+    induction a generalizing b {
+        Zero => {
+            intro b
+            intro h1
+            intro h2
+            cases b {
+                Zero => { rfl }
+                Succ(j) => { exact absurd(h2) }
+            }
+        }
+        Succ(k) ih => {
+            intro b
+            intro h1
+            intro h2
+            cases b {
+                Zero => {
+                    exact absurd(h1)
+                }
+                Succ(j) => {
+                    have hkj : leNat(k, j) = true := h1
+                    have hjk : leNat(j, k) = true := h2
+                    have hkeqj := ih(j, hkj, hjk)
+                    rw [hkeqj]
+                    rfl
+                }
+            }
+        }
+    }
+}
+
+/// The minimum commutes: $\min(a,b) = \min(b,a)$.
+public theorem minNatComm(a : Nat, b : Nat) : minNat(a, b) = minNat(b, a) by {
+    induction a generalizing b {
+        Zero => {
+            intro b
+            induction b {
+                Zero => { rfl }
+                Succ(j) ihb => { rfl }
+            }
+        }
+        Succ(k) ih => {
+            intro b
+            induction b {
+                Zero => { rfl }
+                Succ(j) ihb => { exact ih(j) }
+            }
+        }
+    }
+}
+
+/// The maximum commutes: $\max(a,b) = \max(b,a)$.
+public theorem maxNatComm(a : Nat, b : Nat) : maxNat(a, b) = maxNat(b, a) by {
+    induction a generalizing b {
+        Zero => {
+            intro b
+            induction b {
+                Zero => { rfl }
+                Succ(j) ihb => { rfl }
+            }
+        }
+        Succ(k) ih => {
+            intro b
+            induction b {
+                Zero => { rfl }
+                Succ(j) ihb => { exact ih(j) }
+            }
+        }
+    }
+}

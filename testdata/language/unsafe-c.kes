@@ -1,0 +1,2 @@
+import c "math.h"
+function root() : double with Effects = sqrt(2.0)

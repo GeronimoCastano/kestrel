@@ -1,0 +1,454 @@
+// KesNet optimizers and learning-rate schedules.
+
+import std.math
+//
+// Parameters are Variables, so every update is an ordinary autograd operation
+// on a leaf. Optimizers hold per-parameter state in Arrays of Variables, which
+// makes momentum and moment buffers share the parameter's native storage rules.
+
+/// Shared optimizer surface. Subclasses write `step`.
+public class Optimizer {
+    public var parameters : List[Variable]
+    public var learningRate : double
+
+    new(parameters : List[Variable], learningRate : double = 0.01) {
+        this.parameters = parameters
+        this.learningRate = learningRate
+    }
+
+    public function zeroGrad() : void {
+        for (parameter in this.parameters) { parameter.zeroGrad() }
+    }
+
+    public mut function setLearningRate(value : double) : void {
+        this.learningRate = value
+    }
+
+    public mut function step() : void {}
+
+    public function parameterCount() : Int = this.parameters.length()
+}
+
+/// Stochastic gradient descent with optional momentum, Nesterov momentum and
+/// L2 weight decay.
+public class SGD extends Optimizer {
+    public var momentum : double
+    public var weightDecay : double
+    public var nesterov : Bool
+    public var velocities : Array[Variable]
+
+    new(parameters : List[Variable], learningRate : double = 0.01, momentum : double = 0.0, weightDecay : double = 0.0, nesterov : Bool = false) {
+        this.parameters = parameters
+        this.learningRate = learningRate
+        this.momentum = momentum
+        this.weightDecay = weightDecay
+        this.nesterov = nesterov
+        this.velocities = Array.empty()
+        for (parameter in parameters) {
+            this.velocities.append(Variable.zerosLike(parameter))
+        }
+    }
+
+    @override public mut function step() : void {
+        let mut index := 0
+        for (parameter in this.parameters) {
+            let gradient := parameter.gradVariable()
+            if this.weightDecay > 0.0 {
+                gradient.add_(parameter * this.weightDecay)
+            }
+            let update := if this.momentum > 0.0 {
+                let velocity := this.velocities[index]
+                velocity.mul_(this.momentum)
+                velocity.add_(gradient)
+                if this.nesterov then gradient + velocity * this.momentum else velocity
+            } else {
+                gradient
+            }
+            parameter.add_(update * (0.0 - this.learningRate))
+            index += 1
+        }
+    }
+}
+
+/// Adam with bias-corrected first and second moments.
+public class Adam extends Optimizer {
+    public var beta1 : double
+    public var beta2 : double
+    public var epsilon : double
+    public var weightDecay : double
+    public var firstMoments : Array[Variable]
+    public var secondMoments : Array[Variable]
+    public var steps : Int
+
+    new(parameters : List[Variable], learningRate : double = 0.001, beta1 : double = 0.9, beta2 : double = 0.999, epsilon : double = 0.00000001, weightDecay : double = 0.0) {
+        this.parameters = parameters
+        this.learningRate = learningRate
+        this.beta1 = beta1
+        this.beta2 = beta2
+        this.epsilon = epsilon
+        this.weightDecay = weightDecay
+        this.firstMoments = Array.empty()
+        this.secondMoments = Array.empty()
+        for (parameter in parameters) {
+            this.firstMoments.append(Variable.zerosLike(parameter))
+            this.secondMoments.append(Variable.zerosLike(parameter))
+        }
+        this.steps = 0
+    }
+
+    @override public mut function step() : void {
+        this.steps += 1
+        let correction1 := 1.0 - pow(this.beta1, this.steps.toDouble())
+        let correction2 := 1.0 - pow(this.beta2, this.steps.toDouble())
+        let mut index := 0
+        for (parameter in this.parameters) {
+            let gradient := parameter.gradVariable()
+            if this.weightDecay > 0.0 {
+                gradient.add_(parameter * this.weightDecay)
+            }
+            let first := this.firstMoments[index]
+            let second := this.secondMoments[index]
+            Variable.adamStep(parameter, gradient, first, second, this.learningRate, this.beta1, this.beta2, this.epsilon, correction1, correction2, this.weightDecay)
+            index += 1
+        }
+    }
+}
+
+/// AdamW: Adam's moments with decoupled weight decay.
+public class AdamW extends Optimizer {
+    public var beta1 : double
+    public var beta2 : double
+    public var epsilon : double
+    public var weightDecay : double
+    public var firstMoments : Array[Variable]
+    public var secondMoments : Array[Variable]
+    public var steps : Int
+
+    new(parameters : List[Variable], learningRate : double = 0.001, beta1 : double = 0.9, beta2 : double = 0.999, epsilon : double = 0.00000001, weightDecay : double = 0.01) {
+        this.parameters = parameters
+        this.learningRate = learningRate
+        this.beta1 = beta1
+        this.beta2 = beta2
+        this.epsilon = epsilon
+        this.weightDecay = weightDecay
+        this.firstMoments = Array.empty()
+        this.secondMoments = Array.empty()
+        for (parameter in parameters) {
+            this.firstMoments.append(Variable.zerosLike(parameter))
+            this.secondMoments.append(Variable.zerosLike(parameter))
+        }
+        this.steps = 0
+    }
+
+    @override public mut function step() : void {
+        this.steps += 1
+        let correction1 := 1.0 - pow(this.beta1, this.steps.toDouble())
+        let correction2 := 1.0 - pow(this.beta2, this.steps.toDouble())
+        let mut index := 0
+        for (parameter in this.parameters) {
+            let gradient := parameter.gradVariable()
+            parameter.mul_(1.0 - this.learningRate * this.weightDecay)
+            let first := this.firstMoments[index]
+            let second := this.secondMoments[index]
+            first.mul_(this.beta1)
+            first.add_(gradient * (1.0 - this.beta1))
+            second.mul_(this.beta2)
+            second.add_((gradient * gradient) * (1.0 - this.beta2))
+            let correctedFirst := first / correction1
+            let correctedSecond := second / correction2
+            let denominator := correctedSecond.sqrt() + this.epsilon
+            parameter.add_((correctedFirst / denominator) * (0.0 - this.learningRate))
+            index += 1
+        }
+    }
+}
+
+/// RMSprop: a leaky average of squared gradients.
+public class RMSprop extends Optimizer {
+    public var alpha : double
+    public var epsilon : double
+    public var weightDecay : double
+    public var momentum : double
+    public var squares : Array[Variable]
+    public var velocities : Array[Variable]
+
+    new(parameters : List[Variable], learningRate : double = 0.01, alpha : double = 0.99, epsilon : double = 0.00000001, weightDecay : double = 0.0, momentum : double = 0.0) {
+        this.parameters = parameters
+        this.learningRate = learningRate
+        this.alpha = alpha
+        this.epsilon = epsilon
+        this.weightDecay = weightDecay
+        this.momentum = momentum
+        this.squares = Array.empty()
+        this.velocities = Array.empty()
+        for (parameter in parameters) {
+            this.squares.append(Variable.zerosLike(parameter))
+            this.velocities.append(Variable.zerosLike(parameter))
+        }
+    }
+
+    @override public mut function step() : void {
+        let mut index := 0
+        for (parameter in this.parameters) {
+            let gradient := parameter.gradVariable()
+            if this.weightDecay > 0.0 {
+                gradient.add_(parameter * this.weightDecay)
+            }
+            let square := this.squares[index]
+            square.mul_(this.alpha)
+            square.add_((gradient * gradient) * (1.0 - this.alpha))
+            let scaled := gradient / (square.sqrt() + this.epsilon)
+            let update := if this.momentum > 0.0 {
+                let velocity := this.velocities[index]
+                velocity.mul_(this.momentum)
+                velocity.add_(scaled)
+                velocity
+            } else {
+                scaled
+            }
+            parameter.add_(update * (0.0 - this.learningRate))
+            index += 1
+        }
+    }
+}
+
+/// Adagrad: accumulated squared gradients, one per parameter.
+public class Adagrad extends Optimizer {
+    public var epsilon : double
+    public var weightDecay : double
+    public var squares : Array[Variable]
+
+    new(parameters : List[Variable], learningRate : double = 0.01, epsilon : double = 0.00000001, weightDecay : double = 0.0) {
+        this.parameters = parameters
+        this.learningRate = learningRate
+        this.epsilon = epsilon
+        this.weightDecay = weightDecay
+        this.squares = Array.empty()
+        for (parameter in parameters) { this.squares.append(Variable.zerosLike(parameter)) }
+    }
+
+    @override public mut function step() : void {
+        let mut index := 0
+        for (parameter in this.parameters) {
+            let gradient := parameter.gradVariable()
+            if this.weightDecay > 0.0 { gradient.add_(parameter * this.weightDecay) }
+            let square := this.squares[index]
+            square.add_(gradient * gradient)
+            parameter.add_((gradient / (square.sqrt() + this.epsilon)) * (0.0 - this.learningRate))
+            index += 1
+        }
+    }
+}
+
+/// Adadelta: a window of accumulated gradients and updates.
+public class Adadelta extends Optimizer {
+    public var rho : double
+    public var epsilon : double
+    public var weightDecay : double
+    public var gradientSquares : Array[Variable]
+    public var updateSquares : Array[Variable]
+
+    new(parameters : List[Variable], learningRate : double = 1.0, rho : double = 0.95, epsilon : double = 0.000001, weightDecay : double = 0.0) {
+        this.parameters = parameters
+        this.learningRate = learningRate
+        this.rho = rho
+        this.epsilon = epsilon
+        this.weightDecay = weightDecay
+        this.gradientSquares = Array.empty()
+        this.updateSquares = Array.empty()
+        for (parameter in parameters) {
+            this.gradientSquares.append(Variable.zerosLike(parameter))
+            this.updateSquares.append(Variable.zerosLike(parameter))
+        }
+    }
+
+    @override public mut function step() : void {
+        let mut index := 0
+        for (parameter in this.parameters) {
+            let gradient := parameter.gradVariable()
+            if this.weightDecay > 0.0 { gradient.add_(parameter * this.weightDecay) }
+            let gradientSquare := this.gradientSquares[index]
+            let updateSquare := this.updateSquares[index]
+            gradientSquare.mul_(this.rho)
+            gradientSquare.add_((gradient * gradient) * (1.0 - this.rho))
+            let numerator := (updateSquare + this.epsilon).sqrt()
+            let denominator := (gradientSquare + this.epsilon).sqrt()
+            let delta := (gradient * numerator) / denominator
+            updateSquare.mul_(this.rho)
+            updateSquare.add_((delta * delta) * (1.0 - this.rho))
+            parameter.add_(delta * (0.0 - this.learningRate))
+            index += 1
+        }
+    }
+}
+
+/// Adamax: Adam with an infinite norm for the second moment.
+public class Adamax extends Optimizer {
+    public var beta1 : double
+    public var beta2 : double
+    public var epsilon : double
+    public var weightDecay : double
+    public var firstMoments : Array[Variable]
+    public var secondMoments : Array[Variable]
+    public var steps : Int
+
+    new(parameters : List[Variable], learningRate : double = 0.002, beta1 : double = 0.9, beta2 : double = 0.999, epsilon : double = 0.00000001, weightDecay : double = 0.0) {
+        this.parameters = parameters
+        this.learningRate = learningRate
+        this.beta1 = beta1
+        this.beta2 = beta2
+        this.epsilon = epsilon
+        this.weightDecay = weightDecay
+        this.firstMoments = Array.empty()
+        this.secondMoments = Array.empty()
+        for (parameter in parameters) {
+            this.firstMoments.append(Variable.zerosLike(parameter))
+            this.secondMoments.append(Variable.zerosLike(parameter))
+        }
+        this.steps = 0
+    }
+
+    @override public mut function step() : void {
+        this.steps += 1
+        let correction := 1.0 - pow(this.beta1, this.steps.toDouble())
+        let mut index := 0
+        for (parameter in this.parameters) {
+            let gradient := parameter.gradVariable()
+            if this.weightDecay > 0.0 { gradient.add_(parameter * this.weightDecay) }
+            let first := this.firstMoments[index]
+            let second := this.secondMoments[index]
+            first.mul_(this.beta1)
+            first.add_(gradient * (1.0 - this.beta1))
+            let scaledGradient := gradient.abs() + this.epsilon
+            let candidate := this.maximumOf(second * this.beta2, scaledGradient)
+            second.copy_(candidate)
+            parameter.add_(((first / correction) / second) * (0.0 - this.learningRate))
+            index += 1
+        }
+    }
+
+    function maximumOf(left : Variable, right : Variable) : Variable {
+        // A branch-free expression using (a+b+|a-b|)/2, which is differentiable
+        // except at equality (where either branch is a valid subgradient).
+        (left + right + (left - right).abs()) * 0.5
+    }
+}
+
+// ------------------------------------------------------------------ schedules
+
+/// StepLR multiplies the learning rate by `gamma` every `stepSize` steps.
+public class StepLR {
+    public var stepSize : Int
+    public var gamma : double
+    public var completed : Int
+
+    new(stepSize : Int, gamma : double = 0.1) {
+        this.stepSize = stepSize
+        this.gamma = gamma
+        this.completed = 0
+    }
+
+    public mut function step(mut optimizer : Optimizer) : void {
+        this.completed += 1
+        if this.stepSize > 0 && this.completed % this.stepSize == 0 {
+            optimizer.setLearningRate(optimizer.learningRate * this.gamma)
+        }
+    }
+
+    public function lastLearningRate(optimizer : Optimizer) : double = optimizer.learningRate
+}
+
+/// MultiStepLR multiplies once after each milestone has passed.
+public class MultiStepLR {
+    public var milestones : List[Int]
+    public var gamma : double
+    public var completed : Int
+
+    new(milestones : List[Int], gamma : double = 0.1) {
+        this.milestones = milestones
+        this.gamma = gamma
+        this.completed = 0
+    }
+
+    public mut function step(mut optimizer : Optimizer) : void {
+        this.completed += 1
+        for (milestone in this.milestones) {
+            if milestone == this.completed {
+                optimizer.setLearningRate(optimizer.learningRate * this.gamma)
+            }
+        }
+    }
+}
+
+/// ExponentialLR applies `gamma` on every step.
+public class ExponentialLR {
+    public var gamma : double
+
+    new(gamma : double) { this.gamma = gamma }
+
+    public mut function step(mut optimizer : Optimizer) : void {
+        optimizer.setLearningRate(optimizer.learningRate * this.gamma)
+    }
+}
+
+/// CosineAnnealingLR follows a half cosine from `initial` to `minimum`.
+public class CosineAnnealingLR {
+    public var totalSteps : Int
+    public var minimum : double
+    public var initial : double
+    public var completed : Int
+
+    new(totalSteps : Int, initial : double, minimum : double = 0.0) {
+        this.totalSteps = totalSteps
+        this.minimum = minimum
+        this.initial = initial
+        this.completed = 0
+    }
+
+    public mut function step(mut optimizer : Optimizer) : void {
+        this.completed += 1
+        let ratio := if this.totalSteps <= 0 then 1.0 else
+            min(1.0, this.completed.toDouble() / this.totalSteps.toDouble())
+        let next := this.minimum + (this.initial - this.minimum) * (1.0 + math.cos(3.141592653589793 * ratio)) * 0.5
+        optimizer.setLearningRate(next)
+    }
+}
+
+/// ReduceLROnPlateau lowers the rate when a metric stops improving.
+public class ReduceLROnPlateau {
+    public var factor : double
+    public var patience : Int
+    public var minimum : double
+    public var best : double
+    public var waiting : Int
+
+    new(factor : double = 0.1, patience : Int = 10, minimum : double = 0.000001) {
+        this.factor = factor
+        this.patience = patience
+        this.minimum = minimum
+        this.best = 1.0e300
+        this.waiting = 0
+    }
+
+    public mut function step(mut optimizer : Optimizer, metric : double) : void {
+        if metric < this.best {
+            this.best = metric
+            this.waiting = 0
+        } else {
+            this.waiting += 1
+            if this.waiting > this.patience {
+                let next := optimizer.learningRate * this.factor
+                optimizer.setLearningRate(if next < this.minimum then this.minimum else next)
+                this.waiting = 0
+            }
+        }
+    }
+}
+
+/// A linear warmup followed by a constant rate; return this from `warmupRate`
+/// and assign it to an optimizer.
+public function warmupRate(base : double, step : Int, warmupSteps : Int) : double {
+    if warmupSteps <= 0 { return base }
+    let fraction := step.toDouble() / warmupSteps.toDouble()
+    if fraction >= 1.0 then base else base * fraction
+}

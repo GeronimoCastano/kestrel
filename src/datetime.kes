@@ -1,0 +1,118 @@
+// std.datetime: calendar dates and times in UTC, Unix seconds, and ISO 8601 text.
+// Offsets such as +02:00 are read and applied; named time zones need a zone database,
+// which this module does not carry.
+
+import std.time
+
+public record DateTime(year : Int, month : Int, day : Int, hour : Int, minute : Int, second : Int)
+
+public function isLeapYear(year : Int) : Bool = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+
+public function daysInMonth(year : Int, month : Int) : Int {
+    if month == 2 {
+        return if isLeapYear(year) then 29 else 28
+    }
+    return if month == 4 || month == 6 || month == 9 || month == 11 then 30 else 31
+}
+
+// Days since 1970-01-01 for a civil date (Howard Hinnant's algorithm).
+function daysFromCivil(year : Int, month : Int, day : Int) : Int {
+    let y := if month <= 2 then year - 1 else year
+    let era := (if y >= 0 then y else y - 399) / 400
+    let yoe := y - era * 400
+    let mp := (month + 9) % 12
+    let doy := (153 * mp + 2) / 5 + day - 1
+    let doe := yoe * 365 + yoe / 4 - yoe / 100 + doy
+    return era * 146097 + doe - 719468
+}
+
+// The UTC date and time of a Unix time in seconds.
+public function fromUnix(seconds : Int) : DateTime {
+    let days := (if seconds >= 0 then seconds else seconds - 86399) / 86400
+    let rest := seconds - days * 86400
+    let z := days + 719468
+    let era := (if z >= 0 then z else z - 146096) / 146097
+    let doe := z - era * 146097
+    let yoe := (doe - doe / 1460 + doe / 36524 - doe / 146096) / 365
+    let doy := doe - (365 * yoe + yoe / 4 - yoe / 100)
+    let mp := (5 * doy + 2) / 153
+    let day := doy - (153 * mp + 2) / 5 + 1
+    let month := if mp < 10 then mp + 3 else mp - 9
+    let year := yoe + era * 400 + (if month <= 2 then 1 else 0)
+    return DateTime(year, month, day, rest / 3600, rest % 3600 / 60, rest % 60)
+}
+
+public function toUnix(t : DateTime) : Int =
+    daysFromCivil(t.year, t.month, t.day) * 86400 + t.hour * 3600 + t.minute * 60 + t.second
+
+// The current UTC time, to the second.
+public function now() : DateTime with Effects {
+    let seconds := match time.now().floor().checkedToInt() {
+        n => n,
+        _ => 0,
+    }
+    return fromUnix(seconds)
+}
+
+// 0 is Monday and 6 is Sunday.
+public function dayOfWeek(t : DateTime) : Int = (daysFromCivil(t.year, t.month, t.day) + 3).mod(7)
+
+public function addSeconds(t : DateTime, seconds : Int) : DateTime = fromUnix(toUnix(t) + seconds)
+
+public function addDays(t : DateTime, days : Int) : DateTime = fromUnix(toUnix(t) + days * 86400)
+
+// ISO 8601 in UTC, such as "2026-11-15T09:30:00Z".
+public function format(t : DateTime) : String =
+    f"{t.year:04d}-{t.month:02d}-{t.day:02d}T{t.hour:02d}:{t.minute:02d}:{t.second:02d}Z"
+
+public function formatDate(t : DateTime) : String = f"{t.year:04d}-{t.month:02d}-{t.day:02d}"
+
+function digits(text : String, start : Int, count : Int) : Int or Error {
+    let part := text.substring(start, start + count)
+    if part.length() != count || !part.isdigit() {
+        return Error(f"Expected {count} digits at position {start} of \"{text}\".")
+    }
+    return parseInt(part)
+}
+
+// Reads "2026-11-15", "2026-11-15T09:30:00", "...Z" or "...+02:00" and gives the UTC time.
+public function parse(text : String) : DateTime or Error {
+    let year := digits(text, 0, 4)?
+    if text.substring(4, 5) != "-" || text.substring(7, 8) != "-" {
+        return Error(f"Expected YYYY-MM-DD in \"{text}\".")
+    }
+    let month := digits(text, 5, 2)?
+    let day := digits(text, 8, 2)?
+    if month < 1 || month > 12 || day < 1 || day > daysInMonth(year, month) {
+        return Error(f"\"{text}\" is not a calendar date.")
+    }
+    if text.length() == 10 {
+        return DateTime(year, month, day, 0, 0, 0)
+    }
+    let separator := text.substring(10, 11)
+    if separator != "T" && separator != " " {
+        return Error(f"Expected T between the date and the time in \"{text}\".")
+    }
+    let hour := digits(text, 11, 2)?
+    let minute := digits(text, 14, 2)?
+    let second := digits(text, 17, 2)?
+    if text.substring(13, 14) != ":" || text.substring(16, 17) != ":" || hour > 23 || minute > 59 || second > 59 {
+        return Error(f"\"{text}\" has no valid HH:MM:SS time.")
+    }
+    let local := DateTime(year, month, day, hour, minute, second)
+    let zone := text.substring(19, text.length())
+    if zone == "" || zone == "Z" {
+        return local
+    }
+    let sign := zone.substring(0, 1)
+    if zone.length() != 6 || (sign != "+" && sign != "-") || zone.substring(3, 4) != ":" {
+        return Error(f"Expected Z or an offset such as +02:00 in \"{text}\".")
+    }
+    let offsetHour := digits(zone, 1, 2)?
+    let offsetMinute := digits(zone, 4, 2)?
+    if offsetHour > 23 || offsetMinute > 59 {
+        return Error(f"Invalid UTC offset in \"{text}\".")
+    }
+    let offset := offsetHour * 3600 + offsetMinute * 60
+    return addSeconds(local, if sign == "+" then -offset else offset)
+}

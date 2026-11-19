@@ -1,0 +1,10 @@
+class Registry {
+    public static final name : String = "kestrel" + " registry"
+    public static final limits : List[Int] = [1, 2, 3]
+    public static final lookup : Map[String, Int] = Map("a" => 1)
+    new() {}
+}
+
+print(Registry.name)
+print(Registry.limits.length())
+print(match Registry.lookup.get("a") {Some(v) => v, None => 0})

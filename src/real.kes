@@ -1,0 +1,8 @@
+public alias Real = double
+public const PI : Real = 3.141592653589793
+public const E : Real = 2.718281828459045
+public function abs(x : Real) : Real = x.abs()
+public function sqrt(x : Real) : Real = x.sqrt()
+public function min(a : Real, b : Real) : Real = a.min(b)
+public function max(a : Real, b : Real) : Real = a.max(b)
+public function isFinite(x : Real) : Bool = x.isFinite()

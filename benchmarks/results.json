@@ -1,0 +1,142 @@
+{
+  "machine": "arm64 macOS-27.0.1-arm64-arm-64bit",
+  "versions": {
+    "clang": "Apple clang version 21.0.0 (clang-2100.4.1.1)",
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+    "java": "openjdk version \"25.0.4.1\" 2026-08-18",
+    "python": "Python 3.11.4"
+  },
+  "runs": 3,
+  "benchmarks": {
+    "numeric": {
+      "kestrel": {
+        "seconds": 0.46827983297407627,
+        "peak_bytes": 1720320,
+        "compile_seconds": 0.5482367919757962,
+        "partial": false
+      },
+      "rust": {
+        "seconds": 0.39505312498658895,
+        "peak_bytes": 1884160,
+        "compile_seconds": 0.10830950003582984,
+        "partial": false
+      },
+      "java": {
+        "seconds": 1.004169624997303,
+        "peak_bytes": 44974080,
+        "compile_seconds": 0.3722649170085788,
+        "partial": false
+      },
+      "python": {
+        "seconds": 3.218977833050303,
+        "peak_bytes": 15204352,
+        "compile_seconds": 0.0,
+        "partial": true
+      }
+    },
+    "collections": {
+      "kestrel": {
+        "seconds": 0.09681587503291667,
+        "peak_bytes": 133316608,
+        "compile_seconds": 0.18497579195536673,
+        "partial": false
+      },
+      "rust": {
+        "seconds": 0.09331112494692206,
+        "peak_bytes": 144834560,
+        "compile_seconds": 0.2500427080085501,
+        "partial": false
+      },
+      "java": {
+        "seconds": 0.19924887490924448,
+        "peak_bytes": 502120448,
+        "compile_seconds": 0.32696425006724894,
+        "partial": false
+      },
+      "python": {
+        "seconds": 0.2028434999519959,
+        "peak_bytes": 375472128,
+        "compile_seconds": 0.0,
+        "partial": false
+      }
+    },
+    "strings": {
+      "kestrel": {
+        "seconds": 0.08940191706642509,
+        "peak_bytes": 18792448,
+        "compile_seconds": 0.15060416609048843,
+        "partial": false
+      },
+      "rust": {
+        "seconds": 0.0671110829571262,
+        "peak_bytes": 18989056,
+        "compile_seconds": 0.1267755829030648,
+        "partial": false
+      },
+      "java": {
+        "seconds": 0.0775516249705106,
+        "peak_bytes": 97140736,
+        "compile_seconds": 0.30095712502952665,
+        "partial": false
+      },
+      "python": {
+        "seconds": 0.18754929094575346,
+        "peak_bytes": 198475776,
+        "compile_seconds": 0.0,
+        "partial": false
+      }
+    },
+    "trees": {
+      "kestrel": {
+        "seconds": 2.8531649169744924,
+        "peak_bytes": 69222400,
+        "compile_seconds": 0.19412587501574308,
+        "partial": false
+      },
+      "rust": {
+        "seconds": 2.726703832973726,
+        "peak_bytes": 35684352,
+        "compile_seconds": 0.11775341595057398,
+        "partial": false
+      },
+      "java": {
+        "seconds": 0.330645791022107,
+        "peak_bytes": 600522752,
+        "compile_seconds": 0.31587337504606694,
+        "partial": false
+      },
+      "python": {
+        "seconds": 6.062411291990429,
+        "peak_bytes": 48381952,
+        "compile_seconds": 0.0,
+        "partial": false
+      }
+    },
+    "channels": {
+      "kestrel": {
+        "seconds": 0.07494720804970711,
+        "peak_bytes": 2998272,
+        "compile_seconds": 0.2233638750622049,
+        "partial": false
+      },
+      "rust": {
+        "seconds": 0.07581087504513562,
+        "peak_bytes": 4276224,
+        "compile_seconds": 0.636181875015609,
+        "partial": false
+      },
+      "java": {
+        "seconds": 0.6312049999833107,
+        "peak_bytes": 240975872,
+        "compile_seconds": 0.37553216703236103,
+        "partial": false
+      },
+      "python": {
+        "seconds": 0.3768476250115782,
+        "peak_bytes": 166215680,
+        "compile_seconds": 0.0,
+        "partial": false
+      }
+    }
+  }
+}

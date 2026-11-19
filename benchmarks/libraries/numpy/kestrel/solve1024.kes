@@ -1,0 +1,15 @@
+import std.linalg
+
+let n := 1024
+let reps := 280
+let A := Tensor.generate((n, n), (i, j) => if i == j then 4.0 else 0.01)
+let b := Tensor.generate((n,), i => (i % 7).toDouble())
+let mut total := 0.0
+let mut normTotal := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    let x := linalg.solve(A, b)
+    total = total + x.sum()
+    normTotal = normTotal + linalg.norm(x)
+}
+print(f"{total:.6f}")
+print(f"{normTotal:.6f}")

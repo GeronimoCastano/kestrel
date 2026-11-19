@@ -1,0 +1,26 @@
+import std.stats
+
+let n := 8000000
+let reps := 6
+let x := Tensor.generate((n,), i => (i % 1000).toDouble())
+let y := Tensor.generate((n,), i => ((i * 7) % 1000).toDouble())
+let data := Tensor.generate((n, 2), (i, j) => if j == 0 then (i % 1000).toDouble() else ((i * 7) % 1000).toDouble())
+let mut meanTotal := 0.0
+let mut varianceTotal := 0.0
+let mut stddevTotal := 0.0
+let mut covarianceTotal := 0.0
+let mut correlationTotal := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    meanTotal = meanTotal + stats.mean(x)
+    varianceTotal = varianceTotal + stats.variance(x)
+    stddevTotal = stddevTotal + stats.stddev(x)
+    let covariance := stats.covariance(data)
+    let correlation := stats.correlation(data)
+    covarianceTotal = covarianceTotal + covariance[0, 1]
+    correlationTotal = correlationTotal + correlation[0, 1]
+}
+print(f"{meanTotal:.6f}")
+print(f"{varianceTotal:.6f}")
+print(f"{stddevTotal:.6f}")
+print(f"{covarianceTotal:.6f}")
+print(f"{correlationTotal:.6f}")

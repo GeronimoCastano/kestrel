@@ -1,0 +1,17 @@
+// Native execution: cargo run -- run examples/native.kes
+function identity[T](value : T) : T = value
+
+function sum(limit : Int) : Int {
+    let mut total := 0
+    for (let n : Int = 0; n < limit; n = n + 1) {
+        total = total + n
+    }
+    total
+}
+
+function add(a : double, b : double) : double = a + b
+let addOne := add(1.0, _)
+print(f"sum: {identity(sum(10))}")
+print(f"partial call: {3.0 |> addOne:.2f}")
+print("\u03bb and \uD83D\uDE00")
+print((1.0 / 0.0).isFinite())

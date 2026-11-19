@@ -1,0 +1,38 @@
+// Native numerical modules, a rank-1 vector in @, and seeded sampling.
+import std.linalg
+import std.math
+import std.stats
+import std.random.{Rng}
+import std.prob.{Normal}
+
+let A := Tensor([1.0, 2.0, 3.0, 4.0], shape = (2, 2))
+let x := Tensor([1.0, 2.0])
+print(A @ x)
+print(x @ A)
+print(linalg.dot(x, x))
+print(linalg.outer(x, x))
+
+let B := Tensor([4.0, 2.0, 2.0, 3.0], shape = (2, 2))
+print(linalg.solve(B, B @ x))
+let factor := linalg.lu(B)
+print(factor.solve(B @ x))
+let lower := linalg.cholesky(B)
+print((lower @ lower.transpose() - B).norm() < 1e-12)
+let qrDecomposition := linalg.qr(A)
+print((qrDecomposition.q @ qrDecomposition.r - A).norm() < 1e-12)
+let decomposition := linalg.svd(A)
+let singular := Tensor.generate((2, 2), (i, j) => if i == j then decomposition.s[i] else 0.0)
+print((decomposition.u @ singular @ decomposition.vt - A).norm() < 1e-12)
+
+print(stats.mean(B))
+print(stats.mean(B, axis = 0))
+print(stats.variance(B))
+print(math.exp(Tensor([0.0, 1.0])).norm() > 1.0)
+
+let rng := Rng.seeded(42)
+let same := Rng.seeded(42)
+print(rng.integers(0, 100) == same.integers(0, 100))
+print(rng.normal(0.0, 1.0) == same.normal(0.0, 1.0))
+let normal := Normal.create(0.0, 1.0)
+print(normal.pdf(0.0) > 0.0)
+print(normal.cdf(0.0))

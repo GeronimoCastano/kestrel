@@ -1,0 +1,50 @@
+// A compact tour of std.ml: preprocessing, regression, classification,
+// clustering, decomposition, splitting and evaluation.
+import std.ml.{StandardScaler, MinMaxScaler, PolynomialFeatures, LinearRegression, KNeighborsClassifier, LogisticRegression, KMeans, PCA, trainTestSplit, foldIndices, meanSquaredError, accuracy, confusionMatrix, precision, recall, f1Score}
+import std.random.{Rng}
+
+let X := Tensor([1.0, 2.0, 2.0, 1.0, 4.0, 3.0, 5.0, 6.0], shape = (4, 2))
+let y := Tensor([2.0 * 1.0 + 3.0 * 2.0 + 1.0, 2.0 * 2.0 + 3.0 * 1.0 + 1.0, 2.0 * 4.0 + 3.0 * 3.0 + 1.0, 2.0 * 5.0 + 3.0 * 6.0 + 1.0], shape = (4,))
+
+let scaler := StandardScaler.fit(X)
+print(scaler.means)
+print(scaler.scales)
+print(MinMaxScaler.fitTransform(X))
+print(PolynomialFeatures.fitTransform(Tensor([2.0, 3.0], shape = (1, 2))))
+
+let linear := LinearRegression.fit(X, y)
+print((linear.coefficients[0] - 2.0).abs() < 1e-9)
+print((linear.coefficients[1] - 3.0).abs() < 1e-9)
+print((linear.intercept - 1.0).abs() < 1e-9)
+print(meanSquaredError(y, linear.predict(X)) < 1e-12)
+
+let rng := Rng.seeded(7)
+let (trainingX, testingX, trainingY, testingY) := trainTestSplit(X, y, 1, rng)
+print(trainingX.shape())
+print(testingX.shape())
+let (foldTrain, foldTest) := foldIndices(4, 2, 0)
+print(foldTrain)
+print(foldTest)
+
+let labels := Tensor([0.0, 1.0, 1.0, 1.0], shape = (4,))
+let neighbors := KNeighborsClassifier.fit(X, labels, 1)
+print(neighbors.predict(X))
+print(accuracy(labels, neighbors.predict(X)))
+
+let logistic := LogisticRegression.fit(X, labels, 0.5, 2000)
+print(logistic.predict(X))
+print(accuracy(labels, logistic.predict(X)))
+
+let groups := KMeans.fit(Tensor([0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 5.0, 5.0, 5.1, 5.0, 5.0, 5.1], shape = (6, 2)), 2, 50)
+print(groups.predict(Tensor([0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 5.0, 5.0, 5.1, 5.0, 5.0, 5.1], shape = (6, 2))))
+
+let pca := PCA.fit(X, 1)
+print(pca.transform(X).shape())
+print(pca.explainedVariance[0] > 0.0)
+
+let actual := Tensor([0.0, 0.0, 1.0, 1.0])
+let predicted := Tensor([0.0, 1.0, 1.0, 0.0])
+print(confusionMatrix(actual, predicted))
+print(precision(actual, predicted))
+print(recall(actual, predicted))
+print(f1Score(actual, predicted))

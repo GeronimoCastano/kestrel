@@ -1,0 +1,7 @@
+enum Shape {
+    Circle(double)
+    Square(double)
+}
+function area(s : Shape) : double = match s {
+    Circle(r) => r * r,
+}

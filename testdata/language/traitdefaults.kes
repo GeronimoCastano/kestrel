@@ -1,0 +1,30 @@
+public trait Named {
+    public function value() : String
+    public function name() : String = this.value()
+}
+
+public trait Labelled { has Named }
+public trait Tagged { has Named }
+
+public class User {
+    has Labelled, Tagged
+    new() {}
+    public function value() : String = "Ada"
+}
+
+public class CustomUser {
+    has Named
+    new() {}
+    public function value() : String = "Grace"
+    @override public function name() : String = "CustomUser"
+}
+
+let user := User()
+print(user.name())
+let view : &dyn Named = user
+print(view.name())
+
+let custom := CustomUser()
+print(custom.name())
+let customView : &dyn Named = custom
+print(customView.name())

@@ -1,0 +1,12 @@
+// Building one long String from many small pieces.
+import std.str.{length}
+
+function build(n : Int) : Int {
+    let mut s := ""
+    for (let i : Int = 0; i < n; i = i + 1) {
+        s = s + i.text() + ","
+    }
+    length(s)
+}
+
+print(build(2000000))

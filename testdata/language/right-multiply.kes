@@ -1,0 +1,6 @@
+class Vector {
+    public final x : double
+    new(x : double) { this.x = x }
+}
+let v := Vector(2.0)
+2.0 * v

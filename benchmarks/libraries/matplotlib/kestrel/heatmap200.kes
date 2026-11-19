@@ -1,0 +1,37 @@
+// heatmap200: a 200x200 matrix drawn with the heatmap renderer and a colorbar.
+import std.kesplot as plt
+import std.math.{sin, cos}
+import c "stdlib.h"
+
+function quote(text : String) : String = "'" + text.replace("'", "'\\''") + "'"
+
+function reportSize(path : String) : void or Error with Effects {
+    let sizePath := path + ".size"
+    let status := unsafe { system("wc -c < " + quote(path) + " > " + quote(sizePath)) }
+    if status.toInt() != 0 { return Error("cannot measure " + path) }
+    using reader := open(sizePath)? {
+        let line := reader.readLine()?
+        print(parseInt(line.trim())?)
+    }
+}
+
+function main() : void or Error with Effects {
+    let rows := 200
+    let cols := 200
+    let matrix : Array[List[double]] = Array.empty()
+    for (r in range(rows)) {
+        let row : Array[double] = Array.empty()
+        for (c in range(cols)) {
+            row.append(0.5 + 0.5 * sin(r.toDouble() * 0.05) * cos(c.toDouble() * 0.05))
+        }
+        matrix.append(row.toList())
+    }
+
+    let fig := plt.Figure(width = 8.0, height = 6.0)
+    fig.heatmap(matrix.toList(), [], [], "viridis", true, "value")
+    fig.title("200 x 200 heatmap")
+
+    fig.save("/tmp/plotbench/kestrel_heatmap200.svg")?
+    reportSize("/tmp/plotbench/kestrel_heatmap200.svg")?
+}
+main()

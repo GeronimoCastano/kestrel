@@ -1,0 +1,11 @@
+// A.T is a read-only view: it borrows A and reverses its axes without
+// copying. Use copy() when an independent writable tensor is needed.
+let A := Tensor([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape = (2, 3))
+print(A.T)
+print(A.T.shape())
+print(A.T[0, 1])
+print(A.T @ Tensor([1.0, 2.0], shape = (2,)))
+print(A.T.sum())
+print(A.T.T)
+let independent := A.T.copy()
+print(independent)

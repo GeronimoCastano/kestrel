@@ -1,0 +1,66 @@
+// `Self` in a trait is the class that implements it; in a class it is the
+// class that declares the member.
+
+trait Builder {
+    function reset() : Self
+    function named(name : String) : Self
+}
+
+class Query {
+    has Builder
+    public final text : String
+    new() { this.text = "" }
+    new(text : String) { this.text = text }
+    @override public function reset() : Query = Query()
+    @override public function named(name : String) : Query = Query(name)
+}
+
+class Form {
+    has Builder
+    public final label : String
+    new(label : String) { this.label = label }
+    @override public function reset() : Form = Form("")
+    @override public function named(name : String) : Form = Form(name)
+}
+
+// The bound binds Self to T, so the whole chain keeps type T.
+function twice[T : Builder](b : T) : T = b.reset().named("x")
+
+// A default body cannot name the implementing class, so it returns this.
+trait Copyable {
+    public function copy() : Self = this
+}
+
+class Counter {
+    has Copyable
+    public var hits : Int
+    new() { this.hits = 0 }
+    public mut function bump() : void { this.hits = this.hits + 1 }
+}
+
+// An override may narrow a Self result to the subclass.
+class SubQuery extends Query {
+    new() { super() }
+    new(text : String) { super(text) }
+    @override public function reset() : SubQuery = SubQuery()
+    @override public function named(name : String) : SubQuery = SubQuery(name)
+}
+
+// Self also names the class in a parameter and in a field type.
+class Node {
+    public final label : String
+    public final next : Option[Self]
+    new(label : String) { this.label = label; this.next = None }
+    public function joined(other : Self) : Self = Node(this.label + other.label)
+}
+
+let q := Query().reset().named("hello")
+print(q.text)
+print(twice(Form("a")).label)
+print(twice(Query("b")).text)
+let s := SubQuery("c").named("d")
+print(s.text)
+let mut c := Counter()
+c.bump()
+print(c.copy().hits)
+print(Node("a").joined(Node("b")).label)

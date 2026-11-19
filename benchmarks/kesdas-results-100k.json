@@ -1,0 +1,242 @@
+{
+  "rows": 100000,
+  "runs": 3,
+  "reps": 1,
+  "data": "benchmarks/build/kesdas-data-100000.csv",
+  "load": {
+    "kestrel": {
+      "cpu": 0.02,
+      "wall": 0.037632916937582195,
+      "rss": 33505280,
+      "checksum": "1098705.0"
+    },
+    "pandas": {
+      "cpu": 0.34,
+      "wall": 0.35859829105902463,
+      "rss": 129007616,
+      "checksum": "1098705.0"
+    }
+  },
+  "pipelines": [
+    {
+      "pipeline": "filter_sort",
+      "kestrel": {
+        "cpu": 0.03,
+        "wall": 0.04284133296459913,
+        "rss": 44761088,
+        "checksum": "15049.709999999994"
+      },
+      "pandas": {
+        "cpu": 0.34,
+        "wall": 0.36078225006349385,
+        "rss": 136167424,
+        "checksum": "15049.71"
+      },
+      "kestrel_compute": 0.009999999999999998,
+      "pandas_compute": 0.0,
+      "kestrel_total": 0.03,
+      "pandas_total": 0.34,
+      "speed_ratio_total": 11.333333333333334,
+      "speed_ratio_compute": 0.0,
+      "memory_ratio": 3.0420937042459735
+    },
+    {
+      "pipeline": "groupby_agg",
+      "kestrel": {
+        "cpu": 0.03,
+        "wall": 0.04493974999058992,
+        "rss": 33439744,
+        "checksum": "998820.92094765045"
+      },
+      "pandas": {
+        "cpu": 0.34,
+        "wall": 0.36267433292232454,
+        "rss": 129810432,
+        "checksum": "998820.9209476504"
+      },
+      "kestrel_compute": 0.009999999999999998,
+      "pandas_compute": 0.0,
+      "kestrel_total": 0.03,
+      "pandas_total": 0.34,
+      "speed_ratio_total": 11.333333333333334,
+      "speed_ratio_compute": 0.0,
+      "memory_ratio": 3.881920627143557
+    },
+    {
+      "pipeline": "groupby_two_keys",
+      "kestrel": {
+        "cpu": 0.03,
+        "wall": 0.04381625005044043,
+        "rss": 40648704,
+        "checksum": "1449019.27"
+      },
+      "pandas": {
+        "cpu": 0.34,
+        "wall": 0.3630257499171421,
+        "rss": 137543680,
+        "checksum": "1449019.27"
+      },
+      "kestrel_compute": 0.009999999999999998,
+      "pandas_compute": 0.0,
+      "kestrel_total": 0.03,
+      "pandas_total": 0.34,
+      "speed_ratio_total": 11.333333333333334,
+      "speed_ratio_compute": 0.0,
+      "memory_ratio": 3.3837162434502215
+    },
+    {
+      "pipeline": "pivot",
+      "kestrel": {
+        "cpu": 0.03,
+        "wall": 0.04009037499781698,
+        "rss": 35258368,
+        "checksum": "998705.0"
+      },
+      "pandas": {
+        "cpu": 0.35,
+        "wall": 0.3684094169875607,
+        "rss": 134627328,
+        "checksum": "998705.0"
+      },
+      "kestrel_compute": 0.009999999999999998,
+      "pandas_compute": 0.009999999999999953,
+      "kestrel_total": 0.03,
+      "pandas_total": 0.35,
+      "speed_ratio_total": 11.666666666666666,
+      "speed_ratio_compute": 0.9999999999999954,
+      "memory_ratio": 3.818308550185874
+    },
+    {
+      "pipeline": "merge",
+      "kestrel": {
+        "cpu": 0.05,
+        "wall": 0.06607879209332168,
+        "rss": 80134144,
+        "checksum": "1017036.6499999999"
+      },
+      "pandas": {
+        "cpu": 0.36,
+        "wall": 0.3776772919809446,
+        "rss": 150142976,
+        "checksum": "1017036.6499999999"
+      },
+      "kestrel_compute": 0.030000000000000002,
+      "pandas_compute": 0.019999999999999962,
+      "kestrel_total": 0.05,
+      "pandas_total": 0.36,
+      "speed_ratio_total": 7.199999999999999,
+      "speed_ratio_compute": 0.6666666666666654,
+      "memory_ratio": 1.8736454712737682
+    },
+    {
+      "pipeline": "missing_fill",
+      "kestrel": {
+        "cpu": 0.03,
+        "wall": 0.04815379111096263,
+        "rss": 41959424,
+        "checksum": "100069.89791337791"
+      },
+      "pandas": {
+        "cpu": 0.34,
+        "wall": 0.3631090830313042,
+        "rss": 132136960,
+        "checksum": "100069.8979133779"
+      },
+      "kestrel_compute": 0.009999999999999998,
+      "pandas_compute": 0.0,
+      "kestrel_total": 0.03,
+      "pandas_total": 0.34,
+      "speed_ratio_total": 11.333333333333334,
+      "speed_ratio_compute": 0.0,
+      "memory_ratio": 3.149160484185865
+    },
+    {
+      "pipeline": "value_counts",
+      "kestrel": {
+        "cpu": 0.02,
+        "wall": 0.03752150002401322,
+        "rss": 33570816,
+        "checksum": "100000.0"
+      },
+      "pandas": {
+        "cpu": 0.34,
+        "wall": 0.3608244169736281,
+        "rss": 129171456,
+        "checksum": "100000.0"
+      },
+      "kestrel_compute": 0.0,
+      "pandas_compute": 0.0,
+      "kestrel_total": 0.02,
+      "pandas_total": 0.34,
+      "speed_ratio_total": 17.0,
+      "speed_ratio_compute": 0.0,
+      "memory_ratio": 3.847730600292826
+    },
+    {
+      "pipeline": "rolling",
+      "kestrel": {
+        "cpu": 0.03,
+        "wall": 0.04208100005052984,
+        "rss": 36929536,
+        "checksum": "1448259.1217999931"
+      },
+      "pandas": {
+        "cpu": 0.34,
+        "wall": 0.3629305000649765,
+        "rss": 132235264,
+        "checksum": "1448259.1217999998"
+      },
+      "kestrel_compute": 0.009999999999999998,
+      "pandas_compute": 0.0,
+      "kestrel_total": 0.03,
+      "pandas_total": 0.34,
+      "speed_ratio_total": 11.333333333333334,
+      "speed_ratio_compute": 0.0,
+      "memory_ratio": 3.580745341614907
+    },
+    {
+      "pipeline": "corr",
+      "kestrel": {
+        "cpu": 0.03,
+        "wall": 0.03936079202685505,
+        "rss": 29163520,
+        "checksum": "2.9918418783165288"
+      },
+      "pandas": {
+        "cpu": 0.34,
+        "wall": 0.3604447089601308,
+        "rss": 129368064,
+        "checksum": "2.991841878316528"
+      },
+      "kestrel_compute": 0.009999999999999998,
+      "pandas_compute": 0.0,
+      "kestrel_total": 0.03,
+      "pandas_total": 0.34,
+      "speed_ratio_total": 11.333333333333334,
+      "speed_ratio_compute": 0.0,
+      "memory_ratio": 4.435955056179775
+    },
+    {
+      "pipeline": "melt",
+      "kestrel": {
+        "cpu": 0.03,
+        "wall": 0.048282832955010235,
+        "rss": 60702720,
+        "checksum": "1449019.2699999795"
+      },
+      "pandas": {
+        "cpu": 0.34,
+        "wall": 0.36368858302012086,
+        "rss": 135315456,
+        "checksum": "1449019.27"
+      },
+      "kestrel_compute": 0.009999999999999998,
+      "pandas_compute": 0.0,
+      "kestrel_total": 0.03,
+      "pandas_total": 0.34,
+      "speed_ratio_total": 11.333333333333334,
+      "speed_ratio_compute": 0.0,
+      "memory_ratio": 2.2291497975708503
+    }
+  ]
+}

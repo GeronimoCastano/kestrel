@@ -1,0 +1,28 @@
+// KesNet end-to-end regression: a two-layer network, Adam and mean squared error.
+// Run with: kestrel run examples/kesnet.kes
+import std.kesnet.{Linear, ReLU, Sequential, mseLoss, meanSquaredError}
+import std.kesnet.optim.{Adam, StepLR}
+
+Variable.seed(11)
+let features := Tensor([1.0, 2.0, 2.0, 1.0, 4.0, 3.0, 5.0, 6.0], shape = (4, 2))
+let targets := Tensor([8.0, 7.0, 18.0, 29.0], shape = (4, 1))
+let inputs := Variable.fromTensor(features)
+let expected := Variable.fromTensor(targets)
+
+let model := Sequential([box(Linear(2, 16)), box(ReLU()), box(Linear(16, 1))])
+let mut optimizer := Adam(model.parameters(), 0.03)
+let mut schedule := StepLR(200, 0.5)
+
+for (epoch in range(400)) {
+    let loss := mseLoss(model.forward(inputs), expected)
+    optimizer.zeroGrad()
+    loss.backward()
+    optimizer.step()
+    schedule.step(optimizer)
+    if epoch % 100 == 0 { print(f"epoch {epoch}: loss {loss.item()}") }
+}
+
+let prediction := model.forward(inputs)
+print(f"final loss {meanSquaredError(prediction, expected)}")
+print(prediction.data())
+print(f"parameters {model.parameterCount()}")

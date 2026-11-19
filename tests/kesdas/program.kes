@@ -1,0 +1,1695 @@
+import std.kesdas.{Series, DataFrame, Scalar}
+
+function case0() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s)
+}
+
+function case1() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(f)
+}
+
+function case2() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s + 10)
+}
+
+function case3() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s * 1.5)
+}
+
+function case4() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s / 2)
+}
+
+function case5() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(-s)
+}
+
+function case6() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.gt(2))
+}
+
+function case7() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.sortValues())
+}
+
+function case8() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.sortValues(ascending = false))
+}
+
+function case9() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.head(2))
+}
+
+function case10() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.tail(2))
+}
+
+function case11() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.cumSum())
+}
+
+function case12() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.diff())
+}
+
+function case13() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.shift(2))
+}
+
+function case14() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(f.rolling(2).mean())
+}
+
+function case15() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.describe())
+}
+
+function case16() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.sum())
+}
+
+function case17() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.mean())
+}
+
+function case18() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.std())
+}
+
+function case19() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.median())
+}
+
+function case20() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.quantile(0.25))
+}
+
+function case21() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.min())
+}
+
+function case22() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(f.max())
+}
+
+function case23() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.idxMax())
+}
+
+function case24() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.rank())
+}
+
+function case25() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(f.pctChange())
+}
+
+function case26() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(Series([1.234, 5.678]).round(1))
+}
+
+function case27() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.isIn([1, 2]))
+}
+
+function case28() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.between(2, 4))
+}
+
+function case29() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.clip(2.0, 4.0))
+}
+
+function case30() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.filter(s.gt(2)))
+}
+
+function case31() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.str().upper())
+}
+
+function case32() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.str().len())
+}
+
+function case33() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.valueCounts())
+}
+
+function case34() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.unique())
+}
+
+function case35() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.nunique())
+}
+
+function case36() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.astype("float64"))
+}
+
+function case37() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df)
+}
+
+function case38() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.head(2))
+}
+
+function case39() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.tail(2))
+}
+
+function case40() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.shape())
+}
+
+function case42() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.sum())
+}
+
+function case43() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.mean())
+}
+
+function case44() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.describe())
+}
+
+function case45() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.corr())
+}
+
+function case46() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.sortValues("v", ascending = false)?)
+}
+
+function case47() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.sortValues(["k", "v"], ascending = false)?)
+}
+
+function case48() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.filter(df.col("v")?.gt(3)))
+}
+
+function case49() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.drop("w"))
+}
+
+function case50() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.rename("v", "value"))
+}
+
+function case51() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.assign("z", df.col("v")? * 2))
+}
+
+function case52() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.setIndex("k")?)
+}
+
+function case53() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.setIndex("k")?.resetIndex())
+}
+
+function case54() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.sum())
+}
+
+function case55() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.mean())
+}
+
+function case56() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.counts())
+}
+
+function case57() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.size())
+}
+
+function case58() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.max())
+}
+
+function case59() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.agg([("v", "sum"), ("w", "mean")]))
+}
+
+function case60() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.pivotTable("k", "v", "w", "sum")?)
+}
+
+function case61() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.duplicated())
+}
+
+function case62() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.dropDuplicates(["k"])?)
+}
+
+function case63() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.nlargest(2, "w")?)
+}
+
+function case64() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.toCsv())
+}
+
+function case65() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.head(-2))
+}
+
+function case66() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.tail(-2))
+}
+
+function case67() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.any())
+}
+
+function case68() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.all())
+}
+
+function case69() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.sem())
+}
+
+function case70() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.skew())
+}
+
+function case71() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.kurt())
+}
+
+function case72() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.quantile([0.25, 0.75]))
+}
+
+function case73() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.rank(method = "dense"))
+}
+
+function case74() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.rank(pct = true))
+}
+
+function case75() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.duplicated(keep = "last"))
+}
+
+function case76() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.dropDuplicates(keep = "none"))
+}
+
+function case77() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.valueCounts(normalize = true))
+}
+
+function case78() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.valueCounts(sort = false))
+}
+
+function case79() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let miss := Series([1.0, 0.0 / 0.0, 3.0, 0.0 / 0.0], name = "m")
+print(miss.interpolate())
+}
+
+function case80() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let miss := Series([1.0, 0.0 / 0.0, 3.0], name = "m")
+print(miss.ffill())
+}
+
+function case81() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let miss := Series([1.0, 0.0 / 0.0, 3.0], name = "m")
+print(miss.bfill())
+}
+
+function case82() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.where(s.gt(2), Scalar.ofInt(0)))
+}
+
+function case83() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.mask(s.gt(2), Scalar.ofInt(0)))
+}
+
+function case84() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.corr(s))
+}
+
+function case85() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.cov(s))
+}
+
+function case87() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(Series.concat([s, f]))
+}
+
+function case88() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.mapValues(Map("a" => "A", "b" => "B")))
+}
+
+function case89() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.head(-2))
+}
+
+function case90() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.tail(-2))
+}
+
+function case91() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.at(2, "v")?)
+}
+
+function case92() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.iat(2, 1)?)
+}
+
+function case93() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.any())
+}
+
+function case94() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.all())
+}
+
+function case95() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.prod())
+}
+
+function case96() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.sem())
+}
+
+function case97() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.skew())
+}
+
+function case98() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.kurt())
+}
+
+function case99() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.quantile(0.5))
+}
+
+function case100() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.quantile([0.25, 0.75]))
+}
+
+function case101() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.cov())
+}
+
+function case102() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.corrwith(df))
+}
+
+function case103() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.valueCounts("k")?)
+}
+
+function case104() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.duplicated(keep = "last"))
+}
+
+function case105() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.sortValues(["k", "v"], ascending = [false, true])?)
+}
+
+function case106() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.selectDtypes("number"))
+}
+
+function case107() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.selectDtypes("number").round(1))
+}
+
+function case108() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.selectDtypes("number").abs())
+}
+
+function case109() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.selectDtypes("number").clip(2.0, 5.0))
+}
+
+function case110() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.shift(1))
+}
+
+function case111() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.diff())
+}
+
+function case112() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.pctChange())
+}
+
+function case113() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.cumSum())
+}
+
+function case114() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.rank())
+}
+
+function case115() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.replace("a", "z"))
+}
+
+function case116() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let bumped := df.insert(1, "x", Series([9, 8, 7, 6, 5, 4]))?
+print(bumped)
+}
+
+function case117() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.pivot("k", "v", "w")?)
+}
+
+function case118() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.crosstab("k", "v")?)
+}
+
+function case119() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.getDummies(["k"])?)
+}
+
+function case120() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.melt(idVars = ["k"], valueVars = ["v", "w"])?)
+}
+
+function case121() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let right := DataFrame([Series([10, 20, 30, 40, 50, 60], name = "x")])
+print(DataFrame.concatColumns([df, right])?)
+}
+
+function case122() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.toCsv(separator = ";"))
+}
+
+function case123() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.str().count("a"))
+}
+
+function case124() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.str().find("b"))
+}
+
+function case125() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.str().center(3))
+}
+
+function case126() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.str().zfill(3))
+}
+
+function case127() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.str().sliceReplace(0, 1, "Q"))
+}
+
+function case128() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let padded := Series(["  a", " b "], name = "p")
+print(padded.str().stripLeading())
+}
+
+function case129() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.col("k")?.splitToFrame("x"))
+}
+
+function case130() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.head(2))
+}
+
+function case131() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.tail(1))
+}
+
+function case132() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.nth(1))
+}
+
+function case133() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.cumCount())
+}
+
+function case134() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.ngroup())
+}
+
+function case135() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.getGroup("a")?)
+}
+
+function case136() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.transformAll("mean"))
+}
+
+function case137() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.shift("v"))
+}
+
+function case138() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.diff("v"))
+}
+
+function case139() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.pctChange("v"))
+}
+
+function case140() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.sem())
+}
+
+function case141() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.skew())
+}
+
+function case142() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.kurt())
+}
+
+function case143() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.all())
+}
+
+function case144() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.any())
+}
+
+function case145() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.quantile(0.5))
+}
+
+function case146() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.rolling(2).mean())
+}
+
+function case147() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let left := DataFrame([Series(["a", "b", "d"], name = "k"), Series([10, 20, 40], name = "x")])
+print(df.merge(left, on = "k")?)
+}
+
+function case148() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let left := DataFrame([Series(["a", "b", "d"], name = "k"), Series([10, 20, 40], name = "x")])
+print(df.merge(left, on = "k", how = "left")?)
+}
+
+function case149() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let left := DataFrame([Series(["a", "b", "d"], name = "k"), Series([10, 20, 40], name = "x")])
+print(df.merge(left, on = "k", how = "right")?)
+}
+
+function case150() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let left := DataFrame([Series(["a", "b", "d"], name = "k"), Series([10, 20, 40], name = "x")])
+print(df.merge(left, on = "k", how = "outer")?)
+}
+
+function case151() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let left := DataFrame([Series(["a", "b", "d"], name = "k"), Series([10, 20, 40], name = "x")])
+print(df.merge(left, on = "k", how = "outer", leftSuffix = "_l", rightSuffix = "_r")?)
+}
+
+function case152() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let m := DataFrame.parseCsv("a,b\n1,\n,2\n,\n3,3\n")
+print(m.dropNa())
+}
+
+function case153() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let m := DataFrame.parseCsv("a,b\n1,\n,2\n,\n3,3\n")
+print(m.dropNa(how = "all"))
+}
+
+function case154() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let m := DataFrame.parseCsv("a,b\n1,\n,2\n,\n3,3\n")
+print(m.dropNa(thresh = 2))
+}
+
+function case155() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let m := DataFrame.parseCsv("a,b\n1,\n,2\n,\n3,3\n")
+print(m.dropNa(["b"])?)
+}
+
+function case156() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.cumSum("v"))
+}
+
+function case157() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.cumMax("v"))
+}
+
+function case158() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.groupBy("k")?.rank("v"))
+}
+
+function case159() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.clip(2, 4))
+}
+
+function case160() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.repeat(2))
+}
+
+function case161() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.isUnique())
+}
+
+function case162() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(s.isMonotonic())
+}
+
+function case163() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.idxMax())
+}
+
+function case164() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["k", "v"])?.mode())
+}
+
+function case165() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.expanding().mean())
+}
+
+function case166() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.ewm(alpha = 0.5).mean())
+}
+
+function case167() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.ewm(alpha = 0.5, adjust = false).mean())
+}
+
+function case168() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+
+print(df.select(["v", "w"])?.transpose()?)
+}
+
+function case169() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let m := DataFrame.parseCsv("a,b\n1,\n2,2\n3,6\n4,8\n")
+print(m.corr())
+}
+
+function case170() : void or Error with Effects {
+let df := DataFrame([Series(["a", "b", "a", "c", "b", "a"], name = "k"), Series([1, 2, 3, 4, 5, 6], name = "v"), Series([1.5, 2.5, 3.5, 4.5, 5.5, 6.5], name = "w")])
+let s := Series([3, 1, 2, 5, 4], name = "n")
+let f := Series([1.5, 2.25, 3.0], name = "f")
+let m := DataFrame.parseCsv("a,b\n1,\n2,2\n3,6\n4,8\n")
+print(m.cov())
+}
+
+function main() : void or Error with Effects {
+    print("=== series")
+    case0()?
+    print("=== series float")
+    case1()?
+    print("=== series add scalar")
+    case2()?
+    print("=== series mul float")
+    case3()?
+    print("=== series div")
+    case4()?
+    print("=== series neg")
+    case5()?
+    print("=== series compare")
+    case6()?
+    print("=== series sort")
+    case7()?
+    print("=== series sort desc")
+    case8()?
+    print("=== series head")
+    case9()?
+    print("=== series tail")
+    case10()?
+    print("=== series cumsum")
+    case11()?
+    print("=== series diff")
+    case12()?
+    print("=== series shift")
+    case13()?
+    print("=== series rolling mean")
+    case14()?
+    print("=== series describe")
+    case15()?
+    print("=== series sum")
+    case16()?
+    print("=== series mean")
+    case17()?
+    print("=== series std")
+    case18()?
+    print("=== series median")
+    case19()?
+    print("=== series quantile")
+    case20()?
+    print("=== series min")
+    case21()?
+    print("=== series max")
+    case22()?
+    print("=== series idxmax")
+    case23()?
+    print("=== series rank")
+    case24()?
+    print("=== series pct_change")
+    case25()?
+    print("=== series round")
+    case26()?
+    print("=== series isin")
+    case27()?
+    print("=== series between")
+    case28()?
+    print("=== series clip")
+    case29()?
+    print("=== series filter")
+    case30()?
+    print("=== series str upper")
+    case31()?
+    print("=== series str len")
+    case32()?
+    print("=== series value_counts")
+    case33()?
+    print("=== series unique")
+    case34()?
+    print("=== series nunique")
+    case35()?
+    print("=== series astype float")
+    case36()?
+    print("=== frame")
+    case37()?
+    print("=== frame head")
+    case38()?
+    print("=== frame tail")
+    case39()?
+    print("=== frame shape")
+    case40()?
+    print("=== frame sum numeric")
+    case42()?
+    print("=== frame mean numeric")
+    case43()?
+    print("=== frame describe")
+    case44()?
+    print("=== frame corr")
+    case45()?
+    print("=== frame sort")
+    case46()?
+    print("=== frame sort two")
+    case47()?
+    print("=== frame filter")
+    case48()?
+    print("=== frame drop")
+    case49()?
+    print("=== frame rename")
+    case50()?
+    print("=== frame assign")
+    case51()?
+    print("=== frame set_index")
+    case52()?
+    print("=== frame reset_index")
+    case53()?
+    print("=== groupby sum")
+    case54()?
+    print("=== groupby mean")
+    case55()?
+    print("=== groupby count")
+    case56()?
+    print("=== groupby size")
+    case57()?
+    print("=== groupby max")
+    case58()?
+    print("=== groupby agg")
+    case59()?
+    print("=== pivot")
+    case60()?
+    print("=== duplicated")
+    case61()?
+    print("=== drop duplicates")
+    case62()?
+    print("=== nlargest")
+    case63()?
+    print("=== csv")
+    case64()?
+    print("=== series head negative")
+    case65()?
+    print("=== series tail negative")
+    case66()?
+    print("=== series any")
+    case67()?
+    print("=== series all")
+    case68()?
+    print("=== series sem")
+    case69()?
+    print("=== series skew")
+    case70()?
+    print("=== series kurt")
+    case71()?
+    print("=== series quantiles")
+    case72()?
+    print("=== series rank dense")
+    case73()?
+    print("=== series rank pct")
+    case74()?
+    print("=== series duplicated last")
+    case75()?
+    print("=== series drop duplicates none")
+    case76()?
+    print("=== series value counts normalize")
+    case77()?
+    print("=== series value counts unsorted")
+    case78()?
+    print("=== series interpolate")
+    case79()?
+    print("=== series ffill")
+    case80()?
+    print("=== series bfill")
+    case81()?
+    print("=== series where")
+    case82()?
+    print("=== series mask")
+    case83()?
+    print("=== series corr")
+    case84()?
+    print("=== series cov")
+    case85()?
+    print("=== series concat")
+    case87()?
+    print("=== series map values")
+    case88()?
+    print("=== frame head negative")
+    case89()?
+    print("=== frame tail negative")
+    case90()?
+    print("=== frame at")
+    case91()?
+    print("=== frame iat")
+    case92()?
+    print("=== frame any")
+    case93()?
+    print("=== frame all")
+    case94()?
+    print("=== frame prod")
+    case95()?
+    print("=== frame sem")
+    case96()?
+    print("=== frame skew")
+    case97()?
+    print("=== frame kurt")
+    case98()?
+    print("=== frame quantile")
+    case99()?
+    print("=== frame quantiles")
+    case100()?
+    print("=== frame cov")
+    case101()?
+    print("=== frame corrwith")
+    case102()?
+    print("=== frame value counts")
+    case103()?
+    print("=== frame duplicated last")
+    case104()?
+    print("=== frame sort multi ascending")
+    case105()?
+    print("=== frame select dtypes")
+    case106()?
+    print("=== frame round")
+    case107()?
+    print("=== frame abs")
+    case108()?
+    print("=== frame clip")
+    case109()?
+    print("=== frame shift")
+    case110()?
+    print("=== frame diff")
+    case111()?
+    print("=== frame pct change")
+    case112()?
+    print("=== frame cumsum")
+    case113()?
+    print("=== frame rank")
+    case114()?
+    print("=== frame replace")
+    case115()?
+    print("=== frame insert")
+    case116()?
+    print("=== frame pivot")
+    case117()?
+    print("=== frame crosstab")
+    case118()?
+    print("=== frame get dummies")
+    case119()?
+    print("=== frame melt")
+    case120()?
+    print("=== frame concat columns")
+    case121()?
+    print("=== csv separator")
+    case122()?
+    print("=== string count")
+    case123()?
+    print("=== string find")
+    case124()?
+    print("=== string center")
+    case125()?
+    print("=== string zfill")
+    case126()?
+    print("=== string slice replace")
+    case127()?
+    print("=== string strip leading")
+    case128()?
+    print("=== string split to frame")
+    case129()?
+    print("=== groupby head")
+    case130()?
+    print("=== groupby tail")
+    case131()?
+    print("=== groupby nth")
+    case132()?
+    print("=== groupby cumcount")
+    case133()?
+    print("=== groupby ngroup")
+    case134()?
+    print("=== groupby get group")
+    case135()?
+    print("=== groupby transform all")
+    case136()?
+    print("=== groupby shift")
+    case137()?
+    print("=== groupby diff")
+    case138()?
+    print("=== groupby pct change")
+    case139()?
+    print("=== groupby sem")
+    case140()?
+    print("=== groupby skew")
+    case141()?
+    print("=== groupby kurt")
+    case142()?
+    print("=== groupby all")
+    case143()?
+    print("=== groupby any")
+    case144()?
+    print("=== groupby quantile")
+    case145()?
+    print("=== frame rolling")
+    case146()?
+    print("=== merge inner")
+    case147()?
+    print("=== merge left")
+    case148()?
+    print("=== merge right")
+    case149()?
+    print("=== merge outer")
+    case150()?
+    print("=== merge suffixes")
+    case151()?
+    print("=== frame dropna")
+    case152()?
+    print("=== frame dropna all")
+    case153()?
+    print("=== frame dropna thresh")
+    case154()?
+    print("=== frame dropna subset")
+    case155()?
+    print("=== groupby cumsum")
+    case156()?
+    print("=== groupby cummax")
+    case157()?
+    print("=== groupby rank")
+    case158()?
+    print("=== series clip int")
+    case159()?
+    print("=== series repeat")
+    case160()?
+    print("=== series is unique")
+    case161()?
+    print("=== series is monotonic")
+    case162()?
+    print("=== frame idxmax")
+    case163()?
+    print("=== frame mode")
+    case164()?
+    print("=== frame expanding mean")
+    case165()?
+    print("=== frame ewm mean")
+    case166()?
+    print("=== frame ewm adjusted false")
+    case167()?
+    print("=== frame transpose")
+    case168()?
+    print("=== frame corr missing")
+    case169()?
+    print("=== frame cov missing")
+    case170()?
+}
+main()?

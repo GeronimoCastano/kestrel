@@ -1,0 +1,5 @@
+// A proof sketch. `sorry` closes any goal and produces a warning; a theorem
+// that uses it can still be cited while drafting, but no function may require it.
+theorem unproved(n : Nat) : n = Zero by {
+    sorry
+}

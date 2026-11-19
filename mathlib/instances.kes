@@ -1,0 +1,107 @@
+// Instances are audit theorems: the statement is the conjunction of the laws
+// at one concrete carrier and its operations.
+
+import nat.{addComm, addAssoc, addZeroL, addZeroR, mulComm, mulAssoc, mulOneL, mulOneR}
+import set.{unionComm, unionAssoc, unionIdem, unionEmptyL, interComm, interAssoc,
+             interIdem, interEmptyL, interDistribUnion, unionDistribInter}
+
+/// Nat with addition, zero and commutativity is a commutative monoid.
+public theorem natAddCommMonoid() :
+        (forall a : Nat, forall b : Nat, a + b = b + a) and
+        (forall a : Nat, forall b : Nat, forall c : Nat, (a + b) + c = a + (b + c)) and
+        (forall a : Nat, Zero + a = a) and
+        (forall a : Nat, a + Zero = a) by {
+    constructor
+    constructor
+    constructor
+    { intro a
+      intro b
+      exact addComm(a, b) }
+    { intro a
+      intro b
+      intro c
+      exact addAssoc(a, b, c) }
+    { intro a
+      exact addZeroL(a) }
+    { intro a
+      exact addZeroR(a) }
+}
+
+/// Nat with multiplication, one and commutativity is a commutative monoid.
+public theorem natMulCommMonoid() :
+        (forall a : Nat, forall b : Nat, a * b = b * a) and
+        (forall a : Nat, forall b : Nat, forall c : Nat, (a * b) * c = a * (b * c)) and
+        (forall a : Nat, 1 * a = a) and
+        (forall a : Nat, a * 1 = a) by {
+    constructor
+    constructor
+    constructor
+    { intro a
+      intro b
+      exact mulComm(a, b) }
+    { intro a
+      intro b
+      intro c
+      exact mulAssoc(a, b, c) }
+    { intro a
+      exact mulOneL(a) }
+    { intro a
+      exact mulOneR(a) }
+}
+
+/// Set union and intersection form a distributive lattice with a bottom.
+public theorem setUnionInterLattice[U]() :
+        (forall A : Set[U], forall B : Set[U], A ∪ B = B ∪ A) and
+        (forall A : Set[U], forall B : Set[U], forall C : Set[U],
+         (A ∪ B) ∪ C = A ∪ (B ∪ C)) and
+        (forall A : Set[U], A ∪ A = A) and
+        (forall A : Set[U], A ∪ ∅ = A) and
+        (forall A : Set[U], forall B : Set[U], A ∩ B = B ∩ A) and
+        (forall A : Set[U], forall B : Set[U], forall C : Set[U],
+         (A ∩ B) ∩ C = A ∩ (B ∩ C)) and
+        (forall A : Set[U], A ∩ A = A) and
+        (forall A : Set[U], A ∩ ∅ = ∅) and
+        (forall A : Set[U], forall B : Set[U], forall C : Set[U],
+         A ∩ (B ∪ C) = (A ∩ B) ∪ (A ∩ C)) and
+        (forall A : Set[U], forall B : Set[U], forall C : Set[U],
+         A ∪ (B ∩ C) = (A ∪ B) ∩ (A ∪ C)) by {
+    constructor
+    constructor
+    constructor
+    constructor
+    constructor
+    constructor
+    constructor
+    constructor
+    constructor
+    { intro A
+      intro B
+      exact unionComm(A, B) }
+    { intro A
+      intro B
+      intro C
+      exact unionAssoc(A, B, C) }
+    { intro A
+      exact unionIdem(A) }
+    { intro A
+      exact unionEmptyL(A) }
+    { intro A
+      intro B
+      exact interComm(A, B) }
+    { intro A
+      intro B
+      intro C
+      exact interAssoc(A, B, C) }
+    { intro A
+      exact interIdem(A) }
+    { intro A
+      exact interEmptyL(A) }
+    { intro A
+      intro B
+      intro C
+      exact interDistribUnion(A, B, C) }
+    { intro A
+      intro B
+      intro C
+      exact unionDistribInter(A, B, C) }
+}

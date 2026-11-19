@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kestrel-kernel"
+version = "0.1.0"
+description = "A Jupyter kernel for the Kestrel language"
+requires-python = ">=3.9"
+dependencies = ["ipykernel>=6.0"]
+
+[tool.setuptools]
+packages = ["kestrel_kernel"]
+
+[tool.setuptools.package-data]
+kestrel_kernel = ["*.png", "kesdas_metadata.json", "kesnet_metadata.json", "builtins_metadata.json"]

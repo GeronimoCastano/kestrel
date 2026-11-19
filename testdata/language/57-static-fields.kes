@@ -1,0 +1,8 @@
+class Registry {
+    public static final name : String = "kestrel" + " registry"
+    public static final limits : List[Int] = [1, 2, 3]
+    new() {}
+}
+
+print(Registry.name)
+print(Registry.limits.length())

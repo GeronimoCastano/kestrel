@@ -1,0 +1,3 @@
+public function identity[T](x : T) : T = x
+public function compose[A, B, C](move f : B -> C, move g : A -> B) : A -> C = move x => f(g(x))
+public function constant[A, B](value : B, ignored : A) : B = value

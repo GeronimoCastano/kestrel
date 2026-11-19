@@ -1,0 +1,11 @@
+// Save and restore a model's parameters by position.
+// Run with: kestrel run examples/kesnetstate.kes
+import std.kesnet.{Linear, saveParameters, loadParameters}
+
+let model := Linear(2, 3)
+model.weight.fill_(1.5)
+saveParameters(model, "/tmp/kesnet-model")
+let restored := Linear(2, 3)
+loadParameters(restored, "/tmp/kesnet-model")
+let x := Variable.fromArray([1.0, 2.0].toArray(), (1, 2))
+print(model.forward(x).data()[0, 0] == restored.forward(x).data()[0, 0])

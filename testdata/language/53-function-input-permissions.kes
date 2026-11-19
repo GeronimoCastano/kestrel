@@ -1,0 +1,26 @@
+class Counter {
+    var n : Int
+    new() {this.n=0}
+    public mut function increment() : Int {this.n=this.n+1
+    this.n}
+}
+class Payload {
+    public final label : String
+    new(label : String) {this.label=label}
+}
+alias Update = (mut value : Counter) -> Int
+alias Consume = (move value : Payload) -> String
+alias Combine = (left : Int, right : Int) -> Int
+function increment(mut target : Counter) : Int=target.increment()
+function takePayload(move item : Payload) : String=item.label
+function add(a : Int,b : Int) : Int=a+b
+function run(update : Update,mut counter : Counter) : Int=update(value=counter)
+function own(consume : Consume,move payload : Payload) : String=consume(value=payload)
+let counter:=Counter()
+let update : Update=increment
+print(update(value=counter))
+print(run(update,counter))
+let consume : Consume=takePayload
+print(own(consume,Payload("owned"+" value")))
+let combine : Combine=add
+print(combine(right=3,left=2))

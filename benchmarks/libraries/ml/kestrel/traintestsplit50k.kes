@@ -1,0 +1,31 @@
+// Train/test split of 50,000 rows with 6 features and y as the row sums.
+// The split repeats R times with a fresh Rng seeded identically. The shuffle
+// sequences differ between implementations, so the checksum is the
+// split-invariant column sums of X over the training and testing outputs,
+// added across repetitions.
+import std.ml.{trainTestSplit}
+import std.random.{Rng}
+
+import std.process.{args}
+
+let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 1500 }) else 1500
+
+let X := Tensor.generate((50000, 6), (i, j) => ((i * 1103515245 + j * 12345 + 7) % 2147483648).toDouble() / 2147483648.0)
+let y := Tensor.generate((50000,), i => X[i, 0] + X[i, 1] + X[i, 2] + X[i, 3] + X[i, 4] + X[i, 5])
+let mut total0 := 0.0
+let mut total1 := 0.0
+let mut total2 := 0.0
+let mut total3 := 0.0
+let mut total4 := 0.0
+let mut total5 := 0.0
+for (step in range(REPETITIONS)) {
+    let (trainingX, testingX, trainingY, testingY) := trainTestSplit(X, y, 10000, Rng.seeded(7))
+    let columns := trainingX.sum(axis = 0) + testingX.sum(axis = 0)
+    total0 += columns[0]
+    total1 += columns[1]
+    total2 += columns[2]
+    total3 += columns[3]
+    total4 += columns[4]
+    total5 += columns[5]
+}
+print(f"{total0:.6f} {total1:.6f} {total2:.6f} {total3:.6f} {total4:.6f} {total5:.6f}")

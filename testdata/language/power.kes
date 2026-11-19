@@ -1,0 +1,26 @@
+// `**` with an Int exponent is a matrix power on a square matrix.
+// On vectors and non-square matrices it is elementwise; a double exponent is
+// always elementwise.
+let A := Tensor([1.0, 2.0, 3.0, 4.0], shape = (2, 2))
+print(A ** 0)
+print(A ** 2)
+print(A ** 2.0)
+print(-A)
+
+let v := Tensor([1.0, 2.0, 3.0])
+print(v ** 2)
+
+// Classes opt into the same operators with Negatable and Powerable.
+class Scaled {
+    public final value : Int
+    new(value : Int) { this.value = value }
+    has Negatable, Powerable, RightPowerable
+    public function negate() : Scaled = Scaled(-this.value)
+    public function power(exponent : Int) : Scaled = Scaled(this.value ** exponent)
+    public function rightPower(left : Int) : Scaled = Scaled(left ** this.value)
+}
+
+let scaled := Scaled(3)
+print((-scaled).value)
+print((scaled ** 2).value)
+print((2 ** scaled).value)

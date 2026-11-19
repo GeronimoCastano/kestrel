@@ -1,0 +1,55 @@
+class Account {
+    invariant this.balance >= 0.0
+    invariant this.balance <= 1000.0
+
+    public var balance : double
+
+    new(start : double) { this.balance = start }
+
+    private mut function touch() : void {
+        let saved := this.balance
+        this.balance = -1.0
+        this.balance = saved
+    }
+
+    public mut function deposit(amount : double) : void {
+        this.touch()
+        this.balance = this.balance + amount
+    }
+
+    public mut function withdraw(amount : double) : void or Error {
+        if amount > this.balance { return Error("insufficient funds") }
+        this.balance = this.balance - amount
+    }
+
+    public function current() : double = this.balance
+
+    public function healthy() : Bool = this.current() >= 0.0
+}
+
+class Savings extends Account {
+    invariant this.rate >= 0.0
+
+    public var rate : double
+
+    new(start : double, rate : double) {
+        this.balance = start
+        this.rate = rate
+    }
+
+    public mut function earn() : void {
+        this.balance = this.balance + this.balance * this.rate
+    }
+}
+
+let account := Account(40.0)
+account.deposit(2.0)
+print(account.current())
+print(account.healthy())
+match account.withdraw(5000.0) {
+    RuntimeError.Message(message) => print(message),
+    _ => print("unexpected"),
+}
+let savings := Savings(100.0, 0.1)
+savings.earn()
+print(savings.current())

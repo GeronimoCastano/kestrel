@@ -1,0 +1,18 @@
+// Linear congruential generator, an in-place sort, and a strided sum.
+function generate(n : Int) : Array[Int] {
+    let mut values : Array[Int] = Array.empty()
+    let mut x := 42
+    for (let i : Int = 0; i < n; i = i + 1) {
+        x = (x * 1103515245 + 12345) % 2147483648
+        values.append(x)
+    }
+    values
+}
+
+let values := generate(2000000)
+values.sort()
+let mut total := 0
+for (let i : Int = 0; i < values.length(); i = i + 1000) {
+    total = total + values[i]
+}
+print(total)

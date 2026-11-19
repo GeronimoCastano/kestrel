@@ -1,0 +1,93 @@
+// Kesdas benchmark pipelines. Run with:
+//   kestrel build benchmarks/kesdas/pipelines.kes -o benchmarks/build/kesdas_pipelines
+//   benchmarks/build/kesdas_pipelines DATA.csv PIPELINE
+//
+// The program loads the CSV once and prints one checksum. `load` measures the
+// shared read and checksum cost, so the driver can subtract it from a pipeline.
+import std.kesdas as kd
+import std.process.{args}
+
+function checksum(frame : kd.DataFrame) : double or Error =
+    frame.length().toDouble() + frame.col("units")?.sum().asDouble()
+
+function pipeline(frame : kd.DataFrame, name : String) : double or Error {
+    if name == "load" {
+        return checksum(frame)
+    }
+
+    if name == "filter_sort" {
+        let units := frame.col("units")?
+        let price := frame.col("price")?
+        let withRevenue := frame.assign("revenue", units * price)
+        let mask := withRevenue.col("active")?.both(withRevenue.col("revenue")?.gt(20.0))
+        let top := withRevenue.filter(mask).nlargest(100, "revenue")?
+        return top.col("revenue")?.sum().asDouble()
+    }
+
+    if name == "groupby_agg" {
+        let grouped := frame.groupBy("region")?
+        return grouped.agg([("units", "sum"), ("price", "mean"), ("units", "mean")]).sum().sum().asDouble()
+    }
+
+    if name == "groupby_two_keys" {
+        let small := frame.select(["region", "product", "units", "price"])?
+        let grouped := small.groupBy(["region", "product"])?
+        return grouped.sum().select(["units", "price"])?.sum().sum().asDouble()
+    }
+
+    if name == "pivot" {
+        let table := frame.pivotTable("region", "product", "units", "sum")?
+        return table.sum().sum().asDouble()
+    }
+
+    if name == "merge" {
+        let regions := kd.Series(["r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"], name = "region")
+        let weights := kd.Series([1.0, 0.9, 1.1, 1.2, 0.8, 1.05, 0.95, 1.15], name = "weight")
+        let lookup := kd.DataFrame([regions, weights])
+        let merged := frame.merge(lookup, on = "region", how = "left")?
+        let weighted := merged.assign("weighted", merged.col("units")? * merged.col("weight")?).select(["region", "weighted"])?
+        return weighted.groupBy("region")?.sum().select(["weighted"])?.sum().sum().asDouble()
+    }
+
+    if name == "missing_fill" {
+        let clean := frame.fillNa(0.0)
+        let units := clean.col("units")?
+        let price := clean.col("price")?
+        let discount := clean.col("discount")?
+        let multiplier := discount.multiply(-1.0).add(1.0)
+        let net := clean.assign("net", units * price * multiplier)
+        return net.groupBy("active")?.mean().sum().sum().asDouble()
+    }
+
+    if name == "value_counts" {
+        return frame.valueCounts("region")?.sum().asDouble()
+    }
+
+    if name == "rolling" {
+        let numeric := frame.select(["units", "price"])?
+        return numeric.rolling(50).mean().sum().sum().asDouble()
+    }
+
+    if name == "corr" {
+        let numeric := frame.select(["units", "price", "discount"])?
+        return numeric.corr().sum().sum().asDouble()
+    }
+
+    if name == "melt" {
+        let wide := frame.select(["id", "units", "price"])?
+        let long := wide.melt(idVars = ["id"], valueVars = ["units", "price"])?
+        return long.col("value")?.sum().asDouble()
+    }
+
+    Error("unknown pipeline " + name)
+}
+
+function main() : void or Error with Effects {
+    let a := args.toArray()
+    let frame := kd.readCsv(a[0])?
+    let reps := if a.length() > 2 then parseInt(a[2])? else 1
+    let mut total := 0.0
+    for (i in range(reps)) { total = total + pipeline(frame, a[1])? }
+    print(total)
+}
+main()

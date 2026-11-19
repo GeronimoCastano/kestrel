@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kestrel Game — proofs, one tactic at a time</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --panel: #161b22;
+    --panel-2: #1c2430;
+    --ink: #e6edf3;
+    --muted: #8b98a9;
+    --line: #2b3543;
+    --gold: #e3b341;
+    --gold-soft: #e3b34122;
+    --teal: #4dd0c4;
+    --green: #3fb950;
+    --red: #f85149;
+    --violet: #bc8cff;
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0; background:
+      radial-gradient(1200px 600px at 80% -10%, #1d2a3a 0%, transparent 55%),
+      radial-gradient(900px 500px at -10% 110%, #241d12 0%, transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header {
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
+    padding: 18px 28px; border-bottom: 1px solid var(--line);
+    background: #0d1117cc; backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 10;
+  }
+  .brand { display: flex; align-items: baseline; gap: 12px; }
+  .brand h1 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
+  .brand h1 span { color: var(--gold); }
+  .brand small { color: var(--muted); }
+  .progress { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+  .progress-track { width: 180px; height: 6px; border-radius: 99px; background: #212a36; overflow: hidden; }
+  .progress-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--teal), var(--gold)); transition: width .35s ease; }
+  main { display: grid; grid-template-columns: 290px minmax(0, 1fr); min-height: calc(100vh - 73px); }
+  aside { border-right: 1px solid var(--line); padding: 18px 14px 40px; overflow-y: auto; }
+  .group-title { margin: 16px 8px 7px; font-size: 11px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); }
+  .game {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 2px;
+    width: 100%; padding: 8px 10px; margin: 2px 0; border: 1px solid transparent; border-radius: 8px;
+    background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: inherit;
+  }
+  .game:hover { background: #ffffff08; }
+  .game.active { background: var(--gold-soft); border-color: #e3b34155; }
+  .game-title { font-size: 13.5px; font-weight: 600; line-height: 1.25; }
+  .game-meta { color: var(--muted); font: 11px var(--mono); }
+  .world-note { color: var(--muted); font-size: 12px; line-height: 1.45; padding: 2px 9px 8px; white-space: pre-wrap; }
+  .level {
+    display: grid; grid-template-columns: 26px 1fr; gap: 9px; align-items: center;
+    width: 100%; padding: 9px 10px; margin: 2px 0; border: 1px solid transparent; border-radius: 8px;
+    background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: inherit;
+  }
+  .level:hover { background: #ffffff08; }
+  .level.active { background: var(--gold-soft); border-color: #e3b34155; }
+  .level .number {
+    display: grid; place-items: center; width: 24px; height: 24px; border-radius: 7px;
+    background: #222c38; color: var(--muted); font: 600 12px/1 var(--mono);
+  }
+  .level.done .number { background: #1f3a2b; color: var(--green); }
+  .level.active .number { background: var(--gold); color: #1b1405; }
+  .level .name { font-size: 13.5px; line-height: 1.25; }
+  .workspace { padding: 26px clamp(24px, 5vw, 68px) 60px; max-width: 1080px; }
+  .eyebrow { color: var(--gold); font: 600 12px/1 var(--mono); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; }
+  .level-head { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  h2.title { margin: 0; font-size: clamp(24px, 3vw, 34px); letter-spacing: -0.03em; }
+  .badge { padding: 3px 10px; border-radius: 99px; border: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+  .badge.solved { color: var(--green); border-color: #3fb95055; background: #3fb95012; }
+  .blurb { color: #b9c4d2; max-width: 72ch; margin: 12px 0 20px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .panel-label {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 9px 14px; font: 600 11px/1 var(--mono); letter-spacing: .1em;
+    text-transform: uppercase; color: var(--muted); border-bottom: 1px solid var(--line);
+    background: #ffffff04;
+  }
+  .statement pre {
+    margin: 0; padding: 15px 18px; font: 14px/1.65 var(--mono);
+    color: #dbe6f2; white-space: pre-wrap; overflow-x: auto;
+  }
+  .editor-wrap { margin-top: 16px; }
+  textarea {
+    display: block; width: 100%; min-height: 190px; resize: vertical;
+    padding: 15px 18px; border: 0; outline: 0; background: #0b0f14; color: #e6edf3;
+    font: 14px/1.7 var(--mono); caret-color: var(--gold); tab-size: 2;
+  }
+  textarea:focus { box-shadow: inset 0 0 0 1px #e3b34166; }
+  textarea:disabled { color: var(--muted); }
+  .actions { display: flex; gap: 9px; align-items: center; flex-wrap: wrap; margin: 14px 0 6px; }
+  button {
+    font: inherit; border-radius: 8px; border: 1px solid var(--line); cursor: pointer;
+    padding: 8px 15px; background: #222c38; color: var(--ink); transition: .15s ease;
+  }
+  button:hover { border-color: #465568; background: #27313f; }
+  button.primary { background: var(--gold); border-color: var(--gold); color: #1b1405; font-weight: 650; }
+  button.primary:hover { background: #f0c34c; }
+  button.ghost { background: transparent; color: var(--muted); }
+  button:disabled { opacity: .5; cursor: default; }
+  .key { color: var(--muted); font: 11px var(--mono); }
+  #result { min-height: 22px; margin: 8px 0 18px; }
+  .result-line { display: flex; gap: 8px; align-items: flex-start; padding: 9px 12px; border-radius: 8px; font-size: 13.5px; }
+  .result-line.ok { background: #3fb95014; border: 1px solid #3fb95044; color: #a7e3b3; }
+  .result-line.bad { background: #f8514910; border: 1px solid #f8514944; color: #ffb4ae; }
+  .result-line.warn { background: #e3b34110; border: 1px solid #e3b34155; color: #e8d8ad; }
+  .result-line .message { font-size: 13.5px; }
+  .result-line .diag { margin: 0; font: 12.5px/1.55 var(--mono); white-space: pre-wrap; }
+  .grid { display: grid; grid-template-columns: minmax(0, 1.45fr) minmax(260px, .8fr); gap: 16px; align-items: start; }
+  @media (max-width: 980px) { .grid { grid-template-columns: 1fr; } main { grid-template-columns: 1fr; } aside { border-right: 0; border-bottom: 1px solid var(--line); max-height: 44vh; } }
+  .goals { padding: 10px; min-height: 120px; }
+  .goal { border: 1px solid var(--line); border-radius: 9px; background: #0f141b; padding: 10px 12px; margin-bottom: 9px; }
+  .goal:last-child { margin-bottom: 0; }
+  .goal-head { display: flex; justify-content: space-between; color: var(--muted); font: 10.5px/1 var(--mono); letter-spacing: .09em; text-transform: uppercase; margin-bottom: 8px; }
+  .entry { display: flex; gap: 7px; font: 12.8px/1.65 var(--mono); white-space: pre-wrap; }
+  .entry .hyp { color: var(--gold); font-weight: 650; }
+  .entry .sep { color: #5f6c7d; }
+  .entry .ty { color: var(--teal); }
+  .entry .prop { color: #d7e0ea; }
+  .target { margin-top: 9px; padding-top: 8px; border-top: 1px solid var(--line); font: 13px/1.65 var(--mono); white-space: pre-wrap; }
+  .turnstile { color: var(--gold); margin-right: 5px; }
+  .goals-empty { color: var(--muted); padding: 14px 6px; font-size: 13px; }
+  .goals-empty strong { color: var(--green); }
+  .symbol { color: var(--violet); }
+  .fn { color: #d2a8ff; }
+  .side-card { padding: 13px 15px; color: #b9c4d2; font-size: 13px; }
+  .side-card h3 { margin: 0 0 8px; font: 600 11px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .world-intro { margin: 0; color: #b9c4d2; font-size: 13px; line-height: 1.5; white-space: pre-wrap; }
+  .hint { margin-top: 10px; padding: 12px 14px; border-left: 3px solid var(--gold); background: #e3b3410d; border-radius: 0 8px 8px 0; color: #e8d8ad; font-size: 13.5px; white-space: pre-wrap; }
+  .hint[hidden] { display: none; }
+  footer { color: #5f6c7d; font-size: 12px; padding: 12px 0 0; }
+  kbd { border: 1px solid #3a4656; border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px; font: 11px var(--mono); color: var(--muted); }
+  code { font-family: var(--mono); }
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Kestrel <span>Game</span></h1>
+    <small>proofs, one tactic at a time</small>
+  </div>
+  <div class="progress">
+    <span id="progress-text">0 / 0</span>
+    <div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+  </div>
+</header>
+<main>
+  <aside aria-label="Games, worlds and levels">
+    <div class="group-title">Games</div>
+    <div id="games"></div>
+    <div class="group-title">Worlds</div>
+    <div id="worlds"></div>
+  </aside>
+  <section class="workspace">
+    <div class="eyebrow" id="eyebrow">Loading</div>
+    <div class="level-head">
+      <h2 class="title" id="title">Loading…</h2>
+      <span class="badge" id="badge">unsolved</span>
+    </div>
+    <p class="blurb" id="blurb"></p>
+    <div class="panel statement">
+      <div class="panel-label"><span>Theorem</span><span>Kestrel</span></div>
+      <pre id="statement"></pre>
+    </div>
+    <div class="panel editor-wrap">
+      <div class="panel-label"><span>Proof</span><span class="key">Tab inserts two spaces</span></div>
+      <textarea id="proof" spellcheck="false" autocapitalize="off" autocomplete="off" aria-label="Proof script"></textarea>
+    </div>
+    <div class="actions">
+      <button class="primary" id="check">Check proof <span class="key">⌘↵</span></button>
+      <button id="hint">Show hint</button>
+      <button id="solution">Show solution</button>
+      <button class="ghost" id="reset">Reset</button>
+      <button class="ghost" id="next" disabled>Next level →</button>
+    </div>
+    <div id="result" aria-live="polite"></div>
+    <div class="grid">
+      <div class="panel">
+        <div class="panel-label"><span>Goals</span><span id="goal-count"></span></div>
+        <div class="goals" id="goals"><div class="goals-empty">Place the cursor in the proof to see its goals.</div></div>
+      </div>
+      <div>
+        <div class="panel side-card">
+          <h3>World</h3>
+          <p class="world-intro" id="world-intro"></p>
+          <div class="hint" id="hint-box" hidden></div>
+        </div>
+        <footer>Checked by the Kestrel kernel. No proof is accepted by the browser alone.</footer>
+      </div>
+    </div>
+  </section>
+</main>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const editor = $('proof');
+const state = {
+  catalog: [],
+  game: null,
+  flat: [],
+  current: 0,
+  solved: new Set(),
+  timer: null,
+  sequence: 0
+};
+
+function element(tag, className, text) {
+  const node = document.createElement(tag);
+  if (className) node.className = className;
+  if (text !== undefined) node.textContent = String(text);
+  return node;
+}
+
+const tokenPattern = /(∀|∃|→|↔|∧|∨|¬|⊢|∈|⊆)|([A-Za-z_][A-Za-z0-9_]*)(?=\()|\b(Nat|Int|Bool|Zero|Succ|True|False)\b/g;
+
+function highlightInto(parent, text) {
+  const source = String(text == null ? '' : text);
+  let last = 0;
+  for (const match of source.matchAll(tokenPattern)) {
+    if (match.index > last) {
+      parent.append(document.createTextNode(source.slice(last, match.index)));
+    }
+    const className = match[1] ? 'symbol' : match[2] ? 'fn' : 'ty';
+    parent.append(element('span', className, match[0]));
+    last = match.index + match[0].length;
+  }
+  if (last < source.length) parent.append(document.createTextNode(source.slice(last)));
+}
+
+function contextEntry(name, text, className, highlight) {
+  const row = element('div', 'entry');
+  row.append(element('span', 'hyp', name), element('span', 'sep', ':'));
+  const value = element('span', className);
+  if (highlight) highlightInto(value, text);
+  else value.textContent = String(text == null ? '' : text);
+  row.append(value);
+  return row;
+}
+
+function storageKey(gameId) {
+  return `kestrel-game-progress:${gameId}`;
+}
+
+function loadSolved(gameId) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(storageKey(gameId)) || '[]');
+    return new Set(Array.isArray(parsed) ? parsed.filter(item => typeof item === 'string') : []);
+  } catch (error) {
+    return new Set();
+  }
+}
+
+function saveSolved() {
+  if (!state.game) return;
+  try {
+    localStorage.setItem(storageKey(state.game.id), JSON.stringify([...state.solved]));
+  } catch (error) {
+    // A browser with storage disabled still gets the in-memory session.
+  }
+}
+
+function updateProgress() {
+  const total = state.flat.length;
+  const solved = state.flat.filter(entry => state.solved.has(entry.level.id)).length;
+  $('progress-text').textContent = `${solved} / ${total}`;
+  $('progress-fill').style.width = total ? `${Math.round(100 * solved / total)}%` : '0%';
+}
+
+function updateBadge() {
+  const entry = state.flat[state.current];
+  const solved = Boolean(entry && state.solved.has(entry.level.id));
+  $('badge').textContent = solved ? 'solved' : 'unsolved';
+  $('badge').className = solved ? 'badge solved' : 'badge';
+}
+
+function renderGames() {
+  const container = $('games');
+  container.replaceChildren();
+  for (const game of state.catalog) {
+    const button = element('button', 'game');
+    button.type = 'button';
+    if (state.game && game.id === state.game.id) button.classList.add('active');
+    const solved = loadSolved(game.id).size;
+    const count = game.levels === 1 ? 'level' : 'levels';
+    button.append(
+      element('span', 'game-title', game.title),
+      element('span', 'game-meta', `${game.levels} ${count} · ${solved} solved`)
+    );
+    button.addEventListener('click', () => {
+      if (state.game && state.game.id === game.id) return;
+      openGame(game.id, '');
+    });
+    container.append(button);
+  }
+}
+
+function renderWorlds() {
+  const container = $('worlds');
+  container.replaceChildren();
+  if (!state.game) {
+    container.append(element('div', 'world-note', 'No game is selected.'));
+    return;
+  }
+  if (!state.game.worlds.length) {
+    container.append(element('div', 'world-note', 'This game has no worlds.'));
+    return;
+  }
+  let flatIndex = 0;
+  for (const world of state.game.worlds) {
+    container.append(element('div', 'group-title', world.title));
+    for (const level of world.levels) {
+      const index = flatIndex;
+      flatIndex += 1;
+      const done = state.solved.has(level.id);
+      const button = element('button', 'level');
+      button.type = 'button';
+      if (index === state.current) button.classList.add('active');
+      if (done) button.classList.add('done');
+      button.append(
+        element('span', 'number', done ? '✓' : String(level.index)),
+        element('span', 'name', level.title)
+      );
+      button.addEventListener('click', () => selectLevel(index));
+      container.append(button);
+    }
+  }
+}
+
+function showMessage(kind, message) {
+  const line = element('div', `result-line ${kind}`);
+  line.append(element('div', 'message', message));
+  $('result').replaceChildren(line);
+}
+
+function showErrors(errors) {
+  const lines = errors.map(error => {
+    const line = element('div', 'result-line bad');
+    line.append(element('pre', 'diag', error));
+    return line;
+  });
+  $('result').replaceChildren(...lines);
+}
+
+function renderGoals(report) {
+  const goals = Array.isArray(report.goals) ? report.goals : [];
+  $('goal-count').textContent = goals.length
+    ? `${goals.length} ${goals.length === 1 ? 'goal' : 'goals'}`
+    : '';
+  const container = $('goals');
+  if (!goals.length) {
+    const empty = element('div', 'goals-empty');
+    if (report.ok) {
+      empty.append(element('strong', null, 'No goals.'), document.createTextNode(' The kernel accepted this proof.'));
+    } else if (report.complete && report.sorry) {
+      empty.append(
+        element('strong', null, 'No goals.'),
+        document.createTextNode(' This proof uses '),
+        element('code', null, 'sorry'),
+        document.createTextNode('; replace it with a real proof.')
+      );
+    } else if (report.complete) {
+      empty.append(element('strong', null, 'No goals.'), document.createTextNode(' The proof is complete.'));
+    } else {
+      empty.textContent = 'Place the cursor in the proof to see its goals.';
+    }
+    container.replaceChildren(empty);
+    return;
+  }
+
+  const cards = goals.map((goal, index) => {
+    const card = element('div', 'goal');
+    const variables = Array.isArray(goal.variables) ? goal.variables : [];
+    const hypotheses = Array.isArray(goal.hypotheses) ? goal.hypotheses : [];
+    const head = element('div', 'goal-head');
+    head.append(
+      element('span', null, `Goal ${index + 1} / ${goals.length}`),
+      element('span', null, variables.length || hypotheses.length ? 'context' : 'closed context')
+    );
+    card.append(head);
+    for (const variable of variables) card.append(contextEntry(variable[0], variable[1], 'ty', false));
+    for (const hypothesis of hypotheses) card.append(contextEntry(hypothesis[0], hypothesis[1], 'prop', true));
+    const target = element('div', 'target');
+    target.append(element('span', 'turnstile', '⊢'));
+    highlightInto(target, goal.target);
+    card.append(target);
+    return card;
+  });
+  container.replaceChildren(...cards);
+}
+
+function updateHash() {
+  const entry = state.flat[state.current];
+  if (!state.game || !entry) return;
+  try {
+    history.replaceState(null, '', `#${encodeURIComponent(state.game.id)}/${encodeURIComponent(entry.level.id)}`);
+  } catch (error) {
+    // Replacing the hash is a convenience, not part of the game state.
+  }
+}
+
+function selectLevel(index) {
+  if (!state.flat.length) {
+    state.current = 0;
+    $('eyebrow').textContent = '';
+    $('title').textContent = 'This game has no levels';
+    $('blurb').textContent = 'Add a world with at least one level to game.json.';
+    $('statement').replaceChildren();
+    $('goals').replaceChildren(element('div', 'goals-empty', 'There is nothing to prove yet.'));
+    $('result').replaceChildren();
+    editor.value = '';
+    editor.disabled = true;
+    $('check').disabled = true;
+    $('hint').disabled = true;
+    $('solution').disabled = true;
+    $('reset').disabled = true;
+    $('next').disabled = true;
+    updateProgress();
+    renderWorlds();
+    return;
+  }
+
+  state.current = Math.max(0, Math.min(index, state.flat.length - 1));
+  const { world, level } = state.flat[state.current];
+  editor.disabled = false;
+  $('check').disabled = false;
+  $('hint').disabled = false;
+  $('solution').disabled = false;
+  $('reset').disabled = false;
+  $('eyebrow').textContent = `${world.title} · Level ${level.index}`;
+  $('title').textContent = level.title;
+  $('blurb').textContent = level.blurb || '';
+  const statement = $('statement');
+  statement.replaceChildren();
+  highlightInto(statement, level.statement || '');
+  $('world-intro').textContent = world.intro || '';
+  $('hint-box').textContent = level.hint || '';
+  $('hint-box').hidden = true;
+  $('hint').textContent = 'Show hint';
+  editor.value = level.starter || '';
+  $('result').replaceChildren();
+  $('next').disabled = state.current >= state.flat.length - 1;
+  updateBadge();
+  renderWorlds();
+  updateProgress();
+  updateHash();
+  updateGoals(true);
+  editor.focus();
+  editor.setSelectionRange(0, 0);
+}
+
+async function openGame(gameId, levelId) {
+  try {
+    const response = await fetch(`/api/game/${encodeURIComponent(gameId)}`);
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) throw new Error((payload && payload.error) || `The game answered ${response.status}.`);
+    state.game = payload;
+    state.flat = [];
+    for (const world of state.game.worlds || []) {
+      for (const level of world.levels || []) state.flat.push({ world, level });
+    }
+    state.solved = loadSolved(state.game.id);
+    renderGames();
+    const wanted = levelId ? state.flat.findIndex(entry => entry.level.id === levelId) : 0;
+    selectLevel(wanted >= 0 ? wanted : 0);
+  } catch (error) {
+    $('title').textContent = 'The game could not be loaded';
+    $('blurb').textContent = error.message;
+    $('eyebrow').textContent = '';
+    editor.disabled = true;
+    $('check').disabled = true;
+    $('hint').disabled = true;
+    $('solution').disabled = true;
+    $('reset').disabled = true;
+    $('next').disabled = true;
+    showMessage('bad', error.message);
+  }
+}
+
+async function requestCheck(withOffset) {
+  if (!state.game || !state.flat.length) return null;
+  const level = state.flat[state.current].level;
+  const body = { game: state.game.id, level: level.id, proof: editor.value };
+  if (withOffset) body.offset = editor.selectionStart;
+  const response = await fetch('/api/check', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body)
+  });
+  const result = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error((result && result.error) || `The checker answered ${response.status}.`);
+  }
+  return result;
+}
+
+function updateGoals(initial) {
+  clearTimeout(state.timer);
+  state.timer = setTimeout(async () => {
+    const sequence = ++state.sequence;
+    try {
+      const result = await requestCheck(true);
+      if (!result || sequence !== state.sequence) return;
+      renderGoals(result);
+    } catch (error) {
+      if (sequence !== state.sequence) return;
+      const message = element('div', 'goals-empty', `The checker is unavailable: ${error.message}`);
+      $('goals').replaceChildren(message);
+    }
+  }, initial ? 0 : 220);
+}
+
+async function check() {
+  clearTimeout(state.timer);
+  const sequence = ++state.sequence;
+  showMessage('', 'Checking…');
+  try {
+    const result = await requestCheck(false);
+    if (!result || sequence !== state.sequence) return;
+    renderGoals(result);
+    if (result.ok) {
+      markSolved();
+      showMessage(
+        'ok',
+        result.admitted
+          ? 'QED. The proof closes every goal; it relies on the axioms this game declares.'
+          : 'QED. The kernel accepted this proof.'
+      );
+    } else if (Array.isArray(result.errors) && result.errors.length) {
+      showErrors(result.errors);
+    } else if (result.sorry) {
+      showMessage('warn', 'This proof uses `sorry`. The kernel admits it, but a game solution must prove the goal.');
+    } else if (result.error) {
+      showMessage('bad', result.error);
+    } else {
+      showMessage('warn', 'The proof is incomplete. Close every goal, then check again.');
+    }
+  } catch (error) {
+    showMessage('bad', error.message);
+  }
+  editor.focus();
+}
+
+function markSolved() {
+  const entry = state.flat[state.current];
+  if (!entry || state.solved.has(entry.level.id)) return;
+  state.solved.add(entry.level.id);
+  saveSolved();
+  updateBadge();
+  renderWorlds();
+  renderGames();
+  updateProgress();
+}
+
+async function showSolution() {
+  if (!state.game || !state.flat.length) return;
+  const level = state.flat[state.current].level;
+  try {
+    const response = await fetch(`/api/solution/${encodeURIComponent(state.game.id)}/${encodeURIComponent(level.id)}`);
+    const payload = await response.json().catch(() => null);
+    if (!response.ok) throw new Error((payload && payload.error) || `The solution answered ${response.status}.`);
+    const solution = typeof payload.solution === 'string' ? payload.solution : '';
+    editor.value = solution.replace(/\r?\n$/, '');
+    showMessage('warn', 'The model solution is in the editor. Check it to mark the level solved.');
+    updateGoals(true);
+  } catch (error) {
+    showMessage('bad', error.message);
+  }
+  editor.focus();
+  editor.setSelectionRange(editor.value.length, editor.value.length);
+}
+
+function parseHash() {
+  const raw = location.hash.replace(/^#/, '');
+  try {
+    const slash = raw.indexOf('/');
+    if (slash < 0) return { game: decodeURIComponent(raw), level: '' };
+    return {
+      game: decodeURIComponent(raw.slice(0, slash)),
+      level: decodeURIComponent(raw.slice(slash + 1))
+    };
+  } catch (error) {
+    return { game: '', level: '' };
+  }
+}
+
+editor.addEventListener('input', () => updateGoals(false));
+editor.addEventListener('click', () => updateGoals(true));
+editor.addEventListener('keyup', () => updateGoals(true));
+editor.addEventListener('keydown', event => {
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    event.preventDefault();
+    check();
+  }
+  if (event.key === 'Tab') {
+    event.preventDefault();
+    const start = editor.selectionStart;
+    const end = editor.selectionEnd;
+    const text = editor.value;
+    editor.value = text.slice(0, start) + '  ' + text.slice(end);
+    editor.setSelectionRange(start + 2, start + 2);
+    updateGoals(true);
+  }
+});
+$('check').addEventListener('click', check);
+$('reset').addEventListener('click', () => {
+  const entry = state.flat[state.current];
+  if (!entry) return;
+  editor.value = entry.level.starter || '';
+  $('result').replaceChildren();
+  updateGoals(true);
+  editor.focus();
+});
+$('hint').addEventListener('click', () => {
+  const box = $('hint-box');
+  box.hidden = !box.hidden;
+  $('hint').textContent = box.hidden ? 'Show hint' : 'Hide hint';
+  editor.focus();
+});
+$('solution').addEventListener('click', showSolution);
+$('next').addEventListener('click', () => selectLevel(state.current + 1));
+
+async function start() {
+  try {
+    const response = await fetch('/api/games');
+    const catalog = await response.json().catch(() => null);
+    if (!response.ok) throw new Error((catalog && catalog.error) || `The catalog answered ${response.status}.`);
+    state.catalog = Array.isArray(catalog) ? catalog : [];
+  } catch (error) {
+    $('title').textContent = 'The game server is not responding';
+    $('blurb').textContent = error.message;
+    $('eyebrow').textContent = '';
+    editor.disabled = true;
+    $('check').disabled = true;
+    $('hint').disabled = true;
+    $('solution').disabled = true;
+    $('reset').disabled = true;
+    $('next').disabled = true;
+    $('goals').replaceChildren(element('div', 'goals-empty', 'Start the server with `kestrel game`.'));
+    return;
+  }
+
+  renderGames();
+  if (!state.catalog.length) {
+    $('title').textContent = 'No games yet';
+    $('blurb').textContent = 'Add a directory with game.json under games/ and restart the server.';
+    $('eyebrow').textContent = '';
+    $('worlds').replaceChildren(element('div', 'world-note', 'No game directories were found.'));
+    editor.disabled = true;
+    $('check').disabled = true;
+    $('hint').disabled = true;
+    $('solution').disabled = true;
+    $('reset').disabled = true;
+    $('next').disabled = true;
+    $('goals').replaceChildren(element('div', 'goals-empty', 'There is nothing to prove yet.'));
+    return;
+  }
+
+  const wanted = parseHash();
+  const game = state.catalog.find(item => item.id === wanted.game) || state.catalog[0];
+  await openGame(game.id, wanted.level);
+
+  window.addEventListener('hashchange', () => {
+    const next = parseHash();
+    if (!next.game || !state.catalog.some(item => item.id === next.game)) return;
+    if (state.game && next.game === state.game.id) {
+      const index = state.flat.findIndex(entry => entry.level.id === next.level);
+      if (index >= 0 && index !== state.current) selectLevel(index);
+      return;
+    }
+    openGame(next.game, next.level);
+  });
+}
+
+start().catch(error => {
+  $('title').textContent = 'The game server is not responding';
+  $('blurb').textContent = error.message;
+});
+</script>
+</body>
+</html>

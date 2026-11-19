@@ -1,0 +1,4220 @@
+{
+  "module": "std.kesdas",
+  "types": [
+    "Column",
+    "DataError",
+    "DataFrame",
+    "EWM",
+    "Expanding",
+    "FrameRolling",
+    "GroupBy",
+    "Rolling",
+    "Scalar",
+    "Series",
+    "StringMethods",
+    "FrameEWM",
+    "FrameExpanding"
+  ],
+  "names": [
+    "Column",
+    "DataError",
+    "DataFrame",
+    "EWM",
+    "Expanding",
+    "FrameRolling",
+    "GroupBy",
+    "Rolling",
+    "Scalar",
+    "Series",
+    "StringMethods",
+    "FrameEWM",
+    "FrameExpanding",
+    "readCsv"
+  ],
+  "functions": [
+    {
+      "name": "readCsv",
+      "signature": "readCsv(path : String, separator : String = \",\", header : Bool = true, skipRows : Int = 0, nRows : Int = -1) : DataFrame or Error with Effects",
+      "parameters": [
+        "path : String",
+        "separator : String = \"",
+        "\"",
+        "header : Bool = true",
+        "skipRows : Int = 0",
+        "nRows : Int = -1"
+      ],
+      "documentation": "Reads a CSV file into a frame."
+    }
+  ],
+  "constructors": {
+    "Column": [
+      {
+        "name": "Column",
+        "signature": "Column(kind : Int, ints : List[Int], floats : List[double], bools : List[Bool], strs : List[String], missing : List[Bool], size : Int) : Column",
+        "parameters": [
+          "kind : Int",
+          "ints : List[Int]",
+          "floats : List[double]",
+          "bools : List[Bool]",
+          "strs : List[String]",
+          "missing : List[Bool]",
+          "size : Int"
+        ],
+        "documentation": "A typed column with a mask of missing entries. Most code gets a Column from a Series."
+      }
+    ],
+    "Scalar": [
+      {
+        "name": "Scalar",
+        "signature": "Scalar(kind : Int, whole : Int, real : double, flag : Bool, word : String) : Scalar",
+        "parameters": [
+          "kind : Int",
+          "whole : Int",
+          "real : double",
+          "flag : Bool",
+          "word : String"
+        ],
+        "documentation": "One cell lifted out of a column: a number, a flag, a text, or a missing entry."
+      }
+    ],
+    "Series": [
+      {
+        "name": "Series",
+        "signature": "Series(name : String, move data : Column, move index : Column, indexName : String) : Series",
+        "parameters": [
+          "name : String",
+          "move data : Column",
+          "move index : Column",
+          "indexName : String"
+        ],
+        "documentation": "A Series from Int values, with a default 0..n-1 index."
+      },
+      {
+        "name": "Series",
+        "signature": "Series(values : List[Int], name : String = \"\") : Series",
+        "parameters": [
+          "values : List[Int]",
+          "name : String = \"\""
+        ],
+        "documentation": "A Series from double values."
+      },
+      {
+        "name": "Series",
+        "signature": "Series(values : List[double], name : String = \"\") : Series",
+        "parameters": [
+          "values : List[double]",
+          "name : String = \"\""
+        ],
+        "documentation": "A Series from String values."
+      },
+      {
+        "name": "Series",
+        "signature": "Series(values : List[String], name : String = \"\") : Series",
+        "parameters": [
+          "values : List[String]",
+          "name : String = \"\""
+        ],
+        "documentation": "A Series from Bool values."
+      },
+      {
+        "name": "Series",
+        "signature": "Series(values : List[Bool], name : String = \"\") : Series",
+        "parameters": [
+          "values : List[Bool]",
+          "name : String = \"\""
+        ],
+        "documentation": "A Series from explicit storage, index and names. The data and index move into the new Series."
+      }
+    ],
+    "Rolling": [
+      {
+        "name": "Rolling",
+        "signature": "Rolling(move series : Series, window : Int) : Rolling",
+        "parameters": [
+          "move series : Series",
+          "window : Int"
+        ],
+        "documentation": "A rolling-window view over a Series. Series.rolling builds one."
+      },
+      {
+        "name": "Rolling",
+        "signature": "Rolling(move series : Series, window : Int, minPeriods : Int) : Rolling",
+        "parameters": [
+          "move series : Series",
+          "window : Int",
+          "minPeriods : Int"
+        ],
+        "documentation": "Builds a Rolling."
+      }
+    ],
+    "StringMethods": [
+      {
+        "name": "StringMethods",
+        "signature": "StringMethods(move series : Series) : StringMethods",
+        "parameters": [
+          "move series : Series"
+        ],
+        "documentation": "String helpers over a Series. Series.str builds one."
+      }
+    ],
+    "DataFrame": [
+      {
+        "name": "DataFrame",
+        "signature": "DataFrame(names : List[String], move cols : Array[Column], move index : Column, indexName : String) : DataFrame",
+        "parameters": [
+          "names : List[String]",
+          "move cols : Array[Column]",
+          "move index : Column",
+          "indexName : String"
+        ],
+        "documentation": "A frame from named Series that share a length."
+      },
+      {
+        "name": "DataFrame",
+        "signature": "DataFrame(series : List[Series]) : DataFrame",
+        "parameters": [
+          "series : List[Series]"
+        ],
+        "documentation": "A frame from name/value pairs of Int columns."
+      },
+      {
+        "name": "DataFrame",
+        "signature": "DataFrame(columns : List[(String, List[Int])]) : DataFrame",
+        "parameters": [
+          "columns : List[(String, List[Int])]"
+        ],
+        "documentation": "A frame from name/value pairs of double columns."
+      },
+      {
+        "name": "DataFrame",
+        "signature": "DataFrame(columns : List[(String, List[double])]) : DataFrame",
+        "parameters": [
+          "columns : List[(String, List[double])]"
+        ],
+        "documentation": "A frame from name/value pairs of String columns."
+      },
+      {
+        "name": "DataFrame",
+        "signature": "DataFrame(columns : List[(String, List[String])]) : DataFrame",
+        "parameters": [
+          "columns : List[(String, List[String])]"
+        ],
+        "documentation": "A frame from name/value pairs of Bool columns."
+      },
+      {
+        "name": "DataFrame",
+        "signature": "DataFrame(columns : List[(String, List[Bool])]) : DataFrame",
+        "parameters": [
+          "columns : List[(String, List[Bool])]"
+        ],
+        "documentation": "A frame from explicit column storage. The storage and index move into the new frame."
+      }
+    ],
+    "GroupBy": [
+      {
+        "name": "GroupBy",
+        "signature": "GroupBy(move frame : DataFrame, keys : List[String]) : GroupBy",
+        "parameters": [
+          "move frame : DataFrame",
+          "keys : List[String]"
+        ],
+        "documentation": "A grouped frame. DataFrame.groupBy builds one."
+      }
+    ],
+    "Expanding": [
+      {
+        "name": "Expanding",
+        "signature": "Expanding(move series : Series, minPeriods : Int) : Expanding",
+        "parameters": [
+          "move series : Series",
+          "minPeriods : Int"
+        ],
+        "documentation": "Builds a Expanding."
+      }
+    ],
+    "EWM": [
+      {
+        "name": "EWM",
+        "signature": "EWM(move series : Series, alpha : double, adjust : Bool, minPeriods : Int) : EWM",
+        "parameters": [
+          "move series : Series",
+          "alpha : double",
+          "adjust : Bool",
+          "minPeriods : Int"
+        ],
+        "documentation": "Builds a EWM."
+      }
+    ],
+    "FrameRolling": [
+      {
+        "name": "FrameRolling",
+        "signature": "FrameRolling(move frame : DataFrame, window : Int, minPeriods : Int) : FrameRolling",
+        "parameters": [
+          "move frame : DataFrame",
+          "window : Int",
+          "minPeriods : Int"
+        ],
+        "documentation": "Builds a FrameRolling."
+      }
+    ],
+    "FrameExpanding": [
+      {
+        "name": "FrameExpanding",
+        "signature": "FrameExpanding(move frame : DataFrame, minPeriods : Int) : FrameExpanding",
+        "parameters": [
+          "move frame : DataFrame",
+          "minPeriods : Int"
+        ],
+        "documentation": "Builds a FrameExpanding."
+      }
+    ],
+    "FrameEWM": [
+      {
+        "name": "FrameEWM",
+        "signature": "FrameEWM(move frame : DataFrame, alpha : double, adjust : Bool, minPeriods : Int) : FrameEWM",
+        "parameters": [
+          "move frame : DataFrame",
+          "alpha : double",
+          "adjust : Bool",
+          "minPeriods : Int"
+        ],
+        "documentation": "Builds a FrameEWM."
+      }
+    ]
+  },
+  "statics": {
+    "DataError": [
+      {
+        "name": "MissingColumn",
+        "signature": "DataError.MissingColumn(name : String) : DataError",
+        "parameters": [
+          "name : String"
+        ],
+        "documentation": "A frame operation named a column that is not there."
+      },
+      {
+        "name": "BadArgument",
+        "signature": "DataError.BadArgument(message : String) : DataError",
+        "parameters": [
+          "message : String"
+        ],
+        "documentation": "A frame operation received an unusable argument."
+      }
+    ],
+    "Column": [
+      {
+        "name": "ints",
+        "signature": "Column.ints(values : List[Int]) : Column",
+        "parameters": [
+          "values : List[Int]"
+        ],
+        "documentation": "An Int column with no missing entries."
+      },
+      {
+        "name": "floats",
+        "signature": "Column.floats(values : List[double]) : Column",
+        "parameters": [
+          "values : List[double]"
+        ],
+        "documentation": "A double column with no missing entries."
+      },
+      {
+        "name": "bools",
+        "signature": "Column.bools(values : List[Bool]) : Column",
+        "parameters": [
+          "values : List[Bool]"
+        ],
+        "documentation": "A Bool column with no missing entries."
+      },
+      {
+        "name": "strings",
+        "signature": "Column.strings(values : List[String]) : Column",
+        "parameters": [
+          "values : List[String]"
+        ],
+        "documentation": "A String column with no missing entries."
+      },
+      {
+        "name": "ofInts",
+        "signature": "Column.ofInts(values : List[Int], missing : List[Bool]) : Column",
+        "parameters": [
+          "values : List[Int]",
+          "missing : List[Bool]"
+        ],
+        "documentation": "An Int column with an explicit missing mask. A missing entry promotes the column to double, as in pandas."
+      },
+      {
+        "name": "ofFloats",
+        "signature": "Column.ofFloats(values : List[double], missing : List[Bool]) : Column",
+        "parameters": [
+          "values : List[double]",
+          "missing : List[Bool]"
+        ],
+        "documentation": "A double column with an explicit missing mask."
+      },
+      {
+        "name": "ofBools",
+        "signature": "Column.ofBools(values : List[Bool], missing : List[Bool]) : Column",
+        "parameters": [
+          "values : List[Bool]",
+          "missing : List[Bool]"
+        ],
+        "documentation": "A Bool column with an explicit missing mask."
+      },
+      {
+        "name": "ofStrings",
+        "signature": "Column.ofStrings(values : List[String], missing : List[Bool]) : Column",
+        "parameters": [
+          "values : List[String]",
+          "missing : List[Bool]"
+        ],
+        "documentation": "A String column with an explicit missing mask."
+      },
+      {
+        "name": "noneMissing",
+        "signature": "Column.noneMissing(n : Int) : List[Bool]",
+        "parameters": [
+          "n : Int"
+        ],
+        "documentation": "A mask of n false entries."
+      },
+      {
+        "name": "empty",
+        "signature": "Column.empty(kind : Int, size : Int) : Column",
+        "parameters": [
+          "kind : Int",
+          "size : Int"
+        ],
+        "documentation": "A column of one kind whose entries are all missing."
+      }
+    ],
+    "Scalar": [
+      {
+        "name": "ofInt",
+        "signature": "Scalar.ofInt(value : Int) : Scalar",
+        "parameters": [
+          "value : Int"
+        ],
+        "documentation": "A scalar holding an Int."
+      },
+      {
+        "name": "ofFloat",
+        "signature": "Scalar.ofFloat(value : double) : Scalar",
+        "parameters": [
+          "value : double"
+        ],
+        "documentation": "A scalar holding a double; NaN becomes a missing scalar."
+      },
+      {
+        "name": "ofBool",
+        "signature": "Scalar.ofBool(value : Bool) : Scalar",
+        "parameters": [
+          "value : Bool"
+        ],
+        "documentation": "A scalar holding a Bool."
+      },
+      {
+        "name": "ofString",
+        "signature": "Scalar.ofString(value : String) : Scalar",
+        "parameters": [
+          "value : String"
+        ],
+        "documentation": "A scalar holding a String."
+      },
+      {
+        "name": "missing",
+        "signature": "Scalar.missing() : Scalar",
+        "parameters": [],
+        "documentation": "A missing scalar."
+      }
+    ],
+    "DataFrame": [
+      {
+        "name": "empty",
+        "signature": "DataFrame.empty() : DataFrame",
+        "parameters": [],
+        "documentation": "A frame with no rows and no columns."
+      },
+      {
+        "name": "concat",
+        "signature": "DataFrame.concat(frames : List[DataFrame]) : DataFrame",
+        "parameters": [
+          "frames : List[DataFrame]"
+        ],
+        "documentation": "Stacks frames one below the other, matching columns by name."
+      },
+      {
+        "name": "parseCsv",
+        "signature": "DataFrame.parseCsv(text : String, separator : String = \",\", header : Bool = true, skipRows : Int = 0, nRows : Int = -1) : DataFrame",
+        "parameters": [
+          "text : String",
+          "separator : String = \"",
+          "\"",
+          "header : Bool = true",
+          "skipRows : Int = 0",
+          "nRows : Int = -1"
+        ],
+        "documentation": "Reads CSV text: the first line names the columns, and each column takes the narrowest kind that fits."
+      },
+      {
+        "name": "parseCsvLines",
+        "signature": "DataFrame.parseCsvLines(lines : List[String], separator : String = \",\", header : Bool = true, skipRows : Int = 0, nRows : Int = -1) : DataFrame",
+        "parameters": [
+          "lines : List[String]",
+          "separator : String = \",\"",
+          "header : Bool = true",
+          "skipRows : Int = 0",
+          "nRows : Int = -1"
+        ],
+        "documentation": "A frame from CSV lines already read from a file or notebook."
+      },
+      {
+        "name": "concatColumns",
+        "signature": "DataFrame.concatColumns(frames : List[DataFrame]) : DataFrame or Error",
+        "parameters": [
+          "frames : List[DataFrame]"
+        ],
+        "documentation": "Static member of DataFrame."
+      }
+    ],
+    "Series": [
+      {
+        "name": "concat",
+        "signature": "Series.concat(parts : List[Series]) : Series",
+        "parameters": [
+          "parts : List[Series]"
+        ],
+        "documentation": "Static member of Series."
+      }
+    ]
+  },
+  "methods": {
+    "Column": [
+      {
+        "name": "copy",
+        "signature": "Column.copy() : Column",
+        "parameters": [],
+        "documentation": "An independent copy of the storage and mask."
+      },
+      {
+        "name": "dtype",
+        "signature": "Column.dtype() : String",
+        "parameters": [],
+        "documentation": "The pandas-style dtype: int64, float64, bool or str."
+      },
+      {
+        "name": "isNumeric",
+        "signature": "Column.isNumeric() : Bool",
+        "parameters": [],
+        "documentation": "Whether the kind is Int or double."
+      },
+      {
+        "name": "gather",
+        "signature": "Column.gather(positions : List[Int]) : Column",
+        "parameters": [
+          "positions : List[Int]"
+        ],
+        "documentation": "A new column holding the given row positions, in that order."
+      },
+      {
+        "name": "orderPositions",
+        "signature": "Column.orderPositions(start : List[Int], ascending : Bool, naFirst : Bool) : List[Int]",
+        "parameters": [
+          "start : List[Int]",
+          "ascending : Bool",
+          "naFirst : Bool"
+        ],
+        "documentation": "Stable positions sorted by this column, with missing entries first or last."
+      },
+      {
+        "name": "topPositions",
+        "signature": "Column.topPositions(n : Int, ascending : Bool) : List[Int]",
+        "parameters": [
+          "n : Int",
+          "ascending : Bool"
+        ],
+        "documentation": "The n largest or smallest present row positions, in rank order."
+      },
+      {
+        "name": "head",
+        "signature": "Column.head(n : Int) : Column",
+        "parameters": [
+          "n : Int"
+        ],
+        "documentation": "The first n entries."
+      },
+      {
+        "name": "join",
+        "signature": "Column.join(other : Column) : Column",
+        "parameters": [
+          "other : Column"
+        ],
+        "documentation": "Appends another column of the same kind below this one."
+      },
+      {
+        "name": "toFloats",
+        "signature": "Column.toFloats() : List[double]",
+        "parameters": [],
+        "documentation": "The numbers as doubles; missing entries become NaN."
+      },
+      {
+        "name": "texts",
+        "signature": "Column.texts() : List[String]",
+        "parameters": [],
+        "documentation": "One display string per entry, with NaN for a missing entry."
+      },
+      {
+        "name": "keys",
+        "signature": "Column.keys() : List[String]",
+        "parameters": [],
+        "documentation": "One comparable key per entry; equal values give equal keys."
+      }
+    ],
+    "Scalar": [
+      {
+        "name": "isMissing",
+        "signature": "Scalar.isMissing() : Bool",
+        "parameters": [],
+        "documentation": "Whether this scalar is a missing entry."
+      },
+      {
+        "name": "isNumeric",
+        "signature": "Scalar.isNumeric() : Bool",
+        "parameters": [],
+        "documentation": "Whether the kind is Int or double."
+      },
+      {
+        "name": "asDouble",
+        "signature": "Scalar.asDouble() : double",
+        "parameters": [],
+        "documentation": "The value as a double; a non-number is NaN."
+      },
+      {
+        "name": "asInt",
+        "signature": "Scalar.asInt() : Int",
+        "parameters": [],
+        "documentation": "The value as an Int, rounding a double down."
+      },
+      {
+        "name": "asString",
+        "signature": "Scalar.asString() : String",
+        "parameters": [],
+        "documentation": "The same text that text() gives."
+      },
+      {
+        "name": "asBool",
+        "signature": "Scalar.asBool() : Bool",
+        "parameters": [],
+        "documentation": "True only for a Bool scalar holding true."
+      },
+      {
+        "name": "text",
+        "signature": "Scalar.text() : String",
+        "parameters": [],
+        "documentation": "The display text, with NaN for a missing entry."
+      },
+      {
+        "name": "equals",
+        "signature": "Scalar.equals(other : Scalar) : Bool",
+        "parameters": [
+          "other : Scalar"
+        ],
+        "documentation": "Whether two scalars have the same kind and value."
+      }
+    ],
+    "Series": [
+      {
+        "name": "copy",
+        "signature": "Series.copy() : Series",
+        "parameters": [],
+        "documentation": "An independent copy of the data and index."
+      },
+      {
+        "name": "length",
+        "signature": "Series.length() : Int",
+        "parameters": [],
+        "documentation": "The number of values."
+      },
+      {
+        "name": "isEmpty",
+        "signature": "Series.isEmpty() : Bool",
+        "parameters": [],
+        "documentation": "Whether the Series has no values."
+      },
+      {
+        "name": "dtype",
+        "signature": "Series.dtype() : String",
+        "parameters": [],
+        "documentation": "The pandas-style dtype: int64, float64, bool or str."
+      },
+      {
+        "name": "derive",
+        "signature": "Series.derive(move data : Column) : Series",
+        "parameters": [
+          "move data : Column"
+        ],
+        "documentation": "A Series with new data and this Series name and index. The column moves into the result."
+      },
+      {
+        "name": "take",
+        "signature": "Series.take(positions : List[Int]) : Series",
+        "parameters": [
+          "positions : List[Int]"
+        ],
+        "documentation": "Rows at the given positions, in that order."
+      },
+      {
+        "name": "rename",
+        "signature": "Series.rename(name : String) : Series",
+        "parameters": [
+          "name : String"
+        ],
+        "documentation": "A copy with a new Series name."
+      },
+      {
+        "name": "withIndex",
+        "signature": "Series.withIndex(labels : List[String]) : Series",
+        "parameters": [
+          "labels : List[String]"
+        ],
+        "documentation": "A copy with String row labels."
+      },
+      {
+        "name": "withIndex",
+        "signature": "Series.withIndex(labels : List[Int]) : Series",
+        "parameters": [
+          "labels : List[Int]"
+        ],
+        "documentation": "A copy with Int row labels."
+      },
+      {
+        "name": "withIndexColumn",
+        "signature": "Series.withIndexColumn(labels : Column) : Series",
+        "parameters": [
+          "labels : Column"
+        ],
+        "documentation": "A copy with explicit index labels."
+      },
+      {
+        "name": "named",
+        "signature": "Series.named(indexName : String) : Series",
+        "parameters": [
+          "indexName : String"
+        ],
+        "documentation": "A copy with a name for the index."
+      },
+      {
+        "name": "toInts",
+        "signature": "Series.toInts() : List[Int]",
+        "parameters": [],
+        "documentation": "The values as Ints."
+      },
+      {
+        "name": "toFloats",
+        "signature": "Series.toFloats() : List[double]",
+        "parameters": [],
+        "documentation": "The values as doubles; missing entries become NaN."
+      },
+      {
+        "name": "toStrings",
+        "signature": "Series.toStrings() : List[String]",
+        "parameters": [],
+        "documentation": "The display text of every value."
+      },
+      {
+        "name": "toBools",
+        "signature": "Series.toBools() : List[Bool]",
+        "parameters": [],
+        "documentation": "The values as Bools."
+      },
+      {
+        "name": "indexLabels",
+        "signature": "Series.indexLabels() : List[String]",
+        "parameters": [],
+        "documentation": "The index labels as text."
+      },
+      {
+        "name": "missingMask",
+        "signature": "Series.missingMask() : List[Bool]",
+        "parameters": [],
+        "documentation": "One flag per value: true means missing."
+      },
+      {
+        "name": "astype",
+        "signature": "Series.astype(dtype : String) : Series",
+        "parameters": [
+          "dtype : String"
+        ],
+        "documentation": "Converts the values to int64, float64, bool or str."
+      },
+      {
+        "name": "head",
+        "signature": "Series.head(n : Int = 5) : Series",
+        "parameters": [
+          "n : Int = 5"
+        ],
+        "documentation": "The first n rows."
+      },
+      {
+        "name": "tail",
+        "signature": "Series.tail(n : Int = 5) : Series",
+        "parameters": [
+          "n : Int = 5"
+        ],
+        "documentation": "The last n rows."
+      },
+      {
+        "name": "slice",
+        "signature": "Series.slice(start : Int, stop : Int) : Series",
+        "parameters": [
+          "start : Int",
+          "stop : Int"
+        ],
+        "documentation": "Rows in the half-open range start to stop."
+      },
+      {
+        "name": "iloc",
+        "signature": "Series.iloc(position : Int) : Scalar",
+        "parameters": [
+          "position : Int"
+        ],
+        "documentation": "One value by row position."
+      },
+      {
+        "name": "iloc",
+        "signature": "Series.iloc(positions : List[Int]) : Series",
+        "parameters": [
+          "positions : List[Int]"
+        ],
+        "documentation": "Rows at the given positions."
+      },
+      {
+        "name": "positionOf",
+        "signature": "Series.positionOf(label : Int) : Option[Int]",
+        "parameters": [
+          "label : Int"
+        ],
+        "documentation": "The row position of an Int index label."
+      },
+      {
+        "name": "positionOf",
+        "signature": "Series.positionOf(label : String) : Option[Int]",
+        "parameters": [
+          "label : String"
+        ],
+        "documentation": "The row position of a String index label."
+      },
+      {
+        "name": "loc",
+        "signature": "Series.loc(label : Int) : Scalar",
+        "parameters": [
+          "label : Int"
+        ],
+        "documentation": "One value by Int index label; a missing label gives a missing scalar."
+      },
+      {
+        "name": "loc",
+        "signature": "Series.loc(label : String) : Scalar",
+        "parameters": [
+          "label : String"
+        ],
+        "documentation": "One value by String index label; a missing label gives a missing scalar."
+      },
+      {
+        "name": "filter",
+        "signature": "Series.filter(mask : Series) : Series",
+        "parameters": [
+          "mask : Series"
+        ],
+        "documentation": "Keeps the rows where the Bool mask is true."
+      },
+      {
+        "name": "where",
+        "signature": "Series.where(mask : Series, other : Scalar) : Series",
+        "parameters": [
+          "mask : Series",
+          "other : Scalar"
+        ],
+        "documentation": "Keeps a value where the mask is true and fills the other rows with a scalar."
+      },
+      {
+        "name": "sortValues",
+        "signature": "Series.sortValues(ascending : Bool = true, naPosition : String = \"last\") : Series",
+        "parameters": [
+          "ascending : Bool = true",
+          "naPosition : String = \"last\""
+        ],
+        "documentation": "Sorts by value."
+      },
+      {
+        "name": "sortIndex",
+        "signature": "Series.sortIndex(ascending : Bool = true, naPosition : String = \"last\") : Series",
+        "parameters": [
+          "ascending : Bool = true",
+          "naPosition : String = \"last\""
+        ],
+        "documentation": "Sorts by index label."
+      },
+      {
+        "name": "nlargest",
+        "signature": "Series.nlargest(n : Int = 5) : Series",
+        "parameters": [
+          "n : Int = 5"
+        ],
+        "documentation": "The n largest values, largest first."
+      },
+      {
+        "name": "nsmallest",
+        "signature": "Series.nsmallest(n : Int = 5) : Series",
+        "parameters": [
+          "n : Int = 5"
+        ],
+        "documentation": "The n smallest values, smallest first."
+      },
+      {
+        "name": "resetIndex",
+        "signature": "Series.resetIndex() : Series",
+        "parameters": [],
+        "documentation": "Replaces the index with 0..n-1."
+      },
+      {
+        "name": "add",
+        "signature": "Series.add(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise addition with another Series."
+      },
+      {
+        "name": "subtract",
+        "signature": "Series.subtract(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise subtraction with another Series."
+      },
+      {
+        "name": "multiply",
+        "signature": "Series.multiply(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise multiplication with another Series."
+      },
+      {
+        "name": "divide",
+        "signature": "Series.divide(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise division by another Series."
+      },
+      {
+        "name": "floorDivide",
+        "signature": "Series.floorDivide(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise floor division."
+      },
+      {
+        "name": "mod",
+        "signature": "Series.mod(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise remainder."
+      },
+      {
+        "name": "pow",
+        "signature": "Series.pow(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise power."
+      },
+      {
+        "name": "rightAdd",
+        "signature": "Series.rightAdd(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "A scalar added from the left, as in 2.0 + series."
+      },
+      {
+        "name": "rightSubtract",
+        "signature": "Series.rightSubtract(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "A scalar subtracted from the left, as in 2.0 - series."
+      },
+      {
+        "name": "rightMultiply",
+        "signature": "Series.rightMultiply(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "A scalar multiplied from the left."
+      },
+      {
+        "name": "rightDivide",
+        "signature": "Series.rightDivide(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "A scalar divided from the left, as in 2.0 / series."
+      },
+      {
+        "name": "negate",
+        "signature": "Series.negate() : Series",
+        "parameters": [],
+        "documentation": "Negates every value."
+      },
+      {
+        "name": "abs",
+        "signature": "Series.abs() : Series",
+        "parameters": [],
+        "documentation": "The absolute value of every number."
+      },
+      {
+        "name": "round",
+        "signature": "Series.round(decimals : Int = 0) : Series",
+        "parameters": [
+          "decimals : Int = 0"
+        ],
+        "documentation": "Rounds every number to the given number of decimals."
+      },
+      {
+        "name": "sqrt",
+        "signature": "Series.sqrt() : Series",
+        "parameters": [],
+        "documentation": "The square root of every number."
+      },
+      {
+        "name": "clip",
+        "signature": "Series.clip(low : double, high : double) : Series",
+        "parameters": [
+          "low : double",
+          "high : double"
+        ],
+        "documentation": "Limits every number to the low and high bounds."
+      },
+      {
+        "name": "eq",
+        "signature": "Series.eq(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise equality; the result is a Bool Series."
+      },
+      {
+        "name": "ne",
+        "signature": "Series.ne(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise inequality."
+      },
+      {
+        "name": "lt",
+        "signature": "Series.lt(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise less-than."
+      },
+      {
+        "name": "le",
+        "signature": "Series.le(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise less-than-or-equal."
+      },
+      {
+        "name": "gt",
+        "signature": "Series.gt(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise greater-than."
+      },
+      {
+        "name": "ge",
+        "signature": "Series.ge(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise greater-than-or-equal."
+      },
+      {
+        "name": "both",
+        "signature": "Series.both(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise logical and of two Bool Series."
+      },
+      {
+        "name": "either",
+        "signature": "Series.either(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Elementwise logical or of two Bool Series."
+      },
+      {
+        "name": "invert",
+        "signature": "Series.invert() : Series",
+        "parameters": [],
+        "documentation": "Elementwise logical not."
+      },
+      {
+        "name": "between",
+        "signature": "Series.between(low : double, high : double) : Series",
+        "parameters": [
+          "low : double",
+          "high : double"
+        ],
+        "documentation": "A Bool Series that is true inside the inclusive bounds."
+      },
+      {
+        "name": "between",
+        "signature": "Series.between(low : Int, high : Int) : Series",
+        "parameters": [
+          "low : Int",
+          "high : Int"
+        ],
+        "documentation": "A Bool Series that is true inside the inclusive Int bounds."
+      },
+      {
+        "name": "between",
+        "signature": "Series.between(low : String, high : String) : Series",
+        "parameters": [
+          "low : String",
+          "high : String"
+        ],
+        "documentation": "A Bool Series that is true inside the inclusive String bounds."
+      },
+      {
+        "name": "isIn",
+        "signature": "Series.isIn(values : List[Int]) : Series",
+        "parameters": [
+          "values : List[Int]"
+        ],
+        "documentation": "A Bool Series that is true where the value is in the list."
+      },
+      {
+        "name": "isIn",
+        "signature": "Series.isIn(values : List[double]) : Series",
+        "parameters": [
+          "values : List[double]"
+        ],
+        "documentation": "A Bool Series that is true where the value is in the list."
+      },
+      {
+        "name": "isIn",
+        "signature": "Series.isIn(values : List[String]) : Series",
+        "parameters": [
+          "values : List[String]"
+        ],
+        "documentation": "A Bool Series that is true where the value is in the list."
+      },
+      {
+        "name": "isIn",
+        "signature": "Series.isIn(values : List[Bool]) : Series",
+        "parameters": [
+          "values : List[Bool]"
+        ],
+        "documentation": "A Bool Series that is true where the value is in the list."
+      },
+      {
+        "name": "isNa",
+        "signature": "Series.isNa() : Series",
+        "parameters": [],
+        "documentation": "A Bool Series that is true for missing entries."
+      },
+      {
+        "name": "notNa",
+        "signature": "Series.notNa() : Series",
+        "parameters": [],
+        "documentation": "A Bool Series that is true for present entries."
+      },
+      {
+        "name": "fillNa",
+        "signature": "Series.fillNa(value : double) : Series",
+        "parameters": [
+          "value : double"
+        ],
+        "documentation": "Replaces missing entries with a double."
+      },
+      {
+        "name": "fillNa",
+        "signature": "Series.fillNa(value : Int) : Series",
+        "parameters": [
+          "value : Int"
+        ],
+        "documentation": "Replaces missing entries with an Int."
+      },
+      {
+        "name": "fillNa",
+        "signature": "Series.fillNa(value : String) : Series",
+        "parameters": [
+          "value : String"
+        ],
+        "documentation": "Replaces missing entries with a String."
+      },
+      {
+        "name": "fillNa",
+        "signature": "Series.fillNa(value : Bool) : Series",
+        "parameters": [
+          "value : Bool"
+        ],
+        "documentation": "Replaces missing entries with a Bool."
+      },
+      {
+        "name": "fillNa",
+        "signature": "Series.fillNa(value : Scalar) : Series",
+        "parameters": [
+          "value : Scalar"
+        ],
+        "documentation": "Replaces missing entries with a Scalar."
+      },
+      {
+        "name": "dropNa",
+        "signature": "Series.dropNa() : Series",
+        "parameters": [],
+        "documentation": "Removes rows with a missing entry."
+      },
+      {
+        "name": "ffill",
+        "signature": "Series.ffill() : Series",
+        "parameters": [],
+        "documentation": "Carries the last present value forward."
+      },
+      {
+        "name": "bfill",
+        "signature": "Series.bfill() : Series",
+        "parameters": [],
+        "documentation": "Carries the next present value back."
+      },
+      {
+        "name": "count",
+        "signature": "Series.count() : Int",
+        "parameters": [],
+        "documentation": "The number of present entries."
+      },
+      {
+        "name": "sum",
+        "signature": "Series.sum() : Scalar",
+        "parameters": [],
+        "documentation": "The sum of the present numbers."
+      },
+      {
+        "name": "min",
+        "signature": "Series.min() : Scalar",
+        "parameters": [],
+        "documentation": "The smallest present value."
+      },
+      {
+        "name": "max",
+        "signature": "Series.max() : Scalar",
+        "parameters": [],
+        "documentation": "The largest present value."
+      },
+      {
+        "name": "mean",
+        "signature": "Series.mean() : Scalar",
+        "parameters": [],
+        "documentation": "The mean of the present numbers."
+      },
+      {
+        "name": "median",
+        "signature": "Series.median() : Scalar",
+        "parameters": [],
+        "documentation": "The median of the present numbers."
+      },
+      {
+        "name": "quantile",
+        "signature": "Series.quantile(q : double) : Scalar",
+        "parameters": [
+          "q : double"
+        ],
+        "documentation": "The q quantile of the present numbers."
+      },
+      {
+        "name": "std",
+        "signature": "Series.std(ddof : Int = 1) : Scalar",
+        "parameters": [
+          "ddof : Int = 1"
+        ],
+        "documentation": "The sample standard deviation."
+      },
+      {
+        "name": "variance",
+        "signature": "Series.variance(ddof : Int = 1) : Scalar",
+        "parameters": [
+          "ddof : Int = 1"
+        ],
+        "documentation": "The sample variance."
+      },
+      {
+        "name": "prod",
+        "signature": "Series.prod() : Scalar",
+        "parameters": [],
+        "documentation": "The product of the present numbers."
+      },
+      {
+        "name": "any",
+        "signature": "Series.any() : Bool",
+        "parameters": [],
+        "documentation": "Whether any present Bool entry is true."
+      },
+      {
+        "name": "all",
+        "signature": "Series.all() : Bool",
+        "parameters": [],
+        "documentation": "Whether every present Bool entry is true."
+      },
+      {
+        "name": "nunique",
+        "signature": "Series.nunique() : Int",
+        "parameters": [],
+        "documentation": "The number of distinct present values."
+      },
+      {
+        "name": "idxMax",
+        "signature": "Series.idxMax() : Scalar",
+        "parameters": [],
+        "documentation": "The index label of the largest value."
+      },
+      {
+        "name": "idxMin",
+        "signature": "Series.idxMin() : Scalar",
+        "parameters": [],
+        "documentation": "The index label of the smallest value."
+      },
+      {
+        "name": "unique",
+        "signature": "Series.unique() : Series",
+        "parameters": [],
+        "documentation": "The distinct values, in first-seen order."
+      },
+      {
+        "name": "duplicated",
+        "signature": "Series.duplicated(keep : String = \"first\") : Series",
+        "parameters": [
+          "keep : String = \"first\""
+        ],
+        "documentation": "A Bool Series that is true for repeated values."
+      },
+      {
+        "name": "dropDuplicates",
+        "signature": "Series.dropDuplicates(keep : String = \"first\") : Series",
+        "parameters": [
+          "keep : String = \"first\""
+        ],
+        "documentation": "Keeps the first occurrence of every value."
+      },
+      {
+        "name": "valueCounts",
+        "signature": "Series.valueCounts(ascending : Bool = false, normalize : Bool = false, sort : Bool = true, dropNa : Bool = true) : Series",
+        "parameters": [
+          "ascending : Bool = false",
+          "normalize : Bool = false",
+          "sort : Bool = true",
+          "dropNa : Bool = true"
+        ],
+        "documentation": "Counts of each distinct value; absent entries are dropped."
+      },
+      {
+        "name": "mode",
+        "signature": "Series.mode() : Series",
+        "parameters": [],
+        "documentation": "The most frequent value or values."
+      },
+      {
+        "name": "cumSum",
+        "signature": "Series.cumSum() : Series",
+        "parameters": [],
+        "documentation": "A running sum."
+      },
+      {
+        "name": "cumProd",
+        "signature": "Series.cumProd() : Series",
+        "parameters": [],
+        "documentation": "A running product."
+      },
+      {
+        "name": "cumMax",
+        "signature": "Series.cumMax() : Series",
+        "parameters": [],
+        "documentation": "A running maximum."
+      },
+      {
+        "name": "cumMin",
+        "signature": "Series.cumMin() : Series",
+        "parameters": [],
+        "documentation": "A running minimum."
+      },
+      {
+        "name": "shift",
+        "signature": "Series.shift(periods : Int = 1) : Series",
+        "parameters": [
+          "periods : Int = 1"
+        ],
+        "documentation": "Moves values down by the given number of rows, leaving missing entries behind."
+      },
+      {
+        "name": "diff",
+        "signature": "Series.diff(periods : Int = 1) : Series",
+        "parameters": [
+          "periods : Int = 1"
+        ],
+        "documentation": "The difference between each value and the value that many rows earlier."
+      },
+      {
+        "name": "pctChange",
+        "signature": "Series.pctChange(periods : Int = 1) : Series",
+        "parameters": [
+          "periods : Int = 1"
+        ],
+        "documentation": "The fractional change from the value that many rows earlier."
+      },
+      {
+        "name": "rolling",
+        "signature": "Series.rolling(window : Int, minPeriods : Int = -1) : Rolling",
+        "parameters": [
+          "window : Int",
+          "minPeriods : Int = -1"
+        ],
+        "documentation": "A rolling-window view; call mean, sum, min, max, std or count on it."
+      },
+      {
+        "name": "rank",
+        "signature": "Series.rank(ascending : Bool = true, method : String = \"average\", pct : Bool = false) : Series",
+        "parameters": [
+          "ascending : Bool = true",
+          "method : String = \"average\"",
+          "pct : Bool = false"
+        ],
+        "documentation": "Each value place in sorted order; tied values share the average place."
+      },
+      {
+        "name": "apply",
+        "signature": "Series.apply(f : double -> double) : Series",
+        "parameters": [
+          "f : double -> double"
+        ],
+        "documentation": "Applies a function to every number."
+      },
+      {
+        "name": "applyInt",
+        "signature": "Series.applyInt(f : Int -> Int) : Series",
+        "parameters": [
+          "f : Int -> Int"
+        ],
+        "documentation": "Applies a function to every Int."
+      },
+      {
+        "name": "applyString",
+        "signature": "Series.applyString(f : String -> String) : Series",
+        "parameters": [
+          "f : String -> String"
+        ],
+        "documentation": "Applies a function to the display text of every value."
+      },
+      {
+        "name": "applyBool",
+        "signature": "Series.applyBool(f : double -> Bool) : Series",
+        "parameters": [
+          "f : double -> Bool"
+        ],
+        "documentation": "Applies a predicate to every number and gives a Bool Series."
+      },
+      {
+        "name": "replace",
+        "signature": "Series.replace(old : String, replacement : String) : Series",
+        "parameters": [
+          "old : String",
+          "replacement : String"
+        ],
+        "documentation": "Replaces matching String values."
+      },
+      {
+        "name": "replace",
+        "signature": "Series.replace(old : Int, replacement : Int) : Series",
+        "parameters": [
+          "old : Int",
+          "replacement : Int"
+        ],
+        "documentation": "Replaces matching Int values."
+      },
+      {
+        "name": "replace",
+        "signature": "Series.replace(old : double, replacement : double) : Series",
+        "parameters": [
+          "old : double",
+          "replacement : double"
+        ],
+        "documentation": "Replaces matching double values."
+      },
+      {
+        "name": "str",
+        "signature": "Series.str() : StringMethods",
+        "parameters": [],
+        "documentation": "String helpers such as upper, contains and splitPart."
+      },
+      {
+        "name": "describe",
+        "signature": "Series.describe() : Series",
+        "parameters": [],
+        "documentation": "Count, mean, standard deviation, quartiles and extremes for numbers, or count, unique, top and freq for other values."
+      },
+      {
+        "name": "toFrame",
+        "signature": "Series.toFrame() : DataFrame",
+        "parameters": [],
+        "documentation": "A one-column DataFrame holding this Series."
+      },
+      {
+        "name": "text",
+        "signature": "Series.text() : String",
+        "parameters": [],
+        "documentation": "The plain-text table shown in a notebook."
+      },
+      {
+        "name": "html",
+        "signature": "Series.html() : String",
+        "parameters": [],
+        "documentation": "The HTML table shown in a notebook."
+      },
+      {
+        "name": "size",
+        "signature": "Series.size() : Int",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ndim",
+        "signature": "Series.ndim() : Int",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "toScalars",
+        "signature": "Series.toScalars() : List[Scalar]",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "items",
+        "signature": "Series.items() : List[(Scalar, Scalar)]",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "equals",
+        "signature": "Series.equals(other : Series) : Bool",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "iat",
+        "signature": "Series.iat(position : Int) : Scalar",
+        "parameters": [
+          "position : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "takeGaps",
+        "signature": "Series.takeGaps(positions : List[Int]) : Series",
+        "parameters": [
+          "positions : List[Int]"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "positionOf",
+        "signature": "Series.positionOf(label : double) : Option[Int]",
+        "parameters": [
+          "label : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "loc",
+        "signature": "Series.loc(label : double) : Scalar",
+        "parameters": [
+          "label : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "at",
+        "signature": "Series.at(label : Int) : Scalar",
+        "parameters": [
+          "label : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "at",
+        "signature": "Series.at(label : String) : Scalar",
+        "parameters": [
+          "label : String"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "where",
+        "signature": "Series.where(mask : Series, other : Series) : Series",
+        "parameters": [
+          "mask : Series",
+          "other : Series"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "mask",
+        "signature": "Series.mask(mask : Series, other : Scalar) : Series",
+        "parameters": [
+          "mask : Series",
+          "other : Scalar"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "add",
+        "signature": "Series.add(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "subtract",
+        "signature": "Series.subtract(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "multiply",
+        "signature": "Series.multiply(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "divide",
+        "signature": "Series.divide(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "floorDivide",
+        "signature": "Series.floorDivide(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "mod",
+        "signature": "Series.mod(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "pow",
+        "signature": "Series.pow(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "add",
+        "signature": "Series.add(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "rightAdd",
+        "signature": "Series.rightAdd(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "rightSubtract",
+        "signature": "Series.rightSubtract(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "rightMultiply",
+        "signature": "Series.rightMultiply(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "rightDivide",
+        "signature": "Series.rightDivide(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "eq",
+        "signature": "Series.eq(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ne",
+        "signature": "Series.ne(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "lt",
+        "signature": "Series.lt(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "le",
+        "signature": "Series.le(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "gt",
+        "signature": "Series.gt(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ge",
+        "signature": "Series.ge(other : double) : Series",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "eq",
+        "signature": "Series.eq(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ne",
+        "signature": "Series.ne(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "lt",
+        "signature": "Series.lt(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "le",
+        "signature": "Series.le(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "gt",
+        "signature": "Series.gt(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ge",
+        "signature": "Series.ge(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "interpolate",
+        "signature": "Series.interpolate() : Series",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "quantile",
+        "signature": "Series.quantile(qs : List[double]) : Series",
+        "parameters": [
+          "qs : List[double]"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "sem",
+        "signature": "Series.sem(ddof : Int = 1) : Scalar",
+        "parameters": [
+          "ddof : Int = 1"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "skew",
+        "signature": "Series.skew() : Scalar",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "kurt",
+        "signature": "Series.kurt() : Scalar",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "argMax",
+        "signature": "Series.argMax() : Int",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "argMin",
+        "signature": "Series.argMin() : Int",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "expanding",
+        "signature": "Series.expanding(minPeriods : Int = 1) : Expanding",
+        "parameters": [
+          "minPeriods : Int = 1"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ewm",
+        "signature": "Series.ewm(alpha : double, adjust : Bool = true, minPeriods : Int = 0) : EWM",
+        "parameters": [
+          "alpha : double",
+          "adjust : Bool = true",
+          "minPeriods : Int = 0"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ewmSpan",
+        "signature": "Series.ewmSpan(span : Int, adjust : Bool = true, minPeriods : Int = 0) : EWM",
+        "parameters": [
+          "span : Int",
+          "adjust : Bool = true",
+          "minPeriods : Int = 0"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ewmHalfLife",
+        "signature": "Series.ewmHalfLife(halflife : double, adjust : Bool = true, minPeriods : Int = 0) : EWM",
+        "parameters": [
+          "halflife : double",
+          "adjust : Bool = true",
+          "minPeriods : Int = 0"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "map",
+        "signature": "Series.map(f : Scalar -> Scalar) : Series",
+        "parameters": [
+          "f : Scalar -> Scalar"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "replace",
+        "signature": "Series.replace(old : Bool, replacement : Bool) : Series",
+        "parameters": [
+          "old : Bool",
+          "replacement : Bool"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "replaceMany",
+        "signature": "Series.replaceMany(pairs : List[(Scalar, Scalar)]) : Series",
+        "parameters": [
+          "pairs : List[(Scalar, Scalar)]"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "mapValues",
+        "signature": "Series.mapValues(mapping : Map[String, String]) : Series",
+        "parameters": [
+          "mapping : Map[String, String]"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "splitToFrame",
+        "signature": "Series.splitToFrame(separator : String) : DataFrame",
+        "parameters": [
+          "separator : String"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "cov",
+        "signature": "Series.cov(other : Series, ddof : Int = 1) : Scalar",
+        "parameters": [
+          "other : Series",
+          "ddof : Int = 1"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "corr",
+        "signature": "Series.corr(other : Series) : Scalar",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "autocorr",
+        "signature": "Series.autocorr(lag : Int = 1) : Scalar",
+        "parameters": [
+          "lag : Int = 1"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "factorize",
+        "signature": "Series.factorize() : (Series, Series)",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "toCsv",
+        "signature": "Series.toCsv(separator : String = \",\", header : Bool = true, includeIndex : Bool = true) : String",
+        "parameters": [
+          "separator : String = \"",
+          "\"",
+          "header : Bool = true",
+          "includeIndex : Bool = true"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "toTensor",
+        "signature": "Series.toTensor() : DynTensor[double]",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "append",
+        "signature": "Series.append(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "combineFirst",
+        "signature": "Series.combineFirst(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "update",
+        "signature": "Series.update(other : Series) : Series",
+        "parameters": [
+          "other : Series"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "positionOf",
+        "signature": "Series.positionOf(label : Bool) : Option[Int]",
+        "parameters": [
+          "label : Bool"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "loc",
+        "signature": "Series.loc(label : Bool) : Scalar",
+        "parameters": [
+          "label : Bool"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "at",
+        "signature": "Series.at(label : Bool) : Scalar",
+        "parameters": [
+          "label : Bool"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "subtract",
+        "signature": "Series.subtract(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "multiply",
+        "signature": "Series.multiply(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "divide",
+        "signature": "Series.divide(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "floorDivide",
+        "signature": "Series.floorDivide(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "mod",
+        "signature": "Series.mod(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "pow",
+        "signature": "Series.pow(other : Int) : Series",
+        "parameters": [
+          "other : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "add",
+        "signature": "Series.add(other : String) : Series",
+        "parameters": [
+          "other : String"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "clip",
+        "signature": "Series.clip(low : Int, high : Int) : Series",
+        "parameters": [
+          "low : Int",
+          "high : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "item",
+        "signature": "Series.item(position : Int = 0) : Scalar",
+        "parameters": [
+          "position : Int = 0"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "isUnique",
+        "signature": "Series.isUnique() : Bool",
+        "parameters": [],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "isMonotonic",
+        "signature": "Series.isMonotonic(increasing : Bool = true) : Bool",
+        "parameters": [
+          "increasing : Bool = true"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "repeat",
+        "signature": "Series.repeat(times : Int) : Series",
+        "parameters": [
+          "times : Int"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "eq",
+        "signature": "Series.eq(other : Bool) : Series",
+        "parameters": [
+          "other : Bool"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ne",
+        "signature": "Series.ne(other : Bool) : Series",
+        "parameters": [
+          "other : Bool"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "lt",
+        "signature": "Series.lt(other : String) : Series",
+        "parameters": [
+          "other : String"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "le",
+        "signature": "Series.le(other : String) : Series",
+        "parameters": [
+          "other : String"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "gt",
+        "signature": "Series.gt(other : String) : Series",
+        "parameters": [
+          "other : String"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "ge",
+        "signature": "Series.ge(other : String) : Series",
+        "parameters": [
+          "other : String"
+        ],
+        "documentation": "Member of Series."
+      },
+      {
+        "name": "replace",
+        "signature": "Series.replace(old : Scalar, replacement : Scalar) : Series",
+        "parameters": [
+          "old : Scalar",
+          "replacement : Scalar"
+        ],
+        "documentation": "Member of Series."
+      }
+    ],
+    "Rolling": [
+      {
+        "name": "mean",
+        "signature": "Rolling.mean() : Series",
+        "parameters": [],
+        "documentation": "The mean of each window."
+      },
+      {
+        "name": "sum",
+        "signature": "Rolling.sum() : Series",
+        "parameters": [],
+        "documentation": "The sum of each window."
+      },
+      {
+        "name": "min",
+        "signature": "Rolling.min() : Series",
+        "parameters": [],
+        "documentation": "The smallest value in each window."
+      },
+      {
+        "name": "max",
+        "signature": "Rolling.max() : Series",
+        "parameters": [],
+        "documentation": "The largest value in each window."
+      },
+      {
+        "name": "std",
+        "signature": "Rolling.std() : Series",
+        "parameters": [],
+        "documentation": "The sample standard deviation of each window."
+      },
+      {
+        "name": "count",
+        "signature": "Rolling.count() : Series",
+        "parameters": [],
+        "documentation": "The number of present entries in each window."
+      },
+      {
+        "name": "variance",
+        "signature": "Rolling.variance() : Series",
+        "parameters": [],
+        "documentation": "Member of Rolling."
+      },
+      {
+        "name": "median",
+        "signature": "Rolling.median() : Series",
+        "parameters": [],
+        "documentation": "Member of Rolling."
+      },
+      {
+        "name": "sem",
+        "signature": "Rolling.sem() : Series",
+        "parameters": [],
+        "documentation": "Member of Rolling."
+      },
+      {
+        "name": "skew",
+        "signature": "Rolling.skew() : Series",
+        "parameters": [],
+        "documentation": "Member of Rolling."
+      },
+      {
+        "name": "kurt",
+        "signature": "Rolling.kurt() : Series",
+        "parameters": [],
+        "documentation": "Member of Rolling."
+      },
+      {
+        "name": "quantile",
+        "signature": "Rolling.quantile(q : double) : Series",
+        "parameters": [
+          "q : double"
+        ],
+        "documentation": "Member of Rolling."
+      },
+      {
+        "name": "apply",
+        "signature": "Rolling.apply(f : List[double] -> double) : Series",
+        "parameters": [
+          "f : List[double] -> double"
+        ],
+        "documentation": "Member of Rolling."
+      }
+    ],
+    "StringMethods": [
+      {
+        "name": "upper",
+        "signature": "StringMethods.upper() : Series",
+        "parameters": [],
+        "documentation": "Uppercases every value."
+      },
+      {
+        "name": "lower",
+        "signature": "StringMethods.lower() : Series",
+        "parameters": [],
+        "documentation": "Lowercases every value."
+      },
+      {
+        "name": "strip",
+        "signature": "StringMethods.strip() : Series",
+        "parameters": [],
+        "documentation": "Trims whitespace from every value."
+      },
+      {
+        "name": "replace",
+        "signature": "StringMethods.replace(old : String, replacement : String) : Series",
+        "parameters": [
+          "old : String",
+          "replacement : String"
+        ],
+        "documentation": "Replaces every occurrence of a substring."
+      },
+      {
+        "name": "capitalize",
+        "signature": "StringMethods.capitalize() : Series",
+        "parameters": [],
+        "documentation": "Uppercases the first letter and lowercases the rest."
+      },
+      {
+        "name": "title",
+        "signature": "StringMethods.title() : Series",
+        "parameters": [],
+        "documentation": "Uppercases the start of every word."
+      },
+      {
+        "name": "slice",
+        "signature": "StringMethods.slice(start : Int, stop : Int) : Series",
+        "parameters": [
+          "start : Int",
+          "stop : Int"
+        ],
+        "documentation": "Keeps the half-open character range of every value."
+      },
+      {
+        "name": "cat",
+        "signature": "StringMethods.cat(other : String) : Series",
+        "parameters": [
+          "other : String"
+        ],
+        "documentation": "Appends a suffix to every value."
+      },
+      {
+        "name": "pad",
+        "signature": "StringMethods.pad(width : Int) : Series",
+        "parameters": [
+          "width : Int"
+        ],
+        "documentation": "Pads every value on the left to a width."
+      },
+      {
+        "name": "contains",
+        "signature": "StringMethods.contains(part : String) : Series",
+        "parameters": [
+          "part : String"
+        ],
+        "documentation": "A Bool Series that is true where the value contains the text."
+      },
+      {
+        "name": "startsWith",
+        "signature": "StringMethods.startsWith(part : String) : Series",
+        "parameters": [
+          "part : String"
+        ],
+        "documentation": "A Bool Series that is true where the value starts with the text."
+      },
+      {
+        "name": "endsWith",
+        "signature": "StringMethods.endsWith(part : String) : Series",
+        "parameters": [
+          "part : String"
+        ],
+        "documentation": "A Bool Series that is true where the value ends with the text."
+      },
+      {
+        "name": "isEmpty",
+        "signature": "StringMethods.isEmpty() : Series",
+        "parameters": [],
+        "documentation": "A Bool Series that is true for empty values."
+      },
+      {
+        "name": "len",
+        "signature": "StringMethods.len() : Series",
+        "parameters": [],
+        "documentation": "The length of every value."
+      },
+      {
+        "name": "splitPart",
+        "signature": "StringMethods.splitPart(separator : String, position : Int) : Series",
+        "parameters": [
+          "separator : String",
+          "position : Int"
+        ],
+        "documentation": "Splits each value and keeps one part."
+      },
+      {
+        "name": "swapcase",
+        "signature": "StringMethods.swapcase() : Series",
+        "parameters": [],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "stripLeading",
+        "signature": "StringMethods.stripLeading() : Series",
+        "parameters": [],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "stripTrailing",
+        "signature": "StringMethods.stripTrailing() : Series",
+        "parameters": [],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "sliceReplace",
+        "signature": "StringMethods.sliceReplace(start : Int, stop : Int, replacement : String) : Series",
+        "parameters": [
+          "start : Int",
+          "stop : Int",
+          "replacement : String"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "repeat",
+        "signature": "StringMethods.repeat(times : Int) : Series",
+        "parameters": [
+          "times : Int"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "ljust",
+        "signature": "StringMethods.ljust(width : Int) : Series",
+        "parameters": [
+          "width : Int"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "rjust",
+        "signature": "StringMethods.rjust(width : Int) : Series",
+        "parameters": [
+          "width : Int"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "center",
+        "signature": "StringMethods.center(width : Int) : Series",
+        "parameters": [
+          "width : Int"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "zfill",
+        "signature": "StringMethods.zfill(width : Int) : Series",
+        "parameters": [
+          "width : Int"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "count",
+        "signature": "StringMethods.count(part : String) : Series",
+        "parameters": [
+          "part : String"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "find",
+        "signature": "StringMethods.find(part : String) : Series",
+        "parameters": [
+          "part : String"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "rfind",
+        "signature": "StringMethods.rfind(part : String) : Series",
+        "parameters": [
+          "part : String"
+        ],
+        "documentation": "Member of StringMethods."
+      },
+      {
+        "name": "get",
+        "signature": "StringMethods.get(position : Int) : Series",
+        "parameters": [
+          "position : Int"
+        ],
+        "documentation": "Member of StringMethods."
+      }
+    ],
+    "DataFrame": [
+      {
+        "name": "length",
+        "signature": "DataFrame.length() : Int",
+        "parameters": [],
+        "documentation": "The number of rows."
+      },
+      {
+        "name": "width",
+        "signature": "DataFrame.width() : Int",
+        "parameters": [],
+        "documentation": "The number of columns."
+      },
+      {
+        "name": "shape",
+        "signature": "DataFrame.shape() : (Int, Int)",
+        "parameters": [],
+        "documentation": "The row and column counts."
+      },
+      {
+        "name": "isEmpty",
+        "signature": "DataFrame.isEmpty() : Bool",
+        "parameters": [],
+        "documentation": "Whether the frame has no rows or no columns."
+      },
+      {
+        "name": "columns",
+        "signature": "DataFrame.columns() : List[String]",
+        "parameters": [],
+        "documentation": "The column names, in order."
+      },
+      {
+        "name": "hasColumn",
+        "signature": "DataFrame.hasColumn(name : String) : Bool",
+        "parameters": [
+          "name : String"
+        ],
+        "documentation": "Whether a column with this name exists."
+      },
+      {
+        "name": "copy",
+        "signature": "DataFrame.copy() : DataFrame",
+        "parameters": [],
+        "documentation": "An independent copy of every column and the index."
+      },
+      {
+        "name": "dtypes",
+        "signature": "DataFrame.dtypes() : Series",
+        "parameters": [],
+        "documentation": "One dtype string per column, indexed by column name."
+      },
+      {
+        "name": "keyColumn",
+        "signature": "DataFrame.keyColumn(name : String) : Column",
+        "parameters": [
+          "name : String"
+        ],
+        "documentation": "A copy of a column by name."
+      },
+      {
+        "name": "keyCodes",
+        "signature": "DataFrame.keyCodes(name : String) : (List[Int], Int)",
+        "parameters": [
+          "name : String"
+        ],
+        "documentation": "Factorizes one key column: integer codes and the number of distinct codes."
+      },
+      {
+        "name": "col",
+        "signature": "DataFrame.col(name : String) : Series or Error",
+        "parameters": [
+          "name : String"
+        ],
+        "documentation": "One column as a Series. A missing name is a DataError.MissingColumn."
+      },
+      {
+        "name": "get",
+        "signature": "DataFrame.get(name : String) : Option[Series]",
+        "parameters": [
+          "name : String"
+        ],
+        "documentation": "One column as a Series, or None when the name is absent."
+      },
+      {
+        "name": "select",
+        "signature": "DataFrame.select(selected : List[String]) : DataFrame or Error",
+        "parameters": [
+          "selected : List[String]"
+        ],
+        "documentation": "A frame with the named columns, in that order."
+      },
+      {
+        "name": "take",
+        "signature": "DataFrame.take(positions : List[Int]) : DataFrame",
+        "parameters": [
+          "positions : List[Int]"
+        ],
+        "documentation": "Rows at the given positions, in that order."
+      },
+      {
+        "name": "head",
+        "signature": "DataFrame.head(n : Int = 5) : DataFrame",
+        "parameters": [
+          "n : Int = 5"
+        ],
+        "documentation": "The first n rows."
+      },
+      {
+        "name": "tail",
+        "signature": "DataFrame.tail(n : Int = 5) : DataFrame",
+        "parameters": [
+          "n : Int = 5"
+        ],
+        "documentation": "The last n rows."
+      },
+      {
+        "name": "slice",
+        "signature": "DataFrame.slice(start : Int, stop : Int) : DataFrame",
+        "parameters": [
+          "start : Int",
+          "stop : Int"
+        ],
+        "documentation": "Rows in the half-open range start to stop."
+      },
+      {
+        "name": "iloc",
+        "signature": "DataFrame.iloc(positions : List[Int]) : DataFrame",
+        "parameters": [
+          "positions : List[Int]"
+        ],
+        "documentation": "Rows at the given positions."
+      },
+      {
+        "name": "row",
+        "signature": "DataFrame.row(position : Int) : Series",
+        "parameters": [
+          "position : Int"
+        ],
+        "documentation": "One row as a Series indexed by column names."
+      },
+      {
+        "name": "filter",
+        "signature": "DataFrame.filter(mask : Series) : DataFrame",
+        "parameters": [
+          "mask : Series"
+        ],
+        "documentation": "Keeps the rows where the Bool mask is true."
+      },
+      {
+        "name": "loc",
+        "signature": "DataFrame.loc(label : Int) : DataFrame",
+        "parameters": [
+          "label : Int"
+        ],
+        "documentation": "Rows whose Int index label matches."
+      },
+      {
+        "name": "loc",
+        "signature": "DataFrame.loc(label : String) : DataFrame",
+        "parameters": [
+          "label : String"
+        ],
+        "documentation": "Rows whose String index label matches."
+      },
+      {
+        "name": "sortValues",
+        "signature": "DataFrame.sortValues(by : String, ascending : Bool = true, naPosition : String = \"last\") : DataFrame or Error",
+        "parameters": [
+          "by : String",
+          "ascending : Bool = true",
+          "naPosition : String = \"last\""
+        ],
+        "documentation": "Sorts rows by one column."
+      },
+      {
+        "name": "sortValues",
+        "signature": "DataFrame.sortValues(by : List[String], ascending : Bool = true, naPosition : String = \"last\") : DataFrame or Error",
+        "parameters": [
+          "by : List[String]",
+          "ascending : Bool = true",
+          "naPosition : String = \"last\""
+        ],
+        "documentation": "Sorts rows by several columns, the first key most significant."
+      },
+      {
+        "name": "sortIndex",
+        "signature": "DataFrame.sortIndex(ascending : Bool = true, naPosition : String = \"last\") : DataFrame",
+        "parameters": [
+          "ascending : Bool = true",
+          "naPosition : String = \"last\""
+        ],
+        "documentation": "Sorts rows by index label."
+      },
+      {
+        "name": "nlargest",
+        "signature": "DataFrame.nlargest(n : Int, by : String) : DataFrame or Error",
+        "parameters": [
+          "n : Int",
+          "by : String"
+        ],
+        "documentation": "The n rows with the largest value in a column."
+      },
+      {
+        "name": "nsmallest",
+        "signature": "DataFrame.nsmallest(n : Int, by : String) : DataFrame or Error",
+        "parameters": [
+          "n : Int",
+          "by : String"
+        ],
+        "documentation": "The n rows with the smallest value in a column."
+      },
+      {
+        "name": "drop",
+        "signature": "DataFrame.drop(column : String) : DataFrame",
+        "parameters": [
+          "column : String"
+        ],
+        "documentation": "A frame without one column."
+      },
+      {
+        "name": "drop",
+        "signature": "DataFrame.drop(removed : List[String]) : DataFrame",
+        "parameters": [
+          "removed : List[String]"
+        ],
+        "documentation": "A frame without the named columns."
+      },
+      {
+        "name": "dropRows",
+        "signature": "DataFrame.dropRows(positions : List[Int]) : DataFrame",
+        "parameters": [
+          "positions : List[Int]"
+        ],
+        "documentation": "A frame without the rows at the given positions."
+      },
+      {
+        "name": "rename",
+        "signature": "DataFrame.rename(old : String, replacement : String) : DataFrame",
+        "parameters": [
+          "old : String",
+          "replacement : String"
+        ],
+        "documentation": "A frame with one column renamed."
+      },
+      {
+        "name": "renameColumns",
+        "signature": "DataFrame.renameColumns(mapping : Map[String, String]) : DataFrame",
+        "parameters": [
+          "mapping : Map[String, String]"
+        ],
+        "documentation": "A frame whose columns are renamed through a map; unlisted names stay."
+      },
+      {
+        "name": "assign",
+        "signature": "DataFrame.assign(name : String, series : Series) : DataFrame",
+        "parameters": [
+          "name : String",
+          "series : Series"
+        ],
+        "documentation": "A frame with a column added or replaced."
+      },
+      {
+        "name": "assign",
+        "signature": "DataFrame.assign(name : String, values : List[Int]) : DataFrame",
+        "parameters": [
+          "name : String",
+          "values : List[Int]"
+        ],
+        "documentation": "A frame with an Int column added or replaced."
+      },
+      {
+        "name": "assign",
+        "signature": "DataFrame.assign(name : String, values : List[double]) : DataFrame",
+        "parameters": [
+          "name : String",
+          "values : List[double]"
+        ],
+        "documentation": "A frame with a double column added or replaced."
+      },
+      {
+        "name": "assign",
+        "signature": "DataFrame.assign(name : String, values : List[String]) : DataFrame",
+        "parameters": [
+          "name : String",
+          "values : List[String]"
+        ],
+        "documentation": "A frame with a String column added or replaced."
+      },
+      {
+        "name": "assign",
+        "signature": "DataFrame.assign(name : String, values : List[Bool]) : DataFrame",
+        "parameters": [
+          "name : String",
+          "values : List[Bool]"
+        ],
+        "documentation": "A frame with a Bool column added or replaced."
+      },
+      {
+        "name": "setIndex",
+        "signature": "DataFrame.setIndex(name : String) : DataFrame or Error",
+        "parameters": [
+          "name : String"
+        ],
+        "documentation": "Uses one column as the index and removes it from the columns."
+      },
+      {
+        "name": "resetIndex",
+        "signature": "DataFrame.resetIndex(drop : Bool = false) : DataFrame",
+        "parameters": [
+          "drop : Bool = false"
+        ],
+        "documentation": "Replaces the index with 0..n-1; by default the old index becomes a column."
+      },
+      {
+        "name": "astype",
+        "signature": "DataFrame.astype(dtype : String) : DataFrame",
+        "parameters": [
+          "dtype : String"
+        ],
+        "documentation": "Converts every column to int64, float64, bool or str."
+      },
+      {
+        "name": "isNa",
+        "signature": "DataFrame.isNa() : DataFrame",
+        "parameters": [],
+        "documentation": "A Bool frame that is true for missing entries."
+      },
+      {
+        "name": "notNa",
+        "signature": "DataFrame.notNa() : DataFrame",
+        "parameters": [],
+        "documentation": "A Bool frame that is true for present entries."
+      },
+      {
+        "name": "fillNa",
+        "signature": "DataFrame.fillNa(value : double) : DataFrame",
+        "parameters": [
+          "value : double"
+        ],
+        "documentation": "Replaces missing entries with a double where the column kind fits."
+      },
+      {
+        "name": "fillNa",
+        "signature": "DataFrame.fillNa(value : Int) : DataFrame",
+        "parameters": [
+          "value : Int"
+        ],
+        "documentation": "Replaces missing entries with an Int where the column kind fits."
+      },
+      {
+        "name": "fillNa",
+        "signature": "DataFrame.fillNa(value : String) : DataFrame",
+        "parameters": [
+          "value : String"
+        ],
+        "documentation": "Replaces missing entries with a String where the column kind fits."
+      },
+      {
+        "name": "fillNa",
+        "signature": "DataFrame.fillNa(value : Bool) : DataFrame",
+        "parameters": [
+          "value : Bool"
+        ],
+        "documentation": "Replaces missing entries with a Bool where the column kind fits."
+      },
+      {
+        "name": "dropNa",
+        "signature": "DataFrame.dropNa() : DataFrame",
+        "parameters": [],
+        "documentation": "Selects rows by the named columns."
+      },
+      {
+        "name": "dropNa",
+        "signature": "DataFrame.dropNa(subset : List[String]) : DataFrame or Error",
+        "parameters": [
+          "subset : List[String]"
+        ],
+        "documentation": "Selects rows by the named columns."
+      },
+      {
+        "name": "dropNa",
+        "signature": "DataFrame.dropNa(how : String = \"any\", thresh : Int = 0) : DataFrame",
+        "parameters": [
+          "how : String = \"any\"",
+          "thresh : Int = 0"
+        ],
+        "documentation": "Removes rows with a missing entry."
+      },
+      {
+        "name": "dropNa",
+        "signature": "DataFrame.dropNa(subset : List[String], how : String = \"any\", thresh : Int = 0) : DataFrame or Error",
+        "parameters": [
+          "subset : List[String]",
+          "how : String = \"any\"",
+          "thresh : Int = 0"
+        ],
+        "documentation": "Selects rows by the named columns."
+      },
+      {
+        "name": "duplicated",
+        "signature": "DataFrame.duplicated(keep : String = \"first\") : Series",
+        "parameters": [
+          "keep : String = \"first\""
+        ],
+        "documentation": "A Bool Series that is true for repeated rows."
+      },
+      {
+        "name": "dropDuplicates",
+        "signature": "DataFrame.dropDuplicates() : DataFrame",
+        "parameters": [],
+        "documentation": "Selects rows by the named columns."
+      },
+      {
+        "name": "dropDuplicates",
+        "signature": "DataFrame.dropDuplicates(subset : List[String]) : DataFrame or Error",
+        "parameters": [
+          "subset : List[String]"
+        ],
+        "documentation": "Selects rows by the named columns."
+      },
+      {
+        "name": "dropDuplicates",
+        "signature": "DataFrame.dropDuplicates(keep : String = \"first\") : DataFrame",
+        "parameters": [
+          "keep : String = \"first\""
+        ],
+        "documentation": "Keeps the first occurrence of every row."
+      },
+      {
+        "name": "dropDuplicates",
+        "signature": "DataFrame.dropDuplicates(subset : List[String], keep : String = \"first\") : DataFrame or Error",
+        "parameters": [
+          "subset : List[String]",
+          "keep : String = \"first\""
+        ],
+        "documentation": "Selects rows by the named columns."
+      },
+      {
+        "name": "agg",
+        "signature": "DataFrame.agg(statistic : String) : Series",
+        "parameters": [
+          "statistic : String"
+        ],
+        "documentation": "Reduces every column with a named statistic."
+      },
+      {
+        "name": "sum",
+        "signature": "DataFrame.sum() : Series",
+        "parameters": [],
+        "documentation": "The sum of every column."
+      },
+      {
+        "name": "mean",
+        "signature": "DataFrame.mean() : Series",
+        "parameters": [],
+        "documentation": "The mean of every numeric column."
+      },
+      {
+        "name": "median",
+        "signature": "DataFrame.median() : Series",
+        "parameters": [],
+        "documentation": "The median of every numeric column."
+      },
+      {
+        "name": "min",
+        "signature": "DataFrame.min() : Series",
+        "parameters": [],
+        "documentation": "The smallest value in every column."
+      },
+      {
+        "name": "max",
+        "signature": "DataFrame.max() : Series",
+        "parameters": [],
+        "documentation": "The largest value in every column."
+      },
+      {
+        "name": "count",
+        "signature": "DataFrame.count() : Series",
+        "parameters": [],
+        "documentation": "The number of present entries in every column."
+      },
+      {
+        "name": "std",
+        "signature": "DataFrame.std() : Series",
+        "parameters": [],
+        "documentation": "The sample standard deviation of every numeric column."
+      },
+      {
+        "name": "variance",
+        "signature": "DataFrame.variance() : Series",
+        "parameters": [],
+        "documentation": "The sample variance of every numeric column."
+      },
+      {
+        "name": "nunique",
+        "signature": "DataFrame.nunique() : Series",
+        "parameters": [],
+        "documentation": "The number of distinct values in every column."
+      },
+      {
+        "name": "describe",
+        "signature": "DataFrame.describe() : DataFrame",
+        "parameters": [],
+        "documentation": "Summary statistics: one column per numeric column, or counts for a frame without numbers."
+      },
+      {
+        "name": "corr",
+        "signature": "DataFrame.corr() : DataFrame",
+        "parameters": [],
+        "documentation": "The Pearson correlation of every pair of numeric columns."
+      },
+      {
+        "name": "groupBy",
+        "signature": "DataFrame.groupBy(key : String) : GroupBy or Error",
+        "parameters": [
+          "key : String"
+        ],
+        "documentation": "Groups rows by one column."
+      },
+      {
+        "name": "groupBy",
+        "signature": "DataFrame.groupBy(keys : List[String]) : GroupBy or Error",
+        "parameters": [
+          "keys : List[String]"
+        ],
+        "documentation": "Groups rows by several columns."
+      },
+      {
+        "name": "merge",
+        "signature": "DataFrame.merge(other : DataFrame, on : String, how : String = \"inner\", leftSuffix : String = \"_x\", rightSuffix : String = \"_y\") : DataFrame or Error",
+        "parameters": [
+          "other : DataFrame",
+          "on : String",
+          "how : String = \"inner\"",
+          "leftSuffix : String = \"_x\"",
+          "rightSuffix : String = \"_y\""
+        ],
+        "documentation": "Joins another frame on a column with the same name."
+      },
+      {
+        "name": "merge",
+        "signature": "DataFrame.merge(other : DataFrame, on : List[String], how : String = \"inner\", leftSuffix : String = \"_x\", rightSuffix : String = \"_y\") : DataFrame or Error",
+        "parameters": [
+          "other : DataFrame",
+          "on : List[String]",
+          "how : String = \"inner\"",
+          "leftSuffix : String = \"_x\"",
+          "rightSuffix : String = \"_y\""
+        ],
+        "documentation": "Joins another frame on several columns with the same names."
+      },
+      {
+        "name": "merge",
+        "signature": "DataFrame.merge(other : DataFrame, leftOn : String, rightOn : String, how : String = \"inner\", leftSuffix : String = \"_x\", rightSuffix : String = \"_y\") : DataFrame or Error",
+        "parameters": [
+          "other : DataFrame",
+          "leftOn : String",
+          "rightOn : String",
+          "how : String = \"inner\"",
+          "leftSuffix : String = \"_x\"",
+          "rightSuffix : String = \"_y\""
+        ],
+        "documentation": "Joins another frame on different column names."
+      },
+      {
+        "name": "append",
+        "signature": "DataFrame.append(other : DataFrame) : DataFrame",
+        "parameters": [
+          "other : DataFrame"
+        ],
+        "documentation": "Stacks another frame below this one, matching columns by name."
+      },
+      {
+        "name": "pivotTable",
+        "signature": "DataFrame.pivotTable(index : String, columns : String, values : String, aggfunc : String = \"mean\") : DataFrame or Error",
+        "parameters": [
+          "index : String",
+          "columns : String",
+          "values : String",
+          "aggfunc : String = \"mean\""
+        ],
+        "documentation": "Lays one column values across the top, aggregating a third column."
+      },
+      {
+        "name": "toTensor",
+        "signature": "DataFrame.toTensor() : DynTensor[double]",
+        "parameters": [],
+        "documentation": "Copies the numeric columns into a rows-by-columns tensor."
+      },
+      {
+        "name": "toCsv",
+        "signature": "DataFrame.toCsv(separator : String = \",\", header : Bool = true, includeIndex : Bool = false) : String",
+        "parameters": [
+          "separator : String = \"",
+          "\"",
+          "header : Bool = true",
+          "includeIndex : Bool = false"
+        ],
+        "documentation": "Writes the frame as CSV text."
+      },
+      {
+        "name": "text",
+        "signature": "DataFrame.text() : String",
+        "parameters": [],
+        "documentation": "The plain-text table shown in a notebook."
+      },
+      {
+        "name": "html",
+        "signature": "DataFrame.html() : String",
+        "parameters": [],
+        "documentation": "The HTML table shown in a notebook."
+      },
+      {
+        "name": "cell",
+        "signature": "DataFrame.cell(row : Int, column : String) : Scalar or Error",
+        "parameters": [
+          "row : Int",
+          "column : String"
+        ],
+        "documentation": "One value by row position and column name."
+      },
+      {
+        "name": "mapNumeric",
+        "signature": "DataFrame.mapNumeric(f : double -> double) : DataFrame",
+        "parameters": [
+          "f : double -> double"
+        ],
+        "documentation": "Applies a function to every number column and keeps the others."
+      },
+      {
+        "name": "saveCsv",
+        "signature": "DataFrame.saveCsv(path : String, separator : String = \",\", includeIndex : Bool = false) : void or Error with Effects",
+        "parameters": [
+          "path : String",
+          "separator : String = \"",
+          "\"",
+          "includeIndex : Bool = false"
+        ],
+        "documentation": "Writes the frame to a file."
+      },
+      {
+        "name": "info",
+        "signature": "DataFrame.info() : void with Effects",
+        "parameters": [],
+        "documentation": "Prints the column names, non-null counts and dtypes."
+      },
+      {
+        "name": "ndim",
+        "signature": "DataFrame.ndim() : Int",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "size",
+        "signature": "DataFrame.size() : Int",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "equals",
+        "signature": "DataFrame.equals(other : DataFrame) : Bool",
+        "parameters": [
+          "other : DataFrame"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "items",
+        "signature": "DataFrame.items() : List[(String, Series)]",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "takeGaps",
+        "signature": "DataFrame.takeGaps(positions : List[Int]) : DataFrame",
+        "parameters": [
+          "positions : List[Int]"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "iloc",
+        "signature": "DataFrame.iloc(position : Int) : Series",
+        "parameters": [
+          "position : Int"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "at",
+        "signature": "DataFrame.at(row : Int, column : String) : Scalar or Error",
+        "parameters": [
+          "row : Int",
+          "column : String"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "iat",
+        "signature": "DataFrame.iat(row : Int, column : Int) : Scalar or Error",
+        "parameters": [
+          "row : Int",
+          "column : Int"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "iterrows",
+        "signature": "DataFrame.iterrows() : List[(Scalar, Series)]",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "sortValues",
+        "signature": "DataFrame.sortValues(by : List[String], ascending : List[Bool], naPosition : String = \"last\") : DataFrame or Error",
+        "parameters": [
+          "by : List[String]",
+          "ascending : List[Bool]",
+          "naPosition : String = \"last\""
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "assign",
+        "signature": "DataFrame.assign(name : String, value : Int) : DataFrame",
+        "parameters": [
+          "name : String",
+          "value : Int"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "assign",
+        "signature": "DataFrame.assign(name : String, value : double) : DataFrame",
+        "parameters": [
+          "name : String",
+          "value : double"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "selectDtypes",
+        "signature": "DataFrame.selectDtypes(dtype : String) : DataFrame",
+        "parameters": [
+          "dtype : String"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "round",
+        "signature": "DataFrame.round(decimals : Int = 0) : DataFrame",
+        "parameters": [
+          "decimals : Int = 0"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "abs",
+        "signature": "DataFrame.abs() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "clip",
+        "signature": "DataFrame.clip(low : double, high : double) : DataFrame",
+        "parameters": [
+          "low : double",
+          "high : double"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "shift",
+        "signature": "DataFrame.shift(periods : Int = 1) : DataFrame",
+        "parameters": [
+          "periods : Int = 1"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "diff",
+        "signature": "DataFrame.diff(periods : Int = 1) : DataFrame",
+        "parameters": [
+          "periods : Int = 1"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "pctChange",
+        "signature": "DataFrame.pctChange(periods : Int = 1) : DataFrame",
+        "parameters": [
+          "periods : Int = 1"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "cumSum",
+        "signature": "DataFrame.cumSum() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "cumProd",
+        "signature": "DataFrame.cumProd() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "cumMax",
+        "signature": "DataFrame.cumMax() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "cumMin",
+        "signature": "DataFrame.cumMin() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "rank",
+        "signature": "DataFrame.rank(ascending : Bool = true, method : String = \"average\", pct : Bool = false) : DataFrame",
+        "parameters": [
+          "ascending : Bool = true",
+          "method : String = \"average\"",
+          "pct : Bool = false"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "interpolate",
+        "signature": "DataFrame.interpolate() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "where",
+        "signature": "DataFrame.where(mask : DataFrame, other : Scalar) : DataFrame",
+        "parameters": [
+          "mask : DataFrame",
+          "other : Scalar"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "mask",
+        "signature": "DataFrame.mask(mask : DataFrame, other : Scalar) : DataFrame",
+        "parameters": [
+          "mask : DataFrame",
+          "other : Scalar"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "replace",
+        "signature": "DataFrame.replace(old : String, replacement : String) : DataFrame",
+        "parameters": [
+          "old : String",
+          "replacement : String"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "replace",
+        "signature": "DataFrame.replace(old : Int, replacement : Int) : DataFrame",
+        "parameters": [
+          "old : Int",
+          "replacement : Int"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "replace",
+        "signature": "DataFrame.replace(old : double, replacement : double) : DataFrame",
+        "parameters": [
+          "old : double",
+          "replacement : double"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "apply",
+        "signature": "DataFrame.apply(f : double -> double) : DataFrame",
+        "parameters": [
+          "f : double -> double"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "insert",
+        "signature": "DataFrame.insert(position : Int, name : String, series : Series) : DataFrame or Error",
+        "parameters": [
+          "position : Int",
+          "name : String",
+          "series : Series"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "prod",
+        "signature": "DataFrame.prod() : Series",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "sem",
+        "signature": "DataFrame.sem() : Series",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "skew",
+        "signature": "DataFrame.skew() : Series",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "kurt",
+        "signature": "DataFrame.kurt() : Series",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "any",
+        "signature": "DataFrame.any() : Series",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "all",
+        "signature": "DataFrame.all() : Series",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "agg",
+        "signature": "DataFrame.agg(spec : List[(String, String)]) : Series",
+        "parameters": [
+          "spec : List[(String, String)]"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "quantile",
+        "signature": "DataFrame.quantile(q : double) : Series",
+        "parameters": [
+          "q : double"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "cov",
+        "signature": "DataFrame.cov(ddof : Int = 1) : DataFrame",
+        "parameters": [
+          "ddof : Int = 1"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "corrwith",
+        "signature": "DataFrame.corrwith(other : DataFrame) : Series",
+        "parameters": [
+          "other : DataFrame"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "valueCounts",
+        "signature": "DataFrame.valueCounts(column : String, normalize : Bool = false) : Series or Error",
+        "parameters": [
+          "column : String",
+          "normalize : Bool = false"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "melt",
+        "signature": "DataFrame.melt(idVars : List[String] = [], valueVars : List[String] = [], varName : String = \"variable\", valueName : String = \"value\") : DataFrame or Error",
+        "parameters": [
+          "idVars : List[String] = []",
+          "valueVars : List[String] = []",
+          "varName : String = \"variable\"",
+          "valueName : String = \"value\""
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "pivot",
+        "signature": "DataFrame.pivot(index : String, columns : String, values : String) : DataFrame or Error",
+        "parameters": [
+          "index : String",
+          "columns : String",
+          "values : String"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "crosstab",
+        "signature": "DataFrame.crosstab(index : String, columns : String) : DataFrame or Error",
+        "parameters": [
+          "index : String",
+          "columns : String"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "getDummies",
+        "signature": "DataFrame.getDummies(columns : List[String] = [], prefix : String = \"\", dropFirst : Bool = false, dummyNa : Bool = false) : DataFrame or Error",
+        "parameters": [
+          "columns : List[String] = []",
+          "prefix : String = \"\"",
+          "dropFirst : Bool = false",
+          "dummyNa : Bool = false"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "rolling",
+        "signature": "DataFrame.rolling(window : Int, minPeriods : Int = -1) : FrameRolling",
+        "parameters": [
+          "window : Int",
+          "minPeriods : Int = -1"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "assign",
+        "signature": "DataFrame.assign(name : String, value : Bool) : DataFrame",
+        "parameters": [
+          "name : String",
+          "value : Bool"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "where",
+        "signature": "DataFrame.where(mask : DataFrame) : DataFrame",
+        "parameters": [
+          "mask : DataFrame"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "mask",
+        "signature": "DataFrame.mask(mask : DataFrame) : DataFrame",
+        "parameters": [
+          "mask : DataFrame"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "replace",
+        "signature": "DataFrame.replace(old : Scalar, replacement : Scalar) : DataFrame",
+        "parameters": [
+          "old : Scalar",
+          "replacement : Scalar"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "idxMax",
+        "signature": "DataFrame.idxMax() : Series",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "idxMin",
+        "signature": "DataFrame.idxMin() : Series",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "mode",
+        "signature": "DataFrame.mode() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "quantile",
+        "signature": "DataFrame.quantile(qs : List[double]) : DataFrame",
+        "parameters": [
+          "qs : List[double]"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "valueCounts",
+        "signature": "DataFrame.valueCounts(subset : List[String] = [], normalize : Bool = false) : DataFrame or Error",
+        "parameters": [
+          "subset : List[String] = []",
+          "normalize : Bool = false"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "transpose",
+        "signature": "DataFrame.transpose() : DataFrame or Error",
+        "parameters": [],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "expanding",
+        "signature": "DataFrame.expanding(minPeriods : Int = 1) : FrameExpanding",
+        "parameters": [
+          "minPeriods : Int = 1"
+        ],
+        "documentation": "Member of DataFrame."
+      },
+      {
+        "name": "ewm",
+        "signature": "DataFrame.ewm(alpha : double, adjust : Bool = true, minPeriods : Int = 0) : FrameEWM",
+        "parameters": [
+          "alpha : double",
+          "adjust : Bool = true",
+          "minPeriods : Int = 0"
+        ],
+        "documentation": "Member of DataFrame."
+      }
+    ],
+    "GroupBy": [
+      {
+        "name": "count",
+        "signature": "GroupBy.count() : Int",
+        "parameters": [],
+        "documentation": "The number of groups."
+      },
+      {
+        "name": "aggregate",
+        "signature": "GroupBy.aggregate(statistic : String) : DataFrame",
+        "parameters": [
+          "statistic : String"
+        ],
+        "documentation": "Applies a named statistic to every value column."
+      },
+      {
+        "name": "sum",
+        "signature": "GroupBy.sum() : DataFrame",
+        "parameters": [],
+        "documentation": "The sum of every value column in each group."
+      },
+      {
+        "name": "mean",
+        "signature": "GroupBy.mean() : DataFrame",
+        "parameters": [],
+        "documentation": "The mean of every numeric value column in each group."
+      },
+      {
+        "name": "median",
+        "signature": "GroupBy.median() : DataFrame",
+        "parameters": [],
+        "documentation": "The median of every numeric value column in each group."
+      },
+      {
+        "name": "min",
+        "signature": "GroupBy.min() : DataFrame",
+        "parameters": [],
+        "documentation": "The smallest value in every value column in each group."
+      },
+      {
+        "name": "max",
+        "signature": "GroupBy.max() : DataFrame",
+        "parameters": [],
+        "documentation": "The largest value in every value column in each group."
+      },
+      {
+        "name": "std",
+        "signature": "GroupBy.std() : DataFrame",
+        "parameters": [],
+        "documentation": "The sample standard deviation of every numeric value column."
+      },
+      {
+        "name": "variance",
+        "signature": "GroupBy.variance() : DataFrame",
+        "parameters": [],
+        "documentation": "The sample variance of every numeric value column."
+      },
+      {
+        "name": "first",
+        "signature": "GroupBy.first() : DataFrame",
+        "parameters": [],
+        "documentation": "The first row of every value column in each group."
+      },
+      {
+        "name": "last",
+        "signature": "GroupBy.last() : DataFrame",
+        "parameters": [],
+        "documentation": "The last row of every value column in each group."
+      },
+      {
+        "name": "nunique",
+        "signature": "GroupBy.nunique() : DataFrame",
+        "parameters": [],
+        "documentation": "The number of distinct values in every value column."
+      },
+      {
+        "name": "prod",
+        "signature": "GroupBy.prod() : DataFrame",
+        "parameters": [],
+        "documentation": "The product of every numeric value column in each group."
+      },
+      {
+        "name": "counts",
+        "signature": "GroupBy.counts() : DataFrame",
+        "parameters": [],
+        "documentation": "The number of present entries in every value column."
+      },
+      {
+        "name": "size",
+        "signature": "GroupBy.size() : Series",
+        "parameters": [],
+        "documentation": "The number of rows in each group."
+      },
+      {
+        "name": "agg",
+        "signature": "GroupBy.agg(spec : List[(String, String)]) : DataFrame",
+        "parameters": [
+          "spec : List[(String, String)]"
+        ],
+        "documentation": "Applies a statistic to named columns: agg([(\"price\", \"mean\"), (\"qty\", \"sum\")])."
+      },
+      {
+        "name": "filterGroups",
+        "signature": "GroupBy.filterGroups(keep : Int -> Bool) : DataFrame",
+        "parameters": [
+          "keep : Int -> Bool"
+        ],
+        "documentation": "Keeps the rows of every group whose size the test accepts."
+      },
+      {
+        "name": "transform",
+        "signature": "GroupBy.transform(column : String, statistic : String) : Series",
+        "parameters": [
+          "column : String",
+          "statistic : String"
+        ],
+        "documentation": "Gives every row the statistic of its group, in the original order."
+      },
+      {
+        "name": "head",
+        "signature": "GroupBy.head(n : Int = 5) : DataFrame",
+        "parameters": [
+          "n : Int = 5"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "tail",
+        "signature": "GroupBy.tail(n : Int = 5) : DataFrame",
+        "parameters": [
+          "n : Int = 5"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "nth",
+        "signature": "GroupBy.nth(n : Int) : DataFrame",
+        "parameters": [
+          "n : Int"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "cumCount",
+        "signature": "GroupBy.cumCount(ascending : Bool = true) : Series",
+        "parameters": [
+          "ascending : Bool = true"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "ngroup",
+        "signature": "GroupBy.ngroup() : Series",
+        "parameters": [],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "getGroup",
+        "signature": "GroupBy.getGroup(label : Int) : DataFrame or Error",
+        "parameters": [
+          "label : Int"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "getGroup",
+        "signature": "GroupBy.getGroup(label : String) : DataFrame or Error",
+        "parameters": [
+          "label : String"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "transformAll",
+        "signature": "GroupBy.transformAll(statistic : String) : DataFrame",
+        "parameters": [
+          "statistic : String"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "shift",
+        "signature": "GroupBy.shift(column : String, periods : Int = 1) : Series",
+        "parameters": [
+          "column : String",
+          "periods : Int = 1"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "diff",
+        "signature": "GroupBy.diff(column : String, periods : Int = 1) : Series",
+        "parameters": [
+          "column : String",
+          "periods : Int = 1"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "pctChange",
+        "signature": "GroupBy.pctChange(column : String, periods : Int = 1) : Series",
+        "parameters": [
+          "column : String",
+          "periods : Int = 1"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "sem",
+        "signature": "GroupBy.sem() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "skew",
+        "signature": "GroupBy.skew() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "kurt",
+        "signature": "GroupBy.kurt() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "all",
+        "signature": "GroupBy.all() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "any",
+        "signature": "GroupBy.any() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "quantile",
+        "signature": "GroupBy.quantile(q : double) : DataFrame",
+        "parameters": [
+          "q : double"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "getGroup",
+        "signature": "GroupBy.getGroup(label : Bool) : DataFrame or Error",
+        "parameters": [
+          "label : Bool"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "cumSum",
+        "signature": "GroupBy.cumSum(column : String) : Series",
+        "parameters": [
+          "column : String"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "cumProd",
+        "signature": "GroupBy.cumProd(column : String) : Series",
+        "parameters": [
+          "column : String"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "cumMax",
+        "signature": "GroupBy.cumMax(column : String) : Series",
+        "parameters": [
+          "column : String"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "cumMin",
+        "signature": "GroupBy.cumMin(column : String) : Series",
+        "parameters": [
+          "column : String"
+        ],
+        "documentation": "Member of GroupBy."
+      },
+      {
+        "name": "rank",
+        "signature": "GroupBy.rank(column : String, ascending : Bool = true, method : String = \"average\", pct : Bool = false) : Series",
+        "parameters": [
+          "column : String",
+          "ascending : Bool = true",
+          "method : String = \"average\"",
+          "pct : Bool = false"
+        ],
+        "documentation": "Member of GroupBy."
+      }
+    ],
+    "Expanding": [
+      {
+        "name": "mean",
+        "signature": "Expanding.mean() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "sum",
+        "signature": "Expanding.sum() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "min",
+        "signature": "Expanding.min() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "max",
+        "signature": "Expanding.max() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "std",
+        "signature": "Expanding.std() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "variance",
+        "signature": "Expanding.variance() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "median",
+        "signature": "Expanding.median() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "count",
+        "signature": "Expanding.count() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "sem",
+        "signature": "Expanding.sem() : Series",
+        "parameters": [],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "quantile",
+        "signature": "Expanding.quantile(q : double) : Series",
+        "parameters": [
+          "q : double"
+        ],
+        "documentation": "Member of Expanding."
+      },
+      {
+        "name": "apply",
+        "signature": "Expanding.apply(f : List[double] -> double) : Series",
+        "parameters": [
+          "f : List[double] -> double"
+        ],
+        "documentation": "Member of Expanding."
+      }
+    ],
+    "EWM": [
+      {
+        "name": "mean",
+        "signature": "EWM.mean() : Series",
+        "parameters": [],
+        "documentation": "Member of EWM."
+      },
+      {
+        "name": "sum",
+        "signature": "EWM.sum() : Series",
+        "parameters": [],
+        "documentation": "Member of EWM."
+      },
+      {
+        "name": "variance",
+        "signature": "EWM.variance(bias : Bool = false) : Series",
+        "parameters": [
+          "bias : Bool = false"
+        ],
+        "documentation": "Member of EWM."
+      },
+      {
+        "name": "std",
+        "signature": "EWM.std(bias : Bool = false) : Series",
+        "parameters": [
+          "bias : Bool = false"
+        ],
+        "documentation": "Member of EWM."
+      },
+      {
+        "name": "count",
+        "signature": "EWM.count() : Series",
+        "parameters": [],
+        "documentation": "Member of EWM."
+      }
+    ],
+    "FrameRolling": [
+      {
+        "name": "mean",
+        "signature": "FrameRolling.mean() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "sum",
+        "signature": "FrameRolling.sum() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "min",
+        "signature": "FrameRolling.min() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "max",
+        "signature": "FrameRolling.max() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "std",
+        "signature": "FrameRolling.std() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "count",
+        "signature": "FrameRolling.count() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "median",
+        "signature": "FrameRolling.median() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "variance",
+        "signature": "FrameRolling.variance() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "sem",
+        "signature": "FrameRolling.sem() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "skew",
+        "signature": "FrameRolling.skew() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "kurt",
+        "signature": "FrameRolling.kurt() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameRolling."
+      },
+      {
+        "name": "quantile",
+        "signature": "FrameRolling.quantile(q : double) : DataFrame",
+        "parameters": [
+          "q : double"
+        ],
+        "documentation": "Member of FrameRolling."
+      }
+    ],
+    "FrameExpanding": [
+      {
+        "name": "mean",
+        "signature": "FrameExpanding.mean() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "sum",
+        "signature": "FrameExpanding.sum() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "min",
+        "signature": "FrameExpanding.min() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "max",
+        "signature": "FrameExpanding.max() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "std",
+        "signature": "FrameExpanding.std() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "count",
+        "signature": "FrameExpanding.count() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "median",
+        "signature": "FrameExpanding.median() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "variance",
+        "signature": "FrameExpanding.variance() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "sem",
+        "signature": "FrameExpanding.sem() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameExpanding."
+      },
+      {
+        "name": "quantile",
+        "signature": "FrameExpanding.quantile(q : double) : DataFrame",
+        "parameters": [
+          "q : double"
+        ],
+        "documentation": "Member of FrameExpanding."
+      }
+    ],
+    "FrameEWM": [
+      {
+        "name": "mean",
+        "signature": "FrameEWM.mean() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameEWM."
+      },
+      {
+        "name": "sum",
+        "signature": "FrameEWM.sum() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameEWM."
+      },
+      {
+        "name": "variance",
+        "signature": "FrameEWM.variance(bias : Bool = false) : DataFrame",
+        "parameters": [
+          "bias : Bool = false"
+        ],
+        "documentation": "Member of FrameEWM."
+      },
+      {
+        "name": "std",
+        "signature": "FrameEWM.std(bias : Bool = false) : DataFrame",
+        "parameters": [
+          "bias : Bool = false"
+        ],
+        "documentation": "Member of FrameEWM."
+      },
+      {
+        "name": "count",
+        "signature": "FrameEWM.count() : DataFrame",
+        "parameters": [],
+        "documentation": "Member of FrameEWM."
+      }
+    ]
+  },
+  "fields": {
+    "Column": {
+      "kind": "Int",
+      "ints": "List[Int]",
+      "floats": "List[double]",
+      "bools": "List[Bool]",
+      "strs": "List[String]",
+      "missing": "List[Bool]",
+      "size": "Int"
+    },
+    "Scalar": {
+      "kind": "Int",
+      "whole": "Int",
+      "real": "double",
+      "flag": "Bool",
+      "word": "String"
+    },
+    "Series": {
+      "name": "String",
+      "data": "Column",
+      "index": "Column",
+      "indexName": "String"
+    },
+    "Rolling": {
+      "series": "Series",
+      "window": "Int",
+      "minPeriods": "Int"
+    },
+    "StringMethods": {
+      "series": "Series"
+    },
+    "DataFrame": {
+      "names": "List[String]",
+      "index": "Column",
+      "indexName": "String",
+      "columnsLabel": "String"
+    },
+    "GroupBy": {
+      "frame": "DataFrame",
+      "keys": "List[String]"
+    },
+    "Expanding": {
+      "series": "Series",
+      "minPeriods": "Int"
+    },
+    "EWM": {
+      "series": "Series",
+      "alpha": "double",
+      "adjust": "Bool",
+      "minPeriods": "Int"
+    },
+    "FrameRolling": {
+      "frame": "DataFrame",
+      "window": "Int",
+      "minPeriods": "Int"
+    },
+    "FrameExpanding": {
+      "frame": "DataFrame",
+      "minPeriods": "Int"
+    },
+    "FrameEWM": {
+      "frame": "DataFrame",
+      "alpha": "double",
+      "adjust": "Bool",
+      "minPeriods": "Int"
+    }
+  }
+}

@@ -1,0 +1,72 @@
+// std.path: file paths as Strings, with `/` between parts, and a recursive walk.
+
+import std.fs
+
+// The last part of a path: `fileName("a/b.txt")` is "b.txt".
+public function fileName(path : String) : String {
+    let trimmed := trimEnd(path)
+    let at := trimmed.rfind("/")
+    return if at < 0 then trimmed else trimmed.substring(at + 1, trimmed.length())
+}
+
+// Everything before the last part: `parent("a/b.txt")` is "a", and `parent("b.txt")` is "".
+public function parent(path : String) : String {
+    let trimmed := trimEnd(path)
+    let at := trimmed.rfind("/")
+    if at < 0 {
+        return ""
+    }
+    return if at == 0 then "/" else trimmed.substring(0, at)
+}
+
+// The part after the last dot of the file name, without the dot: "txt", or "" when there is none.
+public function extension(path : String) : String {
+    let name := fileName(path)
+    let at := name.rfind(".")
+    return if at <= 0 then "" else name.substring(at + 1, name.length())
+}
+
+// The file name without its extension: `stem("a/b.tar.gz")` is "b.tar".
+public function stem(path : String) : String {
+    let name := fileName(path)
+    let at := name.rfind(".")
+    return if at <= 0 then name else name.substring(0, at)
+}
+
+// Joins two paths with one `/`. An absolute second path replaces the first.
+public function join(base : String, part : String) : String {
+    if base.isEmpty() || isAbsolute(part) {
+        return part
+    }
+    if part.isEmpty() {
+        return base
+    }
+    return if base.endsWith("/") then base + part else base + "/" + part
+}
+
+public function isAbsolute(path : String) : Bool = path.startsWith("/")
+
+// The non-empty parts between slashes.
+public function parts(path : String) : List[String] = path.split("/").filter(p => !p.isEmpty()).toList()
+
+// Every file below `root`, in name order, with paths that start with `root`.
+public function walk(root : String) : List[String] or Error with Effects {
+    let mut found : List[String] = []
+    for (name in fs.listDir(root)?) {
+        let child := join(root, name)
+        if fs.isDir(child) {
+            found = found + walk(child)?
+        } else {
+            found = found + [child]
+        }
+    }
+    return found
+}
+
+function trimEnd(path : String) : String {
+    let mut end := path.length()
+    while end > 1 && path.substring(end - 1, end) == "/" {
+        end -= 1
+    }
+    return path.substring(0, end)
+}

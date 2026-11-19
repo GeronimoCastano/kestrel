@@ -1,0 +1,13 @@
+// An example is checked and then forgotten. It has no name and cannot be cited.
+example[U](A : Set[U]) : A ⊆ A by {
+    intro x
+    intro h
+    exact h
+}
+
+// An axiom is a named assumption. The checker accepts it but marks it.
+axiom allSetsInhabited[U](A : Set[U]) : ∃ x : U, x ∈ A
+
+theorem useAxiom[U](A : Set[U]) : ∃ x : U, x ∈ A by {
+    exact allSetsInhabited(A)
+}

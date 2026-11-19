@@ -1,0 +1,19 @@
+// Degree-two polynomial expansion of 20,000 observations with 10 features,
+// including the bias column that scikit-learn calls include_bias=True.
+// The transform repeats R times and the printed sum adds every repetition.
+// The bias option puts the leading column of ones in the same transform.
+import std.ml.{PolynomialFeatures}
+
+import std.process.{args}
+
+let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 800 }) else 800
+const OUTPUT_COLUMNS : Int = 66
+
+let X := Tensor.generate((20000, 10), (i, j) => ((i * 17 + j * 11) % 100).toDouble() / 10.0)
+let termsModel := PolynomialFeatures.fit(X, bias = true)
+let mut total := 0.0
+for (step in range(REPETITIONS)) {
+    let features := termsModel.transform(X)
+    total += features.sum()
+}
+print(f"{OUTPUT_COLUMNS.toDouble():.6f} {total:.6f}")

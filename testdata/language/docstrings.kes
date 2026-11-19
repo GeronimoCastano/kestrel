@@ -1,0 +1,19 @@
+/// A rectangle with width $w$ and height $h$.
+/// Its area is $A = wh$.
+record Rectangle(width : Int, height : Int) {
+    /// Computes $A = wh$ using checked integer arithmetic.
+    public function area() : Int = this.width * this.height
+}
+
+/// Computes the triangular number for a nonnegative integer $n$.
+///
+/// $$\sum_{i=0}^{n} i = \frac{n(n+1)}{2}$$
+///
+/// Intermediate arithmetic must fit in Int.
+function triangular(n : Int) : Int or Error requires n >= 0 = n * (n + 1) / 2
+
+/// Field and method expressions reduce to the same value.
+theorem rectangleArea(r : Rectangle) : r.area() = r.width * r.height { rfl }
+
+print(Rectangle(3, 4).area())
+print(triangular(4)?)

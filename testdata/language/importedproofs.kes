@@ -1,0 +1,16 @@
+import testdata.language.proofmath as math
+
+theorem zeroRight(n : Nat) : math.add(n, Zero) = n {
+    induction n {
+        Zero => rfl,
+        Succ(k) ih => congrArg(Succ, ih),
+    }
+}
+
+theorem identity(n : Nat) : math.identity(n) = n { rfl }
+theorem lifted(n : Nat) : math.identity(math.add(n, Zero)) = math.identity(n) {
+    congrArg(math.identity, zeroRight(n))
+}
+
+function count(n : Nat) : Nat requires zeroRight(n) { math.identity(n) }
+print(count(7))

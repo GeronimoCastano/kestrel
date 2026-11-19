@@ -1,0 +1,28 @@
+[package]
+name = "kestrel"
+version = "0.1.0"
+edition = "2024"
+description = "Kestrel compiler and native session"
+publish = false
+
+[lib]
+name = "kestrel"
+path = "src/lib.rs"
+
+# The editor server speaks one JSON object per line. Nothing else in the
+# compiler depends on JSON, so the dependency stays out of the language itself.
+[dependencies]
+serde_json = "1"
+sha2 = "0.10"
+
+[[bin]]
+name = "kestrel"
+path = "src/main.rs"
+
+[[bench]]
+name = "front_end"
+harness = false
+
+[profile.release]
+lto = "thin"
+

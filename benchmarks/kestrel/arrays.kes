@@ -1,0 +1,20 @@
+// Append, indexed sum, then pop half of the values and sum them too.
+function run(n : Int) : Int {
+    let mut values : Array[Int] = Array.empty()
+    for (let i : Int = 0; i < n; i = i + 1) {
+        values.append(i % 1000)
+    }
+    let mut total := 0
+    for (let i : Int = 0; i < values.length(); i = i + 1) {
+        total = total + values[i]
+    }
+    for (let i : Int = 0; i < n / 2; i = i + 1) {
+        match values.pop() {
+            Some(value) => { total = total + value },
+            None => {},
+        }
+    }
+    total
+}
+
+print(run(5000000))

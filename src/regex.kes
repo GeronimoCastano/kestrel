@@ -1,0 +1,203 @@
+// std.regex: regular expressions.
+//
+//     let date := regex.compile("(\\d{4})-(\\d{2})-(\\d{2})")?
+//     match date.find("due 2026-11-15") { Some(m) => print(m.group(1)), None => {} }
+//     print(regex.compile("\\s+")?.replace("a   b  c", " "))
+//
+// Syntax: literals, `.`, `[a-z]`, `[^...]`, `\d \w \s \D \W \S \b \B`, `^ $`, groups `( )` and
+// `(?: )`, `|`, and `* + ? {n} {n,} {n,m}` with a `?` after them for the shortest match.
+// `(?i)` ignores ASCII case. Matching takes time linear in the text: there are no
+// backreferences or lookaround, so no pattern can make a search run exponentially long.
+
+import std.rx
+
+// One match. `start` and `end` count characters, as substring does; `startByte` and
+// `endByte` are the same span in bytes, for byteSlice.
+public record Match(text : String, start : Int, end : Int, startByte : Int, endByte : Int, groups : List[String], present : List[Bool]) {
+    // Group 0 is the whole match; a group that took no part gives None.
+    public function group(index : Int) : Option[String] =
+        if index < 0 || index >= this.groups.length() || !this.present.slice(index, index + 1).all(p => p) then None
+        else Some(this.groups.slice(index, index + 1).join(""))
+}
+
+public class Regex {
+    public final pattern : String
+
+    new(pattern : String) {
+        this.pattern = pattern
+    }
+
+    // A match at or after byte `from` as raw byte offsets, two per group; empty for none.
+    function raw(text : String, from : Int) : List[Int] = rx.find(this.pattern, text, from)
+
+    // Where the next search starts after a match: one character later for an empty match,
+    // as JavaScript's matchAll does. Past the end of the text, the search stops.
+    function after(text : String, startByte : Int, endByte : Int) : Int {
+        if endByte > startByte {
+            return endByte
+        }
+        if endByte >= text.byteLength() {
+            return endByte + 1
+        }
+        let mut next := endByte + 1
+        while next < text.byteLength() && text.byteAt(next) >= 128 && text.byteAt(next) < 192 {
+            next += 1
+        }
+        return next
+    }
+
+    // Whether the pattern matches somewhere in `text`.
+    public function isMatch(text : String) : Bool = !this.raw(text, 0).isEmpty()
+
+    // The first match, if any.
+    public function find(text : String) : Option[Match] {
+        let found := this.raw(text, 0)
+        if found.isEmpty() {
+            return None
+        }
+        return Some(build(text, found, text.byteSlice(0, at(found, 0)).length()))
+    }
+
+    // Whether the whole of `text` matches.
+    public function fullMatch(text : String) : Bool {
+        let anchored := Regex("^(?:" + this.pattern + ")$")
+        return anchored.isMatch(text)
+    }
+
+    // Every match that does not overlap the one before it, left to right. The work grows
+    // with the length of the text and the number of matches, not their product.
+    public function findAll(text : String) : List[Match] {
+        let raws : Array[List[Int]] = Array.empty()
+        let starts : Array[Int] = Array.empty()
+        let mut from := 0
+        let mut countedByte := 0
+        let mut countedChars := 0
+        while from <= text.byteLength() {
+            let found := this.raw(text, from)
+            if found.isEmpty() {
+                break
+            }
+            let startByte := at(found, 0)
+            countedChars += text.byteSlice(countedByte, startByte).length()
+            countedByte = startByte
+            raws.append(found)
+            starts.append(countedChars)
+            from = this.after(text, startByte, at(found, 1))
+        }
+        return [build(text, raws[i], starts[i]) for i in range(raws.length())]
+    }
+
+    // `text` with every match replaced. In `replacement`, `$0` to `$9` insert a group and
+    // `$$` a dollar sign.
+    public function replace(text : String, replacement : String) : String = this.replaceUpTo(text, replacement, -1)
+
+    // `text` with the first match replaced.
+    public function replaceFirst(text : String, replacement : String) : String = this.replaceUpTo(text, replacement, 1)
+
+    function replaceUpTo(text : String, replacement : String, limit : Int) : String {
+        let parts : Array[String] = Array.empty()
+        let groupsUsed := replacement.contains("$")
+        let mut from := 0
+        let mut copied := 0
+        let mut count := 0
+        while from <= text.byteLength() && (limit < 0 || count < limit) {
+            let found := this.raw(text, from)
+            if found.isEmpty() {
+                break
+            }
+            let startByte := at(found, 0)
+            let endByte := at(found, 1)
+            parts.append(text.byteSlice(copied, startByte))
+            parts.append(if groupsUsed then expand(replacement, build(text, found, 0)) else replacement)
+            copied = endByte
+            count += 1
+            from = this.after(text, startByte, endByte)
+        }
+        parts.append(text.byteSlice(copied, text.byteLength()))
+        return parts.join("")
+    }
+
+    // The pieces of `text` between matches.
+    public function split(text : String) : List[String] {
+        let pieces : Array[String] = Array.empty()
+        let mut from := 0
+        let mut copied := 0
+        while from <= text.byteLength() {
+            let found := this.raw(text, from)
+            if found.isEmpty() {
+                break
+            }
+            let startByte := at(found, 0)
+            let endByte := at(found, 1)
+            if endByte > startByte {
+                pieces.append(text.byteSlice(copied, startByte))
+                copied = endByte
+            }
+            from = this.after(text, startByte, endByte)
+        }
+        pieces.append(text.byteSlice(copied, text.byteLength()))
+        return pieces.toList()
+    }
+}
+
+function at(raw : List[Int], index : Int) : Int = raw.slice(index, index + 1).sum()
+
+// A Match from raw byte offsets; `startChar` is the match's start counted in characters.
+function build(text : String, raw : List[Int], startChar : Int) : Match {
+    let startByte := at(raw, 0)
+    let endByte := at(raw, 1)
+    let groups := [if at(raw, 2 * g) >= 0 && at(raw, 2 * g + 1) >= 0 then text.byteSlice(at(raw, 2 * g), at(raw, 2 * g + 1)) else "" for g in range(raw.length() / 2)]
+    let present := [at(raw, 2 * g) >= 0 && at(raw, 2 * g + 1) >= 0 for g in range(raw.length() / 2)]
+    let piece := text.byteSlice(startByte, endByte)
+    return Match(piece, startChar, startChar + piece.length(), startByte, endByte, groups, present)
+}
+
+function expand(replacement : String, found : Match) : String {
+    let parts : Array[String] = Array.empty()
+    let mut i := 0
+    let n := replacement.byteLength()
+    let mut start := 0
+    while i < n {
+        if replacement.byteAt(i) == 36 && i + 1 < n {
+            let next := replacement.byteAt(i + 1)
+            if next == 36 {
+                parts.append(replacement.byteSlice(start, i + 1))
+                i += 2
+                start = i
+            } else if next >= 48 && next <= 57 {
+                parts.append(replacement.byteSlice(start, i))
+                parts.append(found.group(next - 48).unwrapOr(""))
+                i += 2
+                start = i
+            } else {
+                i += 1
+            }
+        } else {
+            i += 1
+        }
+    }
+    parts.append(replacement.byteSlice(start, n))
+    return parts.join("")
+}
+
+// A Regex for `pattern`, or an Error that says what is wrong with it.
+public function compile(pattern : String) : Regex or Error {
+    let problem := rx.check(pattern)
+    if !problem.isEmpty() {
+        return Error(problem)
+    }
+    return Regex(pattern)
+}
+
+// Puts a backslash before every character that has a meaning in a pattern.
+public function escape(text : String) : String {
+    let parts : Array[String] = Array.empty()
+    for (i in range(text.length())) {
+        let c := text.substring(i, i + 1)
+        if "\\.^$|?*+()[]{}".contains(c) {
+            parts.append("\\")
+        }
+        parts.append(c)
+    }
+    return parts.join("")
+}

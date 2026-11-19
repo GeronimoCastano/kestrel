@@ -1,0 +1,39 @@
+// bars50: 50 groups, two grouped bar series, title and legend.
+import std.kesplot as plt
+import c "stdlib.h"
+
+function quote(text : String) : String = "'" + text.replace("'", "'\\''") + "'"
+
+function reportSize(path : String) : void or Error with Effects {
+    let sizePath := path + ".size"
+    let status := unsafe { system("wc -c < " + quote(path) + " > " + quote(sizePath)) }
+    if status.toInt() != 0 { return Error("cannot measure " + path) }
+    using reader := open(sizePath)? {
+        let line := reader.readLine()?
+        print(parseInt(line.trim())?)
+    }
+}
+
+function main() : void or Error with Effects {
+    let n := 50
+    let positions : Array[double] = Array.empty()
+    let north : Array[double] = Array.empty()
+    let south : Array[double] = Array.empty()
+    for (i in range(n)) {
+        positions.append(i.toDouble())
+        north.append((10 + ((i * 7) % 13)).toDouble())
+        south.append((8 + ((i * 5) % 11)).toDouble())
+    }
+
+    let fig := plt.Figure(width = 8.0, height = 6.0)
+    fig.bar(positions.toList(), north.toList(), width = 0.4, label = "north", offset = -0.2)
+    fig.bar(positions.toList(), south.toList(), width = 0.4, label = "south", offset = 0.2)
+    fig.title("Grouped bars: 50 groups, 2 series")
+    fig.xLabel("group")
+    fig.yLabel("value")
+    fig.legend("upper right")
+
+    fig.save("/tmp/plotbench/kestrel_bars50.svg")?
+    reportSize("/tmp/plotbench/kestrel_bars50.svg")?
+}
+main()

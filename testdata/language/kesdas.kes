@@ -1,0 +1,34 @@
+// kesdas: pandas-style tables. Run with: kestrel run examples/kesdas.kes
+import std.kesdas.{Series, DataFrame}
+
+function report() : void or Error with Effects {
+    let sales := DataFrame([
+        Series(["north", "south", "north", "east", "south", "north"], name = "region"),
+        Series([120, 80, 95, 60, 140, 70], name = "units"),
+        Series([2.5, 3.0, 2.5, 4.0, 3.0, 2.5], name = "price"),
+    ])
+    print(sales)
+    print(sales.describe())
+
+    // A new column from arithmetic on others, then keep the large orders.
+    let revenue := sales.assign("revenue", sales.col("units")? * sales.col("price")?)
+    let large := revenue.filter(revenue.col("revenue")?.gt(200.0))
+    print(large)
+
+    // Group, aggregate and sort.
+    let byRegion := revenue.groupBy("region")?.sum()
+    print(byRegion.sortValues("revenue", ascending = false)?)
+
+    // Join a second table on the region name.
+    let managers := DataFrame([
+        Series(["north", "south", "west"], name = "region"),
+        Series(["Ana", "Bo", "Cy"], name = "manager"),
+    ])
+    print(revenue.merge(managers, on = "region", how = "left")?)
+
+    // Long form and a rolling summary.
+    print(revenue.melt(idVars = ["region"], valueVars = ["units", "revenue"])?)
+    print(revenue.select(["units", "revenue"])?.rolling(2).mean())
+}
+
+report()?

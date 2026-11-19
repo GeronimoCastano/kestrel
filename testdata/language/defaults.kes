@@ -1,0 +1,16 @@
+class Point {
+    public final label : String
+    new(label : String) {this.label=label}
+}
+function text(point : Point = Point("fresh" + " value")) : String = point.label
+function own(move point : Point = Point("owned" + " value")) : Point = point
+print(text())
+print(own().label)
+
+let seed:=1
+function value(n : Int = seed) : Int = n
+function caller(seed : Int) : Int = value()
+print(caller(9))
+
+function parsed(n : Int or Error = parseInt("bad")) : Int or Error = n?
+print(match parsed() {RuntimeError.Parse(_) => 42, n => n, _ => 0,})

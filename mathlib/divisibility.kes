@@ -1,0 +1,219 @@
+// Divisibility over Nat as a named predicate. The kernel unfolds `dvd` like
+// any pure function, so the statements read the way a mathematician writes them.
+
+import nat.{mulZeroR, mulOneR, mulAssoc, mulComm, mulDistribLeft, mulSuccR}
+import order.{leTrans, leAntisymm, leAddMonoR, leMulSuccSelf, leOfSubNat}
+import nat.{subNat}
+
+/// `dvd(d, n)` means that $d$ divides $n$: there is a $k$ with $n = d \cdot k$.
+public function dvd(d : Nat, n : Nat) : Prop = exists k : Nat, n = d * k
+
+/// Every divisor divides zero: $d \mid 0$.
+public theorem dvdZero(d : Nat) : dvd(d, Zero) by {
+    exists Zero
+    rw [mulZeroR]
+    rfl
+}
+
+/// Every natural divides itself: $d \mid d$.
+public theorem dvdRefl(d : Nat) : dvd(d, d) by {
+    exists 1
+    rw [mulOneR]
+    rfl
+}
+
+/// Divisibility is transitive: $a \mid b \to b \mid c \to a \mid c$.
+public theorem dvdTrans(a : Nat, b : Nat, c : Nat) :
+        dvd(a, b) -> dvd(b, c) -> dvd(a, c) by {
+    intro h1
+    intro h2
+    cases h1
+    cases h2
+    exists k * k1
+    trans (b * k1)
+    { exact h2w }
+    trans ((a * k) * k1)
+    { have h := congrArg(x => x * k1, h1w)
+      exact h }
+    { exact mulAssoc(a, k, k1) }
+}
+
+/// A divisor of both parts divides their sum: $a \mid b \to a \mid c \to a \mid (b+c)$.
+public theorem dvdAdd(a : Nat, b : Nat, c : Nat) :
+        dvd(a, b) -> dvd(a, c) -> dvd(a, b + c) by {
+    intro h1
+    intro h2
+    cases h1
+    cases h2
+    exists k + k1
+    trans (a * k + a * k1)
+    { have hb := congrArg(x => x + c, h1w)
+      have hc := congrArg(x => (a * k) + x, h2w)
+      exact trans(hb, hc) }
+    { exact symm(mulDistribLeft(a, k, k1)) }
+}
+
+/// A divisor of a factor divides the product: $a \mid b \to a \mid (b \cdot c)$.
+public theorem dvdMulLeft(a : Nat, b : Nat, c : Nat) :
+        dvd(a, b) -> dvd(a, b * c) by {
+    intro h
+    cases h
+    exists k * c
+    trans ((a * k) * c)
+    { have hc := congrArg(x => x * c, hw)
+      exact hc }
+    { exact mulAssoc(a, k, c) }
+}
+
+/// A divisor of a factor divides the product on the other side: $a \mid b \to a \mid (c \cdot b)$.
+public theorem dvdMulRight(a : Nat, b : Nat, c : Nat) :
+        dvd(a, b) -> dvd(a, c * b) by {
+    intro h
+    cases h
+    exists c * k
+    trans (c * (a * k))
+    { have hc := congrArg(x => c * x, hw)
+      exact hc }
+    trans ((c * a) * k)
+    { exact symm(mulAssoc(c, a, k)) }
+    trans ((a * c) * k)
+    { have hcc := mulComm(c, a)
+      have hca := congrArg(x => x * k, hcc)
+      exact hca }
+    { exact mulAssoc(a, c, k) }
+}
+
+/// Only zero is divisible by zero: $0 \mid n \to n = 0$.
+public theorem zeroDvd(n : Nat) : dvd(Zero, n) -> n = Zero by {
+    intro h
+    cases h
+    exact hw
+}
+
+/// One has only one divisor: $d \mid 1 \to d = 1$.
+public theorem dvdOne(d : Nat) : dvd(d, 1) -> d = 1 by {
+    intro h
+    cases h
+    cases d {
+        Zero => { cases hw }
+        Succ(j) => {
+            cases k {
+                Zero => {
+                    have hz := mulZeroR(Succ(j))
+                    have hw0 : 1 = Zero := trans(hw, hz)
+                    cases hw0
+                }
+                Succ(l) => {
+                    cases l {
+                        Zero => {
+                            have ho := mulOneR(Succ(j))
+                            have hw2 : 1 = Succ(j) := trans(hw, ho)
+                            cases hw2
+                            rfl
+                        }
+                        Succ(m) => {
+                            cases hw
+                            cases hw0
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// A divisor of a positive number is no larger than it: $d \mid n \to 0 < n \to d \le n$.
+public theorem dvdLe(d : Nat, n : Nat) : dvd(d, n) -> 0 < n -> d <= n by {
+    intro h
+    intro hpos
+    cases d {
+        Zero => { rfl }
+        Succ(j) => {
+            cases h
+            cases k {
+                Zero => {
+                    have hz := mulZeroR(Succ(j))
+                    have hn0 : n = Zero := trans(hw, hz)
+                    cases hn0
+                    exact absurd(hpos)
+                }
+                Succ(l) => {
+                    have hprod := leMulSuccSelf(Succ(j), l)
+                    rw [hw]
+                    exact hprod
+                }
+            }
+        }
+    }
+}
+
+/// A prime is greater than one and has only the trivial divisors.
+public function prime(p : Nat) : Prop =
+    p > 1 and forall d : Nat, dvd(d, p) -> d = 1 or d = p
+
+/// A prime has no nontrivial divisor.
+public theorem primeIrreducible(p : Nat, d : Nat) :
+        prime(p) -> dvd(d, p) -> d = 1 or d = p by {
+    intro hp
+    intro hd
+    cases hp
+    exact hpr(d, hd)
+}
+
+/// Two is prime.
+public theorem primeTwo() : prime(2) by {
+    constructor
+    { rfl }
+    { intro d
+      intro hd
+      have hpos : 0 < 2 := rfl
+      have hbound := dvdLe(d, 2)
+      have hstep := hbound(hd)
+      have hle := hstep(hpos)
+      cases d {
+        Zero => {
+            have hz := zeroDvd(2)
+            have hzero := hz(hd)
+            cases hzero
+        }
+        Succ(j) => {
+            cases j {
+                Zero => { left
+                          rfl }
+                Succ(i) => {
+                    cases i {
+                        Zero => { right
+                                  rfl }
+                        Succ(m) => { exact absurd(hle) }
+                    }
+                }
+            }
+        }
+    }
+    }
+}
+
+/// Divisibility is antisymmetric on positive numbers: $a \mid b \to b \mid a \to 0 < a \to a = b$.
+public theorem dvdAntisymm(a : Nat, b : Nat) :
+        dvd(a, b) -> dvd(b, a) -> 0 < a -> a = b by {
+    intro h1
+    intro h2
+    intro ha
+    cases b {
+        Zero => {
+            have hz := zeroDvd(a)
+            exact hz(h2)
+        }
+        Succ(j) => {
+            have hbpos : 0 < Succ(j) := rfl
+            have hleft := dvdLe(a, Succ(j))
+            have hlow := hleft(h1)
+            have hlowb := hlow(hbpos)
+            have hright := dvdLe(Succ(j), a)
+            have hhigh := hright(h2)
+            have hhigha := hhigh(ha)
+            have hsym := leAntisymm(a, Succ(j))
+            exact hsym(hlowb, hhigha)
+        }
+    }
+}

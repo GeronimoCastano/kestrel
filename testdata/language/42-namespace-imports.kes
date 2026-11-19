@@ -1,0 +1,6 @@
+import std.math as m
+import std.str
+
+let root := m.sqrt
+print(root(9.0))
+print(str.length("λx"))

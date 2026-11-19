@@ -1,0 +1,14 @@
+class Figure {
+    new() {}
+    public function area() : double = 0.0
+}
+class Square extends Figure {
+    public final side : double
+    new(side : double) {this.side=side}
+    @override public function area() : double = this.side * this.side
+}
+function choose(a : Figure,b : Figure,flag : Bool) : Figure = if flag then a else b
+let square := Square(2.0)
+let figure := Figure()
+print(choose(square,figure,true).area())
+print(choose(square,figure,false).area())

@@ -1,0 +1,559 @@
+// A small, classical machine-learning layer. Models are fitted values: a
+// static fit method returns an immutable-in-spirit object with learned state.
+import std.linalg
+import std.stats
+import std.math
+import std.random.{Rng}
+import std.mlrt.{knnPredict}
+
+public class FittedStandardScaler {
+    public var means : DynTensor[double]
+    public var scales : DynTensor[double]
+
+    new(move means : DynTensor[double], move scales : DynTensor[double]) {
+        this.means = means
+        this.scales = scales
+    }
+
+    public function transform(X : DynTensor[double]) : DynTensor[double] {
+        let dimensions := X.shape()
+        let centered := X - this.means.broadcastTo(dimensions)
+        let inverseScales := this.scales.map(value => 1.0 / value).broadcastTo(dimensions)
+        return centered * inverseScales
+    }
+}
+
+public class StandardScaler {
+    new() {}
+
+    public static function fit(X : DynTensor[double]) : FittedStandardScaler {
+        let means := stats.mean(X, axis = 0)
+        let deviations := stats.variance(X, axis = 0).map(value => value.sqrt())
+        let scales := deviations.map(value => if value == 0.0 then 1.0 else value)
+        return FittedStandardScaler(means, scales)
+    }
+
+    public static function fitTransform(X : DynTensor[double]) : DynTensor[double] {
+        let scaler := StandardScaler.fit(X)
+        return scaler.transform(X)
+    }
+}
+
+public class FittedLinearRegression {
+    public var coefficients : DynTensor[double]
+    public var intercept : double
+
+    new(move coefficients : DynTensor[double], intercept : double) {
+        this.coefficients = coefficients
+        this.intercept = intercept
+    }
+
+    public function predict(X : DynTensor[double]) : DynTensor[double] {
+        return X @ this.coefficients + this.intercept
+    }
+}
+
+public class LinearRegression {
+    new() {}
+
+    public static function fit(X : DynTensor[double], y : DynTensor[double], fitIntercept : Bool = true) : FittedLinearRegression {
+        if fitIntercept {
+            let meanX := stats.mean(X, axis = 0)
+            let meanY := stats.mean(y)
+            let centeredX := X - meanX.broadcastTo(X.shape())
+            let centeredY := y - meanY
+            // Normal equations: the design has far more rows than columns, so
+            // a d-by-d solve is much cheaper than a least-squares SVD.
+            let gram := centeredX.T @ centeredX
+            let right := centeredX.T @ centeredY
+            let coefficients := linalg.solve(gram, right)
+            let intercept := meanY - linalg.dot(meanX, coefficients)
+            return FittedLinearRegression(coefficients, intercept)
+        }
+        let gram := X.T @ X
+        let right := X.T @ y
+        return FittedLinearRegression(linalg.solve(gram, right), 0.0)
+    }
+}
+
+public function meanSquaredError(actual : DynTensor[double], predicted : DynTensor[double]) : double {
+    let difference := actual - predicted
+    return stats.mean(difference * difference)
+}
+
+public function meanAbsoluteError(actual : DynTensor[double], predicted : DynTensor[double]) : double {
+    let difference := actual - predicted
+    return stats.mean(difference.map(value => value.abs()))
+}
+
+public function r2Score(actual : DynTensor[double], predicted : DynTensor[double]) : double {
+    let residual := actual - predicted
+    let centered := actual - stats.mean(actual)
+    let total := (centered * centered).sum()
+    if total == 0.0 {
+        return if (residual * residual).sum() == 0.0 then 1.0 else 0.0
+    }
+    return 1.0 - (residual * residual).sum() / total
+}
+
+public function accuracy(actual : DynTensor[double], predicted : DynTensor[double]) : double {
+    let count := actual.count()
+    if count == 0 {
+        return 0.0
+    }
+    let mut correct := 0
+    for (let i = 0; i < count; i++) {
+        if actual[i] == predicted[i] {
+            correct++
+        }
+    }
+    return correct.toDouble() / count.toDouble()
+}
+
+public class FittedMinMaxScaler {
+    public var minimums : DynTensor[double]
+    public var ranges : DynTensor[double]
+
+    new(move minimums : DynTensor[double], move ranges : DynTensor[double]) {
+        this.minimums = minimums
+        this.ranges = ranges
+    }
+
+    public function transform(X : DynTensor[double]) : DynTensor[double] {
+        let dimensions := X.shape()
+        let centered := X - this.minimums.broadcastTo(dimensions)
+        let inverseRanges := this.ranges.map(value => 1.0 / value).broadcastTo(dimensions)
+        return centered * inverseRanges
+    }
+}
+
+public class MinMaxScaler {
+    new() {}
+
+    public static function fit(X : DynTensor[double]) : FittedMinMaxScaler {
+        let minimums := X.min(axis = 0)
+        let maximums := X.max(axis = 0)
+        let ranges := (maximums - minimums).map(value => if value == 0.0 then 1.0 else value)
+        return FittedMinMaxScaler(minimums, ranges)
+    }
+
+    public static function fitTransform(X : DynTensor[double]) : DynTensor[double] {
+        let scaler := MinMaxScaler.fit(X)
+        return scaler.transform(X)
+    }
+}
+
+public class FittedPolynomialFeatures {
+    public var inputFeatures : Int
+    public var includeBias : Bool
+
+    new(inputFeatures : Int, includeBias : Bool = false) {
+        this.inputFeatures = inputFeatures
+        this.includeBias = includeBias
+    }
+
+    public function transform(X : DynTensor[double]) : DynTensor[double] {
+        let dimensions := X.shape()
+        let rows := dimensions[0]
+        let columns := this.inputFeatures
+        let outputColumns := columns * (columns + 3) / 2 + (if this.includeBias then 1 else 0)
+        // One preallocated buffer, filled by position.
+        let values := Array(rows * outputColumns, 0.0)
+        let mut index := 0
+        for (let row = 0; row < rows; row++) {
+            if this.includeBias {
+                values[index] = 1.0
+                index++
+            }
+            for (let first = 0; first < columns; first++) {
+                values[index] = X[row, first]
+                index++
+            }
+            for (let first = 0; first < columns; first++) {
+                values[index] = X[row, first] * X[row, first]
+                index++
+            }
+            for (let first = 0; first < columns; first++) {
+                for (let second = first + 1; second < columns; second++) {
+                    values[index] = X[row, first] * X[row, second]
+                    index++
+                }
+            }
+        }
+        return Tensor.fromArray(values).reshape((rows, outputColumns))
+    }
+}
+
+public class PolynomialFeatures {
+    new() {}
+
+    public static function fit(X : DynTensor[double], bias : Bool = false) : FittedPolynomialFeatures {
+        return FittedPolynomialFeatures(X.shape()[1], bias)
+    }
+
+    public static function fitTransform(X : DynTensor[double], bias : Bool = false) : DynTensor[double] {
+        let features := PolynomialFeatures.fit(X, bias = bias)
+        return features.transform(X)
+    }
+}
+
+public function shuffleIndices(count : Int, mut rng : Rng) : Array[Int] {
+    let mut order := Array.generate(count, index => index)
+    for (let index = count - 1; index > 0; index--) {
+        let other := rng.integers(0, index + 1)
+        let saved := order[index]
+        order[index] = order[other]
+        order[other] = saved
+    }
+    return order
+}
+
+public function sliceIndices(indices : Array[Int], start : Int, stop : Int) : Array[Int] {
+    let mut result : Array[Int] = Array([])
+    for (let index = start; index < stop; index++) {
+        result.append(indices[index])
+    }
+    return result
+}
+
+public function takeRows(X : DynTensor[double], indices : Array[Int]) : DynTensor[double] {
+    let dimensions := X.shape()
+    let features := dimensions[1]
+    let count := indices.length()
+    let mut values : Array[double] = Array([])
+    for (let row = 0; row < count; row++) {
+        for (let column = 0; column < features; column++) {
+            values.append(X[indices[row], column])
+        }
+    }
+    return Tensor.fromArray(values).reshape((count, features))
+}
+
+public function takeValues(y : DynTensor[double], indices : Array[Int]) : DynTensor[double] {
+    let mut values : Array[double] = Array([])
+    for (let row = 0; row < indices.length(); row++) {
+        values.append(y[indices[row]])
+    }
+    return Tensor.fromArray(values)
+}
+
+public function trainTestSplit(X : DynTensor[double], y : DynTensor[double], testCount : Int, mut rng : Rng) : (DynTensor[double], DynTensor[double], DynTensor[double], DynTensor[double]) {
+    let rows := X.shape()[0]
+    let count := if testCount < 0 then 0 else if testCount > rows then rows else testCount
+    let order := shuffleIndices(rows, rng)
+    let split := rows - count
+    return (takeRows(X, sliceIndices(order, 0, split)), takeRows(X, sliceIndices(order, split, rows)), takeValues(y, sliceIndices(order, 0, split)), takeValues(y, sliceIndices(order, split, rows)))
+}
+
+public class FittedKNeighborsClassifier {
+    public var trainingX : DynTensor[double]
+    public var trainingY : DynTensor[double]
+    public var neighbors : Int
+
+    new(move trainingX : DynTensor[double], move trainingY : DynTensor[double], neighbors : Int) {
+        this.trainingX = trainingX
+        this.trainingY = trainingY
+        this.neighbors = neighbors
+    }
+
+    public function predict(X : DynTensor[double]) : DynTensor[double] {
+        return knnPredict(this.trainingX, this.trainingY, X, this.neighbors)
+    }
+}
+
+public class KNeighborsClassifier {
+    new() {}
+
+    public static function fit(X : DynTensor[double], y : DynTensor[double], neighbors : Int = 5) : FittedKNeighborsClassifier {
+        let count := if neighbors < 1 then 1 else neighbors
+        return FittedKNeighborsClassifier(X.copy(), y.copy(), count)
+    }
+}
+
+public class FittedLogisticRegression {
+    public var coefficients : DynTensor[double]
+    public var intercept : double
+
+    new(move coefficients : DynTensor[double], intercept : double) {
+        this.coefficients = coefficients
+        this.intercept = intercept
+    }
+
+    public function predictProba(X : DynTensor[double]) : DynTensor[double] {
+        let scores := X @ this.coefficients + this.intercept
+        return scores.map(score => 1.0 / (1.0 + math.exp(-score)))
+    }
+
+    public function predict(X : DynTensor[double]) : DynTensor[double] {
+        return this.predictProba(X).map(probability => if probability >= 0.5 then 1.0 else 0.0)
+    }
+}
+
+public class LogisticRegression {
+    new() {}
+
+    // "newton" (the default) solves the score equations with a ridge-stabilized
+    // Newton step, which reaches the same optimum in a handful of iterations.
+    // "gradient" keeps the explicit batch gradient loop, and "auto" uses Newton
+    // for up to 256 features and gradient descent beyond that.
+    public static function fit(X : DynTensor[double], y : DynTensor[double], learningRate : double = 0.1, iterations : Int = 1000, fitIntercept : Bool = true, solver : String = "auto") : FittedLogisticRegression {
+        let dimensions := X.shape()
+        let rows := dimensions[0]
+        let features := dimensions[1]
+        let rowCount := rows.toDouble()
+        let useNewton := (solver == "newton" || solver == "auto") && features <= 256 && iterations > 0
+        if useNewton {
+            let terms := if fitIntercept then features + 1 else features
+            let offset := if fitIntercept then 1 else 0
+            let design := Tensor.generate((rows, terms), (i, j) => if fitIntercept && j == 0 then 1.0 else X[i, j - offset])
+            let ridge := Tensor.generate((terms, terms), (i, j) => if i == j then 1.0e-3 else 0.0)
+            let limit := if iterations < 10 then iterations else 10
+            let mut theta := Tensor.filled((terms,), 0.0)
+            let mut iteration := 0
+            let mut converged := false
+            while (iteration < limit) {
+                let scores := design @ theta
+                let probabilities := scores.map(score => 1.0 / (1.0 + math.exp(-score)))
+                let error := probabilities - y
+                let gradient := (design.T @ error) * (1.0 / rowCount)
+                let weights := probabilities.map(probability => probability * (1.0 - probability))
+                let weighted := design.T * weights.broadcastTo((terms, rows))
+                let hessian := (weighted @ design) * (1.0 / rowCount) + ridge
+                let delta := linalg.solve(hessian, gradient)
+                theta = theta - delta
+                iteration++
+                if linalg.norm(gradient) < 1.0e-8 {
+                    converged = true
+                    break
+                }
+            }
+            if fitIntercept {
+                return FittedLogisticRegression(theta[1:terms], theta[0])
+            }
+            return FittedLogisticRegression(theta, 0.0)
+        }
+        let mut coefficients := X.sum(axis = 0).map(value => 0.0)
+        let mut intercept := 0.0
+        let mut iteration := 0
+        while (iteration < iterations) {
+            let scores := X @ coefficients + intercept
+            let probabilities := scores.map(score => 1.0 / (1.0 + math.exp(-score)))
+            let error := probabilities - y
+            let gradient := (X.T @ error) * (1.0 / rowCount)
+            coefficients = coefficients - gradient * learningRate
+            if fitIntercept {
+                intercept = intercept - stats.mean(error) * learningRate
+            }
+            iteration++
+        }
+        return FittedLogisticRegression(coefficients, intercept)
+    }
+}
+
+public class FittedKMeans {
+    public var centers : DynTensor[double]
+
+    new(move centers : DynTensor[double]) {
+        this.centers = centers
+    }
+
+    public function predict(X : DynTensor[double]) : DynTensor[double] {
+        let dimensions := X.shape()
+        let rows := dimensions[0]
+        let features := dimensions[1]
+        let count := this.centers.shape()[0]
+        let mut labels : Array[double] = Array([])
+        for (let row = 0; row < rows; row++) {
+            let mut best := 0
+            let mut bestDistance := 0.0
+            for (let center = 0; center < count; center++) {
+                let mut distance := 0.0
+                for (let column = 0; column < features; column++) {
+                    let difference := X[row, column] - this.centers[center, column]
+                    distance += difference * difference
+                }
+                if center == 0 || distance < bestDistance {
+                    best = center
+                    bestDistance = distance
+                }
+            }
+            labels.append(best.toDouble())
+        }
+        return Tensor.fromArray(labels)
+    }
+}
+
+public class KMeans {
+    new() {}
+
+    public static function fit(X : DynTensor[double], clusters : Int = 3, iterations : Int = 100) : FittedKMeans {
+        let dimensions := X.shape()
+        let rows := dimensions[0]
+        let features := dimensions[1]
+        let count := if clusters < 1 then 1 else if clusters > rows then rows else clusters
+        let mut initial : Array[double] = Array([])
+        for (let center = 0; center < count; center++) {
+            for (let column = 0; column < features; column++) {
+                initial.append(X[center, column])
+            }
+        }
+        let mut centers := Tensor.fromArray(initial).reshape((count, features))
+        let mut labels := Array.generate(rows, index => 0)
+        let mut iteration := 0
+        while (iteration < iterations) {
+            let mut changed := false
+            for (let row = 0; row < rows; row++) {
+                let mut best := 0
+                let mut bestDistance := 0.0
+                for (let center = 0; center < count; center++) {
+                    let mut distance := 0.0
+                    for (let column = 0; column < features; column++) {
+                        let difference := X[row, column] - centers[center, column]
+                        distance += difference * difference
+                    }
+                    if center == 0 || distance < bestDistance {
+                        best = center
+                        bestDistance = distance
+                    }
+                }
+                if labels[row] != best {
+                    labels[row] = best
+                    changed = true
+                }
+            }
+            let mut sums := Array.generate(count * features, index => 0.0)
+            let mut sizes := Array.generate(count, index => 0)
+            for (let row = 0; row < rows; row++) {
+                let label := labels[row]
+                sizes[label]++
+                for (let column = 0; column < features; column++) {
+                    sums[label * features + column] += X[row, column]
+                }
+            }
+            let mut values : Array[double] = Array([])
+            for (let center = 0; center < count; center++) {
+                for (let column = 0; column < features; column++) {
+                    if sizes[center] == 0 {
+                        values.append(centers[center, column])
+                    } else {
+                        values.append(sums[center * features + column] / sizes[center].toDouble())
+                    }
+                }
+            }
+            centers = Tensor.fromArray(values).reshape((count, features))
+            if !changed {
+                break
+            }
+            iteration++
+        }
+        return FittedKMeans(centers)
+    }
+}
+
+public class FittedPCA {
+    public var means : DynTensor[double]
+    public var components : DynTensor[double]
+    public var explainedVariance : DynTensor[double]
+
+    new(move means : DynTensor[double], move components : DynTensor[double], move explainedVariance : DynTensor[double]) {
+        this.means = means
+        this.components = components
+        this.explainedVariance = explainedVariance
+    }
+
+    public function transform(X : DynTensor[double]) : DynTensor[double] {
+        let centered := X - this.means.broadcastTo(X.shape())
+        return centered @ this.components.T
+    }
+}
+
+public class PCA {
+    new() {}
+
+    public static function fit(X : DynTensor[double], nComponents : Int = 2) : FittedPCA {
+        let dimensions := X.shape()
+        let rows := dimensions[0]
+        let features := dimensions[1]
+        let available := if rows < features then rows else features
+        let count := if nComponents < 1 then 1 else if nComponents > available then available else nComponents
+        let means := stats.mean(X, axis = 0)
+        // A covariance eigenproblem is much cheaper than a full SVD when the
+        // feature count is small, which is the usual tabular case. The raw
+        // second moment avoids materializing the centered matrix here.
+        let denominator := if rows > 1 then rows.toDouble() - 1.0 else 1.0
+        let gram := X.T @ X
+        let meanOuter := linalg.outer(means, means) * rows.toDouble()
+        let covariance := (gram - meanOuter) * (1.0 / denominator)
+        let symmetric := (covariance + covariance.T) * 0.5
+        let decomposition := linalg.eigh(symmetric)
+        let directions := decomposition.vectors
+        let mut componentValues : Array[double] = Array([])
+        let mut varianceValues : Array[double] = Array([])
+        for (let component = 0; component < count; component++) {
+            let source := features - 1 - component
+            for (let column = 0; column < features; column++) {
+                componentValues.append(directions[column, source])
+            }
+            varianceValues.append(decomposition.values[source])
+        }
+        return FittedPCA(means, Tensor.fromArray(componentValues).reshape((count, features)), Tensor.fromArray(varianceValues))
+    }
+}
+
+public function foldIndices(count : Int, folds : Int, fold : Int) : (Array[Int], Array[Int]) {
+    let parts := if folds < 1 then 1 else folds
+    let part := if fold < 0 then 0 else if fold >= parts then parts - 1 else fold
+    let start := count * part / parts
+    let stop := count * (part + 1) / parts
+    let mut training : Array[Int] = Array([])
+    let mut testing : Array[Int] = Array([])
+    for (let index = 0; index < count; index++) {
+        if index >= start && index < stop {
+            testing.append(index)
+        } else {
+            training.append(index)
+        }
+    }
+    return (training, testing)
+}
+
+public function confusionMatrix(actual : DynTensor[double], predicted : DynTensor[double]) : (double, double, double, double) {
+    let count := actual.count()
+    let mut trueNegative := 0
+    let mut falsePositive := 0
+    let mut falseNegative := 0
+    let mut truePositive := 0
+    for (let index = 0; index < count; index++) {
+        let truth := actual[index]
+        let guess := predicted[index]
+        if truth == 0.0 && guess == 0.0 {
+            trueNegative++
+        } else if truth == 0.0 && guess == 1.0 {
+            falsePositive++
+        } else if truth == 1.0 && guess == 0.0 {
+            falseNegative++
+        } else if truth == 1.0 && guess == 1.0 {
+            truePositive++
+        }
+    }
+    return (trueNegative.toDouble(), falsePositive.toDouble(), falseNegative.toDouble(), truePositive.toDouble())
+}
+
+public function precision(actual : DynTensor[double], predicted : DynTensor[double]) : double {
+    let (trueNegative, falsePositive, falseNegative, truePositive) := confusionMatrix(actual, predicted)
+    let denominator := truePositive + falsePositive
+    return if denominator == 0.0 then 0.0 else truePositive / denominator
+}
+
+public function recall(actual : DynTensor[double], predicted : DynTensor[double]) : double {
+    let (trueNegative, falsePositive, falseNegative, truePositive) := confusionMatrix(actual, predicted)
+    let denominator := truePositive + falseNegative
+    return if denominator == 0.0 then 0.0 else truePositive / denominator
+}
+
+public function f1Score(actual : DynTensor[double], predicted : DynTensor[double]) : double {
+    let p := precision(actual, predicted)
+    let r := recall(actual, predicted)
+    let denominator := p + r
+    return if denominator == 0.0 then 0.0 else 2.0 * p * r / denominator
+}

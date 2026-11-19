@@ -1,0 +1,14 @@
+import testdata.language.cycledefaulta as a
+import testdata.language.cycledefaultb as b
+print(a.value())
+print(b.total())
+print(b.token().name)
+print(a.read())
+print(b.name())
+let token := a.Token()
+print(token.size())
+let ints : List[Int] = a.empty()
+let strings : List[String] = a.empty()
+print(ints == [] && strings == [])
+let later := a.value(_)
+print(later(2))

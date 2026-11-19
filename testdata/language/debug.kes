@@ -1,0 +1,8 @@
+class Square {
+    has Text
+    public final side : double
+    new(side : double) { this.side = side }
+    public function text() : String = f"square of side {this.side}"
+}
+let p := Square(2.0)
+f"{p:?}"

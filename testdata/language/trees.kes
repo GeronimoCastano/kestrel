@@ -1,0 +1,55 @@
+// Classes that hold themselves through Option or List: a linked list, a
+// binary tree and a tree with any number of children.
+class Link {
+    public final value : Int
+    public final next : Option[Link]
+    new(value : Int, move next : Option[Link]) {
+        this.value = value
+        this.next = next
+    }
+}
+
+function sum(l : Link) : Int = match l.next {
+    Some(rest) => l.value + sum(rest),
+    None => l.value,
+}
+
+class Tree {
+    public final value : Int
+    public final left : Option[Tree]
+    public final right : Option[Tree]
+    new(value : Int, move left : Option[Tree], move right : Option[Tree]) {
+        this.value = value
+        this.left = left
+        this.right = right
+    }
+}
+
+function depth(t : Tree) : Int {
+    let l := match t.left { Some(x) => depth(x), None => 0 }
+    let r := match t.right { Some(x) => depth(x), None => 0 }
+    if l > r then l + 1 else r + 1
+}
+
+class Node {
+    public final value : Int
+    public final children : List[Node]
+    new(value : Int, children : List[Node]) {
+        this.value = value
+        this.children = children
+    }
+}
+
+function total(n : Node) : Int {
+    let mut s := n.value
+    for (let c in n.children) {
+        s = s + total(c)
+    }
+    s
+}
+
+function chain(n : Int) : Node = if n == 0 then Node(1, []) else Node(1, [chain(n - 1), Node(2, [])])
+
+print(sum(Link(1, Some(Link(2, Some(Link(3, None)))))))
+print(depth(Tree(1, Some(Tree(2, Some(Tree(3, None, None)), None)), Some(Tree(4, None, None)))))
+print(total(chain(200)))

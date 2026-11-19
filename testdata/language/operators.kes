@@ -1,0 +1,23 @@
+// An operator declaration is a checked alias for a function. It needs no proof.
+function add(a : Nat, b : Nat) : Nat = a + b
+
+infixl 10 "⊕" as \oplus = add
+
+theorem operatorRfl() : 2 ⊕ 3 = 5 by {
+    rfl
+}
+
+theorem operatorPrecedence() : 1 + 2 ⊕ 3 = 6 by {
+    rfl
+}
+
+theorem operatorAlias() : 2 ⊕ 3 = 2 \oplus 3 by {
+    rfl
+}
+
+// The same function under a readable ASCII spelling.
+infixl 10 "plus" = add
+
+theorem asciiOperator() : 2 plus 3 = 5 by {
+    rfl
+}

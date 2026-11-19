@@ -1,0 +1,14 @@
+import std.c.{CUInt64}
+import c "stdlib.h"
+
+function allocate() : void or Error with Effects {
+    let memory := unsafe { malloc(CUInt64(64)?) }
+    if memory.isNull() { return RuntimeError.Io("allocation failed") }
+    unsafe { free(memory) }
+    print("released")
+}
+
+match allocate() {
+    RuntimeError.Io(message) => print(message),
+    _ => {},
+}

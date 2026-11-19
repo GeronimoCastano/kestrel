@@ -1,0 +1,322 @@
+// std.json: JSON text to a Json value and back (RFC 8259).
+//
+//     let value := json.parse("{\"name\": \"Kes\", \"tags\": [1, 2]}")?
+//     match value { JObject(fields) => ..., _ => ... }
+//     print(json.stringify(value))
+//
+// An object keeps its fields in the order the text gives them.
+
+public enum Json {
+    JNull
+    JBool(Bool)
+    JNumber(double)
+    JString(String)
+    JArray(List[Json])
+    JObject(List[(String, Json)])
+}
+
+class JsonReader {
+    public final text : String
+    public var at : Int
+
+    new(text : String) {
+        this.text = text
+        this.at = 0
+    }
+
+    public function peek() : Int = if this.at < this.text.byteLength() then this.text.byteAt(this.at) else -1
+
+    public mut function skipSpace() : void {
+        while this.at < this.text.byteLength() {
+            let b := this.text.byteAt(this.at)
+            if b != 32 && b != 9 && b != 10 && b != 13 {
+                break
+            }
+            this.at += 1
+        }
+    }
+
+    public function fail(what : String) : Error = Error(f"JSON: {what} at byte {this.at}.")
+}
+
+function expectWord(mut r : JsonReader, word : String) : void or Error {
+    if r.at + word.byteLength() > r.text.byteLength() || r.text.byteSlice(r.at, r.at + word.byteLength()) != word {
+        return r.fail(f"expected {word}")
+    }
+    r.at += word.byteLength()
+}
+
+function hexValue(b : Int) : Int =
+    if b >= 48 && b <= 57 then b - 48
+    else if b >= 97 && b <= 102 then b - 87
+    else if b >= 65 && b <= 70 then b - 55
+    else -1
+
+function readHex4(mut r : JsonReader) : Int or Error {
+    let mut value := 0
+    for (i in range(4)) {
+        let digit := hexValue(r.peek())
+        if digit < 0 {
+            return r.fail("expected four hex digits after \\u")
+        }
+        value = value * 16 + digit
+        r.at += 1
+    }
+    return value
+}
+
+function readString(mut r : JsonReader) : String or Error {
+    r.at += 1
+    let parts : Array[String] = Array.empty()
+    let mut start := r.at
+    while true {
+        let b := r.peek()
+        if b < 0 {
+            return r.fail("unterminated string")
+        }
+        if b == 34 {
+            parts.append(r.text.byteSlice(start, r.at))
+            r.at += 1
+            break
+        }
+        if b < 32 {
+            return r.fail("control character in string")
+        }
+        if b == 92 {
+            parts.append(r.text.byteSlice(start, r.at))
+            r.at += 1
+            let e := r.peek()
+            r.at += 1
+            if e == 34 {
+                parts.append("\"")
+            } else if e == 92 {
+                parts.append("\\")
+            } else if e == 47 {
+                parts.append("/")
+            } else if e == 98 {
+                parts.append(8.chr())
+            } else if e == 102 {
+                parts.append(12.chr())
+            } else if e == 110 {
+                parts.append("\n")
+            } else if e == 114 {
+                parts.append("\r")
+            } else if e == 116 {
+                parts.append("\t")
+            } else if e == 117 {
+                let mut code := readHex4(r)?
+                if code >= 55296 && code <= 56319 {
+                    expectWord(r, "\\u")?
+                    let low := readHex4(r)?
+                    if low < 56320 || low > 57343 {
+                        return r.fail("unpaired surrogate")
+                    }
+                    code = 65536 + (code - 55296) * 1024 + (low - 56320)
+                } else if code >= 56320 && code <= 57343 {
+                    return r.fail("unpaired surrogate")
+                }
+                parts.append(code.chr())
+            } else {
+                return r.fail("unknown escape")
+            }
+            start = r.at
+        } else {
+            r.at += 1
+        }
+    }
+    return parts.join("")
+}
+
+function readNumber(mut r : JsonReader) : Json or Error {
+    let start := r.at
+    if r.peek() == 45 { r.at += 1 }
+    if r.peek() == 48 {
+        r.at += 1
+        if r.peek() >= 48 && r.peek() <= 57 { return r.fail("a number cannot have a leading zero") }
+    } else {
+        if r.peek() < 49 || r.peek() > 57 { return r.fail("expected a digit") }
+        while r.peek() >= 48 && r.peek() <= 57 { r.at += 1 }
+    }
+    if r.peek() == 46 {
+        r.at += 1
+        if r.peek() < 48 || r.peek() > 57 { return r.fail("expected digits after the decimal point") }
+        while r.peek() >= 48 && r.peek() <= 57 { r.at += 1 }
+    }
+    if r.peek() == 101 || r.peek() == 69 {
+        r.at += 1
+        if r.peek() == 43 || r.peek() == 45 { r.at += 1 }
+        if r.peek() < 48 || r.peek() > 57 { return r.fail("expected exponent digits") }
+        while r.peek() >= 48 && r.peek() <= 57 { r.at += 1 }
+    }
+    let text := r.text.byteSlice(start, r.at)
+    return match parseDouble(text) {
+        x => JNumber(x),
+        _ => r.fail(f"bad number {text}"),
+    }
+}
+
+function readValue(mut r : JsonReader, depth : Int) : Json or Error {
+    if depth > 512 {
+        return r.fail("nesting too deep")
+    }
+    r.skipSpace()
+    let b := r.peek()
+    if b == 123 {
+        r.at += 1
+        let fields : Array[(String, Json)] = Array.empty()
+        r.skipSpace()
+        if r.peek() == 125 {
+            r.at += 1
+            return JObject(fields.toList())
+        }
+        while true {
+            r.skipSpace()
+            if r.peek() != 34 {
+                return r.fail("expected a field name")
+            }
+            let name := readString(r)?
+            r.skipSpace()
+            if r.peek() != 58 {
+                return r.fail("expected :")
+            }
+            r.at += 1
+            let value := readValue(r, depth + 1)?
+            fields.append((name, value))
+            r.skipSpace()
+            let next := r.peek()
+            r.at += 1
+            if next == 125 {
+                break
+            }
+            if next != 44 {
+                return r.fail("expected , or }")
+            }
+        }
+        return JObject(fields.toList())
+    }
+    if b == 91 {
+        r.at += 1
+        let items : Array[Json] = Array.empty()
+        r.skipSpace()
+        if r.peek() == 93 {
+            r.at += 1
+            return JArray(items.toList())
+        }
+        while true {
+            let value := readValue(r, depth + 1)?
+            items.append(value)
+            r.skipSpace()
+            let next := r.peek()
+            r.at += 1
+            if next == 93 {
+                break
+            }
+            if next != 44 {
+                return r.fail("expected , or ]")
+            }
+        }
+        return JArray(items.toList())
+    }
+    if b == 34 {
+        return JString(readString(r)?)
+    }
+    if b == 116 {
+        expectWord(r, "true")?
+        return JBool(true)
+    }
+    if b == 102 {
+        expectWord(r, "false")?
+        return JBool(false)
+    }
+    if b == 110 {
+        expectWord(r, "null")?
+        return JNull
+    }
+    if b == 45 || b >= 48 && b <= 57 {
+        return readNumber(r)
+    }
+    return r.fail("unexpected character")
+}
+
+// Reads one JSON value; text after it, other than spaces, is an error.
+public function parse(text : String) : Json or Error {
+    let r := JsonReader(text)
+    let value := readValue(r, 0)?
+    r.skipSpace()
+    if r.at != text.byteLength() {
+        return r.fail("text after the value")
+    }
+    return value
+}
+
+function quote(s : String) : String {
+    let parts : Array[String] = Array.empty()
+    parts.append("\"")
+    let mut start := 0
+    let mut i := 0
+    let n := s.byteLength()
+    while i < n {
+        let b := s.byteAt(i)
+        if b == 34 || b == 92 || b < 32 {
+            parts.append(s.byteSlice(start, i))
+            parts.append(
+                if b == 34 then "\\\""
+                else if b == 92 then "\\\\"
+                else if b == 10 then "\\n"
+                else if b == 13 then "\\r"
+                else if b == 9 then "\\t"
+                else f"\\u{b:04x}"
+            )
+            start = i + 1
+        }
+        i += 1
+    }
+    parts.append(s.byteSlice(start, n))
+    parts.append("\"")
+    return parts.join("")
+}
+
+function number(x : double) : String {
+    if !x.isFinite() {
+        return "null"
+    }
+    if x == x.floor() && x.abs() < 1000000000000000.0 {
+        return match x.checkedToInt() {
+            n => f"{n}",
+            _ => f"{x}",
+        }
+    }
+    return f"{x}"
+}
+
+function write(value : Json, indent : Int, level : Int) : String {
+    let breakLine := if indent > 0 then "\n" + " " * (indent * (level + 1)) else ""
+    let closeLine := if indent > 0 then "\n" + " " * (indent * level) else ""
+    let colon := if indent > 0 then ": " else ":"
+    return match value {
+        JNull => "null",
+        JBool(b) => if b then "true" else "false",
+        JNumber(x) => number(x),
+        JString(s) => quote(s),
+        JArray(items) => {
+            if items.isEmpty() {
+                "[]"
+            } else {
+                "[" + breakLine + items.map(item => write(item, indent, level + 1)).join("," + breakLine) + closeLine + "]"
+            }
+        },
+        JObject(fields) => {
+            if fields.isEmpty() {
+                "{}"
+            } else {
+                "{" + breakLine + fields.map(field => quote(field[0]) + colon + write(field[1], indent, level + 1)).join("," + breakLine) + closeLine + "}"
+            }
+        },
+    }
+}
+
+// Compact JSON text.
+public function stringify(value : Json) : String = write(value, 0, 0)
+
+// JSON text with each item on its own line, indented by `indent` spaces per level.
+public function pretty(value : Json, indent : Int = 2) : String = write(value, indent, 0)

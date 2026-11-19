@@ -1,0 +1,38 @@
+{
+  "machine": "arm64 macOS-27.0.1-arm64-arm-64bit",
+  "versions": {
+    "clang": "Apple clang version 21.0.0 (clang-2100.4.1.1)",
+    "rustc": "rustc 1.95.0 (59807616e 2026-04-14)",
+    "java": "openjdk version \"25.0.4.1\" 2026-08-18",
+    "python": "Python 3.11.4"
+  },
+  "runs": 9,
+  "benchmarks": {
+    "channels": {
+      "kestrel": {
+        "seconds": 0.08548820798750967,
+        "peak_bytes": 1884160,
+        "compile_seconds": 0.9730375420767814,
+        "partial": false
+      },
+      "rust": {
+        "seconds": 0.07503750000614673,
+        "peak_bytes": 3735552,
+        "compile_seconds": 0.6169758749892935,
+        "partial": false
+      },
+      "java": {
+        "seconds": 0.6260507500264794,
+        "peak_bytes": 241844224,
+        "compile_seconds": 0.4080958339618519,
+        "partial": false
+      },
+      "python": {
+        "seconds": 0.36189016595017165,
+        "peak_bytes": 163971072,
+        "compile_seconds": 0.0,
+        "partial": false
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+theorem addZeroR(n : Nat) : add(n, Zero) = n {
+    match n {
+        Zero    => rfl,
+        Succ(k) => congrArg(Succ, addZeroR(k)),
+    }
+}

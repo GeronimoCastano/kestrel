@@ -1,0 +1,30 @@
+// Acceptance examples. Each cites a checked library theorem; the file is the
+// one `check_mathlib.sh` reads for admitted proofs.
+
+import nat.{addComm, addAssoc}
+import list.{filterAppend, filterList, sumList}
+import set.{interDistribUnion, unionComm}
+
+/// A known sum computes: $\sum [1,2,3] = 6$.
+public theorem sumExample() : sumList([1, 2, 3]) = 6 by {
+    rfl
+}
+
+example[U](A : Set[U], B : Set[U], C : Set[U]) :
+        A ∩ (B ∪ C) = (A ∩ C) ∪ (A ∩ B) by {
+    rw [interDistribUnion]
+    rw [unionComm]
+    rfl
+}
+
+example[T : Copy](p : (T) -> Bool, xs : List[T], ys : List[T]) :
+        filterList(p, xs + ys) = filterList(p, xs) + filterList(p, ys) by {
+    exact filterAppend(p, xs, ys)
+}
+
+example(a : Nat, b : Nat, c : Nat) :
+        (a + b) + c = a + (b + c) and a + b = b + a by {
+    constructor
+    { exact addAssoc(a, b, c) }
+    { exact addComm(a, b) }
+}

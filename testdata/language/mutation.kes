@@ -1,0 +1,23 @@
+public class Counter {
+    private var value : Int
+
+    new() { this.value = 0 }
+
+    public mut function increment() : void {
+        this.value = this.value + 1
+    }
+
+    public mut function incrementBoth(mut other : Counter) : void {
+        this.increment()
+        other.increment()
+    }
+
+    public function current() : Int = this.value
+
+    public function printSomething() : void with Effects = print(this.value)
+
+    public mut function incrementAndPrint() : void with Effects {
+        this.increment()
+        this.printSomething()
+    }
+}

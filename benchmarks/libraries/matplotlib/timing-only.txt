@@ -1,0 +1,6 @@
+line10k
+scatter20k
+bars50
+hist1m
+heatmap200
+panels4

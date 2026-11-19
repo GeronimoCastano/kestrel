@@ -1,0 +1,20 @@
+alias Counter = mut (() -> Int)
+function counter(start : Int) : Counter {
+    let mut n:=start
+    move () => {n=n+1
+    n}
+}
+function next(mut value : Counter) : Int=value()
+function finish(move value : Counter) : Int=value()
+class Ticker {
+    public var step : Counter
+    new(move step : Counter) {this.step=step}
+    public mut function next() : Int=this.step()
+}
+let count:=counter(0)
+print(next(count))
+print(next(count))
+let ticker:=Ticker(counter(10))
+print(ticker.next())
+print(ticker.next())
+print(finish(counter(20)))

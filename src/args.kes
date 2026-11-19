@@ -1,0 +1,101 @@
+// std.args: command-line flags and options.
+//
+//     let parsed := args.parse(process.args)
+//     if parsed.flag("verbose") { ... }
+//     let out := parsed.option("out").unwrapOr("result.txt")
+//
+// `--name value`, `--name=value` and `-n value` are options; `--name` alone, or before
+// another `--option`, is a flag. `--` ends the options, and every other word is positional.
+
+public class Parsed {
+    private final flags : Set[String]
+    private final options : Map[String, String]
+    private final words : List[String]
+
+    new(flags : Set[String], options : Map[String, String], words : List[String]) {
+        this.flags = flags
+        this.options = options
+        this.words = words
+    }
+
+    // Whether `--name` or `-n` appeared without a value.
+    public function flag(name : String) : Bool = this.flags.contains(name)
+
+    // The value given as `--name value` or `--name=value`.
+    public function option(name : String) : Option[String] = this.options.get(name)
+
+    // The value, or a fallback when the option is missing.
+    public function optionOr(name : String, fallback : String) : String = this.options.get(name).unwrapOr(fallback)
+
+    // An option read as an Int.
+    public function intOption(name : String) : Option[Int] or Error = match this.options.get(name) {
+        Some(text) => Some(parseInt(text)?),
+        None => None,
+    }
+
+    // The words that are neither flags nor option values, in order.
+    public function positional() : List[String] = this.words
+}
+
+function optionName(word : String) : String =
+    if word.startsWith("--") then word.substring(2, word.length()) else word.substring(1, word.length())
+
+function isOption(word : String) : Bool = word.length() > 1 && word.startsWith("-") && word != "--"
+
+// Reads `words`, usually `process.args`. `valued` names the options that take a value, so
+// `-o out.txt` keeps out.txt; any other option before a positional word is a flag.
+public function parse(words : List[String], valued : List[String] = []) : Parsed {
+    let mut flags : Set[String] = Set()
+    let mut options : Map[String, String] = Map()
+    let mut positional : List[String] = []
+    let mut pending : Option[String] = None
+    let mut rest := false
+    for (word in words) {
+        if rest {
+            positional = positional + [word]
+        } else if word == "--" {
+            match pending {
+                Some(name) => {
+                    flags = flags.add(name)
+                },
+                None => {},
+            }
+            pending = None
+            rest = true
+        } else if isOption(word) {
+            match pending {
+                Some(name) => {
+                    flags = flags.add(name)
+                },
+                None => {},
+            }
+            pending = None
+            let name := optionName(word)
+            let equals := name.find("=")
+            if equals >= 0 {
+                options = options.put(name.substring(0, equals), name.substring(equals + 1, name.length()))
+            } else if valued.contains(name) {
+                pending = Some(name)
+            } else {
+                flags = flags.add(name)
+            }
+        } else {
+            match pending {
+                Some(name) => {
+                    options = options.put(name, word)
+                },
+                None => {
+                    positional = positional + [word]
+                },
+            }
+            pending = None
+        }
+    }
+    match pending {
+        Some(name) => {
+            flags = flags.add(name)
+        },
+        None => {},
+    }
+    return Parsed(flags, options, positional)
+}

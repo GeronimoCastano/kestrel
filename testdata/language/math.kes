@@ -1,0 +1,51 @@
+// The mathematical core: checked natural-number identities, logic with
+// quantifiers, finite algebra, sets, functions, real numbers and complex
+// numbers. The proofs above `main` are checked at compile time and erased.
+
+import std.algebra.{Z2, Z2Group, z2Plus, z2Times, z2Neg, z2PlusAssoc, z2Distrib}
+import std.func.{identity, compose, constant}
+import std.nat.{plus, times, plusZeroR, timesZeroR}
+import std.real.{Real, PI, abs, sqrt}
+import std.set.{member, subset, properSubset, disjoint, cardinality}
+
+theorem zeroTwice(n : Nat) : plus(plus(n, Zero), Zero) = n by {
+    rw [plusZeroR]
+    rfl
+}
+
+function doubleIt(x : Int) : Int = x * 2
+
+function addOne(x : Int) : Int = x + 1
+
+function main() : void with Effects {
+    // Functions: composition, identity and a constant function.
+    let twiceThenPlusOne := compose(doubleIt, addOne)
+    print(twiceThenPlusOne(3))
+    print(identity(7))
+    print(constant("fixed", 0))
+
+    // Sets: membership, subset, proper subset, disjointness and size.
+    let small := Set().add(1).add(2)
+    let large := Set().add(1).add(2).add(3)
+    print(member(large, 2))
+    print(subset(small, large))
+    print(properSubset(small, large))
+    print(disjoint(small, Set().add(9)))
+    print(cardinality(large))
+
+    // Natural numbers: structural functions with kernel-checked lemmas.
+    print(plus(2, 3))
+    print(times(2, 3))
+
+    // Real numbers: double precision, with the standard math helpers.
+    print(abs(-PI))
+    print(sqrt(9.0))
+
+    // Finite algebra: Z/2Z is a group and a ring; the laws were checked.
+    print(match z2Plus(Z2.One, Z2.One) { Z2.Zero => 0, Z2.One => 1 })
+    print(match z2Times(Z2.One, Z2.One) { Z2.Zero => 0, Z2.One => 1 })
+    print(match z2Neg(Z2.One) { Z2.Zero => 0, Z2.One => 1 })
+    let g := Z2Group()
+    print(match g.op(Z2.One, Z2.One) { Z2.Zero => 0, Z2.One => 1 })
+}
+main()

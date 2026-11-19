@@ -1,0 +1,15 @@
+@simp
+theorem addZeroR(n : Nat) : add(n, Zero) = n {
+    induction n {
+        Zero       => rfl,
+        Succ(k) ih => congrArg(Succ, ih),   // ih : add(k, Zero) = k
+    }
+}
+
+theorem t(n : Nat) : add(n, Zero) = n {
+    simp                    // uses every @simp rule
+}
+
+function count(n : Nat) : Nat requires addZeroR(n) {
+    n                       // the body may use the fact addZeroR(n)
+}

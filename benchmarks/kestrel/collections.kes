@@ -1,0 +1,19 @@
+// Persistent Map building, then a List built from its items.
+function build(n : Int) : Int {
+    let mut m : Map[Int, Int] = Map()
+    for (let i : Int = 0; i < n; i = i + 1) {
+        m = m.put(i, i * 2)
+    }
+    let mut total := 0
+    for ((k, v) in m) {
+        total = total + v
+    }
+    let items := [v + k for (k, v) in m]
+    let mut listTotal := 0
+    for (x in items) {
+        listTotal = listTotal + x
+    }
+    total + listTotal
+}
+
+print(build(2000000))

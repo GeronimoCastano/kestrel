@@ -1,0 +1,33 @@
+import std.memory.{Arena, ArenaRef}
+
+class Node {
+    public final label : String
+    public final next : Option[ArenaRef[Node]]
+    new(label : String, move next : Option[ArenaRef[Node]]) {
+        this.label = label
+        this.next = next
+    }
+}
+
+function nextLabel(nodes : Arena[Node], h : ArenaRef[Node]) : String =
+    match nodes.get(h) {
+        Some(node) => match node.next {
+            Some(next) => match nodes.get(next) {
+                Some(link) => link.label,
+                None => "missing",
+            },
+            None => "end",
+        },
+        None => "missing",
+    }
+
+function graph() : void or Error with Effects {
+    let nodes := Arena[Node]()
+    let a := nodes.insert(Node("a", None))
+    let b := nodes.insert(Node("b", Some(a)))
+    nodes.replace(a, Node("a", Some(b)))?
+    print(nextLabel(nodes, a))
+    print(nextLabel(nodes, b))
+}
+
+graph()?

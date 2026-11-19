@@ -1,0 +1,509 @@
+// The two-element field Z2 as a commutative ring. Every law is a case check,
+// and `z2Ring` states the conjunction an instance must provide.
+
+/// The two elements: Z is zero, O is one.
+public enum Z2 { Z, O }
+
+/// Addition modulo two.
+public function zAdd(a : Z2, b : Z2) : Z2 = match a {
+    Z => b,
+    O => match b { Z => O, O => Z },
+}
+
+/// Negation modulo two: both elements are their own negative.
+public function zNeg(a : Z2) : Z2 = match a {
+    Z => Z,
+    O => O,
+}
+
+/// Multiplication modulo two.
+public function zMul(a : Z2, b : Z2) : Z2 = match a {
+    Z => Z,
+    O => b,
+}
+
+
+/// The zAddComm law.
+public theorem zAddComm(a : Z2, b : Z2) : zAdd(a, b) = zAdd(b, a) by {
+    cases a {
+        Z => {
+            cases b {
+                Z => {
+                    rfl
+                }
+                O => {
+                    rfl
+                }
+            }
+        }
+        O => {
+            cases b {
+                Z => {
+                    rfl
+                }
+                O => {
+                    rfl
+                }
+            }
+        }
+    }
+}
+
+/// The zAddAssoc law.
+public theorem zAddAssoc(a : Z2, b : Z2, c : Z2) : zAdd(zAdd(a, b), c) = zAdd(a, zAdd(b, c)) by {
+    cases a {
+        Z => {
+            cases b {
+                Z => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+                O => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+            }
+        }
+        O => {
+            cases b {
+                Z => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+                O => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The zAddZeroL law.
+public theorem zAddZeroL(a : Z2) : zAdd(Z, a) = a by {
+    cases a {
+        Z => {
+            rfl
+        }
+        O => {
+            rfl
+        }
+    }
+}
+
+/// The zAddZeroR law.
+public theorem zAddZeroR(a : Z2) : zAdd(a, Z) = a by {
+    cases a {
+        Z => {
+            rfl
+        }
+        O => {
+            rfl
+        }
+    }
+}
+
+/// The zAddNegL law.
+public theorem zAddNegL(a : Z2) : zAdd(zNeg(a), a) = Z by {
+    cases a {
+        Z => {
+            rfl
+        }
+        O => {
+            rfl
+        }
+    }
+}
+
+/// The zAddNegR law.
+public theorem zAddNegR(a : Z2) : zAdd(a, zNeg(a)) = Z by {
+    cases a {
+        Z => {
+            rfl
+        }
+        O => {
+            rfl
+        }
+    }
+}
+
+/// The zMulComm law.
+public theorem zMulComm(a : Z2, b : Z2) : zMul(a, b) = zMul(b, a) by {
+    cases a {
+        Z => {
+            cases b {
+                Z => {
+                    rfl
+                }
+                O => {
+                    rfl
+                }
+            }
+        }
+        O => {
+            cases b {
+                Z => {
+                    rfl
+                }
+                O => {
+                    rfl
+                }
+            }
+        }
+    }
+}
+
+/// The zMulAssoc law.
+public theorem zMulAssoc(a : Z2, b : Z2, c : Z2) : zMul(zMul(a, b), c) = zMul(a, zMul(b, c)) by {
+    cases a {
+        Z => {
+            cases b {
+                Z => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+                O => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+            }
+        }
+        O => {
+            cases b {
+                Z => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+                O => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The zMulOneL law.
+public theorem zMulOneL(a : Z2) : zMul(O, a) = a by {
+    cases a {
+        Z => {
+            rfl
+        }
+        O => {
+            rfl
+        }
+    }
+}
+
+/// The zMulOneR law.
+public theorem zMulOneR(a : Z2) : zMul(a, O) = a by {
+    cases a {
+        Z => {
+            rfl
+        }
+        O => {
+            rfl
+        }
+    }
+}
+
+/// The zMulZeroL law.
+public theorem zMulZeroL(a : Z2) : zMul(Z, a) = Z by {
+    cases a {
+        Z => {
+            rfl
+        }
+        O => {
+            rfl
+        }
+    }
+}
+
+/// The zMulZeroR law.
+public theorem zMulZeroR(a : Z2) : zMul(a, Z) = Z by {
+    cases a {
+        Z => {
+            rfl
+        }
+        O => {
+            rfl
+        }
+    }
+}
+
+/// The zMulDistribL law.
+public theorem zMulDistribL(a : Z2, b : Z2, c : Z2) : zMul(a, zAdd(b, c)) = zAdd(zMul(a, b), zMul(a, c)) by {
+    cases a {
+        Z => {
+            cases b {
+                Z => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+                O => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+            }
+        }
+        O => {
+            cases b {
+                Z => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+                O => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The zMulDistribR law.
+public theorem zMulDistribR(a : Z2, b : Z2, c : Z2) : zMul(zAdd(a, b), c) = zAdd(zMul(a, c), zMul(b, c)) by {
+    cases a {
+        Z => {
+            cases b {
+                Z => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+                O => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+            }
+        }
+        O => {
+            cases b {
+                Z => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+                O => {
+                    cases c {
+                        Z => {
+                            rfl
+                        }
+                        O => {
+                            rfl
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// The commutative-ring laws of Z2.
+public theorem z2Ring() :
+        (forall a : Z2, forall b : Z2, zAdd(a, b) = zAdd(b, a)) and
+        (forall a : Z2, forall b : Z2, forall c : Z2, zAdd(zAdd(a, b), c) = zAdd(a, zAdd(b, c))) and
+        (forall a : Z2, zAdd(Z, a) = a) and
+        (forall a : Z2, zAdd(a, Z) = a) and
+        (forall a : Z2, zAdd(zNeg(a), a) = Z) and
+        (forall a : Z2, zAdd(a, zNeg(a)) = Z) and
+        (forall a : Z2, forall b : Z2, zMul(a, b) = zMul(b, a)) and
+        (forall a : Z2, forall b : Z2, forall c : Z2, zMul(zMul(a, b), c) = zMul(a, zMul(b, c))) and
+        (forall a : Z2, zMul(O, a) = a) and
+        (forall a : Z2, zMul(a, O) = a) and
+        (forall a : Z2, zMul(Z, a) = Z) and
+        (forall a : Z2, zMul(a, Z) = Z) and
+        (forall a : Z2, forall b : Z2, forall c : Z2, zMul(a, zAdd(b, c)) = zAdd(zMul(a, b), zMul(a, c))) and
+        (forall a : Z2, forall b : Z2, forall c : Z2, zMul(zAdd(a, b), c) = zAdd(zMul(a, c), zMul(b, c))) by {
+    constructor
+    {
+        constructor
+        {
+            constructor
+            {
+                constructor
+                {
+                    constructor
+                    {
+                        constructor
+                        {
+                            constructor
+                            {
+                                constructor
+                                {
+                                    constructor
+                                    {
+                                        constructor
+                                        {
+                                            constructor
+                                            {
+                                                constructor
+                                                {
+                                                    constructor
+                                                    {
+                                                        intro a
+                                                        intro b
+                                                        exact zAddComm(a, b)
+                                                    }
+                                                    {
+                                                        intro a
+                                                        intro b
+                                                        intro c
+                                                        exact zAddAssoc(a, b, c)
+                                                    }
+                                                }
+                                                {
+                                                    intro a
+                                                    exact zAddZeroL(a)
+                                                }
+                                            }
+                                            {
+                                                intro a
+                                                exact zAddZeroR(a)
+                                            }
+                                        }
+                                        {
+                                            intro a
+                                            exact zAddNegL(a)
+                                        }
+                                    }
+                                    {
+                                        intro a
+                                        exact zAddNegR(a)
+                                    }
+                                }
+                                {
+                                    intro a
+                                    intro b
+                                    exact zMulComm(a, b)
+                                }
+                            }
+                            {
+                                intro a
+                                intro b
+                                intro c
+                                exact zMulAssoc(a, b, c)
+                            }
+                        }
+                        {
+                            intro a
+                            exact zMulOneL(a)
+                        }
+                    }
+                    {
+                        intro a
+                        exact zMulOneR(a)
+                    }
+                }
+                {
+                    intro a
+                    exact zMulZeroL(a)
+                }
+            }
+            {
+                intro a
+                exact zMulZeroR(a)
+            }
+        }
+        {
+            intro a
+            intro b
+            intro c
+            exact zMulDistribL(a, b, c)
+        }
+    }
+    {
+        intro a
+        intro b
+        intro c
+        exact zMulDistribR(a, b, c)
+    }
+}

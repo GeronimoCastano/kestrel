@@ -1,0 +1,7 @@
+// 100000! by an explicit multiplication loop, then its remainder modulo 1000000007.
+let mut factorial : BigInt = 1
+for (let i : Int = 2; i <= 100000; i = i + 1) {
+    factorial = factorial * i
+}
+let modulus : BigInt = 1000000007
+print(factorial % modulus)

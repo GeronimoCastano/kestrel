@@ -1,0 +1,23 @@
+// Adam/backward overhead benchmark: 784 -> 64 -> 10 MLP, batch 64, 3400 steps.
+import std.kesnet.{Linear, ReLU, Sequential, mseLoss}
+import std.kesnet.optim.{Adam}
+
+Variable.seed(5)
+let features := Tensor.generate((64, 784), (i, j) => (((i * 37 + j * 17) % 101).toDouble() - 50.0) / 50.0)
+let targets := Tensor.generate((64, 10), (i, j) => (((i * 53 + j * 29) % 97).toDouble() - 48.0) / 48.0)
+let inputs := Variable.fromTensor(features)
+let expected := Variable.fromTensor(targets)
+
+let model := Sequential([box(Linear(784, 64)), box(ReLU()), box(Linear(64, 10))])
+let mut optimizer := Adam(model.parameters(), 0.001)
+let mut finalLoss := 0.0
+
+for (step in range(3400)) {
+    let loss := mseLoss(model.forward(inputs), expected)
+    optimizer.zeroGrad()
+    loss.backward()
+    optimizer.step()
+    finalLoss = loss.item()
+}
+
+print(f"{finalLoss:.6f}")

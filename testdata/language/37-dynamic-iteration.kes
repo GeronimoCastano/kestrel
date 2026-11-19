@@ -1,0 +1,24 @@
+class Countdown { has Iterator
+    public var nextValue : Int
+    new(n : Int) { this.nextValue = n }
+    public mut function next() : Option[Int] =
+        if this.nextValue == 0 then None else {
+            this.nextValue = this.nextValue - 1
+            Some(this.nextValue)
+        }
+}
+
+class Range { has Iterable
+    public final count : Int
+    new(count : Int) { this.count = count }
+    public function items() : Countdown = Countdown(this.count)
+}
+
+function total(mut values : &dyn Iterable(Item = Int)) : Int with Effects {
+    let mut result := 0
+    for (value in values) { result = result + value }
+    result
+}
+
+let values : Box[dyn Iterable(Item = Int)] = box(Range(4))
+print(total(values))

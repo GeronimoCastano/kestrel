@@ -1,0 +1,13 @@
+import std.math
+
+let n := 16000000
+let reps := 23
+let a := Tensor.filled((n,), 1.5)
+let b := Tensor.filled((n,), 0.5)
+let c := Tensor.filled((n,), 2.0)
+let mut checksum := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    let result := (a + b) * c - a / 2.0 + math.sqrt(a)
+    checksum = checksum + result.sum()
+}
+print(f"{checksum:.6f}")

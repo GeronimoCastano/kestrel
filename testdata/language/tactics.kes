@@ -1,0 +1,73 @@
+// A tour of the tactic language. Every theorem here is checked by the kernel
+// and erased before the program runs.
+
+function add(a : Nat, b : Nat) : Nat = match a {
+    Zero    => b,
+    Succ(k) => Succ(add(k, b)),
+}
+
+theorem addZeroR(n : Nat) : add(n, Zero) = n by {
+    induction n {
+        Zero       => { rfl }
+        Succ(k) ih => { simp [ih] }
+    }
+}
+
+theorem quantified(n : Nat) : forall m : Nat, add(m, Zero) = m by {
+    intro m
+    apply addZeroR
+}
+
+theorem implies(n : Nat) : (n = n) -> n = n by {
+    intro h
+    exact h
+}
+
+theorem both(n : Nat) : n = n and n = n by {
+    constructor
+    repeat { rfl }
+}
+
+theorem either(n : Nat) : n = n or n = Zero by {
+    left
+    rfl
+}
+
+theorem witness(n : Nat) : exists m : Nat, m = m by {
+    exists n
+    rfl
+}
+
+theorem split(n : Nat) : not (Zero = Succ(n)) by {
+    intro h
+    contradiction
+}
+
+theorem fromOr(n : Nat) : (n = Zero or n = n) -> n = n by {
+    intro h
+    cases h
+    { rw [hl]; rfl }
+    { assumption }
+}
+
+theorem chained(n : Nat) : n = add(n, Zero) by {
+    symm
+    apply addZeroR
+}
+
+theorem middle(n : Nat) : add(add(n, Zero), Zero) = n by {
+    trans (add(n, Zero))
+    { rw [addZeroR]; rfl }
+    { rw [addZeroR]; rfl }
+}
+
+theorem unused(n : Nat) : n = n by {
+    try { skip }
+    have h : n = n := rfl
+    exact h
+}
+
+function main() : void with Effects {
+    print(42)
+}
+main()

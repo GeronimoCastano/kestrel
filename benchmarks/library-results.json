@@ -1,0 +1,958 @@
+{
+  "machine": "arm64 macOS-27.0.1-arm64-arm-64bit",
+  "runs": 3,
+  "suites": {
+    "kesnet": {
+      "baselines": {
+        "kestrel": 0.006908874958753586,
+        "python": 0.7378955420572311
+      },
+      "workloads": {
+        "cnntrain": {
+          "kestrel": {
+            "seconds": 1.822656917036511,
+            "minimum_seconds": 1.8190546670230106,
+            "peak_bytes": 35766272
+          },
+          "python": {
+            "seconds": 2.677916625048965,
+            "minimum_seconds": 2.655567416921258,
+            "peak_bytes": 354058240
+          },
+          "kestrel_startup": 0.006908874958753586,
+          "python_startup": 0.7378955420572311,
+          "kestrel_compute": 1.8157480420777574,
+          "python_compute": 1.9400210829917341,
+          "speedup": 1.4692379021077842,
+          "compute_speedup": 1.0684417870949603,
+          "memory_ratio": 0.10101804720037019,
+          "timing_only": true
+        },
+        "lstmtrain": {
+          "kestrel": {
+            "seconds": 0.9664406250230968,
+            "minimum_seconds": 0.965746833011508,
+            "peak_bytes": 14155776
+          },
+          "python": {
+            "seconds": 2.959322457900271,
+            "minimum_seconds": 2.9525174169102684,
+            "peak_bytes": 316129280
+          },
+          "kestrel_startup": 0.006908874958753586,
+          "python_startup": 0.7378955420572311,
+          "kestrel_compute": 0.9595317500643432,
+          "python_compute": 2.2214269158430398,
+          "speedup": 3.062084085951526,
+          "compute_speedup": 2.315115592260577,
+          "memory_ratio": 0.04477844001036538,
+          "timing_only": true
+        },
+        "mlptrain": {
+          "kestrel": {
+            "seconds": 1.3385910419747233,
+            "minimum_seconds": 1.3329302920028567,
+            "peak_bytes": 35291136
+          },
+          "python": {
+            "seconds": 2.6344741249922663,
+            "minimum_seconds": 2.6250812080688775,
+            "peak_bytes": 343293952
+          },
+          "kestrel_startup": 0.006908874958753586,
+          "python_startup": 0.7378955420572311,
+          "kestrel_compute": 1.3316821670159698,
+          "python_compute": 1.8965785829350352,
+          "speedup": 1.9680948418015882,
+          "compute_speedup": 1.424197627565205,
+          "memory_ratio": 0.10280150813725958,
+          "timing_only": true
+        },
+        "optimizeradam": {
+          "kestrel": {
+            "seconds": 0.8715270840330049,
+            "minimum_seconds": 0.8709505000151694,
+            "peak_bytes": 15990784
+          },
+          "python": {
+            "seconds": 3.188125874963589,
+            "minimum_seconds": 3.1155825830064714,
+            "peak_bytes": 318881792
+          },
+          "kestrel_startup": 0.006908874958753586,
+          "python_startup": 0.7378955420572311,
+          "kestrel_compute": 0.8646182090742514,
+          "python_compute": 2.450230332906358,
+          "speedup": 3.658091565221918,
+          "compute_speedup": 2.8338870349837126,
+          "memory_ratio": 0.05014643169090068,
+          "timing_only": true
+        },
+        "transformerforward": {
+          "kestrel": {
+            "seconds": 2.3413742079865187,
+            "minimum_seconds": 2.33480612502899,
+            "peak_bytes": 35799040
+          },
+          "python": {
+            "seconds": 2.9703511669067666,
+            "minimum_seconds": 2.952519625076093,
+            "peak_bytes": 239452160
+          },
+          "kestrel_startup": 0.006908874958753586,
+          "python_startup": 0.7378955420572311,
+          "kestrel_compute": 2.334465333027765,
+          "python_compute": 2.2324556248495355,
+          "speedup": 1.2686358108732825,
+          "compute_speedup": 0.9563027530394188,
+          "memory_ratio": 0.1495039343140609,
+          "timing_only": true
+        }
+      }
+    },
+    "matplotlib": {
+      "baselines": {
+        "kestrel": 0.004531417042016983,
+        "python": 0.2801189998863265
+      },
+      "workloads": {
+        "bars50": {
+          "kestrel": {
+            "seconds": 0.012801375007256866,
+            "minimum_seconds": 0.01198920898605138,
+            "peak_bytes": 2637824
+          },
+          "python": {
+            "seconds": 0.32761333300732076,
+            "minimum_seconds": 0.3219769580755383,
+            "peak_bytes": 66666496
+          },
+          "kestrel_startup": 0.004531417042016983,
+          "python_startup": 0.2801189998863265,
+          "kestrel_compute": 0.008269957965239882,
+          "python_compute": 0.04749433312099427,
+          "speedup": 25.592042481499274,
+          "compute_speedup": 5.742995710573315,
+          "memory_ratio": 0.03956746129270091,
+          "timing_only": true
+        },
+        "heatmap200": {
+          "kestrel": {
+            "seconds": 0.5340505830245093,
+            "minimum_seconds": 0.5302497500088066,
+            "peak_bytes": 25509888
+          },
+          "python": {
+            "seconds": 1.140127957914956,
+            "minimum_seconds": 1.12876354099717,
+            "peak_bytes": 97222656
+          },
+          "kestrel_startup": 0.004531417042016983,
+          "python_startup": 0.2801189998863265,
+          "kestrel_compute": 0.5295191659824923,
+          "python_compute": 0.8600089580286294,
+          "speedup": 2.1348688572869357,
+          "compute_speedup": 1.6241318790282735,
+          "memory_ratio": 0.26238624873609706,
+          "timing_only": true
+        },
+        "hist1m": {
+          "kestrel": {
+            "seconds": 0.05251612502615899,
+            "minimum_seconds": 0.051324125030077994,
+            "peak_bytes": 36995072
+          },
+          "python": {
+            "seconds": 0.3272414170205593,
+            "minimum_seconds": 0.3222384590189904,
+            "peak_bytes": 95125504
+          },
+          "kestrel_startup": 0.004531417042016983,
+          "python_startup": 0.2801189998863265,
+          "kestrel_compute": 0.047984707984142005,
+          "python_compute": 0.04712241713423282,
+          "speedup": 6.231255959146947,
+          "compute_speedup": 0.9820298823076269,
+          "memory_ratio": 0.38890802617981396,
+          "timing_only": true
+        },
+        "line10k": {
+          "kestrel": {
+            "seconds": 0.02025945798959583,
+            "minimum_seconds": 0.01826241600792855,
+            "peak_bytes": 4767744
+          },
+          "python": {
+            "seconds": 0.3114911250304431,
+            "minimum_seconds": 0.30765441700350493,
+            "peak_bytes": 66224128
+          },
+          "kestrel_startup": 0.004531417042016983,
+          "python_startup": 0.2801189998863265,
+          "kestrel_compute": 0.015728040947578847,
+          "python_compute": 0.03137212514411658,
+          "speedup": 15.375096667956674,
+          "compute_speedup": 1.994661970214794,
+          "memory_ratio": 0.07199406234537357,
+          "timing_only": true
+        },
+        "panels4": {
+          "kestrel": {
+            "seconds": 0.015473249950446188,
+            "minimum_seconds": 0.014741417020559311,
+            "peak_bytes": 3604480
+          },
+          "python": {
+            "seconds": 0.41989262495189905,
+            "minimum_seconds": 0.41772029106505215,
+            "peak_bytes": 70746112
+          },
+          "kestrel_startup": 0.004531417042016983,
+          "python_startup": 0.2801189998863265,
+          "kestrel_compute": 0.010941832908429205,
+          "python_compute": 0.13977362506557256,
+          "speedup": 27.136679514428124,
+          "compute_speedup": 12.77424232624644,
+          "memory_ratio": 0.05094951366373321,
+          "timing_only": true
+        },
+        "scatter20k": {
+          "kestrel": {
+            "seconds": 0.04971712490078062,
+            "minimum_seconds": 0.04961587500292808,
+            "peak_bytes": 12533760
+          },
+          "python": {
+            "seconds": 0.867850249982439,
+            "minimum_seconds": 0.8551027090288699,
+            "peak_bytes": 80936960
+          },
+          "kestrel_startup": 0.004531417042016983,
+          "python_startup": 0.2801189998863265,
+          "kestrel_compute": 0.045185707858763635,
+          "python_compute": 0.5877312500961125,
+          "speedup": 17.45576100215748,
+          "compute_speedup": 13.007016553401714,
+          "memory_ratio": 0.1548582995951417,
+          "timing_only": true
+        }
+      }
+    },
+    "ml": {
+      "baselines": {
+        "kestrel": 0.004740667063742876,
+        "python": 1.2092479170532897
+      },
+      "workloads": {
+        "kmeans20k": {
+          "kestrel": {
+            "seconds": 1.3715401659719646,
+            "minimum_seconds": 1.3687600420089439,
+            "peak_bytes": 4784128
+          },
+          "python": {
+            "seconds": 3.1637784999329597,
+            "minimum_seconds": 3.156697207945399,
+            "peak_bytes": 243580928
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 1.3667994989082217,
+          "python_compute": 1.95453058287967,
+          "speedup": 2.3067341215566195,
+          "compute_speedup": 1.4300053405352569,
+          "memory_ratio": 0.01964081522835811,
+          "timing_only": true
+        },
+        "knnpredict5k": {
+          "kestrel": {
+            "seconds": 0.05139854201115668,
+            "minimum_seconds": 0.050589416990987957,
+            "peak_bytes": 62472192
+          },
+          "python": {
+            "seconds": 1.1672259160550311,
+            "minimum_seconds": 1.166816542041488,
+            "peak_bytes": 181862400
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 0.0466578749474138,
+          "python_compute": 0.0,
+          "speedup": 22.70931957178222,
+          "compute_speedup": 0.0,
+          "memory_ratio": 0.3435135135135135,
+          "timing_only": false
+        },
+        "linearregression20k": {
+          "kestrel": {
+            "seconds": 0.3035366660915315,
+            "minimum_seconds": 0.29661512502934784,
+            "peak_bytes": 18776064
+          },
+          "python": {
+            "seconds": 3.032017458928749,
+            "minimum_seconds": 3.0067582910414785,
+            "peak_bytes": 237240320
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 0.29879599902778864,
+          "python_compute": 1.8227695418754593,
+          "speedup": 9.98896607111855,
+          "compute_speedup": 6.100381356531946,
+          "memory_ratio": 0.07914364640883978,
+          "timing_only": false
+        },
+        "logisticregression20k": {
+          "kestrel": {
+            "seconds": 1.9322229590034112,
+            "minimum_seconds": 1.9202239169972017,
+            "peak_bytes": 26394624
+          },
+          "python": {
+            "seconds": 3.077047083992511,
+            "minimum_seconds": 3.0620600000256673,
+            "peak_bytes": 183418880
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 1.9274822919396684,
+          "python_compute": 1.8677991669392213,
+          "speedup": 1.5924906955766478,
+          "compute_speedup": 0.9690357077468211,
+          "memory_ratio": 0.1439035283608754,
+          "timing_only": false
+        },
+        "metrics100k": {
+          "kestrel": {
+            "seconds": 0.07602408295497298,
+            "minimum_seconds": 0.07524233299773186,
+            "peak_bytes": 3375104
+          },
+          "python": {
+            "seconds": 3.9011981670046225,
+            "minimum_seconds": 3.89969566592481,
+            "peak_bytes": 201179136
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 0.0712834158912301,
+          "python_compute": 2.691950249951333,
+          "speedup": 51.31529398802741,
+          "compute_speedup": 37.764046746285615,
+          "memory_ratio": 0.016776610473165567,
+          "timing_only": false
+        },
+        "minmaxscaler100k": {
+          "kestrel": {
+            "seconds": 1.5233528329990804,
+            "minimum_seconds": 1.5210187919437885,
+            "peak_bytes": 65994752
+          },
+          "python": {
+            "seconds": 2.6610416249604896,
+            "minimum_seconds": 2.6408643750473857,
+            "peak_bytes": 215842816
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 1.5186121659353375,
+          "python_compute": 1.4517937079071999,
+          "speedup": 1.7468320978020566,
+          "compute_speedup": 0.9560003142823611,
+          "memory_ratio": 0.30575375740094124,
+          "timing_only": false
+        },
+        "pca10k": {
+          "kestrel": {
+            "seconds": 0.8149379999376833,
+            "minimum_seconds": 0.8146820410620421,
+            "peak_bytes": 18120704
+          },
+          "python": {
+            "seconds": 1.9946425419766456,
+            "minimum_seconds": 1.9882238340796903,
+            "peak_bytes": 184975360
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 0.8101973328739405,
+          "python_compute": 0.7853946249233559,
+          "speedup": 2.447600359940476,
+          "compute_speedup": 0.9693868309062385,
+          "memory_ratio": 0.09796279893711249,
+          "timing_only": false
+        },
+        "polynomialfeatures20k": {
+          "kestrel": {
+            "seconds": 1.333437000052072,
+            "minimum_seconds": 1.3314043340506032,
+            "peak_bytes": 35176448
+          },
+          "python": {
+            "seconds": 3.6836142499232665,
+            "minimum_seconds": 3.660856582922861,
+            "peak_bytes": 191234048
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 1.3286963329883292,
+          "python_compute": 2.4743663328699768,
+          "speedup": 2.7624959032780834,
+          "compute_speedup": 1.862251194225062,
+          "memory_ratio": 0.18394448252227552,
+          "timing_only": false
+        },
+        "standardscaler100k": {
+          "kestrel": {
+            "seconds": 2.3427083750721067,
+            "minimum_seconds": 2.2123004170134664,
+            "peak_bytes": 65929216
+          },
+          "python": {
+            "seconds": 3.8910966670373455,
+            "minimum_seconds": 3.7323164590634406,
+            "peak_bytes": 230457344
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 2.337967708008364,
+          "python_compute": 2.6818487499840558,
+          "speedup": 1.6609394103171635,
+          "compute_speedup": 1.147085454088086,
+          "memory_ratio": 0.28607990900042657,
+          "timing_only": false
+        },
+        "traintestsplit50k": {
+          "kestrel": {
+            "seconds": 1.551632999908179,
+            "minimum_seconds": 1.5468504999298602,
+            "peak_bytes": 26738688
+          },
+          "python": {
+            "seconds": 3.557225833996199,
+            "minimum_seconds": 3.513340917066671,
+            "peak_bytes": 223870976
+          },
+          "kestrel_startup": 0.004740667063742876,
+          "python_startup": 1.2092479170532897,
+          "kestrel_compute": 1.5468923328444362,
+          "python_compute": 2.3479779169429094,
+          "speedup": 2.2925690767125375,
+          "compute_speedup": 1.51786770616765,
+          "memory_ratio": 0.11943793911007025,
+          "timing_only": false
+        }
+      }
+    },
+    "numpy": {
+      "baselines": {
+        "kestrel": 0.006998916040174663,
+        "python": 0.06537537497933954
+      },
+      "workloads": {
+        "broadcast2048": {
+          "kestrel": {
+            "seconds": 1.3629251249367371,
+            "minimum_seconds": 1.3628169579897076,
+            "peak_bytes": 136069120
+          },
+          "python": {
+            "seconds": 1.5960984589764848,
+            "minimum_seconds": 1.5608633329393342,
+            "peak_bytes": 129499136
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.3559262088965625,
+          "python_compute": 1.5307230839971453,
+          "speedup": 1.1710830109251753,
+          "compute_speedup": 1.1289132653043343,
+          "memory_ratio": 1.0507338056680162,
+          "timing_only": false
+        },
+        "broadcast4096": {
+          "kestrel": {
+            "seconds": 0.7169638329651207,
+            "minimum_seconds": 0.7157724159769714,
+            "peak_bytes": 538771456
+          },
+          "python": {
+            "seconds": 1.5870911250822246,
+            "minimum_seconds": 1.5826221249299124,
+            "peak_bytes": 431587328
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.709964916924946,
+          "python_compute": 1.521715750102885,
+          "speedup": 2.213627873694201,
+          "compute_speedup": 2.143367529615204,
+          "memory_ratio": 1.248348644749829,
+          "timing_only": false
+        },
+        "eigh256": {
+          "kestrel": {
+            "seconds": 1.5409805829403922,
+            "minimum_seconds": 1.5362391670932993,
+            "peak_bytes": 15679488
+          },
+          "python": {
+            "seconds": 1.6778200840344653,
+            "minimum_seconds": 1.6696842919336632,
+            "peak_bytes": 54018048
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.5339816669002175,
+          "python_compute": 1.6124447090551257,
+          "speedup": 1.088800276011892,
+          "compute_speedup": 1.0511499217024294,
+          "memory_ratio": 0.2902638762511374,
+          "timing_only": false
+        },
+        "eigh512": {
+          "kestrel": {
+            "seconds": 1.4126201670151204,
+            "minimum_seconds": 1.4078089579707012,
+            "peak_bytes": 37421056
+          },
+          "python": {
+            "seconds": 1.5943546660710126,
+            "minimum_seconds": 1.5911621670238674,
+            "peak_bytes": 92127232
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.4056212509749457,
+          "python_compute": 1.528979291091673,
+          "speedup": 1.1286506474276796,
+          "compute_speedup": 1.087760511610909,
+          "memory_ratio": 0.4061888671527654,
+          "timing_only": false
+        },
+        "elementwisesum16m": {
+          "kestrel": {
+            "seconds": 0.7461800830205902,
+            "minimum_seconds": 0.7461119169602171,
+            "peak_bytes": 1153990656
+          },
+          "python": {
+            "seconds": 1.3876897499430925,
+            "minimum_seconds": 1.3834066250128672,
+            "peak_bytes": 796426240
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.7391811669804156,
+          "python_compute": 1.322314374963753,
+          "speedup": 1.8597249933630302,
+          "compute_speedup": 1.7888907808155605,
+          "memory_ratio": 1.4489611191112939,
+          "timing_only": false
+        },
+        "elementwisesum4m": {
+          "kestrel": {
+            "seconds": 1.0565533339977264,
+            "minimum_seconds": 1.0500483750365674,
+            "peak_bytes": 290111488
+          },
+          "python": {
+            "seconds": 1.4854177919914946,
+            "minimum_seconds": 1.4706070000538602,
+            "peak_bytes": 220397568
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.0495544179575518,
+          "python_compute": 1.420042417012155,
+          "speedup": 1.4059089533805693,
+          "compute_speedup": 1.35299551191979,
+          "memory_ratio": 1.3163098424026167,
+          "timing_only": false
+        },
+        "matmul1024": {
+          "kestrel": {
+            "seconds": 1.0571297500282526,
+            "minimum_seconds": 1.0380537499440834,
+            "peak_bytes": 43810816
+          },
+          "python": {
+            "seconds": 1.4505163750145584,
+            "minimum_seconds": 1.4314074580324814,
+            "peak_bytes": 158466048
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.050130833988078,
+          "python_compute": 1.385141000035219,
+          "speedup": 1.3721270969583368,
+          "compute_speedup": 1.3190175501988397,
+          "memory_ratio": 0.2764681555004136,
+          "timing_only": false
+        },
+        "matmul2048": {
+          "kestrel": {
+            "seconds": 1.3381545840529725,
+            "minimum_seconds": 1.3327569590182975,
+            "peak_bytes": 127926272
+          },
+          "python": {
+            "seconds": 1.4666518330341205,
+            "minimum_seconds": 1.4621785409981385,
+            "peak_bytes": 179585024
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.3311556680127978,
+          "python_compute": 1.401276458054781,
+          "speedup": 1.0960257137048834,
+          "compute_speedup": 1.0526766265786647,
+          "memory_ratio": 0.7123437642550862,
+          "timing_only": false
+        },
+        "matmul256": {
+          "kestrel": {
+            "seconds": 1.5344719999702647,
+            "minimum_seconds": 1.5296868339646608,
+            "peak_bytes": 12304384
+          },
+          "python": {
+            "seconds": 1.6559596250299364,
+            "minimum_seconds": 1.6500067500164732,
+            "peak_bytes": 37208064
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.52747308393009,
+          "python_compute": 1.590584250050597,
+          "speedup": 1.0791722658100154,
+          "compute_speedup": 1.0413173670845484,
+          "memory_ratio": 0.33069132540730956,
+          "timing_only": false
+        },
+        "matmul512": {
+          "kestrel": {
+            "seconds": 1.155226333066821,
+            "minimum_seconds": 1.1523237500805408,
+            "peak_bytes": 18612224
+          },
+          "python": {
+            "seconds": 1.5235158329596743,
+            "minimum_seconds": 1.522115541039966,
+            "peak_bytes": 66174976
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.1482274170266464,
+          "python_compute": 1.4581404579803348,
+          "speedup": 1.3188028954595779,
+          "compute_speedup": 1.2699056270196136,
+          "memory_ratio": 0.2812577370636296,
+          "timing_only": false
+        },
+        "matvec2048": {
+          "kestrel": {
+            "seconds": 1.7559999590739608,
+            "minimum_seconds": 1.7074551249388605,
+            "peak_bytes": 43204608
+          },
+          "python": {
+            "seconds": 1.8343423329060897,
+            "minimum_seconds": 1.8225108340848237,
+            "peak_bytes": 61227008
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.7490010430337861,
+          "python_compute": 1.7689669579267502,
+          "speedup": 1.0446141091446512,
+          "compute_speedup": 1.011415610626699,
+          "memory_ratio": 0.7056462402997057,
+          "timing_only": false
+        },
+        "matvec4096": {
+          "kestrel": {
+            "seconds": 1.615123875089921,
+            "minimum_seconds": 1.5894011249765754,
+            "peak_bytes": 143867904
+          },
+          "python": {
+            "seconds": 1.6665129580069333,
+            "minimum_seconds": 1.6661684169666842,
+            "peak_bytes": 161628160
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.6081249590497464,
+          "python_compute": 1.6011375830275938,
+          "speedup": 1.0318174250963574,
+          "compute_speedup": 0.9956549545588289,
+          "memory_ratio": 0.8901165737455651,
+          "timing_only": false
+        },
+        "qr1024": {
+          "kestrel": {
+            "seconds": 1.146338416961953,
+            "minimum_seconds": 1.1459235840011388,
+            "peak_bytes": 63864832
+          },
+          "python": {
+            "seconds": 1.5671692501055077,
+            "minimum_seconds": 1.56329037505202,
+            "peak_bytes": 213237760
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.1393395009217784,
+          "python_compute": 1.5017938751261681,
+          "speedup": 1.3671087236689217,
+          "compute_speedup": 1.3181267514302342,
+          "memory_ratio": 0.2995005762581637,
+          "timing_only": false
+        },
+        "qr512": {
+          "kestrel": {
+            "seconds": 1.0264927920652553,
+            "minimum_seconds": 1.0221291249617934,
+            "peak_bytes": 31080448
+          },
+          "python": {
+            "seconds": 1.5996423329925165,
+            "minimum_seconds": 1.5526887089945376,
+            "peak_bytes": 120471552
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.0194938760250807,
+          "python_compute": 1.534266958013177,
+          "speedup": 1.5583571023174074,
+          "compute_speedup": 1.5049300384178397,
+          "memory_ratio": 0.25798993608051135,
+          "timing_only": false
+        },
+        "randomnormal1m": {
+          "kestrel": {
+            "seconds": 0.8552339590387419,
+            "minimum_seconds": 0.8540854169987142,
+            "peak_bytes": 9764864
+          },
+          "python": {
+            "seconds": 1.7481536250561476,
+            "minimum_seconds": 1.743758583907038,
+            "peak_bytes": 88244224
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.8482350429985672,
+          "python_compute": 1.682778250076808,
+          "speedup": 2.0440647925405364,
+          "compute_speedup": 1.9838584410850029,
+          "memory_ratio": 0.11065725956182695,
+          "timing_only": true
+        },
+        "reductions2048": {
+          "kestrel": {
+            "seconds": 1.0237488750135526,
+            "minimum_seconds": 1.007579458062537,
+            "peak_bytes": 35340288
+          },
+          "python": {
+            "seconds": 1.106723958044313,
+            "minimum_seconds": 1.0564985839882866,
+            "peak_bytes": 61358080
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.016749958973378,
+          "python_compute": 1.0413485830649734,
+          "speedup": 1.081050231219704,
+          "compute_speedup": 1.0241933858708319,
+          "memory_ratio": 0.5759679572763685,
+          "timing_only": false
+        },
+        "reductions4096": {
+          "kestrel": {
+            "seconds": 1.037727708928287,
+            "minimum_seconds": 1.0349628330441192,
+            "peak_bytes": 136036352
+          },
+          "python": {
+            "seconds": 1.129523416981101,
+            "minimum_seconds": 1.1284285839647055,
+            "peak_bytes": 161726464
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.0307287928881124,
+          "python_compute": 1.0641480420017615,
+          "speedup": 1.0884583761838797,
+          "compute_speedup": 1.03242293156477,
+          "memory_ratio": 0.8411508459122683,
+          "timing_only": false
+        },
+        "solve1024": {
+          "kestrel": {
+            "seconds": 1.5406322500202805,
+            "minimum_seconds": 1.5336808749707416,
+            "peak_bytes": 28442624
+          },
+          "python": {
+            "seconds": 1.6154170839581639,
+            "minimum_seconds": 1.6137857909779996,
+            "peak_bytes": 47923200
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.5336333339801058,
+          "python_compute": 1.5500417089788243,
+          "speedup": 1.0485416516088761,
+          "compute_speedup": 1.0106990208384004,
+          "memory_ratio": 0.5935042735042735,
+          "timing_only": false
+        },
+        "solve512": {
+          "kestrel": {
+            "seconds": 1.4618467499967664,
+            "minimum_seconds": 1.4594824579544365,
+            "peak_bytes": 16449536
+          },
+          "python": {
+            "seconds": 1.6513374999631196,
+            "minimum_seconds": 1.6502001249464229,
+            "peak_bytes": 47874048
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 1.4548478339565918,
+          "python_compute": 1.58596212498378,
+          "speedup": 1.1296242235834724,
+          "compute_speedup": 1.0901223399223896,
+          "memory_ratio": 0.34360027378507874,
+          "timing_only": false
+        },
+        "stats2m": {
+          "kestrel": {
+            "seconds": 0.7038900000043213,
+            "minimum_seconds": 0.7031119579914957,
+            "peak_bytes": 65814528
+          },
+          "python": {
+            "seconds": 1.5013822499895468,
+            "minimum_seconds": 1.4738070000894368,
+            "peak_bytes": 141082624
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.6968910839641467,
+          "python_compute": 1.4360068750102073,
+          "speedup": 2.132978519342979,
+          "compute_speedup": 2.0605901094927574,
+          "memory_ratio": 0.46649634188828243,
+          "timing_only": false
+        },
+        "stats8m": {
+          "kestrel": {
+            "seconds": 0.8017275410238653,
+            "minimum_seconds": 0.801225500064902,
+            "peak_bytes": 257802240
+          },
+          "python": {
+            "seconds": 1.748939709039405,
+            "minimum_seconds": 1.7343460000120103,
+            "peak_bytes": 476741632
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.7947286249836907,
+          "python_compute": 1.6835643340600654,
+          "speedup": 2.181463925769445,
+          "compute_speedup": 2.118414111602706,
+          "memory_ratio": 0.5407588150388343,
+          "timing_only": false
+        },
+        "svd256": {
+          "kestrel": {
+            "seconds": 0.9485147501109168,
+            "minimum_seconds": 0.9429147499613464,
+            "peak_bytes": 17367040
+          },
+          "python": {
+            "seconds": 1.059867416974157,
+            "minimum_seconds": 1.0598582919919863,
+            "peak_bytes": 73383936
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.9415158340707421,
+          "python_compute": 0.9944920419948176,
+          "speedup": 1.1173968742712952,
+          "compute_speedup": 1.056266932543266,
+          "memory_ratio": 0.236659968743023,
+          "timing_only": false
+        },
+        "svd512": {
+          "kestrel": {
+            "seconds": 0.7619948340579867,
+            "minimum_seconds": 0.7612366669345647,
+            "peak_bytes": 44056576
+          },
+          "python": {
+            "seconds": 0.895892999949865,
+            "minimum_seconds": 0.8827906670048833,
+            "peak_bytes": 108855296
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.7549959180178121,
+          "python_compute": 0.8305176249705255,
+          "speedup": 1.1757205690999328,
+          "compute_speedup": 1.1000292917490075,
+          "memory_ratio": 0.4047260686333534,
+          "timing_only": false
+        },
+        "transposesum2048": {
+          "kestrel": {
+            "seconds": 0.1930312500335276,
+            "minimum_seconds": 0.19247862498741597,
+            "peak_bytes": 43761664
+          },
+          "python": {
+            "seconds": 0.3091198329348117,
+            "minimum_seconds": 0.3084109580377117,
+            "peak_bytes": 94699520
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.18603233399335295,
+          "python_compute": 0.24374445795547217,
+          "speedup": 1.601397871490345,
+          "compute_speedup": 1.3102263070256448,
+          "memory_ratio": 0.4621107266435986,
+          "timing_only": false
+        },
+        "transposesum4096": {
+          "kestrel": {
+            "seconds": 0.1681127909105271,
+            "minimum_seconds": 0.167511917068623,
+            "peak_bytes": 144375808
+          },
+          "python": {
+            "seconds": 0.28326574992388487,
+            "minimum_seconds": 0.2826917920028791,
+            "peak_bytes": 296337408
+          },
+          "kestrel_startup": 0.006998916040174663,
+          "python_startup": 0.06537537497933954,
+          "kestrel_compute": 0.16111387487035245,
+          "python_compute": 0.21789037494454533,
+          "speedup": 1.6849744055147142,
+          "compute_speedup": 1.3523998173334273,
+          "memory_ratio": 0.48720075192126944,
+          "timing_only": false
+        }
+      }
+    }
+  }
+}

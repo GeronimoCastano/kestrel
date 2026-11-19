@@ -1,0 +1,33 @@
+/// Doubles a number.
+///
+/// ```kestrel
+/// double(2)      // => 4
+/// double(-3)     // => -6
+/// ```
+public function double(n : Int) : Int = n * 2
+
+/// Describes a limit. A binding stays in scope for the lines below it.
+///
+/// ```kestrel
+/// let limit := 7
+/// limit + 1              // => 8
+/// describe(limit)        // => The limit is 7
+/// ```
+public function describe(limit : Int) : String = "The limit is " + limit.text()
+
+/// Reaches the private helper through a public function.
+///
+/// A snippet sees only the module's public names, so this fence is ignored.
+///
+/// ```kestrel ignore
+/// helper(1) // => 2
+/// ```
+public function documented() : Int = helper(1)
+
+// A private helper. Doctests see only the module's public names.
+function helper(n : Int) : Int = n + 1
+
+/// An ordinary documentation block runs nothing.
+///
+/// `ANSWER` is 42, and `double(ANSWER)` is 84.
+public const ANSWER : Int = 42

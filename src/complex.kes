@@ -1,0 +1,142 @@
+// Double-precision complex numbers. Licensed as part of Kestrel and loaded as
+// the virtual standard module `std.complex`.
+import std.math
+
+// A complex number is a pair of real components. It is immutable, so `re` and
+// `im` are final, and every operation returns a new value.
+public class Complex {
+    has (Addable, Subtractable, Multipliable, Divisible,
+        RightAddable[double], RightSubtractable[double],
+        RightMultipliable[double], RightDivisible[double],
+        Powerable, Negatable, Equals, Text)
+
+    public final re : double
+    public final im : double
+
+    new(re : double, im : double) {
+        this.re = re
+        this.im = im
+    }
+
+    public static function zero() : Complex = Complex(0.0, 0.0)
+    public static function one() : Complex = Complex(1.0, 0.0)
+    public static function i() : Complex = Complex(0.0, 1.0)
+
+    public function add(other : Complex) : Complex =
+        Complex(this.re + other.re, this.im + other.im)
+
+    public function add(other : double) : Complex =
+        Complex(this.re + other, this.im)
+
+    public function subtract(other : Complex) : Complex =
+        Complex(this.re - other.re, this.im - other.im)
+
+    public function subtract(other : double) : Complex =
+        Complex(this.re - other, this.im)
+
+    public function multiply(other : Complex) : Complex =
+        Complex(this.re * other.re - this.im * other.im,
+                this.re * other.im + this.im * other.re)
+
+    public function multiply(other : double) : Complex =
+        Complex(this.re * other, this.im * other)
+
+    public function divide(other : Complex) : Complex {
+        let a := this.re
+        let b := this.im
+        let c := other.re
+        let d := other.im
+        // Scale before combining: dividing the numerator and denominator by
+        // the larger component avoids overflow when both are near the double
+        // limit. The formulas are the same as Smith's algorithm.
+        if c.abs() >= d.abs() {
+            let q := d / c
+            let denominator := 1.0 + q * q
+            return Complex((a / c + (b / c) * q) / denominator,
+                           (b / c - (a / c) * q) / denominator)
+        }
+        let q := c / d
+        let denominator := 1.0 + q * q
+        return Complex(((a / d) * q + b / d) / denominator,
+                       ((b / d) * q - a / d) / denominator)
+    }
+
+    public function divide(other : double) : Complex =
+        Complex(this.re / other, this.im / other)
+
+    public function rightAdd(left : double) : Complex =
+        Complex(left + this.re, this.im)
+
+    public function rightSubtract(left : double) : Complex =
+        Complex(left - this.re, -this.im)
+
+    public function rightMultiply(left : double) : Complex =
+        Complex(left * this.re, left * this.im)
+
+    public function rightDivide(left : double) : Complex =
+        Complex(left, 0.0).divide(this)
+
+    public function power(exponent : Int) : Complex {
+        let mut power := exponent
+        let mut result := Complex(1.0, 0.0)
+        let mut base := this.copy()
+        if power < 0 {
+            base = Complex(1.0, 0.0).divide(base)
+            power = -power
+        }
+        while power > 0 {
+            if power % 2 == 1 {
+                result = result * base
+            }
+            base = base * base
+            power = power / 2
+        }
+        return result
+    }
+
+    public function conjugate() : Complex =
+        Complex(this.re, -this.im)
+
+    public function normSquared() : double =
+        this.re * this.re + this.im * this.im
+
+    // Hypot-style magnitude: scale by the larger component first so large and
+    // small components do not overflow or underflow.
+    public function abs() : double {
+        let x := this.re.abs()
+        let y := this.im.abs()
+        let large := if x > y then x else y
+        let small := if x > y then y else x
+        if !large.isFinite() { return large }
+        if large == 0.0 { return 0.0 }
+        let ratio := small / large
+        return large * (1.0 + ratio * ratio).sqrt()
+    }
+
+    public function arg() : double {
+        let angle := math.atan(this.im / this.re)
+        if this.re > 0.0 { return angle }
+        if this.re < 0.0 && this.im >= 0.0 { return angle + math.PI }
+        if this.re < 0.0 { return angle - math.PI }
+        if this.im > 0.0 { return math.PI / 2.0 }
+        if this.im < 0.0 { return -math.PI / 2.0 }
+        return 0.0
+    }
+
+    public function isFinite() : Bool =
+        this.re.isFinite() && this.im.isFinite()
+
+    public function copy() : Complex = Complex(this.re, this.im)
+
+    public function negate() : Complex = Complex(-this.re, -this.im)
+
+    public function equals(other : Complex) : Bool =
+        this.re == other.re && this.im == other.im
+
+    public function text() : String {
+        if this.im < 0.0 {
+            return this.re.text() + "-" + (-this.im).text() + "i"
+        }
+        return this.re.text() + "+" + this.im.text() + "i"
+    }
+}

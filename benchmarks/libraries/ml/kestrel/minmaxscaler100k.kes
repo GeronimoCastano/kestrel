@@ -1,0 +1,24 @@
+// MinMaxScaler fit and transform over 100,000 observations of 20 features,
+// repeated R times; the printed numbers sum the per-repetition checksums.
+import std.ml.{MinMaxScaler}
+
+import std.process.{args}
+
+let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 300 }) else 300
+
+let X := Tensor.generate((100000, 20), (i, j) => ((i * 13 + j * 7) % 100).toDouble() / 10.0)
+let maximums := X.max(axis = 0)
+let mut totalMinimums := 0.0
+let mut totalMaximums := 0.0
+let mut totalScales := 0.0
+let mut totalTransformed := 0.0
+for (step in range(REPETITIONS)) {
+    let scaler := MinMaxScaler.fit(X)
+    let transformed := scaler.transform(X)
+    let scales := scaler.ranges.map(value => 1.0 / value)
+    totalMinimums += scaler.minimums.sum()
+    totalMaximums += maximums.sum()
+    totalScales += scales.sum()
+    totalTransformed += transformed.sum()
+}
+print(f"{totalMinimums:.6f} {totalMaximums:.6f} {totalScales:.6f} {totalTransformed:.6f}")

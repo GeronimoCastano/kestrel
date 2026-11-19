@@ -1,0 +1,12 @@
+import std.prob.{Normal}
+import std.random
+
+let n := 1_000_000
+let reps := 300
+random.seed(42)
+let mut checksum := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    let x := Normal.sample(mean = 0.0, sigma = 1.0, shape = n)
+    checksum = checksum + x.sum()
+}
+print(f"{checksum:.6f}")

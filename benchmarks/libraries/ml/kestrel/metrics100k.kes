@@ -1,0 +1,31 @@
+// Binary classification metrics over 100,000 labels.
+// The metric computation repeats R times and the printed numbers add every
+// repetition.
+import std.ml.{accuracy, precision, recall, f1Score, confusionMatrix}
+
+import std.process.{args}
+
+let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 80 }) else 80
+
+let actual := Tensor.generate((100000,), i => if ((i * 1103515245 + 12345) % 2147483648) % 100 < 40 then 1.0 else 0.0)
+let predicted := Tensor.generate((100000,), i => if i % 17 == 0 then 1.0 - actual[i] else actual[i])
+let mut totalAccuracy := 0.0
+let mut totalPrecision := 0.0
+let mut totalRecall := 0.0
+let mut totalF1 := 0.0
+let mut totalTrueNegative := 0.0
+let mut totalFalsePositive := 0.0
+let mut totalFalseNegative := 0.0
+let mut totalTruePositive := 0.0
+for (step in range(REPETITIONS)) {
+    let (trueNegative, falsePositive, falseNegative, truePositive) := confusionMatrix(actual, predicted)
+    totalAccuracy += accuracy(actual, predicted)
+    totalPrecision += precision(actual, predicted)
+    totalRecall += recall(actual, predicted)
+    totalF1 += f1Score(actual, predicted)
+    totalTrueNegative += trueNegative
+    totalFalsePositive += falsePositive
+    totalFalseNegative += falseNegative
+    totalTruePositive += truePositive
+}
+print(f"{totalAccuracy:.6f} {totalPrecision:.6f} {totalRecall:.6f} {totalF1:.6f} {totalTrueNegative:.6f} {totalFalsePositive:.6f} {totalFalseNegative:.6f} {totalTruePositive:.6f}")

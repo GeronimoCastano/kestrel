@@ -1,0 +1,349 @@
+
+// Methods on the built-in types, written in Kestrel and loaded with the prelude.
+// Each `extend` function takes the receiver first: `xs.take(2)` calls `take(xs, 2)`.
+// New Lists share the cells of the old ones through slice, pick and `+`, so class items
+// are not copied.
+
+extend List {
+    public function take[T](xs : List[T], n : Int) : List[T] = xs.slice(0, n.max(0))
+
+    public function drop[T](xs : List[T], n : Int) : List[T] = xs.slice(n.max(0), xs.length())
+
+    public function concat[T](xs : List[T], ys : List[T]) : List[T] = xs + ys
+
+    public function takeWhile[T](xs : List[T], test : T -> Bool) : List[T] {
+        let mut count := 0
+        for (x in xs) {
+            if !test(x) {
+                break
+            }
+            count += 1
+        }
+        return xs.slice(0, count)
+    }
+
+    public function dropWhile[T](xs : List[T], test : T -> Bool) : List[T] {
+        let mut count := 0
+        for (x in xs) {
+            if !test(x) {
+                break
+            }
+            count += 1
+        }
+        return xs.slice(count, xs.length())
+    }
+
+    public function find[T](xs : List[T], test : T -> Bool) : Option[&T] = xs.filter(test).first()
+
+    public function findIndex[T](xs : List[T], test : T -> Bool) : Option[Int] {
+        let mut i := 0
+        for (x in xs) {
+            if test(x) {
+                return Some(i)
+            }
+            i += 1
+        }
+        return None
+    }
+
+    public function count[T](xs : List[T], test : T -> Bool) : Int {
+        let mut n := 0
+        for (x in xs) {
+            if test(x) {
+                n += 1
+            }
+        }
+        return n
+    }
+
+    public function partition[T](xs : List[T], test : T -> Bool) : (List[T], List[T]) {
+        let yes : Array[Int] = Array.empty()
+        let no : Array[Int] = Array.empty()
+        let mut i := 0
+        for (x in xs) {
+            if test(x) {
+                yes.append(i)
+            } else {
+                no.append(i)
+            }
+            i += 1
+        }
+        return (xs.pick(yes.toList()), xs.pick(no.toList()))
+    }
+
+    public function flatMap[T, U](xs : List[T], f : T -> List[U]) : List[U] {
+        let mut out : List[U] = []
+        for (x in xs) {
+            out = out + f(x)
+        }
+        return out
+    }
+
+    public function flatten[T](xss : List[List[T]]) : List[T] {
+        let mut out : List[T] = []
+        for (xs in xss) {
+            out = out + xs.slice(0, xs.length())
+        }
+        return out
+    }
+
+    public function distinct[T : Equals](xs : List[T]) : List[T] {
+        let kept : Array[Int] = Array.empty()
+        let mut i := 0
+        for (x in xs) {
+            let mut j := 0
+            let mut seen := false
+            for (y in xs) {
+                if j >= i {
+                    break
+                }
+                if y == x {
+                    seen = true
+                    break
+                }
+                j += 1
+            }
+            if !seen {
+                kept.append(i)
+            }
+            i += 1
+        }
+        return xs.pick(kept.toList())
+    }
+
+    public function chunks[T](xs : List[T], size : Int) : List[List[T]] {
+        if size < 1 {
+            return []
+        }
+        return [xs.slice(i, i + size) for i in range(0, xs.length(), size)]
+    }
+
+    public function windows[T](xs : List[T], size : Int) : List[List[T]] {
+        if size < 1 {
+            return []
+        }
+        return [xs.slice(i, i + size) for i in range(0, xs.length() - size + 1)]
+    }
+
+    public function groupBy[T, K : Equals + Copy](xs : List[T], key : T -> K) : Map[K, List[T]] {
+        let positions : MutMap[K, List[Int]] = MutMap()
+        let order : Array[K] = Array.empty()
+        let mut i := 0
+        for (x in xs) {
+            let k := key(x)
+            match positions.get(k) {
+                Some(found) => {
+                    positions.put(k, found + [i])
+                },
+                None => {
+                    order.append(k)
+                    positions.put(k, [i])
+                },
+            }
+            i += 1
+        }
+        let mut groups : Map[K, List[T]] = Map()
+        for (k in order) {
+            match positions.get(k) {
+                Some(found) => {
+                    groups = groups.put(k, xs.pick(found))
+                },
+                None => {},
+            }
+        }
+        return groups
+    }
+
+    public function binarySearch[T : Comparable](xs : List[T], target : T) : Option[Int] {
+        let mut low := 0
+        let mut high := xs.length()
+        while low < high {
+            let middle := low + (high - low) / 2
+            let order := match xs.slice(middle, middle + 1).first() {
+                Some(item) => item.compare(target),
+                None => 0,
+            }
+            if order == 0 {
+                return Some(middle)
+            }
+            if order < 0 {
+                low = middle + 1
+            } else {
+                high = middle
+            }
+        }
+        return None
+    }
+
+    public function scan[T, A : Copy](xs : List[T], initial : A, f : (A, T) -> A) : List[A] {
+        let out : Array[A] = Array.empty()
+        let mut acc := initial
+        out.append(acc)
+        for (x in xs) {
+            acc = f(acc, x)
+            out.append(acc)
+        }
+        return out.toList()
+    }
+
+    public function sortedBy[T, K : Comparable](xs : List[T], key : T -> K) : List[T] = xs.sorted(key = key)
+}
+
+extend Option {
+    public function map[T, U : Copy](o : Option[T], f : T -> U) : Option[U] = match o {
+        Some(v) => Some(f(v)),
+        None => None,
+    }
+
+    public function flatMap[T, U : Copy](o : Option[T], f : T -> Option[U]) : Option[U] = match o {
+        Some(v) => match f(v) {
+            Some(u) => Some(u),
+            None => None,
+        },
+        None => None,
+    }
+
+    public function filter[T : Copy](o : Option[T], test : T -> Bool) : Option[T] = match o {
+        Some(v) => if test(v) then Some(v) else None,
+        None => None,
+    }
+
+    public function unwrapOr[T : Copy](o : Option[T], fallback : T) : T = match o {
+        Some(v) => v,
+        None => fallback,
+    }
+
+    public function unwrapOrElse[T : Copy](o : Option[T], fallback : () -> T) : T = match o {
+        Some(v) => v,
+        None => fallback(),
+    }
+
+    public function orElse[T : Copy](o : Option[T], other : Option[T]) : Option[T] = match o {
+        Some(v) => Some(v),
+        None => match other {
+            Some(w) => Some(w),
+            None => None,
+        },
+    }
+
+    public function okOr[T : Copy](o : Option[T], message : String) : T or Error = match o {
+        Some(v) => v,
+        None => Error(message),
+    }
+}
+
+extend Map {
+    public function keys[K : Copy, V](m : Map[K, V]) : List[K] = [k for (k, v) in m]
+
+    public function values[K, V : Copy](m : Map[K, V]) : List[V] = [v for (k, v) in m]
+
+    public function entries[K : Copy, V : Copy](m : Map[K, V]) : List[(K, V)] = [(k, v) for (k, v) in m]
+
+    public function keep[K : Equals + Copy, V : Copy](m : Map[K, V], test : (K, V) -> Bool) : Map[K, V] {
+        let mut out : Map[K, V] = Map()
+        for ((k, v) in m) {
+            if test(k, v) {
+                out = out.put(k, v)
+            }
+        }
+        return out
+    }
+
+    public function mapValues[K : Equals + Copy, V, W : Copy](m : Map[K, V], f : V -> W) : Map[K, W] {
+        let mut out : Map[K, W] = Map()
+        for ((k, v) in m) {
+            out = out.put(k, f(v))
+        }
+        return out
+    }
+
+    public function merge[K : Equals + Copy, V : Copy](m : Map[K, V], other : Map[K, V]) : Map[K, V] {
+        let mut out : Map[K, V] = Map()
+        for ((k, v) in m) {
+            out = out.put(k, v)
+        }
+        for ((k, v) in other) {
+            out = out.put(k, v)
+        }
+        return out
+    }
+}
+
+extend Set {
+    public function union[T : Equals + Copy](s : Set[T], other : Set[T]) : Set[T] {
+        let mut out := s
+        for (x in other) {
+            out = out.add(x)
+        }
+        return out
+    }
+
+    public function intersection[T : Equals + Copy](s : Set[T], other : Set[T]) : Set[T] {
+        let mut out : Set[T] = Set()
+        for (x in s) {
+            if other.contains(x) {
+                out = out.add(x)
+            }
+        }
+        return out
+    }
+
+    public function difference[T : Equals + Copy](s : Set[T], other : Set[T]) : Set[T] {
+        let mut out : Set[T] = Set()
+        for (x in s) {
+            if !other.contains(x) {
+                out = out.add(x)
+            }
+        }
+        return out
+    }
+
+    public function isSubset[T : Equals + Copy](s : Set[T], other : Set[T]) : Bool {
+        for (x in s) {
+            if !other.contains(x) {
+                return false
+            }
+        }
+        return true
+    }
+
+    public function isDisjoint[T : Equals + Copy](s : Set[T], other : Set[T]) : Bool {
+        for (x in s) {
+            if other.contains(x) {
+                return false
+            }
+        }
+        return true
+    }
+}
+
+// A cursor owns its String and produces one shared slice per step.
+public class TextCursor {
+    has Iterator(Item = String), Iterable(Item = String)
+    private final source : String
+    private final grapheme : Bool
+    private var at : Int
+    new(source : String, grapheme : Bool) {
+        this.source = source
+        this.grapheme = grapheme
+        this.at = 0
+    }
+    public function items() : TextCursor = TextCursor(this.source, this.grapheme)
+    public mut function next() : Option[String] {
+        if this.at == this.source.byteLength() { return None }
+        let start := this.at
+        this.at = if this.grapheme then this.source.nextGraphemeBoundary(start) else this.source.nextCharBoundary(start)
+        return Some(this.source.byteSlice(start, this.at))
+    }
+}
+
+extend String {
+    public function chars(text : String) : TextCursor = TextCursor(text, false)
+    public function graphemes(text : String) : TextCursor = TextCursor(text, true)
+    public function graphemeLength(text : String) : Int {
+        let cursor := text.graphemes()
+        let mut count := 0
+        for (part in cursor) { count += 1 }
+        return count
+    }
+}

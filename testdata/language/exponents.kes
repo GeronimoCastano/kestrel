@@ -1,0 +1,4 @@
+let scale := 1e3
+let fraction := 2.5E-4
+print(scale)
+print(f"{fraction:.6f}")

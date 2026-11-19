@@ -1,0 +1,28 @@
+// Set theory is not separate from the rest of Kestrel. A class value can be an
+// element of a proof-level set, and a set can hold class values.
+class Dog {
+    public final name : String
+    new(name : String) { this.name = name }
+}
+
+theorem subsetRefl[U](A : Set[U]) : A ⊆ A by {
+    intro x
+    intro h
+    exact h
+}
+
+theorem dogInSet(d : Dog, A : Set[Dog], h : d ∈ A) : d ∈ A by {
+    exact h
+}
+
+theorem dogSubsetRefl(A : Set[Dog]) : A ⊆ A by {
+    exact subsetRefl(A)
+}
+
+theorem dogSubsetTrans(A : Set[Dog], B : Set[Dog], C : Set[Dog],
+                       h1 : A ⊆ B, h2 : B ⊆ C) : A ⊆ C by {
+    intro d
+    intro h3
+    have h4 := h1(h3)
+    exact h2(h4)
+}

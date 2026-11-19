@@ -1,0 +1,743 @@
+// std.toml: TOML 1.0 configuration text to a Toml value.
+//
+//     let config := toml.parse(fs.readFile("kestrel.toml")?)?
+//     let port := toml.getInt(config, "server.port").unwrapOr(8080)
+//
+// Tables keep their keys in the order the text gives them. Dates and times stay as their
+// text in TDateTime, so std.datetime can read them.
+
+import std.datetime
+
+public enum Toml {
+    TString(String)
+    TInt(Int)
+    TFloat(double)
+    TBool(Bool)
+    TDateTime(String)
+    TArray(List[Toml])
+    TTable(List[(String, Toml)])
+}
+
+class TomlReader {
+    public final text : String
+    public var at : Int
+    public var line : Int
+    public var declarations : Set[String]
+    public var closedTables : Set[String]
+    public var arrays : Map[String, Int]
+
+    new(text : String) {
+        this.text = text
+        this.at = 0
+        this.line = 1
+        this.declarations = Set()
+        this.closedTables = Set()
+        this.arrays = Map()
+    }
+
+    public function peek() : Int = if this.at < this.text.byteLength() then this.text.byteAt(this.at) else -1
+
+    public function peekAt(offset : Int) : Int =
+        if this.at + offset < this.text.byteLength() then this.text.byteAt(this.at + offset) else -1
+
+    public function startsWith(word : String) : Bool =
+        this.at + word.byteLength() <= this.text.byteLength() &&
+            this.text.byteSlice(this.at, this.at + word.byteLength()) == word
+
+    public function fail(what : String) : Error = Error(f"TOML line {this.line}: {what}.")
+
+    // Spaces and tabs.
+    public mut function skipBlank() : void {
+        while this.peek() == 32 || this.peek() == 9 {
+            this.at += 1
+        }
+    }
+
+    // Blanks, comments and line breaks, as between array items.
+    public mut function skipSpace() : void {
+        while true {
+            let b := this.peek()
+            if b == 32 || b == 9 || b == 13 {
+                this.at += 1
+            } else if b == 10 {
+                this.at += 1
+                this.line += 1
+            } else if b == 35 {
+                while this.peek() >= 0 && this.peek() != 10 {
+                    this.at += 1
+                }
+            } else {
+                break
+            }
+        }
+    }
+}
+
+function bareKeyByte(b : Int) : Bool = b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 95 || b == 45
+
+function hexDigit(b : Int) : Int =
+    if b >= 48 && b <= 57 then b - 48
+    else if b >= 97 && b <= 102 then b - 87
+    else if b >= 65 && b <= 70 then b - 55
+    else -1
+
+function readEscape(mut r : TomlReader, digits : Int) : String or Error {
+    let mut code := 0
+    for (i in range(digits)) {
+        let d := hexDigit(r.peek())
+        if d < 0 {
+            return r.fail("expected hex digits in a \\u escape")
+        }
+        code = code * 16 + d
+        r.at += 1
+    }
+    if code > 1114111 || code >= 55296 && code <= 57343 {
+        return r.fail("the escape is not a Unicode scalar value")
+    }
+    return code.chr()
+}
+
+// A "basic" string, or a """multi-line""" one when `multi` is set.
+function readBasic(mut r : TomlReader, multi : Bool) : String or Error {
+    let parts : Array[String] = Array.empty()
+    let mut start := r.at
+    while true {
+        let b := r.peek()
+        if b < 0 {
+            return r.fail("a string is never closed")
+        }
+        if b == 34 && (!multi || r.startsWith("\"\"\"")) {
+            parts.append(r.text.byteSlice(start, r.at))
+            r.at += if multi then 3 else 1
+            // A closing """ may be followed by up to two more quotes that belong to the text.
+            let mut extra := 0
+            while multi && r.peek() == 34 && extra < 2 {
+                parts.append("\"")
+                r.at += 1
+                extra += 1
+            }
+            break
+        }
+        if (b < 32 && b != 9 && b != 10 && b != 13) || b == 127 || (b == 13 && (!multi || r.peekAt(1) != 10)) { return r.fail("a string contains a control character") }
+        if b == 10 {
+            if !multi {
+                return r.fail("a line break inside a one-line string")
+            }
+            r.line += 1
+            r.at += 1
+        } else if b == 92 {
+            parts.append(r.text.byteSlice(start, r.at))
+            r.at += 1
+            let e := r.peek()
+            r.at += 1
+            if e == 34 {
+                parts.append("\"")
+            } else if e == 92 {
+                parts.append("\\")
+            } else if e == 98 {
+                parts.append(8.chr())
+            } else if e == 116 {
+                parts.append("\t")
+            } else if e == 110 {
+                parts.append("\n")
+            } else if e == 102 {
+                parts.append(12.chr())
+            } else if e == 114 {
+                parts.append("\r")
+            } else if e == 117 {
+                parts.append(readEscape(r, 4)?)
+            } else if e == 85 {
+                parts.append(readEscape(r, 8)?)
+            } else if multi && (e == 10 || e == 32 || e == 9 || e == 13) {
+                // A backslash at the end of a line joins it to the next text.
+                r.at -= 1
+                r.skipBlank()
+                if r.peek() != 10 && !r.startsWith("\r\n") { return r.fail("a continuation needs a line break") }
+                while r.peek() == 32 || r.peek() == 9 || r.peek() == 10 || r.peek() == 13 {
+                    if r.peek() == 10 { r.line += 1 }
+                    r.at += 1
+                }
+            } else {
+                return r.fail("unknown escape")
+            }
+            start = r.at
+        } else {
+            r.at += 1
+        }
+    }
+    return parts.join("").replace("\r\n", "\n")
+}
+
+// A 'literal' string, or a '''multi-line''' one: no escapes.
+function readLiteral(mut r : TomlReader, multi : Bool) : String or Error {
+    let start := r.at
+    while true {
+        let b := r.peek()
+        if b < 0 {
+            return r.fail("a string is never closed")
+        }
+        if b == 39 && (!multi || r.startsWith("'''")) {
+            let mut text := r.text.byteSlice(start, r.at)
+            r.at += if multi then 3 else 1
+            let mut extra := 0
+            while multi && r.peek() == 39 && extra < 2 { text = text + "'"; r.at += 1; extra += 1 }
+            return text.replace("\r\n", "\n")
+        }
+        if (b < 32 && b != 9 && b != 10 && b != 13) || b == 127 || (b == 13 && (!multi || r.peekAt(1) != 10)) { return r.fail("a string contains a control character") }
+        if b == 10 {
+            if !multi {
+                return r.fail("a line break inside a one-line string")
+            }
+            r.line += 1
+        }
+        r.at += 1
+    }
+    return ""
+}
+
+function readString(mut r : TomlReader) : String or Error {
+    if r.startsWith("\"\"\"") {
+        r.at += 3
+        // A line break right after the opening quotes is not part of the text.
+        if r.peek() == 10 {
+            r.at += 1
+            r.line += 1
+        } else if r.startsWith("\r\n") {
+            r.at += 2
+            r.line += 1
+        }
+        return readBasic(r, true)
+    }
+    if r.startsWith("'''") {
+        r.at += 3
+        if r.peek() == 10 {
+            r.at += 1
+            r.line += 1
+        } else if r.startsWith("\r\n") {
+            r.at += 2
+            r.line += 1
+        }
+        return readLiteral(r, true)
+    }
+    if r.peek() == 34 {
+        r.at += 1
+        return readBasic(r, false)
+    }
+    r.at += 1
+    return readLiteral(r, false)
+}
+
+// One key, or a dotted key such as `server."host name".port`, as its parts.
+function readKey(mut r : TomlReader) : List[String] or Error {
+    let mut parts : List[String] = []
+    while true {
+        r.skipBlank()
+        let b := r.peek()
+        if b == 34 || b == 39 {
+            if r.startsWith("\"\"\"") || r.startsWith("'''") {
+                return r.fail("a key cannot be a multi-line string")
+            }
+            parts = parts + [readString(r)?]
+        } else {
+            let start := r.at
+            while bareKeyByte(r.peek()) {
+                r.at += 1
+            }
+            if r.at == start {
+                return r.fail("expected a key")
+            }
+            parts = parts + [r.text.byteSlice(start, r.at)]
+        }
+        r.skipBlank()
+        if r.peek() != 46 {
+            break
+        }
+        r.at += 1
+    }
+    return parts
+}
+
+function digitsOnly(text : String) : Bool {
+    if text.isEmpty() {
+        return false
+    }
+    for (i in range(text.byteLength())) {
+        let b := text.byteAt(i)
+        if b < 48 || b > 57 {
+            return false
+        }
+    }
+    return true
+}
+
+function looksLikeDate(token : String) : Bool =
+    token.byteLength() >= 10 && digitsOnly(token.byteSlice(0, 4)) && token.byteAt(4) == 45 && token.byteAt(7) == 45 ||
+        token.byteLength() >= 8 && digitsOnly(token.byteSlice(0, 2)) && token.byteAt(2) == 58
+
+function validTime(text : String) : Bool {
+    let n := text.byteLength()
+    if n < 8 || text.byteAt(2) != 58 || text.byteAt(5) != 58 { return false }
+    if !digitsOnly(text.byteSlice(0, 2)) || !digitsOnly(text.byteSlice(3, 5)) || !digitsOnly(text.byteSlice(6, 8)) { return false }
+    let h := match parseInt(text.byteSlice(0, 2)) { value => value, _ => 99 }
+    let m := match parseInt(text.byteSlice(3, 5)) { value => value, _ => 99 }
+    let second := match parseInt(text.byteSlice(6, 8)) { value => value, _ => 99 }
+    if h > 23 || m > 59 || second > 59 { return false }
+    if n == 8 { return true }
+    return text.byteAt(8) == 46 && digitsOnly(text.byteSlice(9, n))
+}
+
+function validDate(text : String) : Bool {
+    let n := text.byteLength()
+    if n >= 8 && text.byteAt(2) == 58 { return validTime(text) }
+    if n < 10 { return false }
+    let date := text.byteSlice(0, 10)
+    let dateOk := match datetime.parse(date) { value => true, _ => false }
+    if !dateOk { return false }
+    if n == 10 { return true }
+    let separator := text.byteAt(10)
+    if separator != 84 && separator != 116 && separator != 32 { return false }
+    let mut end := n
+    if text.endsWith("Z") || text.endsWith("z") { end -= 1 }
+    else if n >= 25 && (text.byteAt(n - 6) == 43 || text.byteAt(n - 6) == 45) {
+        let zone := text.byteSlice(n - 6, n)
+        let ok := match datetime.parse(date + "T00:00:00" + zone) { value => true, _ => false }
+        if !ok { return false }
+        end -= 6
+    }
+    return validTime(text.byteSlice(11, end))
+}
+
+function validDecimal(token : String) : Bool {
+    let n := token.byteLength()
+    let mut at := if token.startsWith("+") || token.startsWith("-") then 1 else 0
+    for (i in range(n)) {
+        if token.byteAt(i) == 95 && (i == 0 || i + 1 == n || !digitsOnly(token.byteSlice(i - 1, i)) || !digitsOnly(token.byteSlice(i + 1, i + 2))) { return false }
+    }
+    let plain := token.replace("_", "")
+    let size := plain.byteLength()
+    let start := at
+    while at < size && digitsOnly(plain.byteSlice(at, at + 1)) { at += 1 }
+    if at == start || at - start > 1 && plain.byteAt(start) == 48 { return false }
+    if at < size && plain.byteAt(at) == 46 {
+        at += 1
+        let first := at
+        while at < size && digitsOnly(plain.byteSlice(at, at + 1)) { at += 1 }
+        if at == first { return false }
+    }
+    if at < size && (plain.byteAt(at) == 101 || plain.byteAt(at) == 69) {
+        at += 1
+        if at < size && (plain.byteAt(at) == 43 || plain.byteAt(at) == 45) { at += 1 }
+        let first := at
+        while at < size && digitsOnly(plain.byteSlice(at, at + 1)) { at += 1 }
+        if at == first { return false }
+    }
+    return at == size
+}
+
+function radixValue(mut r : TomlReader, digits : String, base : Int) : Int or Error {
+    if digits.isEmpty() || digits.startsWith("_") || digits.endsWith("_") || digits.contains("__") {
+        return r.fail("a number needs digits around each underscore")
+    }
+    let mut value := 0
+    for (i in range(digits.byteLength())) {
+        let b := digits.byteAt(i)
+        if b != 95 {
+            let d := hexDigit(b)
+            if d < 0 || d >= base {
+                return r.fail(f"`{digits}` has a digit outside base {base}")
+            }
+            value = value.checkedMultiply(base)?.checkedAdd(d)?
+        }
+    }
+    return value
+}
+
+function readScalar(mut r : TomlReader) : Toml or Error {
+    let start := r.at
+    while true {
+        let b := r.peek()
+        if b < 0 || b == 32 || b == 9 || b == 10 || b == 13 || b == 44 || b == 93 || b == 125 || b == 35 {
+            break
+        }
+        r.at += 1
+    }
+    let mut token := r.text.byteSlice(start, r.at)
+    if token.isEmpty() {
+        return r.fail("expected a value")
+    }
+    if token == "true" {
+        return TBool(true)
+    }
+    if token == "false" {
+        return TBool(false)
+    }
+    if looksLikeDate(token) {
+        // "1979-05-27 07:32:00Z" separates the date and the time with one space.
+        if token.byteLength() == 10 && r.peek() == 32 && r.peekAt(1) >= 48 && r.peekAt(1) <= 57 {
+            r.at += 1
+            let rest := r.at
+            while r.peek() > 32 && r.peek() != 44 && r.peek() != 93 && r.peek() != 125 && r.peek() != 35 {
+                r.at += 1
+            }
+            token = token + " " + r.text.byteSlice(rest, r.at)
+        }
+        if !validDate(token) { return r.fail("invalid date or time") }
+        return TDateTime(token)
+    }
+    let unsigned := if token.startsWith("+") || token.startsWith("-") then token.substring(1, token.length()) else token
+    let negative := token.startsWith("-")
+    if unsigned == "inf" || unsigned == "nan" {
+        let value := if unsigned == "inf" then 1.0 / 0.0 else 0.0 / 0.0
+        return TFloat(if negative then -value else value)
+    }
+    for ((prefix, base) in [("0x", 16), ("0o", 8), ("0b", 2)]) {
+        if token.startsWith(prefix) {
+            return TInt(radixValue(r, token.substring(2, token.length()), base)?)
+        }
+    }
+    let decimal := unsigned.replace("_", "")
+    if decimal.byteLength() > 1 && decimal.startsWith("0") && digitsOnly(decimal.byteSlice(1, 2)) { return r.fail(f"`{token}` has a leading zero") }
+    if !validDecimal(token) { return r.fail(f"`{token}` is not a TOML number") }
+    let plain := token.replace("_", "")
+    let isFloat := plain.contains(".") || (plain.contains("e") || plain.contains("E"))
+    if isFloat {
+        return match parseDouble(plain) {
+            x => TFloat(x),
+            _ => r.fail(f"`{token}` is not a number"),
+        }
+    }
+    if unsigned.length() > 1 && unsigned.startsWith("0") {
+        return r.fail(f"`{token}` has a leading zero")
+    }
+    return match parseInt(plain) {
+        n => TInt(n),
+        _ => r.fail(f"`{token}` is not a value"),
+    }
+}
+
+function readValue(mut r : TomlReader, depth : Int) : Toml or Error {
+    if depth > 256 {
+        return r.fail("values nest too deeply")
+    }
+    r.skipBlank()
+    let b := r.peek()
+    if b == 34 || b == 39 {
+        return TString(readString(r)?)
+    }
+    if b == 91 {
+        r.at += 1
+        let items : Array[Toml] = Array.empty()
+        while true {
+            r.skipSpace()
+            if r.peek() == 93 {
+                r.at += 1
+                break
+            }
+            let item := readValue(r, depth + 1)?
+            items.append(item)
+            r.skipSpace()
+            if r.peek() == 44 {
+                r.at += 1
+            } else if r.peek() == 93 {
+                r.at += 1
+                break
+            } else {
+                return r.fail("expected , or ] in an array")
+            }
+        }
+        return TArray(items.toList())
+    }
+    if b == 123 {
+        r.at += 1
+        let mut fields : List[(String, Toml)] = []
+        let mut closedTables : Set[String] = Set()
+        r.skipBlank()
+        if r.peek() == 125 {
+            r.at += 1
+            return TTable(fields)
+        }
+        while true {
+            let key := readKey(r)?
+            if r.peek() != 61 {
+                return r.fail("expected = in an inline table")
+            }
+            r.at += 1
+            let value := readValue(r, depth + 1)?
+            for (i in range(1, key.length() + 1)) { if closedTables.contains(joinKey(key.take(i))) { return r.fail("an inline table cannot be extended") } }
+            if match value { TTable(inner) => true, _ => false } { closedTables = closedTables.add(joinKey(key)) }
+            fields = setAt(r, fields, key, value)?
+            r.skipBlank()
+            if r.peek() == 44 {
+                r.at += 1
+            } else if r.peek() == 125 {
+                r.at += 1
+                break
+            } else {
+                return r.fail("expected , or } in an inline table")
+            }
+        }
+        return TTable(fields)
+    }
+    return readScalar(r)
+}
+
+function joinKey(path : List[String]) : String = path.join(".")
+
+// `table` with `value` stored at `path`, creating the tables on the way.
+function setAt(r : TomlReader, table : List[(String, Toml)], path : List[String], move value : Toml) : List[(String, Toml)] or Error {
+    let head := path.take(1).join("")
+    let rest := path.drop(1)
+    let mut index := 0
+    for ((key, existing) in table) {
+        if key == head {
+            if rest.isEmpty() {
+                return r.fail(f"`{head}` is defined twice")
+            }
+            let replaced := match existing {
+                TTable(inner) => TTable(setAt(r, inner, rest, value)?),
+                TArray(items) => {
+                    let last := items.drop(items.length() - 1)
+                    let changed := match last {
+                        [TTable(inner)] => TTable(setAt(r, inner, rest, value)?),
+                        _ => {
+                            return r.fail(f"`{head}` is an array of values, not of tables")
+                        },
+                    }
+                    TArray(items.take(items.length() - 1) + [changed])
+                },
+                _ => {
+                    return r.fail(f"`{head}` is a value, not a table")
+                },
+            }
+            return table.take(index) + [(head, replaced)] + table.drop(index + 1)
+        }
+        index += 1
+    }
+    if rest.isEmpty() {
+        return table + [(head, value)]
+    }
+    let fresh : List[(String, Toml)] = []
+    return table + [(head, TTable(setAt(r, fresh, rest, value)?))]
+}
+
+// `[a.b]` makes sure the table exists; a table made earlier by a dotted key may be reopened.
+function ensureTable(r : TomlReader, table : List[(String, Toml)], path : List[String]) : List[(String, Toml)] or Error {
+    let head := path.take(1).join("")
+    let rest := path.drop(1)
+    let mut index := 0
+    for ((key, existing) in table) {
+        if key == head {
+            let replaced := match existing {
+                TTable(inner) => if rest.isEmpty() then TTable(inner) else TTable(ensureTable(r, inner, rest)?),
+                TArray(items) => {
+                    if rest.isEmpty() {
+                        return r.fail(f"`{head}` is already an array of tables")
+                    }
+                    let last := items.drop(items.length() - 1)
+                    let changed := match last {
+                        [TTable(inner)] => TTable(ensureTable(r, inner, rest)?),
+                        _ => {
+                            return r.fail(f"`{head}` is not a table")
+                        },
+                    }
+                    TArray(items.take(items.length() - 1) + [changed])
+                },
+                _ => {
+                    return r.fail(f"`{head}` is a value, not a table")
+                },
+            }
+            return table.take(index) + [(head, replaced)] + table.drop(index + 1)
+        }
+        index += 1
+    }
+    let fresh : List[(String, Toml)] = []
+    let made := if rest.isEmpty() then TTable(fresh) else TTable(ensureTable(r, fresh, rest)?)
+    return table + [(head, made)]
+}
+
+// `[[a.b]]` adds a new empty table at the end of the array of tables at the path.
+function appendTable(r : TomlReader, table : List[(String, Toml)], path : List[String]) : List[(String, Toml)] or Error {
+    let head := path.take(1).join("")
+    let rest := path.drop(1)
+    let fresh : List[(String, Toml)] = []
+    let mut index := 0
+    for ((key, existing) in table) {
+        if key == head {
+            let replaced := match existing {
+                TArray(items) => {
+                    if rest.isEmpty() {
+                        TArray(items + [TTable(fresh)])
+                    } else {
+                        let last := items.drop(items.length() - 1)
+                        let changed := match last {
+                            [TTable(inner)] => TTable(appendTable(r, inner, rest)?),
+                            _ => {
+                                return r.fail(f"`{head}` is not an array of tables")
+                            },
+                        }
+                        TArray(items.take(items.length() - 1) + [changed])
+                    }
+                },
+                TTable(inner) => {
+                    if rest.isEmpty() {
+                        return r.fail(f"`{head}` is a table, not an array of tables")
+                    }
+                    TTable(appendTable(r, inner, rest)?)
+                },
+                _ => {
+                    return r.fail(f"`{head}` is a value, not a table")
+                },
+            }
+            return table.take(index) + [(head, replaced)] + table.drop(index + 1)
+        }
+        index += 1
+    }
+    let made := if rest.isEmpty() then TArray([TTable(fresh)]) else TTable(appendTable(r, fresh, rest)?)
+    return table + [(head, made)]
+}
+
+function endLine(mut r : TomlReader) : void or Error {
+    r.skipBlank()
+    if r.peek() == 35 {
+        while r.peek() >= 0 && r.peek() != 10 {
+            r.at += 1
+        }
+    }
+    if r.peek() == 13 {
+        r.at += 1
+    }
+    if r.peek() == 10 {
+        r.at += 1
+        r.line += 1
+    } else if r.peek() >= 0 {
+        return r.fail("expected the end of the line")
+    }
+}
+
+function tableId(r : TomlReader, path : List[String]) : String {
+    let mut id := ""
+    for (part in path) {
+        id = id + f"/{part.byteLength()}:{part}"
+        match r.arrays.get(id) { Some(n) => { id = id + f"[{n}]" }, None => {} }
+    }
+    return id
+}
+
+function checkSealed(r : TomlReader, path : List[String]) : void or Error {
+    for (i in range(1, path.length() + 1)) {
+        if r.closedTables.contains(tableId(r, path.take(i))) { return r.fail("an inline table cannot be extended") }
+    }
+}
+
+// Reads a whole document as a TTable.
+public function parse(text : String) : Toml or Error {
+    // Raw controls and bare CR are never valid anywhere in a TOML document.
+    for (i in range(text.byteLength())) {
+        let b := text.byteAt(i)
+        if (b < 32 && b != 9 && b != 10 && b != 13) || b == 127 || b == 13 && (i + 1 == text.byteLength() || text.byteAt(i + 1) != 10) { return Error("TOML contains an invalid control character.") }
+    }
+    let r := TomlReader(text)
+    let mut root : List[(String, Toml)] = []
+    let mut current : List[String] = []
+    while true {
+        r.skipSpace()
+        if r.peek() < 0 {
+            break
+        }
+        if r.peek() == 91 {
+            let array := r.peekAt(1) == 91
+            r.at += if array then 2 else 1
+            let path := readKey(r)?
+            if !r.startsWith(if array then "]]" else "]") {
+                return r.fail("expected ] after a table name")
+            }
+            r.at += if array then 2 else 1
+            checkSealed(r, path)?
+            let id := tableId(r, path)
+            if !array && r.declarations.contains(id) { return r.fail("a table is declared twice") }
+            if array {
+                // tableId has the existing generation only at the final component.
+                let parent := tableId(r, path.take(path.length() - 1))
+                let name := path.drop(path.length() - 1).join("")
+                let key := parent + f"/{name.byteLength()}:{name}"
+                let next := match r.arrays.get(key) { Some(n) => n + 1, None => 1 }
+                r.arrays = r.arrays.put(key, next)
+            } else { r.declarations = r.declarations.add(id) }
+            root = if array then appendTable(r, root, path)? else ensureTable(r, root, path)?
+            current = path
+        } else {
+            let key := readKey(r)?
+            if r.peek() != 61 {
+                return r.fail(f"expected = after `{joinKey(key)}`")
+            }
+            r.at += 1
+            let value := readValue(r, 0)?
+            let path := current + key
+            checkSealed(r, path)?
+            for (i in range(1, key.length())) { r.declarations = r.declarations.add(tableId(r, current + key.take(i))) }
+            if match value { TTable(fields) => true, _ => false } { r.closedTables = r.closedTables.add(tableId(r, path)) }
+            root = setAt(r, root, path, value)?
+        }
+        endLine(r)?
+    }
+    return TTable(root)
+}
+
+function find(value : Toml, parts : List[String], wanted : Int) : Option[String] {
+    match parts {
+        [] => {
+            return match value {
+                TString(s) => if wanted == 0 then Some(s) else None,
+                TInt(n) => if wanted == 1 || wanted == 2 then Some(f"{n}") else None,
+                TFloat(x) => if wanted == 2 then Some(f"{x}") else None,
+                TBool(b) => if wanted == 3 then Some(if b then "true" else "false") else None,
+                TDateTime(s) => if wanted == 0 then Some(s) else None,
+                _ => None,
+            }
+        },
+        [head, ..rest] => {
+            match value {
+                TTable(fields) => {
+                    for ((key, item) in fields) {
+                        // Keys are unique, so the first match decides. The test after the
+                        // call keeps it out of tail position, since `item` is a local view.
+                        if key == head {
+                            let found := find(item, rest, wanted)
+                            if found.isSome() {
+                                return found
+                            }
+                            return None
+                        }
+                    }
+                },
+                _ => {},
+            }
+            return None
+        },
+    }
+}
+
+// The String or date-time text at a dotted path such as "server.host".
+public function getString(doc : Toml, path : String) : Option[String] = find(doc, path.split("."), 0)
+
+public function getInt(doc : Toml, path : String) : Option[Int] = match find(doc, path.split("."), 1) {
+    Some(text) => match parseInt(text) {
+        n => Some(n),
+        _ => None,
+    },
+    None => None,
+}
+
+// A float, or an integer read as one.
+public function getFloat(doc : Toml, path : String) : Option[double] = match find(doc, path.split("."), 2) {
+    Some(text) => match parseDouble(text) {
+        x => Some(x),
+        _ => None,
+    },
+    None => None,
+}
+
+public function getBool(doc : Toml, path : String) : Option[Bool] = match find(doc, path.split("."), 3) {
+    Some(text) => Some(text == "true"),
+    None => None,
+}

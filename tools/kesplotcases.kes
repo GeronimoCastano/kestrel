@@ -1,0 +1,229 @@
+// Comparison cases for tools/compare_kesplot.py. Writes PNGs to
+// /tmp/kesplot-compare; Python creates that directory first.
+import std.kesplot as plt
+import std.kesdas.{Series, DataFrame}
+import std.math.{sin, cos, sqrt}
+
+function base() : plt.Figure {
+    let fig := plt.Figure(style = plt.Style.science())
+    fig.style.dpi = 150
+    fig
+}
+
+function line(out : String) : void or Error with Effects {
+    let xs := [i.toDouble() / 20.0 for i in range(101)]
+    let fig := base()
+    fig.plot(xs, [sin(x) for x in xs], label = "sin", marker = "o", markerSize = 3.0)
+    fig.plot(xs, [cos(x) for x in xs], label = "cos", lineStyle = "--")
+    fig.title("Line plot")
+    fig.xLabel("x")
+    fig.yLabel("value")
+    fig.legend("upper right")
+    fig.grid(true)
+    fig.save(out + "/kesplot-line.png")?
+}
+
+function scatter(out : String) : void or Error with Effects {
+    let n := 45
+    let xs := [i.toDouble() * 0.9 for i in range(n)]
+    let ys := [sin(i.toDouble() / 5.0) * 10.0 + i.toDouble() * 0.4 for i in range(n)]
+    let sizes := [20.0 + i.toDouble() * 2.0 for i in range(n)]
+    let fig := base()
+    fig.scatter(xs, ys, sizes, label = "points", marker = "o", alpha = 0.8)
+    fig.title("Scatter")
+    fig.xLabel("x")
+    fig.yLabel("y")
+    fig.legend("upper left")
+    fig.save(out + "/kesplot-scatter.png")?
+}
+
+function bars(out : String) : void or Error with Effects {
+    let frame := DataFrame([
+        Series(["alpha", "beta", "gamma", "delta"], name = "category"),
+        Series([12, 8, 15, 10], name = "north"),
+        Series([9, 14, 7, 12], name = "south"),
+    ])
+    let fig := base()
+    fig.barFrame(frame, x = "category", y = ["north", "south"])?
+    fig.title("Grouped bars")
+    fig.xLabel("category")
+    fig.yLabel("count")
+    fig.legend("upper right")
+    fig.save(out + "/kesplot-bars.png")?
+}
+
+function horizontal(out : String) : void or Error with Effects {
+    let fig := base()
+    fig.barh(["north", "south", "east", "west"], [12.0, -4.0, 9.0, 6.0], label = "profit")
+    fig.title("Horizontal bars")
+    fig.legend("lower right")
+    fig.save(out + "/kesplot-barh.png")?
+}
+
+function histogram(out : String) : void or Error with Effects {
+    let a := [sin(i.toDouble() * 0.7) * 2.0 + 0.5 * cos(i.toDouble() * 0.2) for i in range(200)]
+    let b := [cos(i.toDouble() * 0.45) * 1.5 - 0.3 for i in range(200)]
+    let fig := base()
+    fig.hist(a, bins = 18, label = "A", alpha = 0.55, color = "C0")
+    fig.hist(b, bins = 18, label = "B", alpha = 0.55, color = "C1", histType = "step")
+    fig.title("Histograms")
+    fig.xLabel("value")
+    fig.yLabel("count")
+    fig.legend("upper right")
+    fig.save(out + "/kesplot-hist.png")?
+}
+
+function boxCases(out : String) : void or Error with Effects {
+    let frame := DataFrame([
+        Series([1.0, 2.0, 2.2, 3.0, 4.0, 10.0, 2.5, 2.8], name = "A"),
+        Series([2.0, 3.0, 3.4, 4.0, 5.0, 6.0, 3.2, 3.8], name = "B"),
+        Series([0.5, 1.0, 1.1, 1.5, 2.0, 4.5, 1.2, 1.4], name = "C"),
+    ])
+    let fig := base()
+    fig.boxFrame(frame)?
+    fig.title("Box plots")
+    fig.yLabel("value")
+    fig.save(out + "/kesplot-box.png")?
+}
+
+function errors(out : String) : void or Error with Effects {
+    let xs := [0.0, 1.0, 2.0, 3.0, 4.0]
+    let ys := [1.0, 2.5, 2.0, 3.5, 3.0]
+    let err := [0.3, 0.5, 0.2, 0.6, 0.4]
+    let fig := base()
+    fig.errorBar(xs, ys, err, label = "measurement", marker = "o", capSize = 4.0)
+    fig.title("Error bars")
+    fig.xLabel("x")
+    fig.yLabel("y")
+    fig.legend()
+    fig.save(out + "/kesplot-errors.png")?
+}
+
+function fill(out : String) : void or Error with Effects {
+    let xs := [i.toDouble() / 10.0 for i in range(61)]
+    let mean := [sin(x) for x in xs]
+    let low := [sin(x) - 0.2 for x in xs]
+    let high := [sin(x) + 0.2 for x in xs]
+    let fig := base()
+    fig.fillBetween(xs, low, high, label = "band", alpha = 0.25, color = "C0")
+    fig.plot(xs, mean, label = "mean", color = "C0")
+    fig.title("Filled band")
+    fig.xLabel("x")
+    fig.legend("upper right")
+    fig.save(out + "/kesplot-fill.png")?
+}
+
+function pieCases(out : String) : void or Error with Effects {
+    let fig := base()
+    fig.pie([35.0, 25.0, 20.0, 12.0, 8.0], ["North", "South", "East", "West", "Other"], startAngle = 90.0, autoPercent = true, donut = 0.4)
+    fig.title("Share of sales")
+    fig.legend("outside right")
+    fig.save(out + "/kesplot-pie.png")?
+}
+
+function heatmap(out : String) : void or Error with Effects {
+    let matrix := [[sin(r.toDouble() * 0.8) * cos(c.toDouble() * 0.6) for c in range(6)] for r in range(7)]
+    let fig := base()
+    fig.heatmap(matrix, ["r" + r.text() for r in range(7)], ["c" + c.text() for c in range(6)], "viridis", true, "value")
+    fig.title("Heatmap")
+    fig.save(out + "/kesplot-heatmap.png")?
+}
+
+function contour(out : String) : void or Error with Effects {
+    let matrix := [[sin(r.toDouble() / 3.0) * cos(c.toDouble() / 4.0) for c in range(40)] for r in range(24)]
+    let fig := base()
+    fig.contour(matrix, 7, "viridis", 1.0, [], [], true, "z")
+    fig.title("Contour lines")
+    fig.save(out + "/kesplot-contour.png")?
+}
+
+function logarithmic(out : String) : void or Error with Effects {
+    let xs := [1.0 + i.toDouble() * 2.0 for i in range(40)]
+    let ys := [10.0 * (1.15 ** i.toDouble()) for i in range(40)]
+    let fig := base()
+    fig.plot(xs, ys, label = "growth", marker = "o")
+    fig.yScale("log")
+    fig.title("Log y")
+    fig.xLabel("x")
+    fig.yLabel("count")
+    fig.legend("upper left")
+    fig.grid(true)
+    fig.save(out + "/kesplot-log.png")?
+}
+
+function mathCases(out : String) : void or Error with Effects {
+    let xs := [i.toDouble() / 20.0 for i in range(101)]
+    let fig := base()
+    fig.plot(xs, [sin(x) for x in xs], label = "$\\sin(\\pi x)$")
+    fig.plot(xs, [cos(x) for x in xs], label = "$\\cos(\\pi x)$", lineStyle = "--")
+    fig.title("TeX: $\\frac{a}{b} + x^2$")
+    fig.xLabel("$\\theta$ (rad)")
+    fig.yLabel("$\\sqrt{y}$")
+    fig.legend("upper right")
+    fig.save(out + "/kesplot-math.png")?
+}
+
+function panels(out : String) : void or Error with Effects {
+    let xs := [i.toDouble() for i in range(30)]
+    let fig := base()
+    fig.subplots(2, 2)
+    fig.plot(xs, [x * x for x in xs], label = "square")
+    fig.title("Line")
+    fig.legend()
+    fig.nextPanel()
+    fig.scatter(xs, [sin(x / 3.0) for x in xs], label = "scatter")
+    fig.title("Scatter")
+    fig.nextPanel()
+    fig.bar(["A", "B", "C", "D"], [3.0, 7.0, 2.0, 5.0], label = "counts")
+    fig.title("Bars")
+    fig.nextPanel()
+    fig.hist([sin(i.toDouble() * 0.6) for i in range(100)], bins = 12, label = "hist")
+    fig.title("Histogram")
+    fig.figureTitleText("Panels")
+    fig.save(out + "/kesplot-panels.png")?
+}
+
+function inverted(out : String) : void or Error with Effects {
+    let xs := [i.toDouble() / 10.0 for i in range(51)]
+    let fig := base()
+    fig.plot(xs, [sin(x) for x in xs], label = "signal")
+    fig.xLimits(5.0, 0.0)
+    fig.title("Inverted x")
+    fig.xLabel("x")
+    fig.legend("upper right")
+    fig.save(out + "/kesplot-inverted.png")?
+}
+
+function annotations(out : String) : void or Error with Effects {
+    let xs := [i.toDouble() / 10.0 for i in range(61)]
+    let fig := base()
+    fig.plot(xs, [sin(x) for x in xs], label = "signal")
+    fig.hLine(0.0, label = "zero", color = "C3", lineStyle = "--")
+    fig.annotate("peak", 1.57, 1.0, 3.0, 0.7, color = "C3")
+    fig.title("Annotations")
+    fig.xLabel("x")
+    fig.legend("lower left")
+    fig.save(out + "/kesplot-annotations.png")?
+}
+
+function main() : void or Error with Effects {
+    let out := "/tmp/kesplot-compare"
+    line(out)?
+    scatter(out)?
+    bars(out)?
+    horizontal(out)?
+    histogram(out)?
+    boxCases(out)?
+    errors(out)?
+    fill(out)?
+    pieCases(out)?
+    heatmap(out)?
+    contour(out)?
+    logarithmic(out)?
+    mathCases(out)?
+    panels(out)?
+    annotations(out)?
+    inverted(out)?
+    print("kesplot comparison cases written")
+}
+main()

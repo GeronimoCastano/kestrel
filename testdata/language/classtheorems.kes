@@ -1,0 +1,21 @@
+// Readable records and classes reduce by their declared fields and pure methods.
+record Point(x : Int, y : Int)
+
+class Square {
+    public final side : Int
+    new(side : Int) { this.side = side }
+
+    public function area() : Int = this.side * this.side
+    public function scaled(k : Int) : Square = Square(this.side * k)
+}
+
+theorem pointX(p : Point) : p.x = p.x { rfl }
+
+theorem squareArea(s : Square) : s.area() = s.side * s.side { rfl }
+
+theorem areaScales(s : Square, k : Int) :
+    s.scaled(k).area() = k * k * s.area() { smt }
+
+function side(s : Square) : Int = s.side
+
+theorem constructorField() : side(Square(3)) = 3 { rfl }

@@ -1,0 +1,23 @@
+// MLP training benchmark: 784 -> 256 -> 10, Adam, MSE against a fixed target.
+import std.kesnet.{Linear, ReLU, Sequential, mseLoss}
+import std.kesnet.optim.{Adam}
+
+Variable.seed(1)
+let features := Tensor.generate((128, 784), (i, j) => (((i * 37 + j * 17) % 101).toDouble() - 50.0) / 50.0)
+let targets := Tensor.generate((128, 10), (i, j) => (((i * 53 + j * 29) % 97).toDouble() - 48.0) / 48.0)
+let inputs := Variable.fromTensor(features)
+let expected := Variable.fromTensor(targets)
+
+let model := Sequential([box(Linear(784, 256)), box(ReLU()), box(Linear(256, 10))])
+let mut optimizer := Adam(model.parameters(), 0.001)
+let mut finalLoss := 0.0
+
+for (step in range(1000)) {
+    let loss := mseLoss(model.forward(inputs), expected)
+    optimizer.zeroGrad()
+    loss.backward()
+    optimizer.step()
+    finalLoss = loss.item()
+}
+
+print(f"{finalLoss:.6f}")

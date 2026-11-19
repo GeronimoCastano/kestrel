@@ -1,0 +1,26 @@
+// A case declares its payloads by name. Construction and patterns may then use
+// the names in any order, and the positional forms stay legal.
+enum Move {
+    Jump(height : Int, speed : Int)
+    Wait
+}
+
+function describe(m : Move) : String = match m {
+    Jump(speed = s, height = h) => f"jump {h} by {s}",
+    Wait => "wait",
+}
+
+function total(m : Move) : Int = match m {
+    Jump(h, s) => h + s,
+    Wait => 0,
+}
+
+print(describe(Jump(height = 2, speed = 3)))
+print(describe(Jump(2, 3)))
+print(total(Jump(speed = 3, height = 2)))
+
+// The labels carry no run-time meaning: equality, hashing and ordering stay
+// positional, so the three constructions above are one value.
+let seen := Set(Jump(2, 3), Jump(height = 2, speed = 3), Jump(speed = 3, height = 2))
+print(seen.length())
+print(seen.contains(Jump(height = 2, speed = 3)))

@@ -1,0 +1,4 @@
+// Lazy filter/map pipeline over the integers from 0 to n - 1.
+let n := 5000000
+let total := range(n).filter(x => x % 2 == 0).map(x => x * 2).map(x => x + 7).filter(x => x % 3 == 0).sum()
+print(total)

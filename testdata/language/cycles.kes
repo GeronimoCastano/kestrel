@@ -1,0 +1,4 @@
+import testdata.language.cycleeven as cycle
+
+print(cycle.even(2000000).text())
+print(cycle.relay("heap" + " value", 100000))

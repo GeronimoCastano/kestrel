@@ -1,0 +1,21 @@
+class Label {
+    public final value : String
+    new(value : String) {this.value=value}
+}
+
+class Holder {
+    public final label : Label
+    new(move label : Label) {this.label=label}
+}
+
+function pick(other : Bool) : String {
+    let left := Holder(Label("left" + " value"))
+    let right := Holder(Label("right" + " value"))
+    let mut view := left.label
+    let before := view
+    if other {view=right.label}
+    before.value + " | " + view.value
+}
+
+print(pick(false))
+print(pick(true))

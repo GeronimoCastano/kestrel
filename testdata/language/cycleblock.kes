@@ -1,0 +1,11 @@
+import testdata.language.cycleexpr.{Expr, eval}
+
+public enum Block {
+    Done
+    Then(Expr, Block)
+}
+
+public function sum(b : Block) : Int = match b {
+    Done          => 0,
+    Then(e, rest) => eval(e) + sum(rest),
+}

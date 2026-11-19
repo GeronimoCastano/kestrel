@@ -1,0 +1,242 @@
+{
+  "rows": 1000000,
+  "runs": 3,
+  "reps": 1,
+  "data": "benchmarks/build/kesdas-data-1000000.csv",
+  "load": {
+    "kestrel": {
+      "cpu": 0.31000000000000005,
+      "wall": 0.32312629104126245,
+      "rss": 339755008,
+      "checksum": "11005732.0"
+    },
+    "pandas": {
+      "cpu": 0.5499999999999999,
+      "wall": 0.5702475419966504,
+      "rss": 221921280,
+      "checksum": "11005732.0"
+    }
+  },
+  "pipelines": [
+    {
+      "pipeline": "filter_sort",
+      "kestrel": {
+        "cpu": 0.33999999999999997,
+        "wall": 0.3622359170112759,
+        "rss": 455786496,
+        "checksum": "15183.470000000007"
+      },
+      "pandas": {
+        "cpu": 0.57,
+        "wall": 0.5908749169902876,
+        "rss": 254853120,
+        "checksum": "15183.47"
+      },
+      "kestrel_compute": 0.029999999999999916,
+      "pandas_compute": 0.020000000000000018,
+      "kestrel_total": 0.33999999999999997,
+      "pandas_total": 0.57,
+      "speed_ratio_total": 1.6764705882352942,
+      "speed_ratio_compute": 0.6666666666666692,
+      "memory_ratio": 0.5591502210719292
+    },
+    {
+      "pipeline": "groupby_agg",
+      "kestrel": {
+        "cpu": 0.37,
+        "wall": 0.3910240000113845,
+        "rss": 350601216,
+        "checksum": "10005848.043288654"
+      },
+      "pandas": {
+        "cpu": 0.57,
+        "wall": 0.5912541249999776,
+        "rss": 244809728,
+        "checksum": "10005848.043288654"
+      },
+      "kestrel_compute": 0.05999999999999994,
+      "pandas_compute": 0.020000000000000018,
+      "kestrel_total": 0.37,
+      "pandas_total": 0.57,
+      "speed_ratio_total": 1.5405405405405403,
+      "speed_ratio_compute": 0.3333333333333339,
+      "memory_ratio": 0.6982569278938268
+    },
+    {
+      "pipeline": "groupby_two_keys",
+      "kestrel": {
+        "cpu": 0.36,
+        "wall": 0.37238487508147955,
+        "rss": 406568960,
+        "checksum": "14505417.790000003"
+      },
+      "pandas": {
+        "cpu": 0.59,
+        "wall": 0.6090241250349209,
+        "rss": 268795904,
+        "checksum": "14505417.790000001"
+      },
+      "kestrel_compute": 0.04999999999999993,
+      "pandas_compute": 0.040000000000000036,
+      "kestrel_total": 0.36,
+      "pandas_total": 0.59,
+      "speed_ratio_total": 1.6388888888888888,
+      "speed_ratio_compute": 0.8000000000000018,
+      "memory_ratio": 0.6611323796091074
+    },
+    {
+      "pipeline": "pivot",
+      "kestrel": {
+        "cpu": 0.32999999999999996,
+        "wall": 0.3417905840324238,
+        "rss": 359186432,
+        "checksum": "10005732.0"
+      },
+      "pandas": {
+        "cpu": 0.59,
+        "wall": 0.6093731669243425,
+        "rss": 265240576,
+        "checksum": "10005732.0"
+      },
+      "kestrel_compute": 0.019999999999999907,
+      "pandas_compute": 0.040000000000000036,
+      "kestrel_total": 0.32999999999999996,
+      "pandas_total": 0.59,
+      "speed_ratio_total": 1.787878787878788,
+      "speed_ratio_compute": 2.000000000000011,
+      "memory_ratio": 0.7384482050814214
+    },
+    {
+      "pipeline": "merge",
+      "kestrel": {
+        "cpu": 0.61,
+        "wall": 0.6275817499263212,
+        "rss": 893943808,
+        "checksum": "10192166.450000014"
+      },
+      "pandas": {
+        "cpu": 0.7,
+        "wall": 0.7219457080354914,
+        "rss": 433012736,
+        "checksum": "10192166.45"
+      },
+      "kestrel_compute": 0.29999999999999993,
+      "pandas_compute": 0.15000000000000002,
+      "kestrel_total": 0.61,
+      "pandas_total": 0.7,
+      "speed_ratio_total": 1.1475409836065573,
+      "speed_ratio_compute": 0.5000000000000002,
+      "memory_ratio": 0.48438473662988896
+    },
+    {
+      "pipeline": "missing_fill",
+      "kestrel": {
+        "cpu": 0.41,
+        "wall": 0.4312464169925079,
+        "rss": 460177408,
+        "checksum": "1000140.5316641211"
+      },
+      "pandas": {
+        "cpu": 0.59,
+        "wall": 0.6154775830218568,
+        "rss": 259571712,
+        "checksum": "1000140.5316641211"
+      },
+      "kestrel_compute": 0.09999999999999992,
+      "pandas_compute": 0.040000000000000036,
+      "kestrel_total": 0.41,
+      "pandas_total": 0.59,
+      "speed_ratio_total": 1.4390243902439024,
+      "speed_ratio_compute": 0.4000000000000007,
+      "memory_ratio": 0.5640687862712287
+    },
+    {
+      "pipeline": "value_counts",
+      "kestrel": {
+        "cpu": 0.29000000000000004,
+        "wall": 0.3139133749064058,
+        "rss": 322764800,
+        "checksum": "1000000.0"
+      },
+      "pandas": {
+        "cpu": 0.55,
+        "wall": 0.575438458006829,
+        "rss": 210878464,
+        "checksum": "1000000.0"
+      },
+      "kestrel_compute": 0.0,
+      "pandas_compute": 1.1102230246251565e-16,
+      "kestrel_total": 0.29000000000000004,
+      "pandas_total": 0.55,
+      "speed_ratio_total": 1.896551724137931,
+      "speed_ratio_compute": 1.1102230246251564e-07,
+      "memory_ratio": 0.6533502538071067
+    },
+    {
+      "pipeline": "rolling",
+      "kestrel": {
+        "cpu": 0.35,
+        "wall": 0.3710722919786349,
+        "rss": 407224320,
+        "checksum": "14504696.93840104"
+      },
+      "pandas": {
+        "cpu": 0.58,
+        "wall": 0.6022515830118209,
+        "rss": 276217856,
+        "checksum": "14504696.9384"
+      },
+      "kestrel_compute": 0.039999999999999925,
+      "pandas_compute": 0.030000000000000027,
+      "kestrel_total": 0.35,
+      "pandas_total": 0.58,
+      "speed_ratio_total": 1.657142857142857,
+      "speed_ratio_compute": 0.7500000000000021,
+      "memory_ratio": 0.6782941058137196
+    },
+    {
+      "pipeline": "corr",
+      "kestrel": {
+        "cpu": 0.31,
+        "wall": 0.33303716604132205,
+        "rss": 281919488,
+        "checksum": "3.0020645343828911"
+      },
+      "pandas": {
+        "cpu": 0.56,
+        "wall": 0.583296374999918,
+        "rss": 241516544,
+        "checksum": "3.002064534382891"
+      },
+      "kestrel_compute": 0.0,
+      "pandas_compute": 0.01000000000000012,
+      "kestrel_total": 0.31,
+      "pandas_total": 0.56,
+      "speed_ratio_total": 1.806451612903226,
+      "speed_ratio_compute": 10000000.00000012,
+      "memory_ratio": 0.8566862323473006
+    },
+    {
+      "pipeline": "melt",
+      "kestrel": {
+        "cpu": 0.41,
+        "wall": 0.4348634999478236,
+        "rss": 618823680,
+        "checksum": "14505417.790000256"
+      },
+      "pandas": {
+        "cpu": 0.57,
+        "wall": 0.5945362080819905,
+        "rss": 314392576,
+        "checksum": "14505417.79"
+      },
+      "kestrel_compute": 0.09999999999999992,
+      "pandas_compute": 0.020000000000000018,
+      "kestrel_total": 0.41,
+      "pandas_total": 0.57,
+      "speed_ratio_total": 1.3902439024390243,
+      "speed_ratio_compute": 0.20000000000000034,
+      "memory_ratio": 0.5080487159120995
+    }
+  ]
+}

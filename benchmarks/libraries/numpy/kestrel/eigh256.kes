@@ -1,0 +1,15 @@
+import std.linalg
+
+let n := 256
+let reps := 460
+let A := Tensor.generate((n, n), (i, j) => if i == j then 2.0 else 0.01)
+let mut valuesTotal := 0.0
+let mut residualTotal := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    let eig := linalg.eigh(A)
+    valuesTotal = valuesTotal + eig.values.sum()
+    let W := Tensor.generate((n, n), (i, j) => if i == j then eig.values[i] else 0.0)
+    residualTotal = residualTotal + (A @ eig.vectors - eig.vectors @ W).norm()
+}
+print(f"{valuesTotal:.6f}")
+print(f"{residualTotal:.6f}")

@@ -1,0 +1,242 @@
+// The propositional order on Nat. Comparisons follow the constructors in the
+// kernel, so these are ordinary inductions; no solver is involved.
+
+import nat.{addComm, addAssoc, addZeroR, addZeroL, addSuccR, mulComm, mulSuccR, mulZeroR, subNat}
+
+/// Order is reflexive: $a \le a$.
+public theorem leRefl(a : Nat) : a <= a by {
+    rfl
+}
+
+/// Only zero is below zero: $a \le 0 \leftrightarrow a = 0$.
+public theorem leZero(a : Nat) : (a <= 0) ↔ a = 0 by {
+    constructor
+    { intro h
+      cases a {
+        Zero => { rfl }
+        Succ(k) => { exact absurd(h) }
+      } }
+    { intro h
+      rw [h]
+      rfl }
+}
+
+/// A number is below its successor: $a \le \mathrm{Succ}(a)$.
+public theorem leSucc(a : Nat) : a <= Succ(a) by {
+    induction a {
+        Zero => { rfl }
+        Succ(k) ih => { exact ih }
+    }
+}
+
+/// Order is transitive: $a \le b \to b \le c \to a \le c$.
+public theorem leTrans(a : Nat, b : Nat, c : Nat) :
+        a <= b -> b <= c -> a <= c by {
+    induction a generalizing b, c {
+        Zero => {
+            intro b
+            intro c
+            intro h1
+            intro h2
+            rfl
+        }
+        Succ(k) ih => {
+            intro b
+            intro c
+            intro h1
+            intro h2
+            cases b {
+                Zero => { exact absurd(h1) }
+                Succ(j) => {
+                    cases c {
+                        Zero => { exact absurd(h2) }
+                        Succ(l) => { exact ih(j, l, h1, h2) }
+                    }
+                }
+            }
+        }
+    }
+}
+
+/// Order is antisymmetric: $a \le b \to b \le a \to a = b$.
+public theorem leAntisymm(a : Nat, b : Nat) : a <= b -> b <= a -> a = b by {
+    induction a generalizing b {
+        Zero => {
+            intro b
+            intro h1
+            intro h2
+            cases b {
+                Zero => { rfl }
+                Succ(j) => { exact absurd(h2) }
+            }
+        }
+        Succ(k) ih => {
+            intro b
+            intro h1
+            intro h2
+            cases b {
+                Zero => { exact absurd(h1) }
+                Succ(j) => {
+                    have heq := ih(j, h1, h2)
+                    rw [heq]
+                    rfl
+                }
+            }
+        }
+    }
+}
+
+/// Order is total: $a \le b \lor b \le a$.
+public theorem leTotal(a : Nat, b : Nat) : a <= b or b <= a by {
+    induction a generalizing b {
+        Zero => {
+            intro b
+            left
+            rfl
+        }
+        Succ(k) ih => {
+            intro b
+            induction b {
+                Zero => { right
+                          rfl }
+                Succ(j) ihb => {
+                    have h := ih(j)
+                    exact h
+                }
+            }
+        }
+    }
+}
+
+/// A number is strictly below its successor: $a < \mathrm{Succ}(a)$.
+public theorem ltSuccSelf(a : Nat) : a < Succ(a) by {
+    rfl
+}
+
+/// Addition is monotone on the left: $a \le b \to a + c \le b + c$.
+public theorem leAddMono(a : Nat, b : Nat, c : Nat) : a <= b -> a + c <= b + c by {
+    intro h
+    induction c {
+        Zero => {
+            have ha := addZeroR(a)
+            rw [ha]
+            exact h
+        }
+        Succ(k) ih => {
+            have ha := addSuccR(a, k)
+            rw [ha]
+            exact ih
+        }
+    }
+}
+
+/// Addition is monotone on the right: $a \le b \to c + a \le c + b$.
+public theorem leAddMonoR(a : Nat, b : Nat, c : Nat) : a <= b -> c + a <= c + b by {
+    intro h
+    have hm := leAddMono(a, b, c)
+    have h1 := hm(h)
+    have hc := addComm(a, c)
+    have hac := symm(hc)
+    rw [hac]
+    have hd := addComm(b, c)
+    have hbd := symm(hd)
+    rw [hbd]
+    exact h1
+}
+
+/// Multiplication is monotone: $a \le b \to a \cdot c \le b \cdot c$.
+public theorem leMulMono(a : Nat, b : Nat, c : Nat) :
+        a <= b -> a * c <= b * c by {
+    intro h
+    induction c {
+        Zero => {
+            have ha := mulZeroR(a)
+            rw [ha]
+            rfl
+        }
+        Succ(k) ih => {
+            have hm := leAddMono(a, b, a * k)
+            have h1 := hm(h)
+            have hm2 := leAddMonoR(a * k, b * k, b)
+            have h2 := hm2(ih)
+            have ht := leTrans(a + a * k, b + a * k, b + b * k)
+            have ht1 := ht(h1)
+            have ht2 := ht1(h2)
+            have m1 := mulSuccR(a, k)
+            rw [m1]
+            have m2 := mulSuccR(b, k)
+            rw [m2]
+            exact ht2
+        }
+    }
+}
+
+/// Truncated subtraction characterizes order: $b \le a \leftrightarrow \mathrm{subNat}(a,b) + b = a$.
+public theorem leOfSubNat(a : Nat, b : Nat) :
+        (b <= a) ↔ (subNat(a, b) + b = a) by {
+    induction b generalizing a {
+        Zero => {
+            intro a
+            constructor
+            { intro h
+              simp [addZeroR] }
+            { intro h
+              rfl }
+        }
+        Succ(k) ih => {
+            intro a
+            constructor
+            { intro h
+              cases a {
+                Zero => { exact absurd(h) }
+                Succ(j) => {
+                    have h2 := ih(j)
+                    cases h2
+                    have hres := h2mp(h)
+                    rw [addSuccR]
+                    rw [hres]
+                    rfl
+                }
+              } }
+            { intro h
+              cases a {
+                Zero => {
+                    exact absurd(h)
+                }
+                Succ(j) => {
+                    have h2 := ih(j)
+                    cases h2
+                    have hx := addSuccR(subNat(j, k), k)
+                    have hchain : Succ(subNat(j, k) + k) = Succ(j) := trans(symm(hx), h)
+                    have hsmall : subNat(j, k) + k = j := hchain
+                    have hkl := h2mpr(hsmall)
+                    exact hkl
+                }
+              } }
+        }
+    }
+}
+
+/// Truncated subtraction cancels an established order: $b \le a \to (a-b)+b = a$.
+public theorem subNatAddCancel(a : Nat, b : Nat) :
+        b <= a -> subNat(a, b) + b = a by {
+    intro h
+    have hiff := leOfSubNat(a, b)
+    cases hiff
+    exact hiffmp(h)
+}
+
+/// A number is below itself times a successor: $a \le a \cdot \mathrm{Succ}(b)$.
+public theorem leMulSuccSelf(a : Nat, b : Nat) : a <= a * Succ(b) by {
+    have hmul := mulSuccR(a, b)
+    have h0 : 0 <= a * b := rfl
+    have hm := leAddMono(0, a * b, a)
+    have hle : a <= a * b + a := hm(h0)
+    have hback : a * b + a <= a * Succ(b) by {
+        rw [hmul]
+        rw [addComm(a, a * b)]
+        rfl
+    }
+    have ht := leTrans(a, a * b + a, a * Succ(b))
+    exact ht(hle, hback)
+}

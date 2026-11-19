@@ -1,0 +1,14 @@
+function inspect(value : Label) : String=value.read()
+class Label {
+    public final size : Int
+    public final label : String
+    new(size : Int) {
+        this.size=size
+        this.label=((this)).size.text()
+        let read:=this.read
+        let checked:=read()
+        let passed:=inspect(this)
+    }
+    public function read() : String=this.label
+}
+print(Label(7).read())

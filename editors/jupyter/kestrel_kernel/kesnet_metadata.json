@@ -1,0 +1,4545 @@
+{
+  "types": [
+    "Module",
+    "Identity",
+    "Linear",
+    "ReLU",
+    "LeakyReLU",
+    "ELU",
+    "GELU",
+    "SiLU",
+    "Sigmoid",
+    "Tanh",
+    "Softmax",
+    "LogSoftmax",
+    "Flatten",
+    "Dropout",
+    "Sequential",
+    "ModuleList",
+    "MSELoss",
+    "L1Loss",
+    "CrossEntropyLoss",
+    "NLLLoss",
+    "BCEWithLogitsLoss",
+    "Conv2d",
+    "MaxPool2d",
+    "AvgPool2d",
+    "AdaptiveAvgPool2d",
+    "BatchNorm2d",
+    "BatchNorm1d",
+    "LayerNorm",
+    "GroupNorm",
+    "Embedding",
+    "MultiheadAttention",
+    "TransformerEncoderLayer",
+    "TransformerEncoder",
+    "LSTMCell",
+    "LSTM",
+    "GRUCell",
+    "GRU",
+    "RNNCell",
+    "RNN",
+    "MLP",
+    "Optimizer",
+    "SGD",
+    "Adam",
+    "AdamW",
+    "RMSprop",
+    "Adagrad",
+    "Adadelta",
+    "Adamax",
+    "StepLR",
+    "MultiStepLR",
+    "ExponentialLR",
+    "CosineAnnealingLR",
+    "ReduceLROnPlateau",
+    "TensorDataset",
+    "DataLoader",
+    "Variable"
+  ],
+  "names": [
+    "Module",
+    "registered",
+    "trainingMode",
+    "addParameter",
+    "parameters",
+    "parameterCount",
+    "train",
+    "eval",
+    "zeroGrad",
+    "forward",
+    "summary",
+    "Identity",
+    "Linear",
+    "weight",
+    "biasValue",
+    "hasBias",
+    "inFeatures",
+    "outFeatures",
+    "ReLU",
+    "LeakyReLU",
+    "slope",
+    "ELU",
+    "alpha",
+    "GELU",
+    "SiLU",
+    "Sigmoid",
+    "Tanh",
+    "Softmax",
+    "axis",
+    "LogSoftmax",
+    "Flatten",
+    "startDim",
+    "Dropout",
+    "probability",
+    "Sequential",
+    "layers",
+    "ModuleList",
+    "MSELoss",
+    "reduction",
+    "L1Loss",
+    "CrossEntropyLoss",
+    "NLLLoss",
+    "BCEWithLogitsLoss",
+    "relu",
+    "sigmoid",
+    "tanh",
+    "gelu",
+    "silu",
+    "softmax",
+    "logSoftmax",
+    "linear",
+    "mseLoss",
+    "l1Loss",
+    "crossEntropy",
+    "nllLoss",
+    "binaryCrossEntropy",
+    "Conv2d",
+    "inChannels",
+    "outChannels",
+    "kernelSize",
+    "stride",
+    "padding",
+    "dilation",
+    "groups",
+    "MaxPool2d",
+    "AvgPool2d",
+    "AdaptiveAvgPool2d",
+    "outHeight",
+    "outWidth",
+    "BatchNorm2d",
+    "runningMean",
+    "runningVar",
+    "epsilon",
+    "momentum",
+    "affine",
+    "BatchNorm1d",
+    "inner",
+    "LayerNorm",
+    "GroupNorm",
+    "numGroups",
+    "numChannels",
+    "Embedding",
+    "numEmbeddings",
+    "embeddingDim",
+    "MultiheadAttention",
+    "query",
+    "key",
+    "value",
+    "output",
+    "embedDim",
+    "heads",
+    "headDim",
+    "useBias",
+    "TransformerEncoderLayer",
+    "attention",
+    "norm1",
+    "norm2",
+    "linear1",
+    "linear2",
+    "dropout",
+    "feedforwardDim",
+    "TransformerEncoder",
+    "LSTMCell",
+    "inputInput",
+    "inputForget",
+    "inputCell",
+    "inputOutput",
+    "hiddenInput",
+    "hiddenForget",
+    "hiddenCell",
+    "hiddenOutput",
+    "hiddenSize",
+    "step",
+    "zeros",
+    "LSTM",
+    "cell",
+    "GRUCell",
+    "inputReset",
+    "inputUpdate",
+    "inputNew",
+    "hiddenReset",
+    "hiddenUpdate",
+    "hiddenNew",
+    "GRU",
+    "RNNCell",
+    "inputProjection",
+    "hiddenProjection",
+    "RNN",
+    "cat",
+    "stack",
+    "saveParameters",
+    "loadParameters",
+    "accuracy",
+    "meanAbsoluteError",
+    "meanSquaredError",
+    "xavierUniform",
+    "kaimingUniform",
+    "normalInit",
+    "zerosInit",
+    "onesInit",
+    "MLP",
+    "first",
+    "second",
+    "hidden",
+    "Optimizer",
+    "learningRate",
+    "setLearningRate",
+    "SGD",
+    "weightDecay",
+    "nesterov",
+    "velocities",
+    "Adam",
+    "beta1",
+    "beta2",
+    "firstMoments",
+    "secondMoments",
+    "steps",
+    "AdamW",
+    "RMSprop",
+    "squares",
+    "Adagrad",
+    "Adadelta",
+    "rho",
+    "gradientSquares",
+    "updateSquares",
+    "Adamax",
+    "StepLR",
+    "stepSize",
+    "gamma",
+    "completed",
+    "lastLearningRate",
+    "MultiStepLR",
+    "milestones",
+    "ExponentialLR",
+    "CosineAnnealingLR",
+    "totalSteps",
+    "minimum",
+    "initial",
+    "ReduceLROnPlateau",
+    "factor",
+    "patience",
+    "best",
+    "waiting",
+    "warmupRate",
+    "TensorDataset",
+    "features",
+    "targets",
+    "length",
+    "featureCount",
+    "targetCount",
+    "targetRank",
+    "DataLoader",
+    "dataset",
+    "batchSize",
+    "shuffle",
+    "dropLast",
+    "seed",
+    "epoch",
+    "batches",
+    "reset",
+    "fromDataFrame",
+    "trainTestSplit",
+    "Variable"
+  ],
+  "methods": {
+    "Module": [
+      {
+        "name": "addParameter",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Module",
+        "signature": "Module.addParameter(parameter : Variable) : void",
+        "parameters": [
+          "parameter : Variable"
+        ],
+        "documentation": "Member of Module."
+      },
+      {
+        "name": "parameters",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Module",
+        "signature": "Module.parameters() : List[Variable]",
+        "parameters": [],
+        "documentation": "Member of Module."
+      },
+      {
+        "name": "parameterCount",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Module",
+        "signature": "Module.parameterCount() : Int",
+        "parameters": [],
+        "documentation": "Member of Module."
+      },
+      {
+        "name": "train",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Module",
+        "signature": "Module.train() : void",
+        "parameters": [],
+        "documentation": "Member of Module."
+      },
+      {
+        "name": "eval",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Module",
+        "signature": "Module.eval() : void",
+        "parameters": [],
+        "documentation": "Member of Module."
+      },
+      {
+        "name": "zeroGrad",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Module",
+        "signature": "Module.zeroGrad() : void",
+        "parameters": [],
+        "documentation": "Member of Module."
+      },
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Module",
+        "signature": "Module.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Module."
+      },
+      {
+        "name": "summary",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Module",
+        "signature": "Module.summary() : String",
+        "parameters": [],
+        "documentation": "Member of Module."
+      }
+    ],
+    "Identity": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Identity",
+        "signature": "Identity.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Identity."
+      }
+    ],
+    "Linear": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Linear",
+        "signature": "Linear.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Linear."
+      }
+    ],
+    "ReLU": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "ReLU",
+        "signature": "ReLU.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of ReLU."
+      }
+    ],
+    "LeakyReLU": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "LeakyReLU",
+        "signature": "LeakyReLU.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of LeakyReLU."
+      }
+    ],
+    "ELU": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "ELU",
+        "signature": "ELU.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of ELU."
+      }
+    ],
+    "GELU": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "GELU",
+        "signature": "GELU.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of GELU."
+      }
+    ],
+    "SiLU": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "SiLU",
+        "signature": "SiLU.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of SiLU."
+      }
+    ],
+    "Sigmoid": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Sigmoid",
+        "signature": "Sigmoid.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Sigmoid."
+      }
+    ],
+    "Tanh": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Tanh",
+        "signature": "Tanh.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Tanh."
+      }
+    ],
+    "Softmax": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Softmax",
+        "signature": "Softmax.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Softmax."
+      }
+    ],
+    "LogSoftmax": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "LogSoftmax",
+        "signature": "LogSoftmax.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of LogSoftmax."
+      }
+    ],
+    "Flatten": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Flatten",
+        "signature": "Flatten.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Flatten."
+      }
+    ],
+    "Dropout": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Dropout",
+        "signature": "Dropout.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Dropout."
+      }
+    ],
+    "Sequential": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Sequential",
+        "signature": "Sequential.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Sequential."
+      }
+    ],
+    "ModuleList": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "ModuleList",
+        "signature": "ModuleList.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of ModuleList."
+      }
+    ],
+    "MSELoss": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "MSELoss",
+        "signature": "MSELoss.forward(prediction : Variable, target : Variable) : Variable",
+        "parameters": [
+          "prediction : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Member of MSELoss."
+      }
+    ],
+    "L1Loss": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "L1Loss",
+        "signature": "L1Loss.forward(prediction : Variable, target : Variable) : Variable",
+        "parameters": [
+          "prediction : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Member of L1Loss."
+      }
+    ],
+    "CrossEntropyLoss": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "CrossEntropyLoss",
+        "signature": "CrossEntropyLoss.forward(logits : Variable, target : Variable) : Variable",
+        "parameters": [
+          "logits : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Member of CrossEntropyLoss."
+      }
+    ],
+    "NLLLoss": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "NLLLoss",
+        "signature": "NLLLoss.forward(logProbabilities : Variable, target : Variable) : Variable",
+        "parameters": [
+          "logProbabilities : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Member of NLLLoss."
+      }
+    ],
+    "BCEWithLogitsLoss": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "BCEWithLogitsLoss",
+        "signature": "BCEWithLogitsLoss.forward(logits : Variable, target : Variable) : Variable",
+        "parameters": [
+          "logits : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Member of BCEWithLogitsLoss."
+      }
+    ],
+    "Conv2d": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Conv2d",
+        "signature": "Conv2d.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Conv2d."
+      }
+    ],
+    "MaxPool2d": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "MaxPool2d",
+        "signature": "MaxPool2d.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of MaxPool2d."
+      }
+    ],
+    "AvgPool2d": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "AvgPool2d",
+        "signature": "AvgPool2d.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of AvgPool2d."
+      }
+    ],
+    "AdaptiveAvgPool2d": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "AdaptiveAvgPool2d",
+        "signature": "AdaptiveAvgPool2d.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of AdaptiveAvgPool2d."
+      }
+    ],
+    "BatchNorm2d": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "BatchNorm2d",
+        "signature": "BatchNorm2d.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of BatchNorm2d."
+      }
+    ],
+    "BatchNorm1d": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "BatchNorm1d",
+        "signature": "BatchNorm1d.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of BatchNorm1d."
+      }
+    ],
+    "LayerNorm": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "LayerNorm",
+        "signature": "LayerNorm.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of LayerNorm."
+      }
+    ],
+    "GroupNorm": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "GroupNorm",
+        "signature": "GroupNorm.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of GroupNorm."
+      }
+    ],
+    "Embedding": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "Embedding",
+        "signature": "Embedding.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of Embedding."
+      }
+    ],
+    "MultiheadAttention": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "MultiheadAttention",
+        "signature": "MultiheadAttention.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of MultiheadAttention."
+      }
+    ],
+    "TransformerEncoderLayer": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "TransformerEncoderLayer",
+        "signature": "TransformerEncoderLayer.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of TransformerEncoderLayer."
+      }
+    ],
+    "TransformerEncoder": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "TransformerEncoder",
+        "signature": "TransformerEncoder.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of TransformerEncoder."
+      }
+    ],
+    "LSTMCell": [
+      {
+        "name": "step",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "LSTMCell",
+        "signature": "LSTMCell.step(x : Variable, hidden : Variable, cell : Variable) : (Variable, Variable)",
+        "parameters": [
+          "x : Variable",
+          "hidden : Variable",
+          "cell : Variable"
+        ],
+        "documentation": "Member of LSTMCell."
+      },
+      {
+        "name": "zeros",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "LSTMCell",
+        "signature": "LSTMCell.zeros(batch : Int) : (Variable, Variable)",
+        "parameters": [
+          "batch : Int"
+        ],
+        "documentation": "Member of LSTMCell."
+      }
+    ],
+    "LSTM": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "LSTM",
+        "signature": "LSTM.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of LSTM."
+      }
+    ],
+    "GRUCell": [
+      {
+        "name": "step",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "GRUCell",
+        "signature": "GRUCell.step(x : Variable, hidden : Variable) : Variable",
+        "parameters": [
+          "x : Variable",
+          "hidden : Variable"
+        ],
+        "documentation": "Member of GRUCell."
+      },
+      {
+        "name": "zeros",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "GRUCell",
+        "signature": "GRUCell.zeros(batch : Int) : Variable",
+        "parameters": [
+          "batch : Int"
+        ],
+        "documentation": "Member of GRUCell."
+      }
+    ],
+    "GRU": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "GRU",
+        "signature": "GRU.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of GRU."
+      }
+    ],
+    "RNNCell": [
+      {
+        "name": "step",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "RNNCell",
+        "signature": "RNNCell.step(x : Variable, hidden : Variable) : Variable",
+        "parameters": [
+          "x : Variable",
+          "hidden : Variable"
+        ],
+        "documentation": "Member of RNNCell."
+      },
+      {
+        "name": "zeros",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "RNNCell",
+        "signature": "RNNCell.zeros(batch : Int) : Variable",
+        "parameters": [
+          "batch : Int"
+        ],
+        "documentation": "Member of RNNCell."
+      }
+    ],
+    "RNN": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "RNN",
+        "signature": "RNN.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of RNN."
+      }
+    ],
+    "MLP": [
+      {
+        "name": "forward",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "receiver": "MLP",
+        "signature": "MLP.forward(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Member of MLP."
+      }
+    ],
+    "Optimizer": [
+      {
+        "name": "zeroGrad",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "Optimizer",
+        "signature": "Optimizer.zeroGrad() : void",
+        "parameters": [],
+        "documentation": "Member of Optimizer."
+      },
+      {
+        "name": "setLearningRate",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "Optimizer",
+        "signature": "Optimizer.setLearningRate(value : double) : void",
+        "parameters": [
+          "value : double"
+        ],
+        "documentation": "Member of Optimizer."
+      },
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "Optimizer",
+        "signature": "Optimizer.step() : void",
+        "parameters": [],
+        "documentation": "Member of Optimizer."
+      },
+      {
+        "name": "parameterCount",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "Optimizer",
+        "signature": "Optimizer.parameterCount() : Int",
+        "parameters": [],
+        "documentation": "Member of Optimizer."
+      }
+    ],
+    "SGD": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "SGD",
+        "signature": "SGD.step() : void",
+        "parameters": [],
+        "documentation": "Member of SGD."
+      }
+    ],
+    "Adam": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "Adam",
+        "signature": "Adam.step() : void",
+        "parameters": [],
+        "documentation": "Member of Adam."
+      }
+    ],
+    "AdamW": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "AdamW",
+        "signature": "AdamW.step() : void",
+        "parameters": [],
+        "documentation": "Member of AdamW."
+      }
+    ],
+    "RMSprop": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "RMSprop",
+        "signature": "RMSprop.step() : void",
+        "parameters": [],
+        "documentation": "Member of RMSprop."
+      }
+    ],
+    "Adagrad": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "Adagrad",
+        "signature": "Adagrad.step() : void",
+        "parameters": [],
+        "documentation": "Member of Adagrad."
+      }
+    ],
+    "Adadelta": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "Adadelta",
+        "signature": "Adadelta.step() : void",
+        "parameters": [],
+        "documentation": "Member of Adadelta."
+      }
+    ],
+    "Adamax": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "Adamax",
+        "signature": "Adamax.step() : void",
+        "parameters": [],
+        "documentation": "Member of Adamax."
+      }
+    ],
+    "StepLR": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "StepLR",
+        "signature": "StepLR.step(mut optimizer : Optimizer) : void",
+        "parameters": [
+          "mut optimizer : Optimizer"
+        ],
+        "documentation": "Member of StepLR."
+      },
+      {
+        "name": "lastLearningRate",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "StepLR",
+        "signature": "StepLR.lastLearningRate(optimizer : Optimizer) : double",
+        "parameters": [
+          "optimizer : Optimizer"
+        ],
+        "documentation": "Member of StepLR."
+      }
+    ],
+    "MultiStepLR": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "MultiStepLR",
+        "signature": "MultiStepLR.step(mut optimizer : Optimizer) : void",
+        "parameters": [
+          "mut optimizer : Optimizer"
+        ],
+        "documentation": "Member of MultiStepLR."
+      }
+    ],
+    "ExponentialLR": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "ExponentialLR",
+        "signature": "ExponentialLR.step(mut optimizer : Optimizer) : void",
+        "parameters": [
+          "mut optimizer : Optimizer"
+        ],
+        "documentation": "Member of ExponentialLR."
+      }
+    ],
+    "CosineAnnealingLR": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "CosineAnnealingLR",
+        "signature": "CosineAnnealingLR.step(mut optimizer : Optimizer) : void",
+        "parameters": [
+          "mut optimizer : Optimizer"
+        ],
+        "documentation": "Member of CosineAnnealingLR."
+      }
+    ],
+    "ReduceLROnPlateau": [
+      {
+        "name": "step",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "receiver": "ReduceLROnPlateau",
+        "signature": "ReduceLROnPlateau.step(mut optimizer : Optimizer, metric : double) : void",
+        "parameters": [
+          "mut optimizer : Optimizer",
+          "metric : double"
+        ],
+        "documentation": "Member of ReduceLROnPlateau."
+      }
+    ],
+    "TensorDataset": [
+      {
+        "name": "length",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "receiver": "TensorDataset",
+        "signature": "TensorDataset.length() : Int",
+        "parameters": [],
+        "documentation": "Member of TensorDataset."
+      },
+      {
+        "name": "featureCount",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "receiver": "TensorDataset",
+        "signature": "TensorDataset.featureCount() : Int",
+        "parameters": [],
+        "documentation": "Member of TensorDataset."
+      },
+      {
+        "name": "targetCount",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "receiver": "TensorDataset",
+        "signature": "TensorDataset.targetCount() : Int",
+        "parameters": [],
+        "documentation": "Member of TensorDataset."
+      },
+      {
+        "name": "targetRank",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "receiver": "TensorDataset",
+        "signature": "TensorDataset.targetRank() : Int",
+        "parameters": [],
+        "documentation": "Member of TensorDataset."
+      }
+    ],
+    "DataLoader": [
+      {
+        "name": "batches",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "receiver": "DataLoader",
+        "signature": "DataLoader.batches() : Array[(Variable, Variable)]",
+        "parameters": [],
+        "documentation": "Member of DataLoader."
+      },
+      {
+        "name": "length",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "receiver": "DataLoader",
+        "signature": "DataLoader.length() : Int",
+        "parameters": [],
+        "documentation": "Member of DataLoader."
+      },
+      {
+        "name": "reset",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "receiver": "DataLoader",
+        "signature": "DataLoader.reset() : void",
+        "parameters": [],
+        "documentation": "Member of DataLoader."
+      }
+    ],
+    "Variable": [
+      {
+        "name": "shape",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.shape() : Array[Int]",
+        "parameters": [],
+        "documentation": "Variable.shape is differentiable where the operation is."
+      },
+      {
+        "name": "rank",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.rank() : Int",
+        "parameters": [],
+        "documentation": "Variable.rank is differentiable where the operation is."
+      },
+      {
+        "name": "count",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.count() : Int",
+        "parameters": [],
+        "documentation": "Variable.count is differentiable where the operation is."
+      },
+      {
+        "name": "dtype",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.dtype() : String",
+        "parameters": [],
+        "documentation": "Variable.dtype is differentiable where the operation is."
+      },
+      {
+        "name": "device",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.device() : String",
+        "parameters": [],
+        "documentation": "Variable.device is differentiable where the operation is."
+      },
+      {
+        "name": "requiresGrad",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.requiresGrad() : Bool",
+        "parameters": [],
+        "documentation": "Variable.requiresGrad is differentiable where the operation is."
+      },
+      {
+        "name": "isLeaf",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.isLeaf() : Bool",
+        "parameters": [],
+        "documentation": "Variable.isLeaf is differentiable where the operation is."
+      },
+      {
+        "name": "grad",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.grad() : Option[DynTensor[double]]",
+        "parameters": [],
+        "documentation": "Variable.grad is differentiable where the operation is."
+      },
+      {
+        "name": "gradVariable",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.gradVariable() : Variable",
+        "parameters": [],
+        "documentation": "Variable.gradVariable is differentiable where the operation is."
+      },
+      {
+        "name": "data",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.data() : DynTensor[double]",
+        "parameters": [],
+        "documentation": "Variable.data is differentiable where the operation is."
+      },
+      {
+        "name": "toTensor",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.toTensor() : DynTensor[double]",
+        "parameters": [],
+        "documentation": "Variable.toTensor is differentiable where the operation is."
+      },
+      {
+        "name": "item",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.item() : double",
+        "parameters": [],
+        "documentation": "Variable.item is differentiable where the operation is."
+      },
+      {
+        "name": "copy",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.copy() : Variable",
+        "parameters": [],
+        "documentation": "Variable.copy is differentiable where the operation is."
+      },
+      {
+        "name": "clone",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.clone() : Variable",
+        "parameters": [],
+        "documentation": "Variable.clone is differentiable where the operation is."
+      },
+      {
+        "name": "detach",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.detach() : Variable",
+        "parameters": [],
+        "documentation": "Variable.detach is differentiable where the operation is."
+      },
+      {
+        "name": "text",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.text() : String",
+        "parameters": [],
+        "documentation": "Variable.text is differentiable where the operation is."
+      },
+      {
+        "name": "debug",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.debug() : String",
+        "parameters": [],
+        "documentation": "Variable.debug is differentiable where the operation is."
+      },
+      {
+        "name": "zeroGrad",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.zeroGrad() : void",
+        "parameters": [],
+        "documentation": "Variable.zeroGrad is differentiable where the operation is."
+      },
+      {
+        "name": "retainGrad",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.retainGrad() : Variable",
+        "parameters": [],
+        "documentation": "Variable.retainGrad is differentiable where the operation is."
+      },
+      {
+        "name": "backward",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.backward() : void",
+        "parameters": [],
+        "documentation": "Variable.backward is differentiable where the operation is."
+      },
+      {
+        "name": "backward",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.backward(retainGraph : Bool) : void",
+        "parameters": [
+          "retainGraph : Bool"
+        ],
+        "documentation": "Variable.backward is differentiable where the operation is."
+      },
+      {
+        "name": "requiresGrad_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.requiresGrad_(requiresGrad : Bool) : Variable",
+        "parameters": [
+          "requiresGrad : Bool"
+        ],
+        "documentation": "Variable.requiresGrad_ is differentiable where the operation is."
+      },
+      {
+        "name": "to",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.to(dtype : String) : Variable",
+        "parameters": [
+          "dtype : String"
+        ],
+        "documentation": "Variable.to is differentiable where the operation is."
+      },
+      {
+        "name": "negate",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.negate() : Variable",
+        "parameters": [],
+        "documentation": "Variable.negate is differentiable where the operation is."
+      },
+      {
+        "name": "abs",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.abs() : Variable",
+        "parameters": [],
+        "documentation": "Variable.abs is differentiable where the operation is."
+      },
+      {
+        "name": "exp",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.exp() : Variable",
+        "parameters": [],
+        "documentation": "Variable.exp is differentiable where the operation is."
+      },
+      {
+        "name": "expm1",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.expm1() : Variable",
+        "parameters": [],
+        "documentation": "Variable.expm1 is differentiable where the operation is."
+      },
+      {
+        "name": "log",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.log() : Variable",
+        "parameters": [],
+        "documentation": "Variable.log is differentiable where the operation is."
+      },
+      {
+        "name": "log1p",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.log1p() : Variable",
+        "parameters": [],
+        "documentation": "Variable.log1p is differentiable where the operation is."
+      },
+      {
+        "name": "log2",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.log2() : Variable",
+        "parameters": [],
+        "documentation": "Variable.log2 is differentiable where the operation is."
+      },
+      {
+        "name": "log10",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.log10() : Variable",
+        "parameters": [],
+        "documentation": "Variable.log10 is differentiable where the operation is."
+      },
+      {
+        "name": "sqrt",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sqrt() : Variable",
+        "parameters": [],
+        "documentation": "Variable.sqrt is differentiable where the operation is."
+      },
+      {
+        "name": "rsqrt",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.rsqrt() : Variable",
+        "parameters": [],
+        "documentation": "Variable.rsqrt is differentiable where the operation is."
+      },
+      {
+        "name": "sin",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sin() : Variable",
+        "parameters": [],
+        "documentation": "Variable.sin is differentiable where the operation is."
+      },
+      {
+        "name": "cos",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.cos() : Variable",
+        "parameters": [],
+        "documentation": "Variable.cos is differentiable where the operation is."
+      },
+      {
+        "name": "tan",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.tan() : Variable",
+        "parameters": [],
+        "documentation": "Variable.tan is differentiable where the operation is."
+      },
+      {
+        "name": "asin",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.asin() : Variable",
+        "parameters": [],
+        "documentation": "Variable.asin is differentiable where the operation is."
+      },
+      {
+        "name": "acos",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.acos() : Variable",
+        "parameters": [],
+        "documentation": "Variable.acos is differentiable where the operation is."
+      },
+      {
+        "name": "atan",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.atan() : Variable",
+        "parameters": [],
+        "documentation": "Variable.atan is differentiable where the operation is."
+      },
+      {
+        "name": "sinh",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sinh() : Variable",
+        "parameters": [],
+        "documentation": "Variable.sinh is differentiable where the operation is."
+      },
+      {
+        "name": "cosh",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.cosh() : Variable",
+        "parameters": [],
+        "documentation": "Variable.cosh is differentiable where the operation is."
+      },
+      {
+        "name": "tanh",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.tanh() : Variable",
+        "parameters": [],
+        "documentation": "Variable.tanh is differentiable where the operation is."
+      },
+      {
+        "name": "sigmoid",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sigmoid() : Variable",
+        "parameters": [],
+        "documentation": "Variable.sigmoid is differentiable where the operation is."
+      },
+      {
+        "name": "relu",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.relu() : Variable",
+        "parameters": [],
+        "documentation": "Variable.relu is differentiable where the operation is."
+      },
+      {
+        "name": "silu",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.silu() : Variable",
+        "parameters": [],
+        "documentation": "Variable.silu is differentiable where the operation is."
+      },
+      {
+        "name": "gelu",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.gelu() : Variable",
+        "parameters": [],
+        "documentation": "Variable.gelu is differentiable where the operation is."
+      },
+      {
+        "name": "leakyRelu",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.leakyRelu(slope : double) : Variable",
+        "parameters": [
+          "slope : double"
+        ],
+        "documentation": "Variable.leakyRelu is differentiable where the operation is."
+      },
+      {
+        "name": "elu",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.elu(alpha : double) : Variable",
+        "parameters": [
+          "alpha : double"
+        ],
+        "documentation": "Variable.elu is differentiable where the operation is."
+      },
+      {
+        "name": "softplus",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.softplus(beta : double, threshold : double) : Variable",
+        "parameters": [
+          "beta : double",
+          "threshold : double"
+        ],
+        "documentation": "Variable.softplus is differentiable where the operation is."
+      },
+      {
+        "name": "softmax",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.softmax() : Variable",
+        "parameters": [],
+        "documentation": "Variable.softmax is differentiable where the operation is."
+      },
+      {
+        "name": "softmax",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.softmax(axis : Int) : Variable",
+        "parameters": [
+          "axis : Int"
+        ],
+        "documentation": "Variable.softmax is differentiable where the operation is."
+      },
+      {
+        "name": "logSoftmax",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.logSoftmax() : Variable",
+        "parameters": [],
+        "documentation": "Variable.logSoftmax is differentiable where the operation is."
+      },
+      {
+        "name": "logSoftmax",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.logSoftmax(axis : Int) : Variable",
+        "parameters": [
+          "axis : Int"
+        ],
+        "documentation": "Variable.logSoftmax is differentiable where the operation is."
+      },
+      {
+        "name": "clamp",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.clamp(min : double, max : double) : Variable",
+        "parameters": [
+          "min : double",
+          "max : double"
+        ],
+        "documentation": "Variable.clamp is differentiable where the operation is."
+      },
+      {
+        "name": "add",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.add(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.add is differentiable where the operation is."
+      },
+      {
+        "name": "add",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.add(other : double) : Variable",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Variable.add is differentiable where the operation is."
+      },
+      {
+        "name": "subtract",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.subtract(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.subtract is differentiable where the operation is."
+      },
+      {
+        "name": "subtract",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.subtract(other : double) : Variable",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Variable.subtract is differentiable where the operation is."
+      },
+      {
+        "name": "multiply",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.multiply(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.multiply is differentiable where the operation is."
+      },
+      {
+        "name": "multiply",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.multiply(other : double) : Variable",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Variable.multiply is differentiable where the operation is."
+      },
+      {
+        "name": "divide",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.divide(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.divide is differentiable where the operation is."
+      },
+      {
+        "name": "divide",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.divide(other : double) : Variable",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Variable.divide is differentiable where the operation is."
+      },
+      {
+        "name": "rightAdd",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.rightAdd(left : double) : Variable",
+        "parameters": [
+          "left : double"
+        ],
+        "documentation": "Variable.rightAdd is differentiable where the operation is."
+      },
+      {
+        "name": "rightSubtract",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.rightSubtract(left : double) : Variable",
+        "parameters": [
+          "left : double"
+        ],
+        "documentation": "Variable.rightSubtract is differentiable where the operation is."
+      },
+      {
+        "name": "rightMultiply",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.rightMultiply(left : double) : Variable",
+        "parameters": [
+          "left : double"
+        ],
+        "documentation": "Variable.rightMultiply is differentiable where the operation is."
+      },
+      {
+        "name": "rightDivide",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.rightDivide(left : double) : Variable",
+        "parameters": [
+          "left : double"
+        ],
+        "documentation": "Variable.rightDivide is differentiable where the operation is."
+      },
+      {
+        "name": "matmul",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.matmul(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.matmul is differentiable where the operation is."
+      },
+      {
+        "name": "mm",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.mm(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.mm is differentiable where the operation is."
+      },
+      {
+        "name": "bmm",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.bmm(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.bmm is differentiable where the operation is."
+      },
+      {
+        "name": "dot",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.dot(other : Variable) : double",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.dot is differentiable where the operation is."
+      },
+      {
+        "name": "power",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.power(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.power is differentiable where the operation is."
+      },
+      {
+        "name": "power",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.power(exponent : double) : Variable",
+        "parameters": [
+          "exponent : double"
+        ],
+        "documentation": "Variable.power is differentiable where the operation is."
+      },
+      {
+        "name": "sum",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sum() : Variable",
+        "parameters": [],
+        "documentation": "Variable.sum is differentiable where the operation is."
+      },
+      {
+        "name": "sum",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sum(axis : Int) : Variable",
+        "parameters": [
+          "axis : Int"
+        ],
+        "documentation": "Variable.sum is differentiable where the operation is."
+      },
+      {
+        "name": "sum",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sum(axis : Int, keepdim : Bool) : Variable",
+        "parameters": [
+          "axis : Int",
+          "keepdim : Bool"
+        ],
+        "documentation": "Variable.sum is differentiable where the operation is."
+      },
+      {
+        "name": "mean",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.mean() : Variable",
+        "parameters": [],
+        "documentation": "Variable.mean is differentiable where the operation is."
+      },
+      {
+        "name": "mean",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.mean(axis : Int) : Variable",
+        "parameters": [
+          "axis : Int"
+        ],
+        "documentation": "Variable.mean is differentiable where the operation is."
+      },
+      {
+        "name": "mean",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.mean(axis : Int, keepdim : Bool) : Variable",
+        "parameters": [
+          "axis : Int",
+          "keepdim : Bool"
+        ],
+        "documentation": "Variable.mean is differentiable where the operation is."
+      },
+      {
+        "name": "prod",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.prod() : Variable",
+        "parameters": [],
+        "documentation": "Variable.prod is differentiable where the operation is."
+      },
+      {
+        "name": "max",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.max() : Variable",
+        "parameters": [],
+        "documentation": "Variable.max is differentiable where the operation is."
+      },
+      {
+        "name": "max",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.max(axis : Int) : Variable",
+        "parameters": [
+          "axis : Int"
+        ],
+        "documentation": "Variable.max is differentiable where the operation is."
+      },
+      {
+        "name": "min",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.min() : Variable",
+        "parameters": [],
+        "documentation": "Variable.min is differentiable where the operation is."
+      },
+      {
+        "name": "min",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.min(axis : Int) : Variable",
+        "parameters": [
+          "axis : Int"
+        ],
+        "documentation": "Variable.min is differentiable where the operation is."
+      },
+      {
+        "name": "argmax",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.argmax() : Variable",
+        "parameters": [],
+        "documentation": "Variable.argmax is differentiable where the operation is."
+      },
+      {
+        "name": "argmax",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.argmax(axis : Int) : Variable",
+        "parameters": [
+          "axis : Int"
+        ],
+        "documentation": "Variable.argmax is differentiable where the operation is."
+      },
+      {
+        "name": "argmin",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.argmin() : Variable",
+        "parameters": [],
+        "documentation": "Variable.argmin is differentiable where the operation is."
+      },
+      {
+        "name": "argmin",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.argmin(axis : Int) : Variable",
+        "parameters": [
+          "axis : Int"
+        ],
+        "documentation": "Variable.argmin is differentiable where the operation is."
+      },
+      {
+        "name": "norm",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.norm() : Variable",
+        "parameters": [],
+        "documentation": "Variable.norm is differentiable where the operation is."
+      },
+      {
+        "name": "reshape",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.reshape(shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.reshape is differentiable where the operation is."
+      },
+      {
+        "name": "transpose",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.transpose(dim0 : Int, dim1 : Int) : Variable",
+        "parameters": [
+          "dim0 : Int",
+          "dim1 : Int"
+        ],
+        "documentation": "Variable.transpose is differentiable where the operation is."
+      },
+      {
+        "name": "permute",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.permute(axes : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "axes : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.permute is differentiable where the operation is."
+      },
+      {
+        "name": "squeeze",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.squeeze(dim : Int) : Variable",
+        "parameters": [
+          "dim : Int"
+        ],
+        "documentation": "Variable.squeeze is differentiable where the operation is."
+      },
+      {
+        "name": "unsqueeze",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.unsqueeze(dim : Int) : Variable",
+        "parameters": [
+          "dim : Int"
+        ],
+        "documentation": "Variable.unsqueeze is differentiable where the operation is."
+      },
+      {
+        "name": "flatten",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.flatten() : Variable",
+        "parameters": [],
+        "documentation": "Variable.flatten is differentiable where the operation is."
+      },
+      {
+        "name": "flatten",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.flatten(startDim : Int) : Variable",
+        "parameters": [
+          "startDim : Int"
+        ],
+        "documentation": "Variable.flatten is differentiable where the operation is."
+      },
+      {
+        "name": "broadcastTo",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.broadcastTo(shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.broadcastTo is differentiable where the operation is."
+      },
+      {
+        "name": "expand",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.expand(shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.expand is differentiable where the operation is."
+      },
+      {
+        "name": "cat",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.cat(other : Variable, axis : Int) : Variable",
+        "parameters": [
+          "other : Variable",
+          "axis : Int"
+        ],
+        "documentation": "Variable.cat is differentiable where the operation is."
+      },
+      {
+        "name": "slice",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.slice(axis : Int, start : Int, end : Int) : Variable",
+        "parameters": [
+          "axis : Int",
+          "start : Int",
+          "end : Int"
+        ],
+        "documentation": "Variable.slice is differentiable where the operation is."
+      },
+      {
+        "name": "conv2d",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.conv2d(weight : Variable, bias : Variable, stride : Int, padding : Int, dilation : Int, groups : Int) : Variable",
+        "parameters": [
+          "weight : Variable",
+          "bias : Variable",
+          "stride : Int",
+          "padding : Int",
+          "dilation : Int",
+          "groups : Int"
+        ],
+        "documentation": "Variable.conv2d is differentiable where the operation is."
+      },
+      {
+        "name": "maxPool2d",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.maxPool2d(kernel : Int, stride : Int, padding : Int) : Variable",
+        "parameters": [
+          "kernel : Int",
+          "stride : Int",
+          "padding : Int"
+        ],
+        "documentation": "Variable.maxPool2d is differentiable where the operation is."
+      },
+      {
+        "name": "avgPool2d",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.avgPool2d(kernel : Int, stride : Int, padding : Int) : Variable",
+        "parameters": [
+          "kernel : Int",
+          "stride : Int",
+          "padding : Int"
+        ],
+        "documentation": "Variable.avgPool2d is differentiable where the operation is."
+      },
+      {
+        "name": "adaptiveAvgPool2d",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.adaptiveAvgPool2d(outHeight : Int, outWidth : Int) : Variable",
+        "parameters": [
+          "outHeight : Int",
+          "outWidth : Int"
+        ],
+        "documentation": "Variable.adaptiveAvgPool2d is differentiable where the operation is."
+      },
+      {
+        "name": "batchNorm",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.batchNorm(weight : Variable, bias : Variable, runningMean : Variable, runningVar : Variable, epsilon : double, momentum : double, training : Bool) : Variable",
+        "parameters": [
+          "weight : Variable",
+          "bias : Variable",
+          "runningMean : Variable",
+          "runningVar : Variable",
+          "epsilon : double",
+          "momentum : double",
+          "training : Bool"
+        ],
+        "documentation": "Variable.batchNorm is differentiable where the operation is."
+      },
+      {
+        "name": "layerNorm",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.layerNorm(weight : Variable, bias : Variable, epsilon : double) : Variable",
+        "parameters": [
+          "weight : Variable",
+          "bias : Variable",
+          "epsilon : double"
+        ],
+        "documentation": "Variable.layerNorm is differentiable where the operation is."
+      },
+      {
+        "name": "crossEntropy",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.crossEntropy(target : Variable) : Variable",
+        "parameters": [
+          "target : Variable"
+        ],
+        "documentation": "Variable.crossEntropy is differentiable where the operation is."
+      },
+      {
+        "name": "nllLoss",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.nllLoss(target : Variable) : Variable",
+        "parameters": [
+          "target : Variable"
+        ],
+        "documentation": "Variable.nllLoss is differentiable where the operation is."
+      },
+      {
+        "name": "binaryCrossEntropy",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.binaryCrossEntropy(target : Variable) : Variable",
+        "parameters": [
+          "target : Variable"
+        ],
+        "documentation": "Variable.binaryCrossEntropy is differentiable where the operation is."
+      },
+      {
+        "name": "save",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.save(path : String) : void",
+        "parameters": [
+          "path : String"
+        ],
+        "documentation": "Variable.save is differentiable where the operation is."
+      },
+      {
+        "name": "copyFromFile",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.copyFromFile(path : String) : Variable",
+        "parameters": [
+          "path : String"
+        ],
+        "documentation": "Variable.copyFromFile is differentiable where the operation is."
+      },
+      {
+        "name": "add_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.add_(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.add_ is differentiable where the operation is."
+      },
+      {
+        "name": "add_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.add_(other : double) : Variable",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Variable.add_ is differentiable where the operation is."
+      },
+      {
+        "name": "sub_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sub_(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.sub_ is differentiable where the operation is."
+      },
+      {
+        "name": "sub_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.sub_(other : double) : Variable",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Variable.sub_ is differentiable where the operation is."
+      },
+      {
+        "name": "mul_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.mul_(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.mul_ is differentiable where the operation is."
+      },
+      {
+        "name": "mul_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.mul_(other : double) : Variable",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Variable.mul_ is differentiable where the operation is."
+      },
+      {
+        "name": "div_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.div_(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.div_ is differentiable where the operation is."
+      },
+      {
+        "name": "div_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.div_(other : double) : Variable",
+        "parameters": [
+          "other : double"
+        ],
+        "documentation": "Variable.div_ is differentiable where the operation is."
+      },
+      {
+        "name": "fill_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.fill_(value : double) : Variable",
+        "parameters": [
+          "value : double"
+        ],
+        "documentation": "Variable.fill_ is differentiable where the operation is."
+      },
+      {
+        "name": "zero_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.zero_() : Variable",
+        "parameters": [],
+        "documentation": "Variable.zero_ is differentiable where the operation is."
+      },
+      {
+        "name": "copy_",
+        "module": "std.core",
+        "named": true,
+        "receiver": "Variable",
+        "signature": "Variable.copy_(other : Variable) : Variable",
+        "parameters": [
+          "other : Variable"
+        ],
+        "documentation": "Variable.copy_ is differentiable where the operation is."
+      }
+    ]
+  },
+  "statics": {
+    "Variable": [
+      {
+        "name": "zeros",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.zeros(shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.zeros builds or inspects Variables."
+      },
+      {
+        "name": "ones",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.ones(shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.ones builds or inspects Variables."
+      },
+      {
+        "name": "filled",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.filled(shape : (Int, ...) or Array[Int], value : double) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]",
+          "value : double"
+        ],
+        "documentation": "Variable.filled builds or inspects Variables."
+      },
+      {
+        "name": "fromArray",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.fromArray(values : Array[double]) : Variable",
+        "parameters": [
+          "values : Array[double]"
+        ],
+        "documentation": "Variable.fromArray builds or inspects Variables."
+      },
+      {
+        "name": "fromArray",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.fromArray(values : Array[double], shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "values : Array[double]",
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.fromArray builds or inspects Variables."
+      },
+      {
+        "name": "parameter",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.parameter(values : Array[double]) : Variable",
+        "parameters": [
+          "values : Array[double]"
+        ],
+        "documentation": "Variable.parameter builds or inspects Variables."
+      },
+      {
+        "name": "parameter",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.parameter(values : Array[double], shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "values : Array[double]",
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.parameter builds or inspects Variables."
+      },
+      {
+        "name": "fromTensor",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.fromTensor(source : DynTensor[double]) : Variable",
+        "parameters": [
+          "source : DynTensor[double]"
+        ],
+        "documentation": "Variable.fromTensor builds or inspects Variables."
+      },
+      {
+        "name": "scalar",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.scalar(value : double) : Variable",
+        "parameters": [
+          "value : double"
+        ],
+        "documentation": "Variable.scalar builds or inspects Variables."
+      },
+      {
+        "name": "empty",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.empty() : Variable",
+        "parameters": [],
+        "documentation": "Variable.empty builds or inspects Variables."
+      },
+      {
+        "name": "uniform",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.uniform(shape : (Int, ...) or Array[Int], low : double, high : double) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]",
+          "low : double",
+          "high : double"
+        ],
+        "documentation": "Variable.uniform builds or inspects Variables."
+      },
+      {
+        "name": "normal",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.normal(shape : (Int, ...) or Array[Int], mean : double, sigma : double) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]",
+          "mean : double",
+          "sigma : double"
+        ],
+        "documentation": "Variable.normal builds or inspects Variables."
+      },
+      {
+        "name": "bernoulli",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.bernoulli(shape : (Int, ...) or Array[Int], p : double) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]",
+          "p : double"
+        ],
+        "documentation": "Variable.bernoulli builds or inspects Variables."
+      },
+      {
+        "name": "randn",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.randn(shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.randn builds or inspects Variables."
+      },
+      {
+        "name": "randint",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.randint(low : Int, high : Int, shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "low : Int",
+          "high : Int",
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.randint builds or inspects Variables."
+      },
+      {
+        "name": "rand",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.rand(shape : (Int, ...) or Array[Int]) : Variable",
+        "parameters": [
+          "shape : (Int, ...) or Array[Int]"
+        ],
+        "documentation": "Variable.rand builds or inspects Variables."
+      },
+      {
+        "name": "eye",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.eye(n : Int) : Variable",
+        "parameters": [
+          "n : Int"
+        ],
+        "documentation": "Variable.eye builds or inspects Variables."
+      },
+      {
+        "name": "arange",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.arange(start : Int, stop : Int) : Variable",
+        "parameters": [
+          "start : Int",
+          "stop : Int"
+        ],
+        "documentation": "Variable.arange builds or inspects Variables."
+      },
+      {
+        "name": "arange",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.arange(start : Int, stop : Int, step : Int) : Variable",
+        "parameters": [
+          "start : Int",
+          "stop : Int",
+          "step : Int"
+        ],
+        "documentation": "Variable.arange builds or inspects Variables."
+      },
+      {
+        "name": "linspace",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.linspace(start : Int, stop : Int, steps : Int) : Variable",
+        "parameters": [
+          "start : Int",
+          "stop : Int",
+          "steps : Int"
+        ],
+        "documentation": "Variable.linspace builds or inspects Variables."
+      },
+      {
+        "name": "zerosLike",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.zerosLike(source : Variable) : Variable",
+        "parameters": [
+          "source : Variable"
+        ],
+        "documentation": "Variable.zerosLike builds or inspects Variables."
+      },
+      {
+        "name": "onesLike",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.onesLike(source : Variable) : Variable",
+        "parameters": [
+          "source : Variable"
+        ],
+        "documentation": "Variable.onesLike builds or inspects Variables."
+      },
+      {
+        "name": "randLike",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.randLike(source : Variable) : Variable",
+        "parameters": [
+          "source : Variable"
+        ],
+        "documentation": "Variable.randLike builds or inspects Variables."
+      },
+      {
+        "name": "embedding",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.embedding(weight : Variable, indices : Variable) : Variable",
+        "parameters": [
+          "weight : Variable",
+          "indices : Variable"
+        ],
+        "documentation": "Variable.embedding builds or inspects Variables."
+      },
+      {
+        "name": "load",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.load(path : String) : Variable",
+        "parameters": [
+          "path : String"
+        ],
+        "documentation": "Variable.load builds or inspects Variables."
+      },
+      {
+        "name": "seed",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.seed(value : Int) : void",
+        "parameters": [
+          "value : Int"
+        ],
+        "documentation": "Variable.seed builds or inspects Variables."
+      },
+      {
+        "name": "setTraining",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.setTraining(training : Bool) : void",
+        "parameters": [
+          "training : Bool"
+        ],
+        "documentation": "Variable.setTraining builds or inspects Variables."
+      },
+      {
+        "name": "isTraining",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.isTraining() : Bool",
+        "parameters": [],
+        "documentation": "Variable.isTraining builds or inspects Variables."
+      },
+      {
+        "name": "setGradEnabled",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.setGradEnabled(enabled : Bool) : void",
+        "parameters": [
+          "enabled : Bool"
+        ],
+        "documentation": "Variable.setGradEnabled builds or inspects Variables."
+      },
+      {
+        "name": "isGradEnabled",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.isGradEnabled() : Bool",
+        "parameters": [],
+        "documentation": "Variable.isGradEnabled builds or inspects Variables."
+      },
+      {
+        "name": "liveNodes",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.liveNodes() : Int",
+        "parameters": [],
+        "documentation": "Variable.liveNodes builds or inspects Variables."
+      },
+      {
+        "name": "liveBytes",
+        "module": "std.core",
+        "named": true,
+        "static": "Variable",
+        "signature": "Variable.liveBytes() : Int",
+        "parameters": [],
+        "documentation": "Variable.liveBytes builds or inspects Variables."
+      }
+    ]
+  },
+  "constructors": {
+    "Module": [
+      {
+        "name": "Module",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Module() : Module",
+        "parameters": [],
+        "documentation": "Constructs a Module."
+      }
+    ],
+    "Identity": [
+      {
+        "name": "Identity",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Identity() : Identity",
+        "parameters": [],
+        "documentation": "Constructs a Identity."
+      }
+    ],
+    "Linear": [
+      {
+        "name": "Linear",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Linear(inFeatures : Int, outFeatures : Int, bias : Bool = true) : Linear",
+        "parameters": [
+          "inFeatures : Int",
+          "outFeatures : Int",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a Linear."
+      }
+    ],
+    "ReLU": [
+      {
+        "name": "ReLU",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "ReLU() : ReLU",
+        "parameters": [],
+        "documentation": "Constructs a ReLU."
+      }
+    ],
+    "LeakyReLU": [
+      {
+        "name": "LeakyReLU",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "LeakyReLU(slope : double = 0.01) : LeakyReLU",
+        "parameters": [
+          "slope : double = 0.01"
+        ],
+        "documentation": "Constructs a LeakyReLU."
+      }
+    ],
+    "ELU": [
+      {
+        "name": "ELU",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "ELU(alpha : double = 1.0) : ELU",
+        "parameters": [
+          "alpha : double = 1.0"
+        ],
+        "documentation": "Constructs a ELU."
+      }
+    ],
+    "GELU": [
+      {
+        "name": "GELU",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "GELU() : GELU",
+        "parameters": [],
+        "documentation": "Constructs a GELU."
+      }
+    ],
+    "SiLU": [
+      {
+        "name": "SiLU",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "SiLU() : SiLU",
+        "parameters": [],
+        "documentation": "Constructs a SiLU."
+      }
+    ],
+    "Sigmoid": [
+      {
+        "name": "Sigmoid",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Sigmoid() : Sigmoid",
+        "parameters": [],
+        "documentation": "Constructs a Sigmoid."
+      }
+    ],
+    "Tanh": [
+      {
+        "name": "Tanh",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Tanh() : Tanh",
+        "parameters": [],
+        "documentation": "Constructs a Tanh."
+      }
+    ],
+    "Softmax": [
+      {
+        "name": "Softmax",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Softmax(axis : Int = 0 - 1) : Softmax",
+        "parameters": [
+          "axis : Int = 0 - 1"
+        ],
+        "documentation": "Constructs a Softmax."
+      }
+    ],
+    "LogSoftmax": [
+      {
+        "name": "LogSoftmax",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "LogSoftmax(axis : Int = 0 - 1) : LogSoftmax",
+        "parameters": [
+          "axis : Int = 0 - 1"
+        ],
+        "documentation": "Constructs a LogSoftmax."
+      }
+    ],
+    "Flatten": [
+      {
+        "name": "Flatten",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Flatten(startDim : Int = 1) : Flatten",
+        "parameters": [
+          "startDim : Int = 1"
+        ],
+        "documentation": "Constructs a Flatten."
+      }
+    ],
+    "Dropout": [
+      {
+        "name": "Dropout",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Dropout(probability : double = 0.5) : Dropout",
+        "parameters": [
+          "probability : double = 0.5"
+        ],
+        "documentation": "Constructs a Dropout."
+      }
+    ],
+    "Sequential": [
+      {
+        "name": "Sequential",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Sequential(layers : List[Box[dyn Network]]) : Sequential",
+        "parameters": [
+          "layers : List[Box[dyn Network]]"
+        ],
+        "documentation": "Constructs a Sequential."
+      }
+    ],
+    "ModuleList": [
+      {
+        "name": "ModuleList",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "ModuleList(layers : List[Box[dyn Network]]) : ModuleList",
+        "parameters": [
+          "layers : List[Box[dyn Network]]"
+        ],
+        "documentation": "Constructs a ModuleList."
+      }
+    ],
+    "MSELoss": [
+      {
+        "name": "MSELoss",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "MSELoss(reduction : String = \"mean\") : MSELoss",
+        "parameters": [
+          "reduction : String = \"mean\""
+        ],
+        "documentation": "Constructs a MSELoss."
+      }
+    ],
+    "L1Loss": [
+      {
+        "name": "L1Loss",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "L1Loss(reduction : String = \"mean\") : L1Loss",
+        "parameters": [
+          "reduction : String = \"mean\""
+        ],
+        "documentation": "Constructs a L1Loss."
+      }
+    ],
+    "CrossEntropyLoss": [
+      {
+        "name": "CrossEntropyLoss",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "CrossEntropyLoss() : CrossEntropyLoss",
+        "parameters": [],
+        "documentation": "Constructs a CrossEntropyLoss."
+      }
+    ],
+    "NLLLoss": [
+      {
+        "name": "NLLLoss",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "NLLLoss() : NLLLoss",
+        "parameters": [],
+        "documentation": "Constructs a NLLLoss."
+      }
+    ],
+    "BCEWithLogitsLoss": [
+      {
+        "name": "BCEWithLogitsLoss",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "BCEWithLogitsLoss() : BCEWithLogitsLoss",
+        "parameters": [],
+        "documentation": "Constructs a BCEWithLogitsLoss."
+      }
+    ],
+    "relu": [
+      {
+        "name": "relu",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "relu(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "sigmoid": [
+      {
+        "name": "sigmoid",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "sigmoid(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "tanh": [
+      {
+        "name": "tanh",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "tanh(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "gelu": [
+      {
+        "name": "gelu",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "gelu(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "silu": [
+      {
+        "name": "silu",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "silu(x : Variable) : Variable",
+        "parameters": [
+          "x : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "softmax": [
+      {
+        "name": "softmax",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "softmax(x : Variable, axis : Int = 0 - 1) : Variable",
+        "parameters": [
+          "x : Variable",
+          "axis : Int = 0 - 1"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "logSoftmax": [
+      {
+        "name": "logSoftmax",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "logSoftmax(x : Variable, axis : Int = 0 - 1) : Variable",
+        "parameters": [
+          "x : Variable",
+          "axis : Int = 0 - 1"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "linear": [
+      {
+        "name": "linear",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "linear(x : Variable, weight : Variable, bias : Option[Variable] = None) : Variable",
+        "parameters": [
+          "x : Variable",
+          "weight : Variable",
+          "bias : Option[Variable] = None"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "mseLoss": [
+      {
+        "name": "mseLoss",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "mseLoss(prediction : Variable, target : Variable) : Variable",
+        "parameters": [
+          "prediction : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "l1Loss": [
+      {
+        "name": "l1Loss",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "l1Loss(prediction : Variable, target : Variable) : Variable",
+        "parameters": [
+          "prediction : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "crossEntropy": [
+      {
+        "name": "crossEntropy",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "crossEntropy(logits : Variable, target : Variable) : Variable",
+        "parameters": [
+          "logits : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "nllLoss": [
+      {
+        "name": "nllLoss",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "nllLoss(logProbabilities : Variable, target : Variable) : Variable",
+        "parameters": [
+          "logProbabilities : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "binaryCrossEntropy": [
+      {
+        "name": "binaryCrossEntropy",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "binaryCrossEntropy(logits : Variable, target : Variable) : Variable",
+        "parameters": [
+          "logits : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "Conv2d": [
+      {
+        "name": "Conv2d",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Conv2d(inChannels : Int, outChannels : Int, kernelSize : Int, stride : Int = 1, padding : Int = 0, dilation : Int = 1, groups : Int = 1, bias : Bool = true) : Conv2d",
+        "parameters": [
+          "inChannels : Int",
+          "outChannels : Int",
+          "kernelSize : Int",
+          "stride : Int = 1",
+          "padding : Int = 0",
+          "dilation : Int = 1",
+          "groups : Int = 1",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a Conv2d."
+      }
+    ],
+    "MaxPool2d": [
+      {
+        "name": "MaxPool2d",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "MaxPool2d(kernelSize : Int, stride : Int = 0, padding : Int = 0) : MaxPool2d",
+        "parameters": [
+          "kernelSize : Int",
+          "stride : Int = 0",
+          "padding : Int = 0"
+        ],
+        "documentation": "Constructs a MaxPool2d."
+      }
+    ],
+    "AvgPool2d": [
+      {
+        "name": "AvgPool2d",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "AvgPool2d(kernelSize : Int, stride : Int = 0, padding : Int = 0) : AvgPool2d",
+        "parameters": [
+          "kernelSize : Int",
+          "stride : Int = 0",
+          "padding : Int = 0"
+        ],
+        "documentation": "Constructs a AvgPool2d."
+      }
+    ],
+    "AdaptiveAvgPool2d": [
+      {
+        "name": "AdaptiveAvgPool2d",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "AdaptiveAvgPool2d(outHeight : Int, outWidth : Int) : AdaptiveAvgPool2d",
+        "parameters": [
+          "outHeight : Int",
+          "outWidth : Int"
+        ],
+        "documentation": "Constructs a AdaptiveAvgPool2d."
+      }
+    ],
+    "BatchNorm2d": [
+      {
+        "name": "BatchNorm2d",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "BatchNorm2d(numFeatures : Int, epsilon : double = 0.00001, momentum : double = 0.1, affine : Bool = true) : BatchNorm2d",
+        "parameters": [
+          "numFeatures : Int",
+          "epsilon : double = 0.00001",
+          "momentum : double = 0.1",
+          "affine : Bool = true"
+        ],
+        "documentation": "Constructs a BatchNorm2d."
+      }
+    ],
+    "BatchNorm1d": [
+      {
+        "name": "BatchNorm1d",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "BatchNorm1d(numFeatures : Int, epsilon : double = 0.00001, momentum : double = 0.1, affine : Bool = true) : BatchNorm1d",
+        "parameters": [
+          "numFeatures : Int",
+          "epsilon : double = 0.00001",
+          "momentum : double = 0.1",
+          "affine : Bool = true"
+        ],
+        "documentation": "Constructs a BatchNorm1d."
+      }
+    ],
+    "LayerNorm": [
+      {
+        "name": "LayerNorm",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "LayerNorm(normalizedSize : Int, epsilon : double = 0.00001, affine : Bool = true) : LayerNorm",
+        "parameters": [
+          "normalizedSize : Int",
+          "epsilon : double = 0.00001",
+          "affine : Bool = true"
+        ],
+        "documentation": "Constructs a LayerNorm."
+      }
+    ],
+    "GroupNorm": [
+      {
+        "name": "GroupNorm",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "GroupNorm(numGroups : Int, numChannels : Int, epsilon : double = 0.00001, affine : Bool = true) : GroupNorm",
+        "parameters": [
+          "numGroups : Int",
+          "numChannels : Int",
+          "epsilon : double = 0.00001",
+          "affine : Bool = true"
+        ],
+        "documentation": "Constructs a GroupNorm."
+      }
+    ],
+    "Embedding": [
+      {
+        "name": "Embedding",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "Embedding(numEmbeddings : Int, embeddingDim : Int) : Embedding",
+        "parameters": [
+          "numEmbeddings : Int",
+          "embeddingDim : Int"
+        ],
+        "documentation": "Constructs a Embedding."
+      }
+    ],
+    "MultiheadAttention": [
+      {
+        "name": "MultiheadAttention",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "MultiheadAttention(embedDim : Int, heads : Int, bias : Bool = true) : MultiheadAttention",
+        "parameters": [
+          "embedDim : Int",
+          "heads : Int",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a MultiheadAttention."
+      }
+    ],
+    "TransformerEncoderLayer": [
+      {
+        "name": "TransformerEncoderLayer",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "TransformerEncoderLayer(embedDim : Int, heads : Int, feedforwardDim : Int = 0, dropout : double = 0.1) : TransformerEncoderLayer",
+        "parameters": [
+          "embedDim : Int",
+          "heads : Int",
+          "feedforwardDim : Int = 0",
+          "dropout : double = 0.1"
+        ],
+        "documentation": "Constructs a TransformerEncoderLayer."
+      }
+    ],
+    "TransformerEncoder": [
+      {
+        "name": "TransformerEncoder",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "TransformerEncoder(layers : List[Box[dyn Network]]) : TransformerEncoder",
+        "parameters": [
+          "layers : List[Box[dyn Network]]"
+        ],
+        "documentation": "Constructs a TransformerEncoder."
+      }
+    ],
+    "LSTMCell": [
+      {
+        "name": "LSTMCell",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "LSTMCell(inputSize : Int, hiddenSize : Int, bias : Bool = true) : LSTMCell",
+        "parameters": [
+          "inputSize : Int",
+          "hiddenSize : Int",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a LSTMCell."
+      }
+    ],
+    "LSTM": [
+      {
+        "name": "LSTM",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "LSTM(inputSize : Int, hiddenSize : Int, bias : Bool = true) : LSTM",
+        "parameters": [
+          "inputSize : Int",
+          "hiddenSize : Int",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a LSTM."
+      }
+    ],
+    "GRUCell": [
+      {
+        "name": "GRUCell",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "GRUCell(inputSize : Int, hiddenSize : Int, bias : Bool = true) : GRUCell",
+        "parameters": [
+          "inputSize : Int",
+          "hiddenSize : Int",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a GRUCell."
+      }
+    ],
+    "GRU": [
+      {
+        "name": "GRU",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "GRU(inputSize : Int, hiddenSize : Int, bias : Bool = true) : GRU",
+        "parameters": [
+          "inputSize : Int",
+          "hiddenSize : Int",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a GRU."
+      }
+    ],
+    "RNNCell": [
+      {
+        "name": "RNNCell",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "RNNCell(inputSize : Int, hiddenSize : Int, bias : Bool = true) : RNNCell",
+        "parameters": [
+          "inputSize : Int",
+          "hiddenSize : Int",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a RNNCell."
+      }
+    ],
+    "RNN": [
+      {
+        "name": "RNN",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "RNN(inputSize : Int, hiddenSize : Int, bias : Bool = true) : RNN",
+        "parameters": [
+          "inputSize : Int",
+          "hiddenSize : Int",
+          "bias : Bool = true"
+        ],
+        "documentation": "Constructs a RNN."
+      }
+    ],
+    "cat": [
+      {
+        "name": "cat",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "cat(values : List[Variable], axis : Int) : Variable",
+        "parameters": [
+          "values : List[Variable]",
+          "axis : Int"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "stack": [
+      {
+        "name": "stack",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "stack(values : List[Variable], axis : Int) : Variable",
+        "parameters": [
+          "values : List[Variable]",
+          "axis : Int"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "saveParameters": [
+      {
+        "name": "saveParameters",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "saveParameters(module : Module, path : String) : void with Effects",
+        "parameters": [
+          "module : Module",
+          "path : String"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "loadParameters": [
+      {
+        "name": "loadParameters",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "loadParameters(module : Module, path : String) : void with Effects",
+        "parameters": [
+          "module : Module",
+          "path : String"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "accuracy": [
+      {
+        "name": "accuracy",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "accuracy(logits : Variable, targets : Variable) : double",
+        "parameters": [
+          "logits : Variable",
+          "targets : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "meanAbsoluteError": [
+      {
+        "name": "meanAbsoluteError",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "meanAbsoluteError(prediction : Variable, target : Variable) : double",
+        "parameters": [
+          "prediction : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "meanSquaredError": [
+      {
+        "name": "meanSquaredError",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "meanSquaredError(prediction : Variable, target : Variable) : double",
+        "parameters": [
+          "prediction : Variable",
+          "target : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "xavierUniform": [
+      {
+        "name": "xavierUniform",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "xavierUniform(weight : Variable) : void",
+        "parameters": [
+          "weight : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "kaimingUniform": [
+      {
+        "name": "kaimingUniform",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "kaimingUniform(weight : Variable) : void",
+        "parameters": [
+          "weight : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "normalInit": [
+      {
+        "name": "normalInit",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "normalInit(weight : Variable, mean : double = 0.0, sigma : double = 0.01) : void",
+        "parameters": [
+          "weight : Variable",
+          "mean : double = 0.0",
+          "sigma : double = 0.01"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "zerosInit": [
+      {
+        "name": "zerosInit",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "zerosInit(weight : Variable) : void",
+        "parameters": [
+          "weight : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "onesInit": [
+      {
+        "name": "onesInit",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "onesInit(weight : Variable) : void",
+        "parameters": [
+          "weight : Variable"
+        ],
+        "documentation": "Free function from std.kesnet."
+      }
+    ],
+    "MLP": [
+      {
+        "name": "MLP",
+        "module": "std.kesnet",
+        "gated": true,
+        "named": true,
+        "signature": "MLP(inputs : Int, hiddenSize : Int, outputs : Int, move activation : Box[dyn Network] = box(ReLU())) : MLP",
+        "parameters": [
+          "inputs : Int",
+          "hiddenSize : Int",
+          "outputs : Int",
+          "move activation : Box[dyn Network] = box(ReLU())"
+        ],
+        "documentation": "Constructs a MLP."
+      }
+    ],
+    "Optimizer": [
+      {
+        "name": "Optimizer",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "Optimizer(parameters : List[Variable], learningRate : double = 0.01) : Optimizer",
+        "parameters": [
+          "parameters : List[Variable]",
+          "learningRate : double = 0.01"
+        ],
+        "documentation": "Constructs a Optimizer."
+      }
+    ],
+    "SGD": [
+      {
+        "name": "SGD",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "SGD(parameters : List[Variable], learningRate : double = 0.01, momentum : double = 0.0, weightDecay : double = 0.0, nesterov : Bool = false) : SGD",
+        "parameters": [
+          "parameters : List[Variable]",
+          "learningRate : double = 0.01",
+          "momentum : double = 0.0",
+          "weightDecay : double = 0.0",
+          "nesterov : Bool = false"
+        ],
+        "documentation": "Constructs a SGD."
+      }
+    ],
+    "Adam": [
+      {
+        "name": "Adam",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "Adam(parameters : List[Variable], learningRate : double = 0.001, beta1 : double = 0.9, beta2 : double = 0.999, epsilon : double = 0.00000001, weightDecay : double = 0.0) : Adam",
+        "parameters": [
+          "parameters : List[Variable]",
+          "learningRate : double = 0.001",
+          "beta1 : double = 0.9",
+          "beta2 : double = 0.999",
+          "epsilon : double = 0.00000001",
+          "weightDecay : double = 0.0"
+        ],
+        "documentation": "Constructs a Adam."
+      }
+    ],
+    "AdamW": [
+      {
+        "name": "AdamW",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "AdamW(parameters : List[Variable], learningRate : double = 0.001, beta1 : double = 0.9, beta2 : double = 0.999, epsilon : double = 0.00000001, weightDecay : double = 0.01) : AdamW",
+        "parameters": [
+          "parameters : List[Variable]",
+          "learningRate : double = 0.001",
+          "beta1 : double = 0.9",
+          "beta2 : double = 0.999",
+          "epsilon : double = 0.00000001",
+          "weightDecay : double = 0.01"
+        ],
+        "documentation": "Constructs a AdamW."
+      }
+    ],
+    "RMSprop": [
+      {
+        "name": "RMSprop",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "RMSprop(parameters : List[Variable], learningRate : double = 0.01, alpha : double = 0.99, epsilon : double = 0.00000001, weightDecay : double = 0.0, momentum : double = 0.0) : RMSprop",
+        "parameters": [
+          "parameters : List[Variable]",
+          "learningRate : double = 0.01",
+          "alpha : double = 0.99",
+          "epsilon : double = 0.00000001",
+          "weightDecay : double = 0.0",
+          "momentum : double = 0.0"
+        ],
+        "documentation": "Constructs a RMSprop."
+      }
+    ],
+    "Adagrad": [
+      {
+        "name": "Adagrad",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "Adagrad(parameters : List[Variable], learningRate : double = 0.01, epsilon : double = 0.00000001, weightDecay : double = 0.0) : Adagrad",
+        "parameters": [
+          "parameters : List[Variable]",
+          "learningRate : double = 0.01",
+          "epsilon : double = 0.00000001",
+          "weightDecay : double = 0.0"
+        ],
+        "documentation": "Constructs a Adagrad."
+      }
+    ],
+    "Adadelta": [
+      {
+        "name": "Adadelta",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "Adadelta(parameters : List[Variable], learningRate : double = 1.0, rho : double = 0.95, epsilon : double = 0.000001, weightDecay : double = 0.0) : Adadelta",
+        "parameters": [
+          "parameters : List[Variable]",
+          "learningRate : double = 1.0",
+          "rho : double = 0.95",
+          "epsilon : double = 0.000001",
+          "weightDecay : double = 0.0"
+        ],
+        "documentation": "Constructs a Adadelta."
+      }
+    ],
+    "Adamax": [
+      {
+        "name": "Adamax",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "Adamax(parameters : List[Variable], learningRate : double = 0.002, beta1 : double = 0.9, beta2 : double = 0.999, epsilon : double = 0.00000001, weightDecay : double = 0.0) : Adamax",
+        "parameters": [
+          "parameters : List[Variable]",
+          "learningRate : double = 0.002",
+          "beta1 : double = 0.9",
+          "beta2 : double = 0.999",
+          "epsilon : double = 0.00000001",
+          "weightDecay : double = 0.0"
+        ],
+        "documentation": "Constructs a Adamax."
+      }
+    ],
+    "StepLR": [
+      {
+        "name": "StepLR",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "StepLR(stepSize : Int, gamma : double = 0.1) : StepLR",
+        "parameters": [
+          "stepSize : Int",
+          "gamma : double = 0.1"
+        ],
+        "documentation": "Constructs a StepLR."
+      }
+    ],
+    "MultiStepLR": [
+      {
+        "name": "MultiStepLR",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "MultiStepLR(milestones : List[Int], gamma : double = 0.1) : MultiStepLR",
+        "parameters": [
+          "milestones : List[Int]",
+          "gamma : double = 0.1"
+        ],
+        "documentation": "Constructs a MultiStepLR."
+      }
+    ],
+    "ExponentialLR": [
+      {
+        "name": "ExponentialLR",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "ExponentialLR(gamma : double) : ExponentialLR",
+        "parameters": [
+          "gamma : double"
+        ],
+        "documentation": "Constructs a ExponentialLR."
+      }
+    ],
+    "CosineAnnealingLR": [
+      {
+        "name": "CosineAnnealingLR",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "CosineAnnealingLR(totalSteps : Int, initial : double, minimum : double = 0.0) : CosineAnnealingLR",
+        "parameters": [
+          "totalSteps : Int",
+          "initial : double",
+          "minimum : double = 0.0"
+        ],
+        "documentation": "Constructs a CosineAnnealingLR."
+      }
+    ],
+    "ReduceLROnPlateau": [
+      {
+        "name": "ReduceLROnPlateau",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "ReduceLROnPlateau(factor : double = 0.1, patience : Int = 10, minimum : double = 0.000001) : ReduceLROnPlateau",
+        "parameters": [
+          "factor : double = 0.1",
+          "patience : Int = 10",
+          "minimum : double = 0.000001"
+        ],
+        "documentation": "Constructs a ReduceLROnPlateau."
+      }
+    ],
+    "warmupRate": [
+      {
+        "name": "warmupRate",
+        "module": "std.kesnet.optim",
+        "gated": true,
+        "named": true,
+        "signature": "warmupRate(base : double, step : Int, warmupSteps : Int) : double",
+        "parameters": [
+          "base : double",
+          "step : Int",
+          "warmupSteps : Int"
+        ],
+        "documentation": "Free function from std.kesnet.optim."
+      }
+    ],
+    "TensorDataset": [
+      {
+        "name": "TensorDataset",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "signature": "TensorDataset(move features : DynTensor[double], move targets : DynTensor[double]) : TensorDataset",
+        "parameters": [
+          "move features : DynTensor[double]",
+          "move targets : DynTensor[double]"
+        ],
+        "documentation": "Constructs a TensorDataset."
+      }
+    ],
+    "DataLoader": [
+      {
+        "name": "DataLoader",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "signature": "DataLoader(move dataset : TensorDataset, batchSize : Int = 32, shuffle : Bool = false, dropLast : Bool = false, seed : Int = 0) : DataLoader",
+        "parameters": [
+          "move dataset : TensorDataset",
+          "batchSize : Int = 32",
+          "shuffle : Bool = false",
+          "dropLast : Bool = false",
+          "seed : Int = 0"
+        ],
+        "documentation": "Constructs a DataLoader."
+      }
+    ],
+    "fromDataFrame": [
+      {
+        "name": "fromDataFrame",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "signature": "fromDataFrame(frame : DataFrame, features : List[String], target : String) : TensorDataset or Error",
+        "parameters": [
+          "frame : DataFrame",
+          "features : List[String]",
+          "target : String"
+        ],
+        "documentation": "Free function from std.kesnet.data."
+      }
+    ],
+    "trainTestSplit": [
+      {
+        "name": "trainTestSplit",
+        "module": "std.kesnet.data",
+        "gated": true,
+        "named": true,
+        "signature": "trainTestSplit(dataset : TensorDataset, testCount : Int, seed : Int = 0) : (TensorDataset, TensorDataset)",
+        "parameters": [
+          "dataset : TensorDataset",
+          "testCount : Int",
+          "seed : Int = 0"
+        ],
+        "documentation": "Free function from std.kesnet.data."
+      }
+    ]
+  },
+  "fields": {
+    "Module": {
+      "registered": "Array[Variable]",
+      "trainingMode": "Bool"
+    },
+    "Linear": {
+      "weight": "Variable",
+      "biasValue": "Variable",
+      "hasBias": "Bool",
+      "inFeatures": "Int",
+      "outFeatures": "Int"
+    },
+    "LeakyReLU": {
+      "slope": "double"
+    },
+    "ELU": {
+      "alpha": "double"
+    },
+    "Softmax": {
+      "axis": "Int"
+    },
+    "LogSoftmax": {
+      "axis": "Int"
+    },
+    "Flatten": {
+      "startDim": "Int"
+    },
+    "Dropout": {
+      "probability": "double"
+    },
+    "Sequential": {
+      "layers": "List[Box[dyn Network]]"
+    },
+    "ModuleList": {
+      "layers": "List[Box[dyn Network]]"
+    },
+    "MSELoss": {
+      "reduction": "String"
+    },
+    "L1Loss": {
+      "reduction": "String"
+    },
+    "Conv2d": {
+      "weight": "Variable",
+      "biasValue": "Variable",
+      "hasBias": "Bool",
+      "inChannels": "Int",
+      "outChannels": "Int",
+      "kernelSize": "Int",
+      "stride": "Int",
+      "padding": "Int",
+      "dilation": "Int",
+      "groups": "Int"
+    },
+    "MaxPool2d": {
+      "kernelSize": "Int",
+      "stride": "Int",
+      "padding": "Int"
+    },
+    "AvgPool2d": {
+      "kernelSize": "Int",
+      "stride": "Int",
+      "padding": "Int"
+    },
+    "AdaptiveAvgPool2d": {
+      "outHeight": "Int",
+      "outWidth": "Int"
+    },
+    "BatchNorm2d": {
+      "weight": "Variable",
+      "biasValue": "Variable",
+      "runningMean": "Variable",
+      "runningVar": "Variable",
+      "epsilon": "double",
+      "momentum": "double",
+      "affine": "Bool"
+    },
+    "BatchNorm1d": {
+      "inner": "BatchNorm2d"
+    },
+    "LayerNorm": {
+      "weight": "Variable",
+      "biasValue": "Variable",
+      "epsilon": "double",
+      "affine": "Bool"
+    },
+    "GroupNorm": {
+      "weight": "Variable",
+      "biasValue": "Variable",
+      "numGroups": "Int",
+      "numChannels": "Int",
+      "epsilon": "double",
+      "affine": "Bool"
+    },
+    "Embedding": {
+      "weight": "Variable",
+      "numEmbeddings": "Int",
+      "embeddingDim": "Int"
+    },
+    "MultiheadAttention": {
+      "query": "Linear",
+      "key": "Linear",
+      "value": "Linear",
+      "output": "Linear",
+      "embedDim": "Int",
+      "heads": "Int",
+      "headDim": "Int",
+      "useBias": "Bool"
+    },
+    "TransformerEncoderLayer": {
+      "attention": "MultiheadAttention",
+      "norm1": "LayerNorm",
+      "norm2": "LayerNorm",
+      "linear1": "Linear",
+      "linear2": "Linear",
+      "dropout": "Dropout",
+      "feedforwardDim": "Int"
+    },
+    "TransformerEncoder": {
+      "layers": "List[Box[dyn Network]]"
+    },
+    "LSTMCell": {
+      "inputInput": "Linear",
+      "inputForget": "Linear",
+      "inputCell": "Linear",
+      "inputOutput": "Linear",
+      "hiddenInput": "Linear",
+      "hiddenForget": "Linear",
+      "hiddenCell": "Linear",
+      "hiddenOutput": "Linear",
+      "hiddenSize": "Int",
+      "hasBias": "Bool"
+    },
+    "LSTM": {
+      "cell": "LSTMCell",
+      "hiddenSize": "Int"
+    },
+    "GRUCell": {
+      "inputReset": "Linear",
+      "inputUpdate": "Linear",
+      "inputNew": "Linear",
+      "hiddenReset": "Linear",
+      "hiddenUpdate": "Linear",
+      "hiddenNew": "Linear",
+      "hiddenSize": "Int"
+    },
+    "GRU": {
+      "cell": "GRUCell",
+      "hiddenSize": "Int"
+    },
+    "RNNCell": {
+      "inputProjection": "Linear",
+      "hiddenProjection": "Linear",
+      "hiddenSize": "Int"
+    },
+    "RNN": {
+      "cell": "RNNCell",
+      "hiddenSize": "Int"
+    },
+    "MLP": {
+      "first": "Linear",
+      "second": "Linear",
+      "hidden": "Box[dyn Network]"
+    },
+    "Optimizer": {
+      "parameters": "List[Variable]",
+      "learningRate": "double"
+    },
+    "SGD": {
+      "momentum": "double",
+      "weightDecay": "double",
+      "nesterov": "Bool",
+      "velocities": "Array[Variable]"
+    },
+    "Adam": {
+      "beta1": "double",
+      "beta2": "double",
+      "epsilon": "double",
+      "weightDecay": "double",
+      "firstMoments": "Array[Variable]",
+      "secondMoments": "Array[Variable]",
+      "steps": "Int"
+    },
+    "AdamW": {
+      "beta1": "double",
+      "beta2": "double",
+      "epsilon": "double",
+      "weightDecay": "double",
+      "firstMoments": "Array[Variable]",
+      "secondMoments": "Array[Variable]",
+      "steps": "Int"
+    },
+    "RMSprop": {
+      "alpha": "double",
+      "epsilon": "double",
+      "weightDecay": "double",
+      "momentum": "double",
+      "squares": "Array[Variable]",
+      "velocities": "Array[Variable]"
+    },
+    "Adagrad": {
+      "epsilon": "double",
+      "weightDecay": "double",
+      "squares": "Array[Variable]"
+    },
+    "Adadelta": {
+      "rho": "double",
+      "epsilon": "double",
+      "weightDecay": "double",
+      "gradientSquares": "Array[Variable]",
+      "updateSquares": "Array[Variable]"
+    },
+    "Adamax": {
+      "beta1": "double",
+      "beta2": "double",
+      "epsilon": "double",
+      "weightDecay": "double",
+      "firstMoments": "Array[Variable]",
+      "secondMoments": "Array[Variable]",
+      "steps": "Int"
+    },
+    "StepLR": {
+      "stepSize": "Int",
+      "gamma": "double",
+      "completed": "Int"
+    },
+    "MultiStepLR": {
+      "milestones": "List[Int]",
+      "gamma": "double",
+      "completed": "Int"
+    },
+    "ExponentialLR": {
+      "gamma": "double"
+    },
+    "CosineAnnealingLR": {
+      "totalSteps": "Int",
+      "minimum": "double",
+      "initial": "double",
+      "completed": "Int"
+    },
+    "ReduceLROnPlateau": {
+      "factor": "double",
+      "patience": "Int",
+      "minimum": "double",
+      "best": "double",
+      "waiting": "Int"
+    },
+    "TensorDataset": {
+      "features": "DynTensor[double]",
+      "targets": "DynTensor[double]"
+    },
+    "DataLoader": {
+      "dataset": "TensorDataset",
+      "batchSize": "Int",
+      "shuffle": "Bool",
+      "dropLast": "Bool",
+      "seed": "Int",
+      "epoch": "Int"
+    }
+  },
+  "functions": [],
+  "parents": {
+    "Identity": "Module",
+    "Linear": "Module",
+    "ReLU": "Module",
+    "LeakyReLU": "Module",
+    "ELU": "Module",
+    "GELU": "Module",
+    "SiLU": "Module",
+    "Sigmoid": "Module",
+    "Tanh": "Module",
+    "Softmax": "Module",
+    "LogSoftmax": "Module",
+    "Flatten": "Module",
+    "Dropout": "Module",
+    "Sequential": "Module",
+    "ModuleList": "Module",
+    "Conv2d": "Module",
+    "MaxPool2d": "Module",
+    "AvgPool2d": "Module",
+    "AdaptiveAvgPool2d": "Module",
+    "BatchNorm2d": "Module",
+    "BatchNorm1d": "Module",
+    "LayerNorm": "Module",
+    "GroupNorm": "Module",
+    "Embedding": "Module",
+    "MultiheadAttention": "Module",
+    "TransformerEncoderLayer": "Module",
+    "TransformerEncoder": "Module",
+    "LSTMCell": "Module",
+    "LSTM": "Module",
+    "GRUCell": "Module",
+    "GRU": "Module",
+    "RNNCell": "Module",
+    "RNN": "Module",
+    "MLP": "Module",
+    "SGD": "Optimizer",
+    "Adam": "Optimizer",
+    "AdamW": "Optimizer",
+    "RMSprop": "Optimizer",
+    "Adagrad": "Optimizer",
+    "Adadelta": "Optimizer",
+    "Adamax": "Optimizer"
+  },
+  "module": "std.kesnet",
+  "modules": [
+    {
+      "path": "std.kesnet",
+      "names": [
+        "Module",
+        "registered",
+        "trainingMode",
+        "addParameter",
+        "parameters",
+        "parameterCount",
+        "train",
+        "eval",
+        "zeroGrad",
+        "forward",
+        "summary",
+        "Identity",
+        "Linear",
+        "weight",
+        "biasValue",
+        "hasBias",
+        "inFeatures",
+        "outFeatures",
+        "ReLU",
+        "LeakyReLU",
+        "slope",
+        "ELU",
+        "alpha",
+        "GELU",
+        "SiLU",
+        "Sigmoid",
+        "Tanh",
+        "Softmax",
+        "axis",
+        "LogSoftmax",
+        "Flatten",
+        "startDim",
+        "Dropout",
+        "probability",
+        "Sequential",
+        "layers",
+        "ModuleList",
+        "MSELoss",
+        "reduction",
+        "L1Loss",
+        "CrossEntropyLoss",
+        "NLLLoss",
+        "BCEWithLogitsLoss",
+        "relu",
+        "sigmoid",
+        "tanh",
+        "gelu",
+        "silu",
+        "softmax",
+        "logSoftmax",
+        "linear",
+        "mseLoss",
+        "l1Loss",
+        "crossEntropy",
+        "nllLoss",
+        "binaryCrossEntropy",
+        "Conv2d",
+        "inChannels",
+        "outChannels",
+        "kernelSize",
+        "stride",
+        "padding",
+        "dilation",
+        "groups",
+        "MaxPool2d",
+        "AvgPool2d",
+        "AdaptiveAvgPool2d",
+        "outHeight",
+        "outWidth",
+        "BatchNorm2d",
+        "runningMean",
+        "runningVar",
+        "epsilon",
+        "momentum",
+        "affine",
+        "BatchNorm1d",
+        "inner",
+        "LayerNorm",
+        "GroupNorm",
+        "numGroups",
+        "numChannels",
+        "Embedding",
+        "numEmbeddings",
+        "embeddingDim",
+        "MultiheadAttention",
+        "query",
+        "key",
+        "value",
+        "output",
+        "embedDim",
+        "heads",
+        "headDim",
+        "useBias",
+        "TransformerEncoderLayer",
+        "attention",
+        "norm1",
+        "norm2",
+        "linear1",
+        "linear2",
+        "dropout",
+        "feedforwardDim",
+        "TransformerEncoder",
+        "LSTMCell",
+        "inputInput",
+        "inputForget",
+        "inputCell",
+        "inputOutput",
+        "hiddenInput",
+        "hiddenForget",
+        "hiddenCell",
+        "hiddenOutput",
+        "hiddenSize",
+        "step",
+        "zeros",
+        "LSTM",
+        "cell",
+        "GRUCell",
+        "inputReset",
+        "inputUpdate",
+        "inputNew",
+        "hiddenReset",
+        "hiddenUpdate",
+        "hiddenNew",
+        "GRU",
+        "RNNCell",
+        "inputProjection",
+        "hiddenProjection",
+        "RNN",
+        "cat",
+        "stack",
+        "saveParameters",
+        "loadParameters",
+        "accuracy",
+        "meanAbsoluteError",
+        "meanSquaredError",
+        "xavierUniform",
+        "kaimingUniform",
+        "normalInit",
+        "zerosInit",
+        "onesInit",
+        "MLP",
+        "first",
+        "second",
+        "hidden"
+      ]
+    },
+    {
+      "path": "std.kesnet.optim",
+      "names": [
+        "Optimizer",
+        "parameters",
+        "learningRate",
+        "zeroGrad",
+        "setLearningRate",
+        "step",
+        "parameterCount",
+        "SGD",
+        "momentum",
+        "weightDecay",
+        "nesterov",
+        "velocities",
+        "Adam",
+        "beta1",
+        "beta2",
+        "epsilon",
+        "firstMoments",
+        "secondMoments",
+        "steps",
+        "AdamW",
+        "RMSprop",
+        "alpha",
+        "squares",
+        "Adagrad",
+        "Adadelta",
+        "rho",
+        "gradientSquares",
+        "updateSquares",
+        "Adamax",
+        "StepLR",
+        "stepSize",
+        "gamma",
+        "completed",
+        "lastLearningRate",
+        "MultiStepLR",
+        "milestones",
+        "ExponentialLR",
+        "CosineAnnealingLR",
+        "totalSteps",
+        "minimum",
+        "initial",
+        "ReduceLROnPlateau",
+        "factor",
+        "patience",
+        "best",
+        "waiting",
+        "warmupRate"
+      ]
+    },
+    {
+      "path": "std.kesnet.data",
+      "names": [
+        "TensorDataset",
+        "features",
+        "targets",
+        "length",
+        "featureCount",
+        "targetCount",
+        "targetRank",
+        "DataLoader",
+        "dataset",
+        "batchSize",
+        "shuffle",
+        "dropLast",
+        "seed",
+        "epoch",
+        "batches",
+        "reset",
+        "fromDataFrame",
+        "trainTestSplit"
+      ]
+    }
+  ]
+}

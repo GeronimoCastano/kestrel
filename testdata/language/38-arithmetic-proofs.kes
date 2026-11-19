@@ -1,0 +1,7 @@
+theorem positive(n : Int) : n > 0 requires h : n >= 1 { smt }
+
+theorem successor(n : Nat) : (n + 1) > n requires h : n < 18446744073709551615 { smt }
+
+let n : Nat = 3
+print(n + 1)
+print(n - 1)

@@ -1,0 +1,33 @@
+// hist1m: histogram of 1,000,000 deterministic values in [0, 100), 50 bins.
+import std.kesplot as plt
+import c "stdlib.h"
+
+function quote(text : String) : String = "'" + text.replace("'", "'\\''") + "'"
+
+function reportSize(path : String) : void or Error with Effects {
+    let sizePath := path + ".size"
+    let status := unsafe { system("wc -c < " + quote(path) + " > " + quote(sizePath)) }
+    if status.toInt() != 0 { return Error("cannot measure " + path) }
+    using reader := open(sizePath)? {
+        let line := reader.readLine()?
+        print(parseInt(line.trim())?)
+    }
+}
+
+function main() : void or Error with Effects {
+    let n := 1000000
+    let values : Array[double] = Array.empty()
+    for (i in range(n)) {
+        let hashed := (i * 2654435761 + 12345) % 2147483648
+        values.append(100.0 * hashed.toDouble() / 2147483648.0)
+    }
+    let fig := plt.Figure(width = 8.0, height = 6.0)
+    fig.hist(values.toList(), bins = 50, color = "C0", alpha = 1.0)
+    fig.title("Histogram of 1,000,000 values")
+    fig.xLabel("value")
+    fig.yLabel("count")
+
+    fig.save("/tmp/plotbench/kestrel_hist1m.svg")?
+    reportSize("/tmp/plotbench/kestrel_hist1m.svg")?
+}
+main()

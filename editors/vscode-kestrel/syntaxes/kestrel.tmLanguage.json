@@ -1,0 +1,380 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "Kestrel",
+  "scopeName": "source.kestrel",
+  "fileTypes": [
+    "kes"
+  ],
+  "patterns": [
+    {
+      "include": "#comments"
+    },
+    {
+      "include": "#annotations"
+    },
+    {
+      "include": "#declarations"
+    },
+    {
+      "include": "#keywords"
+    },
+    {
+      "include": "#strings"
+    },
+    {
+      "include": "#numbers"
+    },
+    {
+      "include": "#constants"
+    },
+    {
+      "include": "#types"
+    },
+    {
+      "include": "#functions"
+    },
+    {
+      "include": "#method-calls"
+    },
+    {
+      "include": "#parameter-names"
+    },
+    {
+      "include": "#properties"
+    },
+    {
+      "include": "#variables"
+    },
+    {
+      "include": "#operators"
+    },
+    {
+      "include": "#punctuation"
+    }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.double-slash.kestrel",
+          "match": "//.*$"
+        }
+      ]
+    },
+    "annotations": {
+      "patterns": [
+        {
+          "name": "meta.annotation.kestrel",
+          "match": "@[A-Za-z_][A-Za-z0-9_]*"
+        }
+      ]
+    },
+    "declarations": {
+      "patterns": [
+        {
+          "match": "\\b(let|var)\\s+(?:(mut)\\s+)?([A-Za-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "keyword.other.kestrel"
+            },
+            "2": {
+              "name": "storage.modifier.kestrel"
+            },
+            "3": {
+              "name": "variable.other.kestrel"
+            }
+          }
+        },
+        {
+          "match": "\\b(function)\\s+([a-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.function.kestrel"
+            },
+            "2": {
+              "name": "entity.name.function.kestrel"
+            }
+          }
+        },
+        {
+          "match": "\\b(class|trait|enum|record|alias)\\s+([A-Z][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.kestrel"
+            },
+            "2": {
+              "name": "entity.name.type.kestrel"
+            }
+          }
+        },
+        {
+          "match": "\\b(const)\\s+([A-Z][A-Z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.kestrel"
+            },
+            "2": {
+              "name": "variable.other.kestrel"
+            }
+          }
+        },
+        {
+          "match": "\\b(theorem)\\s+([a-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "storage.type.kestrel"
+            },
+            "2": {
+              "name": "entity.name.function.kestrel"
+            }
+          }
+        }
+      ]
+    },
+    "keywords": {
+      "patterns": [
+        {
+          "name": "keyword.control.kestrel",
+          "match": "\\b(if|then|else|match|for|in|while|break|continue|return|scope|spawn|using|unsafe|import|as|extends|has|otherwise|or|and|not)\\b"
+        },
+        {
+          "name": "storage.modifier.attribute.kestrel",
+          "match": "@(override|test|simp)\\b"
+        },
+        {
+          "name": "storage.modifier.kestrel",
+          "match": "\\b(public|private|package|static|final|var|mut|move|sealed|abstract|with|Effects|requires|ensures|depends|from|at)\\b"
+        },
+        {
+          "name": "keyword.control.tactic.kestrel",
+          "match": "\\b(intro|intros|exact|apply|assumption|constructor|left|right|exists|use|cases|induction|simp|rw|rewrite|have|symm|trans|exfalso|contradiction|rfl|decide|trivial|pushNeg|ext|byContra|skip|done|repeat|try|smt|sorry)\\b"
+        },
+        {
+          "name": "keyword.other.kestrel",
+          "match": "\\b(let|function|class|trait|enum|record|alias|const|new|theorem|example|axiom|infixl|infixr|infix|proof|by|forall|exists)\\b"
+        },
+        {
+          "name": "variable.language.kestrel",
+          "match": "\\b(this|super)\\b"
+        },
+        {
+          "name": "constant.language.boolean.kestrel",
+          "match": "\\b(true|false)\\b"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.interpolated.kestrel",
+          "begin": "f\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kestrel",
+              "match": "\\\\."
+            },
+            {
+              "name": "constant.character.escape.kestrel",
+              "match": "\\{\\{"
+            },
+            {
+              "name": "constant.character.escape.kestrel",
+              "match": "\\}\\}"
+            },
+            {
+              "name": "meta.interpolation.kestrel",
+              "begin": "\\{",
+              "end": "\\}",
+              "patterns": [
+                {
+                  "include": "source.kestrel"
+                },
+                {
+                  "name": "variable.other.kestrel",
+                  "match": "\\b[a-z_][A-Za-z0-9_]*\\b"
+                }
+              ],
+              "beginCaptures": {
+                "0": {
+                  "name": "punctuation.definition.interpolation.begin.kestrel"
+                }
+              },
+              "endCaptures": {
+                "0": {
+                  "name": "punctuation.definition.interpolation.end.kestrel"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.double.kestrel",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.kestrel",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.kestrel",
+          "match": "\\b0[xX][0-9a-fA-F_]+\\b"
+        },
+        {
+          "name": "constant.numeric.kestrel",
+          "match": "\\b\\d[\\d_]*(\\.[0-9][\\d_]*)?([eE][+-]?[0-9][\\d_]*)?\\b"
+        }
+      ]
+    },
+    "constants": {
+      "patterns": [
+        {
+          "name": "variable.other.kestrel",
+          "match": "\\b(?:PI|E)\\b"
+        },
+        {
+          "name": "constant.other.kestrel",
+          "match": "\\b[A-Z][A-Z0-9_]{2,}\\b"
+        },
+        {
+          "name": "constant.language.kestrel",
+          "match": "\\b(None|Some)\\b"
+        }
+      ]
+    },
+    "types": {
+      "patterns": [
+        {
+          "comment": "A borrowed trait object, `&dyn Area`, is one type, including the `&` and `dyn`.",
+          "name": "entity.name.type.kestrel",
+          "match": "&\\s*dyn\\s+[A-Z][A-Za-z0-9_]*"
+        },
+        {
+          "comment": "A trait object inside brackets, as in `Box[dyn Shape]`.",
+          "name": "entity.name.type.kestrel",
+          "match": "\\bdyn\\s+[A-Z][A-Za-z0-9_]*"
+        },
+        {
+          "comment": "A borrowed type after a colon, parenthesis, comma, bracket, angle or arrow, as in `: &Point`.",
+          "name": "entity.name.type.kestrel",
+          "match": "(?<=[:(,\\[<>])\\s*&\\s*[A-Z][A-Za-z0-9_]*"
+        },
+        {
+          "name": "support.type.primitive.kestrel",
+          "match": "\\b(Int|Nat|BigInt|double|Bool|String|void|Error|Text|Comparable)\\b"
+        },
+        {
+          "name": "support.type.kestrel",
+          "match": "\\b(List|Map|Set|SortedSet|Array|Mutex|Atomic|Channel|Arena|ArenaRef|Iterator|Iterable|Option|PythonValue)\\b"
+        },
+        {
+          "name": "entity.name.type.kestrel",
+          "match": "\\b[A-Z][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "functions": {
+      "patterns": [
+        {
+          "match": "\\b([a-z_][A-Za-z0-9_]*)\\s*(?=\\()",
+          "captures": {
+            "1": {
+              "name": "entity.name.function.kestrel"
+            }
+          }
+        }
+      ]
+    },
+    "properties": {
+      "patterns": [
+        {
+          "match": "\\.\\s*([a-z_][A-Za-z0-9_]*)",
+          "captures": {
+            "1": {
+              "name": "variable.other.property.kestrel"
+            }
+          }
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.kestrel",
+          "match": "\\|>|=>|->|==|!=|<=|>=|&&|\\|\\||::|\\.\\.|\u2208|\u2209|\u2286|\u2282|\u2283|\u2287|\u222a|\u2229|\u1d9c|\u2200|\u2203|\u2192|\u2194|\u2190|\u22c3|\u22c2|\u2227|\u2228|\u00ac|\u2265|\u2264|\u2260|\u2295"
+        },
+        {
+          "name": "keyword.operator.kestrel",
+          "match": "[+*/%<>=!&|^~?-]"
+        }
+      ]
+    },
+    "punctuation": {
+      "patterns": [
+        {
+          "name": "punctuation.separator.kestrel",
+          "match": "[,;]"
+        },
+        {
+          "name": "punctuation.terminator.kestrel",
+          "match": "\\."
+        },
+        {
+          "name": "punctuation.section.kestrel",
+          "match": "[{}\\[\\]()]"
+        },
+        {
+          "name": "punctuation.separator.colon.kestrel",
+          "match": ":"
+        }
+      ]
+    },
+    "variables": {
+      "patterns": [
+        {
+          "name": "variable.other.kestrel",
+          "match": "\\b[a-z_][A-Za-z0-9_]*\\b"
+        }
+      ]
+    },
+    "method-calls": {
+      "patterns": [
+        {
+          "match": "\\.\\s*([a-z_][A-Za-z0-9_]*)\\s*(?:\\[[^\\]]*\\])?\\s*(?=\\()",
+          "captures": {
+            "1": {
+              "name": "entity.name.function.kestrel"
+            }
+          }
+        }
+      ]
+    },
+    "parameter-names": {
+      "patterns": [
+        {
+          "match": "(?<=[(,])\\s*([a-z_][A-Za-z0-9_]*)\\s*(?=\\s*=(?!=))",
+          "captures": {
+            "1": {
+              "name": "variable.parameter.kestrel"
+            }
+          }
+        },
+        {
+          "match": "(?<=[(,])\\s*([a-z_][A-Za-z0-9_]*)\\s*(?=\\s*:)",
+          "captures": {
+            "1": {
+              "name": "variable.parameter.kestrel"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

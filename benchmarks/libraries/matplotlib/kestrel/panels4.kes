@@ -1,0 +1,59 @@
+// panels4: a 2x2 grid of four 1,000-point line panels.
+import std.kesplot as plt
+import std.math.{sin, cos}
+import c "stdlib.h"
+
+function quote(text : String) : String = "'" + text.replace("'", "'\\''") + "'"
+
+function reportSize(path : String) : void or Error with Effects {
+    let sizePath := path + ".size"
+    let status := unsafe { system("wc -c < " + quote(path) + " > " + quote(sizePath)) }
+    if status.toInt() != 0 { return Error("cannot measure " + path) }
+    using reader := open(sizePath)? {
+        let line := reader.readLine()?
+        print(parseInt(line.trim())?)
+    }
+}
+
+function main() : void or Error with Effects {
+    let n := 1000
+    let xs : Array[double] = Array.empty()
+    for (i in range(n)) {
+        xs.append(10.0 * i.toDouble() / (n - 1).toDouble())
+    }
+    let sinY : List[double] = [sin(x) for x in xs.toList()]
+    let cosY : List[double] = [cos(x) for x in xs.toList()]
+    let sin2Y : List[double] = [sin(2.0 * x) for x in xs.toList()]
+    let cos2Y : List[double] = [cos(2.0 * x) for x in xs.toList()]
+
+    let fig := plt.Figure(width = 8.0, height = 6.0)
+    fig.subplots(2, 2)
+    fig.plot(xs.toList(), sinY, label = "sin(x)")
+    fig.title("sin(x)")
+    fig.xLabel("x")
+    fig.yLabel("y")
+    fig.legend("upper right")
+    fig.nextPanel()
+    fig.plot(xs.toList(), cosY, label = "cos(x)")
+    fig.title("cos(x)")
+    fig.xLabel("x")
+    fig.yLabel("y")
+    fig.legend("upper right")
+    fig.nextPanel()
+    fig.plot(xs.toList(), sin2Y, label = "sin(2x)")
+    fig.title("sin(2x)")
+    fig.xLabel("x")
+    fig.yLabel("y")
+    fig.legend("upper right")
+    fig.nextPanel()
+    fig.plot(xs.toList(), cos2Y, label = "cos(2x)")
+    fig.title("cos(2x)")
+    fig.xLabel("x")
+    fig.yLabel("y")
+    fig.legend("upper right")
+    fig.figureTitleText("Four 1,000-point panels")
+
+    fig.save("/tmp/plotbench/kestrel_panels4.svg")?
+    reportSize("/tmp/plotbench/kestrel_panels4.svg")?
+}
+main()

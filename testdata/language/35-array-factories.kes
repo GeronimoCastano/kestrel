@@ -1,0 +1,9 @@
+class Point {
+    public final x : Int
+    new(x : Int) { this.x = x }
+}
+
+let points := Array.generate(3, i => Point(i))
+print(points[0].x)
+points[1] = Point(9)
+print(points[1].x)

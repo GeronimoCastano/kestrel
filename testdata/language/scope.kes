@@ -1,0 +1,5 @@
+let c := Channel[Int]()
+scope {
+    spawn c.send(5)
+}?
+c.receive()

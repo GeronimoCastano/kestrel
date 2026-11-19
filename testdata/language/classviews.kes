@@ -1,0 +1,52 @@
+trait Shape {function area() : double}
+class Figure {
+    has Shape
+    public var scale : double
+    public var label : String
+    new(label : String) {this.scale=1.0
+        this.label=label}
+    public function area() : double = this.scale
+    public function me() : Figure = this
+    public function fits(n : double) : Bool = this.area() <= n
+    public mut function bump() : void {this.scale=this.scale+1.0}
+}
+class Square extends Figure {
+    public var side : double
+    new(side : double) {this.side=side
+        this.scale=1.0
+        this.label="square"}
+    @override public function area() : double = this.side * this.side * this.scale
+}
+class Tile extends Square {
+    new() {this.side=1.0
+        this.scale=1.0
+        this.label="tile"}
+    @override public function area() : double = 100.0
+}
+function bigger(a : Figure,b : Figure) : Figure = if a.area() >= b.area() then a else b
+function identity(f : Figure) : Figure ensures result.scale >= 1.0 = f
+function indirect(flag : Bool,a : Figure,b : Figure) : Figure = if flag then identity(a) else identity(b)
+function matched(flag : Bool,a : Figure,b : Figure) : Figure = match flag {true => a,false => b,}
+function early(flag : Bool,a : Figure,b : Figure) : Figure {if flag {return a}
+    b}
+function inspect(f : Figure) : double = f.area()
+function generic[S : Shape](s : S) : double = s.area()
+function asShape(f : Figure) : &dyn Shape = f
+function growSelected(mut a : Figure,mut b : Figure,flag : Bool) : void {
+    let selected := if flag then a else b
+    selected.bump()
+    selected.scale=selected.scale+1.0
+}
+let mut square := Square(2.0)
+let mut figure := Figure("base" + " figure")
+let tile := Tile()
+print(bigger(square,figure).area())
+print(indirect(false,square,figure).label)
+print(inspect(identity(bigger(square,figure)).me()))
+print(matched(false,square,figure).area())
+print(early(true,square,figure).fits(5.0))
+print(generic(bigger(bigger(square,figure),tile)))
+print(asShape(bigger(square,figure)).area())
+growSelected(square,figure,true)
+print(square.scale)
+print(bigger(figure,square).area())

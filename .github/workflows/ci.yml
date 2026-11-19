@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  # The debug checker recurses deeply on the largest KesNet models. The release
+  # profile does not need this, and neither does a normal `kestrel run`.
+  RUST_MIN_STACK: "33554432"
+
+jobs:
+  build-and-test:
+    name: Build and test
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache the build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      - name: Run Clippy
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Run the test suite
+        run: cargo test
+
+      - name: Check mathlib
+        run: ./tools/check_mathlib.sh
+
+  editor:
+    name: Editor extension
+    runs-on: macos-14
+    defaults:
+      run:
+        working-directory: editors/vscode-kestrel
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache the build
+        uses: Swatinem/rust-cache@v2
+
+      # The suite drives the compiler, so it needs a release binary at the
+      # repository root.
+      - name: Build the compiler
+        run: cargo build --release
+        working-directory: .
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run the Node tests
+        run: node --test test/*.test.js

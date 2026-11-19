@@ -1,0 +1,13 @@
+// An expression may hold a block, and a block holds expressions, so this
+// module and examples/cycleblock.kes import each other.
+import testdata.language.cycleblock.{Block, sum}
+
+public enum Expr {
+    Lit(Int)
+    Group(Block)
+}
+
+public function eval(e : Expr) : Int = match e {
+    Lit(n)   => n,
+    Group(b) => sum(b),
+}

@@ -1,0 +1,8 @@
+class Counter {
+    public static var count : Int = 0
+    new() {}
+}
+
+Counter.count = 2
+Counter.count = Counter.count + 1
+print(Counter.count)

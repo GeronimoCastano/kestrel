@@ -1,0 +1,45 @@
+{
+  "Function": {
+    "prefix": "function",
+    "body": [
+      "function ${1:name}(${2:value} : ${3:Int}) : ${4:Int} = ${0:value}"
+    ],
+    "description": "A Kestrel function"
+  },
+  "Class": {
+    "prefix": "class",
+    "body": [
+      "class ${1:Name} {",
+      "    ${0}",
+      "}"
+    ],
+    "description": "A Kestrel class"
+  },
+  "Test": {
+    "prefix": "test",
+    "body": [
+      "@test",
+      "function ${1:name}() : void {",
+      "    ${0}",
+      "}"
+    ],
+    "description": "A Kestrel @test function"
+  },
+  "Match": {
+    "prefix": "match",
+    "body": [
+      "match ${1:value} {",
+      "    ${2:Pattern} => ${3:result},",
+      "    _ => ${0:fallback},",
+      "}"
+    ],
+    "description": "A Kestrel match expression"
+  },
+  "If expression": {
+    "prefix": "if",
+    "body": [
+      "if ${1:condition} then ${2:value} else ${0:other}"
+    ],
+    "description": "A Kestrel if expression"
+  }
+}

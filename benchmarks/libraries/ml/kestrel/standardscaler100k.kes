@@ -1,0 +1,22 @@
+// StandardScaler fit and transform over 100,000 observations of 20 features,
+// repeated R times; the printed numbers sum the per-repetition checksums.
+// The transformed sum is rounded to the six printed decimals per repetition so
+// the near-zero values add up consistently.
+import std.ml.{StandardScaler}
+
+import std.process.{args}
+
+let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 300 }) else 300
+
+let X := Tensor.generate((100000, 20), (i, j) => ((i * 13 + j * 7) % 100).toDouble() / 10.0)
+let mut totalMeans := 0.0
+let mut totalScales := 0.0
+let mut totalTransformed := 0.0
+for (step in range(REPETITIONS)) {
+    let scaler := StandardScaler.fit(X)
+    let transformed := scaler.transform(X)
+    totalMeans += scaler.means.sum()
+    totalScales += scaler.scales.sum()
+    totalTransformed += (transformed.sum() * 1000000.0).round() / 1000000.0
+}
+print(f"{totalMeans:.6f} {totalScales:.6f} {totalTransformed:.6f}")

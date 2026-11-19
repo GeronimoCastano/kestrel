@@ -1,0 +1,76 @@
+public trait Group {
+    type Element
+    function op(a : Element, b : Element) : Element
+    function identity() : Element
+    function inverse(a : Element) : Element
+}
+
+public enum Z2 { Zero, One }
+
+public function z2Plus(a : Z2, b : Z2) : Z2 = match a {
+    Zero => b,
+    One => match b { Zero => One, One => Zero },
+}
+
+public function z2Neg(a : Z2) : Z2 = match a { Zero => Zero, One => One }
+
+public theorem z2PlusAssoc(a : Z2, b : Z2, c : Z2) : z2Plus(z2Plus(a, b), c) = z2Plus(a, z2Plus(b, c)) by {
+    cases a {
+        Zero => { cases b { Zero => { cases c { Zero => { decide }, One => { decide } } }, One => { cases c { Zero => { decide }, One => { decide } } } } }
+        One => { cases b { Zero => { cases c { Zero => { decide }, One => { decide } } }, One => { cases c { Zero => { decide }, One => { decide } } } } }
+    }
+}
+
+public trait Ring {
+    type Element
+    function zero() : Element
+    function one() : Element
+    function plus(a : Element, b : Element) : Element
+    function times(a : Element, b : Element) : Element
+    function negate(a : Element) : Element
+}
+
+public class Z2Group {
+    has Group(Element = Z2)
+
+    new() {}
+
+    public function op(a : Z2, b : Z2) : Z2 = z2Plus(a, b)
+
+    public function identity() : Z2 = Z2.Zero
+
+    public function inverse(a : Z2) : Z2 = z2Neg(a)
+}
+
+public function z2Times(a : Z2, b : Z2) : Z2 = match a {
+    Zero => Zero,
+    One => b,
+}
+
+public theorem z2PlusZeroL(a : Z2) : z2Plus(Z2.Zero, a) = a by {
+    cases a {
+        Zero => { decide }
+        One => { decide }
+    }
+}
+
+public theorem z2PlusNeg(a : Z2) : z2Plus(a, z2Neg(a)) = Z2.Zero by {
+    cases a {
+        Zero => { decide }
+        One => { decide }
+    }
+}
+
+public theorem z2TimesAssoc(a : Z2, b : Z2, c : Z2) : z2Times(z2Times(a, b), c) = z2Times(a, z2Times(b, c)) by {
+    cases a {
+        Zero => { cases b { Zero => { cases c { Zero => { decide }, One => { decide } } }, One => { cases c { Zero => { decide }, One => { decide } } } } }
+        One => { cases b { Zero => { cases c { Zero => { decide }, One => { decide } } }, One => { cases c { Zero => { decide }, One => { decide } } } } }
+    }
+}
+
+public theorem z2Distrib(a : Z2, b : Z2, c : Z2) : z2Times(a, z2Plus(b, c)) = z2Plus(z2Times(a, b), z2Times(a, c)) by {
+    cases a {
+        Zero => { cases b { Zero => { cases c { Zero => { decide }, One => { decide } } }, One => { cases c { Zero => { decide }, One => { decide } } } } }
+        One => { cases b { Zero => { cases c { Zero => { decide }, One => { decide } } }, One => { cases c { Zero => { decide }, One => { decide } } } } }
+    }
+}

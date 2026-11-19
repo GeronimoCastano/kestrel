@@ -1,0 +1,7 @@
+function nonnegative(n : Int) : Int ensures result >= 0 {
+    if n < 0 {return 0}
+    n
+}
+
+print(nonnegative(-3))
+print(nonnegative(4))

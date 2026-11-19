@@ -1,0 +1,8 @@
+node_modules/**
+src/**
+build/**
+test/**
+test-support/**
+package-lock.json
+BENCHMARKS.md
+*.vsix

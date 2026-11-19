@@ -1,0 +1,36 @@
+// Jacobi-style 5-point stencil over a flat row-major grid, with two buffers.
+function run(w : Int, iterations : Int) : double {
+    let size := w * w
+    let mut a : Array[double] = Array(size, 0.0)
+    let mut b : Array[double] = Array(size, 0.0)
+    for (let i : Int = 0; i < w; i = i + 1) {
+        for (let j : Int = 0; j < w; j = j + 1) {
+            a[i * w + j] = ((i * 17 + j * 31) % 100).toDouble()
+        }
+    }
+    for (let iteration : Int = 0; iteration < iterations; iteration = iteration + 1) {
+        for (let i : Int = 1; i < w - 1; i = i + 1) {
+            for (let j : Int = 1; j < w - 1; j = j + 1) {
+                b[i * w + j] = 0.25 * (a[(i - 1) * w + j] + a[(i + 1) * w + j] + a[i * w + j - 1] + a[i * w + j + 1])
+            }
+        }
+        for (let j : Int = 0; j < w; j = j + 1) {
+            b[j] = a[j]
+            b[(w - 1) * w + j] = a[(w - 1) * w + j]
+        }
+        for (let i : Int = 1; i < w - 1; i = i + 1) {
+            b[i * w] = a[i * w]
+            b[i * w + w - 1] = a[i * w + w - 1]
+        }
+        let swap := a
+        a = b
+        b = swap
+    }
+    let mut total := 0.0
+    for (let i : Int = 0; i < size; i = i + 1) {
+        total = total + a[i]
+    }
+    total
+}
+
+print(f"{run(700, 20):.1f}")

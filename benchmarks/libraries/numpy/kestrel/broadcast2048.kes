@@ -1,0 +1,11 @@
+let n := 2048
+let reps := 490
+let A := Tensor.filled((n, n), 1.5)
+let v := Tensor.generate((n,), i => (i % 13).toDouble())
+let vb := v.broadcastTo((n, n))
+let mut checksum := 0.0
+for (let rep : Int = 0; rep < reps; rep = rep + 1) {
+    let result := (A + vb) * 0.5
+    checksum = checksum + result.sum()
+}
+print(f"{checksum:.6f}")

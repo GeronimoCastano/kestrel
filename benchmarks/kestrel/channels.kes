@@ -1,0 +1,31 @@
+// One producer and one consumer joined by a Channel.
+function produce(ch : Channel[Int], n : Int) : void or Error with Effects {
+    for (let i : Int = 0; i < n; i = i + 1) {
+        ch.send(i)?
+    }
+    ch.close()
+}
+
+function consume(ch : Channel[Int], total : Atomic[Int]) : void with Effects {
+    let mut sum := 0
+    let mut running := true
+    while running {
+        match ch.receive() {
+            Some(x) => { sum = sum + x },
+            None => { running = false },
+        }
+    }
+    total.store(sum)
+}
+
+function run(n : Int) : Int or Error with Effects {
+    let ch := Channel[Int]()
+    let total := Atomic(0)
+    scope {
+        spawn produce(ch, n)
+        spawn consume(ch, total)
+    }?
+    total.load()
+}
+
+print(match run(5000000) { n => n.text(), _ => "error", })

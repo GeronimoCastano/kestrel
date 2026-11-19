@@ -1,0 +1,5 @@
+# The debug build's recursive checker needs more stack than the 2 MiB default
+# on macOS for the largest KesNet model. Release builds and normal runs are
+# unaffected; this keeps `cargo test` usable without an environment prefix.
+[env]
+RUST_MIN_STACK = "16777216"

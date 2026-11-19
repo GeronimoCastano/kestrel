@@ -1,0 +1,12 @@
+// One annotation for consecutive parameters.
+function pow(base exp : double) : double = base ** exp
+
+function add2(a b : Nat) : Nat = a + b
+
+theorem same(a b : Nat) : a = a by {
+    rfl
+}
+
+function apply(f : (Int, Int) -> Int) : Int = f(2, 3)
+
+function useLambda() : Int = apply((x y : Int) => x + y)

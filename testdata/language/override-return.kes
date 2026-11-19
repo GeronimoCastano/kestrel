@@ -1,0 +1,6 @@
+class Figure {
+    public function area() : double = 0.0
+}
+class Square extends Figure {
+    @override public function area() : Int = 1
+}

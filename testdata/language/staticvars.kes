@@ -1,0 +1,10 @@
+class Counter {
+    public static var count : Int = 0
+    public static var label : String = "count" + " is"
+    new() {}
+    public static function bump() : void with Effects { Counter.count = Counter.count + 1 }
+}
+
+Counter.count = 2
+Counter.bump()
+print(f"{Counter.label} {Counter.count}")
