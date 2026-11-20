@@ -2811,7 +2811,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
     for (index, source) in program.c_sources.iter().enumerate() {
         let object = temp.path.join(format!("source{index}.o"));
         let output = Command::new("clang")
-            .args(["-std=c11", "-pthread", "-O3", "-c"])
+            .args(["-std=c11", "-pthread", "-O3", "-fno-strict-aliasing", "-c"])
             .arg(source)
             .args(&includes)
             .arg("-o")
@@ -2834,6 +2834,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
             "-std=c11",
             "-pthread",
             "-O3",
+            "-fno-strict-aliasing",
             "-Wall",
             "-Wextra",
             "-Werror",
