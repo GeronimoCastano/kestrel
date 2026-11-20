@@ -1,0 +1,45 @@
+name: Windows
+
+# The port is in progress. This workflow exists to give the work a build loop,
+# not to gate merges: run it by hand, or push to a branch named windows/...
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - "windows/**"
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  probe:
+    name: Probe build (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install LLVM
+        run: choco install llvm --no-progress -y
+        shell: pwsh
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@1.95.0
+
+      - name: Cache the build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build the compiler
+        run: cargo build --release
+        shell: pwsh
+
+      - name: Compile the test binaries
+        run: cargo test --no-run
+        shell: pwsh
+
+      - name: Run the test suite
+        run: cargo test
+        shell: pwsh
+        continue-on-error: true
