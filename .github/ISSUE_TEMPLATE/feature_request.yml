@@ -1,0 +1,21 @@
+name: Feature request
+description: A form the language cannot express, or a tool that is missing.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What you cannot express
+      description: Show the program you want to write and where it stops.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What you have in mind
+      description: Syntax, a library function, a command. A sketch is enough.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: What you do instead today
+      description: The workaround you use, and what it costs.

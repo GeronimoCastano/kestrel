@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: The language manual
+    url: https://github.com/GeronimoCastano/kestrel/blob/main/SYNTAX.md
+    about: Every form in the language, with examples.
+  - name: Standard library reference
+    url: https://github.com/GeronimoCastano/kestrel/tree/main/docs/std
+    about: One page per module.
+  - name: Security report
+    url: https://github.com/GeronimoCastano/kestrel/security/advisories/new
+    about: Report privately, not in an issue.

@@ -1,0 +1,47 @@
+name: Bug report
+description: Something compiles wrong, runs wrong, or crashes.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "A minimal program is worth more than a long description."
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The output, error or crash, as it appeared.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: program
+    attributes:
+      label: Minimal program
+      description: The smallest `.kes` file that shows the problem, with the command you ran.
+      render: kestrel
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Kestrel version
+      description: The output of `kestrel --version`.
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Platform
+      options:
+        - macOS (Apple silicon)
+        - macOS (Intel)
+        - Linux
+        - Windows
+        - Other
+    validations:
+      required: true

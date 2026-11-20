@@ -480,6 +480,13 @@ cargo test
 backend, the runtime, and the `mathlib` library. Programs the tests compile live
 under `testdata/`.
 
+## Versioning
+
+Kestrel is pre-1.0. Within `0.1`, a patch release such as `0.1.3` fixes bugs and
+leaves the language alone. A new form, a changed rule or a new language feature
+bumps the minor number: `0.2.0`. Every release is listed in
+[CHANGELOG.md](CHANGELOG.md).
+
 ## Limits
 
 Kestrel is version 0.1. It refuses some programs on purpose. Each refusal comes
