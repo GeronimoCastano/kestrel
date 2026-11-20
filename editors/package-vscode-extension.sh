@@ -20,11 +20,14 @@ tar -C "$root/editors/vscode-kestrel" -cf - \
 
 # The manifest carries the version from package.json, so the package cannot
 # claim a version the extension does not have.
-version=$(python3 - "$root/editors/vscode-kestrel/package.json" <<'PY'
+identity=$(python3 - "$root/editors/vscode-kestrel/package.json" <<'PY'
 import json, sys
-print(json.load(open(sys.argv[1]))["version"])
+manifest = json.load(open(sys.argv[1]))
+print(manifest["name"] + " " + manifest["version"])
 PY
 )
+name=${identity% *}
+version=${identity#* }
 
 cat > "$work/[Content_Types].xml" <<'XML'
 <?xml version="1.0" encoding="utf-8"?>
@@ -40,7 +43,7 @@ cat > "$work/extension.vsixmanifest" <<XML
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011">
   <Metadata>
-    <Identity Language="en-US" Id="kestrel" Version="$version" Publisher="kestrel-lang"/>
+    <Identity Language="en-US" Id="$name" Version="$version" Publisher="kestrel-lang"/>
     <DisplayName>Kestrel</DisplayName>
     <Description xml:space="preserve">Kestrel language support: highlighting, completions, hover, go to definition, inlay hints, proof state and quick fixes</Description>
     <Categories>Programming Languages</Categories>

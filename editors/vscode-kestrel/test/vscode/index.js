@@ -7,7 +7,7 @@ const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
 exports.run = async function () {
   const root = process.env.KESTREL_VSCODE_QA;
   try {
-    const extension = vscode.extensions.getExtension('kestrel-lang.kestrel');
+    const extension = vscode.extensions.getExtension('kestrel-lang.kestrel-language');
     await extension.activate();
     const text = String.raw`/// Computes $\frac{x^2}{2}$ and preserves **Markdown**.
 ///
