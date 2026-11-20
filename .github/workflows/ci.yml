@@ -11,8 +11,9 @@ permissions:
 env:
   CARGO_TERM_COLOR: always
   # The debug checker recurses deeply on the largest KesNet models. The release
-  # profile does not need this, and neither does a normal `kestrel run`.
-  RUST_MIN_STACK: "33554432"
+  # profile does not need this, and neither does a normal `kestrel run`. The
+  # headroom keeps the deepest test from tipping over on the runner.
+  RUST_MIN_STACK: "134217728"
 
 jobs:
   build-and-test:
