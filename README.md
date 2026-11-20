@@ -451,8 +451,10 @@ the proof, and marks `sorry` and trusted `smt` results in amber. Hover
 documentation typesets `$...$` offline, so editing needs no TeX installation.
 Completion, hover, go to definition and quick fixes all run locally.
 
-Install the packaged extension from the
-[releases page](https://github.com/GeronimoCastano/kestrel/releases):
+Install it from the
+[Visual Studio Marketplace](https://marketplace.visualstudio.com/items?itemName=kestrel-lang.kestrel-language):
+search **Kestrel for VS Code**, published by `kestrel-lang`. The packaged VSIX is
+also on the [releases page](https://github.com/GeronimoCastano/kestrel/releases):
 
 ```sh
 code --install-extension kestrel-vscode-0.4.4.vsix

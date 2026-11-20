@@ -23,7 +23,8 @@ pick **Install from VSIX...**, and select the file. Reload VS Code afterwards.
 ./editors/install-vscode-extension.sh
 ```
 
-**Marketplace.** Not published yet. Until it is, use the VSIX above.
+**Marketplace.** Search **Kestrel for VS Code** by `kestrel-lang`, or open the
+[listing](https://marketplace.visualstudio.com/items?itemName=kestrel-lang.kestrel-language).
 
 ## Point it at the compiler
 
