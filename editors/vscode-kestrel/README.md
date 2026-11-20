@@ -3,25 +3,25 @@
 Support for `.kes` files: highlighting, completion, hover, inlay hints,
 diagnostics, and a live proof state.
 
-![A set-theory goal in the Kestrel Proof State view](https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/docs/editors/images/proof-state.png)
+![Hover showing a signature and a typeset formula](https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/docs/editors/images/hover.png)
 
 ## Install
 
-1. Install the compiler. With Homebrew:
+**1. Install the compiler.** With Homebrew:
 
-   ```sh
-   brew install GeronimoCastano/kestrel/kestrel
-   ```
+```sh
+brew install GeronimoCastano/kestrel/kestrel
+```
 
-   Or build it from source. The [repository](https://github.com/GeronimoCastano/kestrel)
-   has the steps.
+Or build it from source; the [repository](https://github.com/GeronimoCastano/kestrel)
+has the steps.
 
-2. Install this extension. Open the Extensions view and search **Kestrel** by
-   `kestrel-lang`. If it is not listed yet, download the `.vsix` from
-   [Releases](https://github.com/GeronimoCastano/kestrel/releases) and choose
-   **Install from VSIX...**.
+**2. Install this extension.** Open the Extensions view and search **Kestrel**
+by `kestrel-lang`. If it is not listed yet, download the `.vsix` from
+[Releases](https://github.com/GeronimoCastano/kestrel/releases) and choose
+**Install from VSIX...**.
 
-3. Open a `.kes` file. The status bar shows **Kestrel**.
+**3. Open a `.kes` file.** The status bar shows **Kestrel**.
 
 If the compiler is not on `PATH`, set `kestrel.compilerPath` to the binary.
 
@@ -57,6 +57,8 @@ truth for types, effects and ownership, so every error you see comes from
 - `\cup`, `\cap`, `\compl`, `\notin`, `\iff`, `\larr` and `\ot` expand to their
   symbols as you type.
 
+![Goals and hypotheses in the Kestrel Proof State view](https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/docs/editors/images/proof-panel.png)
+
 Run **Kestrel: Show Proof State** from the Command Palette, or click the Kestrel
 icon in the activity bar.
 
@@ -70,8 +72,6 @@ icon in the activity bar.
   works, and `$...$` and `$$...$$` render with bundled MathJax, offline, in light,
   dark and high-contrast themes, scaled with the editor font.
 - An outline of classes, functions and constants.
-
-![Hover showing a signature and a typeset formula](https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/docs/editors/images/hover.png)
 
 ### Checking
 
