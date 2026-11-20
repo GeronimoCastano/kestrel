@@ -11,7 +11,7 @@ leaving the editor.
 [releases page](https://github.com/GeronimoCastano/kestrel/releases), then:
 
 ```sh
-code --install-extension kestrel-vscode-0.4.2.vsix
+code --install-extension kestrel-vscode-0.4.3.vsix
 ```
 
 In the editor you can also open the Extensions view, choose the **...** menu,

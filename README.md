@@ -455,7 +455,7 @@ Install the packaged extension from the
 [releases page](https://github.com/GeronimoCastano/kestrel/releases):
 
 ```sh
-code --install-extension kestrel-vscode-0.4.2.vsix
+code --install-extension kestrel-vscode-0.4.3.vsix
 ```
 
 From a checkout, `./editors/install-vscode-extension.sh` builds and installs it.

@@ -1,8 +1,8 @@
 {
   "name": "kestrel",
   "displayName": "Kestrel",
-  "description": "Kestrel language support: highlighting, completions, hover, go to definition, inlay hints, live proof goals, quick fixes, and compiler errors as you type.",
-  "version": "0.4.2",
+  "description": "Kestrel language support: highlighting, completion, diagnostics, inlay hints and a live proof state.",
+  "version": "0.4.3",
   "publisher": "kestrel-lang",
   "license": "MIT",
   "engines": {
