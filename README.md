@@ -347,6 +347,23 @@ workloads Kestrel still loses.
 
 ## Install
 
+Homebrew puts the compiler on your `PATH` in one step:
+
+```sh
+brew install GeronimoCastano/kestrel/kestrel
+```
+
+A plain `brew install kestrel` needs the formula in Homebrew core, and this
+project is not there yet, so the tapped name carries the owner.
+
+From source, with Rust and Clang:
+
+```sh
+git clone https://github.com/GeronimoCastano/kestrel
+cd kestrel
+cargo build --release
+```
+
 | Piece | Requirement |
 |---|---|
 | Compiler | Rust 1.95 or newer (`cargo build --release`) |
@@ -432,13 +449,16 @@ the proof, and marks `sorry` and trusted `smt` results in amber. Hover
 documentation typesets `$...$` offline, so editing needs no TeX installation.
 Completion, hover, go to definition and quick fixes all run locally.
 
+Install the packaged extension from the
+[releases page](https://github.com/GeronimoCastano/kestrel/releases):
+
 ```sh
-cargo build --release
-./editors/install-vscode-extension.sh
+code --install-extension kestrel-vscode-0.4.2.vsix
 ```
 
-Then reload VS Code. The repository's `.vscode/settings.json` points the extension
-at `target/debug/kestrel`.
+From a checkout, `./editors/install-vscode-extension.sh` builds and installs it.
+[docs/editors/vscode.md](docs/editors/vscode.md) covers the compiler path, Code
+Runner, tasks, the settings that matter and troubleshooting.
 
 `kestrel notebook` backs a Jupyter kernel. Each cell is one session entry, only
 the last expression displays, and completion knows about `DataFrame`, `Series`
@@ -479,6 +499,7 @@ that pin it down.
 | [SYNTAX.md](SYNTAX.md) | The language, form by form, with an example for each |
 | [MATH.md](MATH.md) | Proof kernel, tactics, and how to add a theory |
 | [KESNET.md](KESNET.md) | Deep learning library |
+| [docs/editors/vscode.md](docs/editors/vscode.md) | VS Code, Code Runner and Jupyter setup |
 | [mathlib/README.md](mathlib/README.md) | A checked library of basic mathematics |
 | [KESDAS_BENCHMARKS.md](KESDAS_BENCHMARKS.md) | Data frames against pandas |
 | [BENCHMARK_REPORT.md](BENCHMARK_REPORT.md) | Full benchmark method and results |
