@@ -354,7 +354,9 @@ brew install GeronimoCastano/kestrel/kestrel
 ```
 
 A plain `brew install kestrel` needs the formula in Homebrew core, and this
-project is not there yet, so the tapped name carries the owner.
+project is not there yet, so the tapped name carries the owner. The tap builds
+from source, so Homebrew fetches Rust as a build dependency and the build takes
+about a minute.
 
 From source, with Rust and Clang:
 
