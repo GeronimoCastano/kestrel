@@ -17,8 +17,8 @@ Or build it from source; the [repository](https://github.com/GeronimoCastano/kes
 has the steps.
 
 **2. Install this extension.** Open the Extensions view and search **Kestrel**
-by `kestrel-lang`. If it is not listed yet, download the `.vsix` from
-[Releases](https://github.com/GeronimoCastano/kestrel/releases) and choose
+by `kestrel-lang`. You can also install the `.vsix` from
+[Releases](https://github.com/GeronimoCastano/kestrel/releases) with
 **Install from VSIX...**.
 
 **3. Open a `.kes` file.** The status bar shows **Kestrel**.
