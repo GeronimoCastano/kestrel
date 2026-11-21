@@ -2819,29 +2819,61 @@ const WINDOWS_MANIFEST: &str = r#"<?xml version="1.0" encoding="UTF-8" standalon
 </assembly>
 "#;
 
+/// The system libraries a program's emitted C links: the math library on Unix. The
+/// Windows C runtime includes it.
+pub fn system_libraries() -> &'static [&'static str] {
+    if cfg!(windows) { &[] } else { &["-lm"] }
+}
+
+/// A compiled resource file (`.res`) holding the manifest as resource type 24, id 1.
+/// The linker reads it directly, so the build needs no resource compiler.
+fn manifest_resource(manifest: &str) -> Vec<u8> {
+    fn entry(out: &mut Vec<u8>, data: &[u8], kind: u16, name: u16, language: u16) {
+        let size = u32::try_from(data.len()).expect("a small manifest");
+        out.extend(size.to_le_bytes());
+        out.extend(32u32.to_le_bytes());
+        out.extend([0xFF, 0xFF]);
+        out.extend(kind.to_le_bytes());
+        out.extend([0xFF, 0xFF]);
+        out.extend(name.to_le_bytes());
+        out.extend(0u32.to_le_bytes());
+        out.extend(0x0030u16.to_le_bytes());
+        out.extend(language.to_le_bytes());
+        out.extend(0u32.to_le_bytes());
+        out.extend(0u32.to_le_bytes());
+        out.extend(data);
+        while !out.len().is_multiple_of(4) {
+            out.push(0);
+        }
+    }
+    let mut out = vec![];
+    // Every .res file opens with an empty entry.
+    entry(&mut out, &[], 0, 0, 0);
+    entry(&mut out, manifest.as_bytes(), 24, 1, 0x0409);
+    out
+}
+
 /// Flags for a program's link step on this platform. Windows gives the main thread the
 /// 8 MiB stack that Linux and macOS give it, and embeds the UTF-8 manifest.
 fn platform_link_flags(folder: &Path) -> Result<Vec<std::ffi::OsString>, String> {
     if !cfg!(windows) {
-        return Ok(vec!["-lm".into()]);
+        return Ok(system_libraries().iter().map(Into::into).collect());
     }
-    let manifest = folder.join("program.manifest");
-    fs::write(&manifest, WINDOWS_MANIFEST).map_err(|e| e.to_string())?;
-    let mut input = std::ffi::OsString::from("/MANIFESTINPUT:");
-    input.push(manifest.as_os_str());
+    let resource = folder.join("manifest.res");
+    fs::write(&resource, manifest_resource(WINDOWS_MANIFEST)).map_err(|e| e.to_string())?;
     Ok(vec![
         "-Xlinker".into(),
         "/STACK:8388608".into(),
         "-Xlinker".into(),
-        "/MANIFEST:EMBED".into(),
+        "/MANIFEST:NO".into(),
         "-Xlinker".into(),
-        input,
+        resource.into_os_string(),
     ])
 }
 
 /// Clang flags every C compile shares. Windows Clang has no -pthread: threads come from
 /// the Win32 API there.
-fn thread_flags() -> &'static [&'static str] {
+pub fn thread_flags() -> &'static [&'static str] {
     if cfg!(windows) { &[] } else { &["-pthread"] }
 }
 

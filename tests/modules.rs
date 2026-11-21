@@ -1553,7 +1553,9 @@ fn runtime_contracts_in_import_cycles_keep_guards_without_header_proofs() {
         let b = checked
             .modules
             .iter()
-            .find(|m| m.parsed.source.name.ends_with("/b.kes"))
+            .find(|m| {
+                std::path::Path::new(&m.parsed.source.name).file_name() == Some("b.kes".as_ref())
+            })
             .unwrap();
         assert!(
             b.checked.contract_checks.is_empty(),

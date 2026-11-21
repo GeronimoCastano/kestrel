@@ -5,6 +5,12 @@
 use kestrel::{core, modules::check_path, native};
 use std::{fs, path::Path, process::Command};
 
+/// A path as Kestrel text: forward slashes, which Windows accepts, so a backslash never
+/// reads as a string escape.
+fn kes_path(path: &std::path::Path) -> String {
+    path.display().to_string().replace('\\', "/")
+}
+
 fn run_program(source: &str) -> String {
     let dir = native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
     let file = dir.path().join("program.kes");
@@ -221,8 +227,8 @@ function main() : void or Error with Effects {{
 }}
 main()?
 "#,
-            plain.display(),
-            quoted.display()
+            kes_path(&plain),
+            kes_path(&quoted)
         );
         let got = run_program(&source);
         assert_eq!(got, "3.0\n7.0\n2.0\na|b|c\na,b\nline one\nline two\n");
@@ -357,8 +363,8 @@ function main() : void or Error with Effects {{
 }}
 main()?
 "#,
-            plain.display(),
-            quoted.display()
+            kes_path(&plain),
+            kes_path(&quoted)
         );
         assert_eq!(run_program(&source), "0x10|2\n0x10|2\n");
     });

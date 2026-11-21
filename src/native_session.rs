@@ -116,6 +116,25 @@ fn declares_function(declaration: &str) -> bool {
     false
 }
 
+/// The text with its C comments removed, for deciding what a declaration declares.
+fn without_comments(text: &str) -> String {
+    let mut out = String::with_capacity(text.len());
+    let mut rest = text;
+    while !rest.is_empty() {
+        if let Some(after) = rest.strip_prefix("/*") {
+            rest = after.find("*/").map_or("", |end| &after[end + 2..]);
+            out.push(' ');
+        } else if let Some(after) = rest.strip_prefix("//") {
+            rest = after.find('\n').map_or("", |end| &after[end..]);
+        } else {
+            let next = rest.chars().next().unwrap();
+            out.push(next);
+            rest = &rest[next.len_utf8()..];
+        }
+    }
+    out
+}
+
 /// Split our C runtime's top-level declarations from its definitions. Bodies and
 /// initializers stay in the one shared library; cells include only declarations.
 /// A Windows DLL exports only what it marks, and code outside it reaches DLL data only
@@ -236,13 +255,19 @@ fn runtime_parts(source: &str, windows: bool) -> (String, String) {
             b'}' => braces -= 1,
             b';' if braces == 0 && parens == 0 => {
                 let declaration = &source[start..=i];
-                let local = declaration.contains("_Thread_local");
-                let function = initializer.is_none() && declares_function(&source[start..i]);
-                if declaration.contains("static ") && !local {
+                // A comment before the declaration may say "static"; only code counts.
+                let code = without_comments(declaration);
+                let is_static = code
+                    .split(|c: char| !(c.is_ascii_alphanumeric() || c == '_'))
+                    .any(|word| word == "static");
+                let local = code.contains("_Thread_local");
+                let function = initializer.is_none()
+                    && declares_function(&without_comments(&source[start..i]));
+                if is_static && !local {
                     body.push_str(export);
                 }
                 body.push_str(&declaration.replace("static ", ""));
-                if declaration.contains("static ") && !(windows && local) {
+                if is_static && !(windows && local) {
                     let declaration = source[start..initializer.unwrap_or(i)].trim_end();
                     let external = if windows && !function {
                         "extern __declspec(dllimport) "
@@ -251,7 +276,7 @@ fn runtime_parts(source: &str, windows: bool) -> (String, String) {
                     };
                     header.push_str(&declaration.replace("static ", external));
                     header.push_str(";\n");
-                } else if !declaration.contains("static ") {
+                } else if !is_static {
                     header.push_str(declaration);
                 }
                 start = i + 1;
@@ -667,14 +692,16 @@ mod tests {
     }
     #[test]
     fn windows_runtime_header_imports_data_and_keeps_thread_locals_private() {
-        let source = "static int counter;\nstatic _Thread_local int depth;\nstatic void (*hook)(int);\nstatic _Atomic(int) flag;\nstatic void *alloc(size_t n) __attribute__((unused));\nstatic void *alloc(size_t n) { return malloc(n); }\n";
+        let source = "/* a static var */\ntypedef struct { int n; } Cell;\nstatic int counter;\nstatic _Thread_local int depth;\nstatic void (*hook)(int);\nstatic _Atomic(int) flag;\nstatic void *alloc(size_t n) __attribute__((unused));\nstatic void *alloc(size_t n) { return malloc(n); }\n";
         let (header, body) = runtime_parts(source, true);
         assert!(header.contains("extern __declspec(dllimport) int counter;"));
         assert!(header.contains("extern __declspec(dllimport) void (*hook)(int);"));
         assert!(header.contains("extern __declspec(dllimport) _Atomic(int) flag;"));
         assert!(header.contains("extern void *alloc(size_t n) __attribute__((unused));"));
         assert!(!header.contains("depth"));
-        assert!(body.contains("__declspec(dllexport) int counter;"));
+        assert!(!body.contains("dllexport) /* a"));
+        assert!(header.contains("typedef struct { int n; } Cell;"));
+        assert!(body.contains("__declspec(dllexport) \nint counter;"));
         assert!(body.contains("\n_Thread_local int depth;"));
         assert!(
             body.contains("__declspec(dllexport) \nvoid *alloc(size_t n) { return malloc(n); }")

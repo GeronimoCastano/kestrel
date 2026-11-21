@@ -70,8 +70,14 @@ fn repository(root: &Path, package: &str, project_body: &str, source: &str) -> P
     repo
 }
 
+/// A file URL Git accepts on every platform: file:///C:/... on Windows.
 fn file_url(path: &Path) -> String {
-    format!("file://{}", path.display())
+    let path = path.display().to_string().replace('\\', "/");
+    if path.starts_with('/') {
+        format!("file://{path}")
+    } else {
+        format!("file:///{path}")
+    }
 }
 
 fn project(root: &Path, body: &str) -> PathBuf {

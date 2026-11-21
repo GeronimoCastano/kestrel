@@ -1822,7 +1822,12 @@ fn foreign_import(
             signature.effects = true;
             signature.callable = Some(crate::resolution::Callable::Builtin(reference.clone()));
         }
-        if environment.values.contains_key(&function.name) {
+        if let Some(existing) = environment.values.get(&function.name) {
+            // Two headers may declare one C function: the Windows C runtime declares
+            // abs in both math.h and stdlib.h. The same signature is the same import.
+            if existing.ty == ty {
+                continue;
+            }
             diagnostics.push(diag(
                 node,
                 "E_DUPLICATE_IMPORT",

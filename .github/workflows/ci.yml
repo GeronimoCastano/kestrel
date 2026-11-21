@@ -67,7 +67,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Run the test suite
-        run: cargo test
+        run: cargo test --no-fail-fast
 
   windows:
     name: Build and test (Windows)
@@ -85,6 +85,16 @@ jobs:
       # from the Visual Studio installation on the image.
       - name: Show the C toolchain
         run: clang --version
+
+      # The proof suite exercises the optional `smt` bridge, as on macOS and Linux.
+      - name: Install Z3
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download z3-5.3.3 -R Z3Prover/z3 -p z3-5.3.3-x64-win.zip -D "$RUNNER_TEMP"
+          7z x -o"$RUNNER_TEMP" "$RUNNER_TEMP/z3-5.3.3-x64-win.zip" > /dev/null
+          echo "$RUNNER_TEMP\\z3-5.3.3-x64-win\\bin" >> "$GITHUB_PATH"
 
       - name: Run the test suite
         run: cargo test --no-fail-fast

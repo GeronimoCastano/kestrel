@@ -754,18 +754,18 @@ fn assert_sanitizer_clean_with_args(program: &Program, expected: &Output, argume
     }
     let dir = TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
     let source = dir.path().join("program.c");
-    let binary = dir.path().join("checked");
+    let binary = native::executable_path(&dir.path().join("checked"));
     fs::write(&source, native::emit_c(program).unwrap()).unwrap();
     let built = Command::new("clang")
         .args([
             "-std=c11",
             "-O1",
             "-g",
-            "-pthread",
             "-fsanitize=address,undefined",
             "-fno-sanitize-recover=undefined",
             "-Wno-unused-function",
         ])
+        .args(native::thread_flags())
         .arg(&source)
         .args(&program.c_sources)
         .args(
@@ -776,7 +776,8 @@ fn assert_sanitizer_clean_with_args(program: &Program, expected: &Output, argume
         )
         .args(python_flags)
         .args(program.c_libraries.iter().map(|name| format!("-l{name}")))
-        .args(["-lm", "-o"])
+        .args(native::system_libraries())
+        .arg("-o")
         .arg(&binary)
         .output()
         .unwrap();
@@ -842,19 +843,20 @@ fn assert_no_leaks_with_args(binary: &std::path::Path, arguments: &[&str]) {
 fn execute_c(source: &str) -> Output {
     let dir = TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
     let path = dir.path().join("test.c");
-    let binary = dir.path().join("test");
+    let binary = native::executable_path(&dir.path().join("test"));
     fs::write(&path, source).unwrap();
     let built = Command::new("clang")
         .args([
             "-std=c11",
             "-O2",
-            "-pthread",
             "-Werror",
             "-Wno-unused-function",
             "-Wno-unused-label",
         ])
+        .args(native::thread_flags())
         .arg(&path)
-        .args(["-lm", "-o"])
+        .args(native::system_libraries())
+        .arg("-o")
         .arg(&binary)
         .output()
         .unwrap();
@@ -869,13 +871,41 @@ fn intercept_close(program: &Program, implementation: &str) -> Output {
     let source = native::emit_c(program)
         .unwrap()
         .replace("fclose(", "k_test_close(");
-    let source = source.replace(
-        "#include <pthread.h>",
-        &format!(
-            "#include <pthread.h>\nstatic int k_test_close(FILE *file) {{ {implementation} }}"
-        ),
+    // <setjmp.h> follows <stdio.h> in the runtime on every platform.
+    let source = source.replacen(
+        "#include <setjmp.h>",
+        &format!("#include <setjmp.h>\nstatic int k_test_close(FILE *file) {{ {implementation} }}"),
+        1,
     );
     execute_c(&source)
+}
+/// Like `prints`, but a line holding a fractional number may differ from the expected one
+/// in its last bits: libm's lgamma and exp round differently on each C library.
+fn prints_close(source: &str, expected: &str) {
+    let output = execute(source);
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert!(output.stderr.is_empty());
+    let got = String::from_utf8(output.stdout).unwrap();
+    let (found, wanted) = (
+        got.lines().collect::<Vec<_>>(),
+        expected.lines().collect::<Vec<_>>(),
+    );
+    assert_eq!(found.len(), wanted.len(), "{got}");
+    for (have, want) in found.iter().zip(&wanted) {
+        match (have.parse::<f64>(), want.parse::<f64>()) {
+            (Ok(a), Ok(b)) if want.contains('.') => {
+                assert!(
+                    (a - b).abs() <= 1e-12 * b.abs().max(1.0),
+                    "{have} != {want}\n{got}"
+                )
+            }
+            _ => assert_eq!(have, want, "{got}"),
+        }
+    }
 }
 fn prints(source: &str, expected: &str) {
     let output = execute(source);
@@ -4594,12 +4624,14 @@ print(first(backwards,"empty"))
     // by the normal builder. This previously failed at -O1 without sanitizers.
     let dir = TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
     let source = dir.path().join("tail.c");
-    let binary = dir.path().join("tail");
+    let binary = native::executable_path(&dir.path().join("tail"));
     fs::write(&source, c).unwrap();
     let built = Command::new("clang")
-        .args(["-std=c11", "-O1", "-pthread"])
+        .args(["-std=c11", "-O1"])
+        .args(native::thread_flags())
         .arg(&source)
-        .args(["-lm", "-o"])
+        .args(native::system_libraries())
+        .arg("-o")
         .arg(&binary)
         .output()
         .unwrap();
@@ -5590,6 +5622,10 @@ print(number([1,2].length))
 
 #[test]
 fn imported_defaults_keep_owned_python_callbacks_and_class_reads_safe() {
+    if !python_available("builtins") {
+        eprintln!("skipped: no embeddable CPython");
+        return;
+    }
     let dir = TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
     fs::write(
         dir.path().join("defaults.kes"),
@@ -8061,7 +8097,7 @@ fn probability_example_uses_objects_static_methods_and_shapes() {
 
 #[test]
 fn probability_objects_expose_named_parameters_and_instance_methods() {
-    prints(
+    prints_close(
         r#"
 import std.prob.{Normal, Binomial, Poisson, NegativeBinomial, Hypergeometric, DiscreteUniform, Bernoulli}
 import std.random.{Rng}
