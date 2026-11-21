@@ -70,8 +70,21 @@ jobs:
         run: cargo test --no-fail-fast
 
   windows:
-    name: Build and test (Windows)
+    # "bundled" is what the Windows install ships: Clang from llvm-mingw, OpenBLAS and Z3
+    # beside kestrel.exe. "MSVC Clang" is the other way to run Kestrel on Windows, with
+    # LLVM and Visual Studio installed by hand.
+    name: Build and test (Windows${{ matrix.label }})
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - toolchain: bundled
+            label: ""
+          - toolchain: msvc
+            label: ", MSVC Clang"
+    env:
+      GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
 
@@ -81,45 +94,43 @@ jobs:
       - name: Cache the build
         uses: Swatinem/rust-cache@v2
 
-      # The runner image ships LLVM. Clang finds the MSVC linker and the Windows SDK
-      # from the Visual Studio installation on the image.
+      # The suite's own Clang, Z3 and OpenBLAS calls find the bundle through PATH. The
+      # MSVC job keeps the runner's LLVM and the Visual Studio linker.
+      - name: Assemble the Windows bundle
+        shell: bash
+        run: |
+          tools/windows-bundle.sh - "$RUNNER_TEMP/kestrel"
+          echo "$RUNNER_TEMP\\kestrel\\bin" >> "$GITHUB_PATH"
+          echo "$RUNNER_TEMP\\kestrel\\z3" >> "$GITHUB_PATH"
+          if [ "${{ matrix.toolchain }}" = bundled ]; then
+            echo "$RUNNER_TEMP\\kestrel\\toolchain\\bin" >> "$GITHUB_PATH"
+          fi
+
       - name: Show the C toolchain
         run: clang --version
-
-      # The proof suite exercises the optional `smt` bridge, as on macOS and Linux.
-      - name: Install Z3
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download z3-5.3.3 -R Z3Prover/z3 -p z3-5.3.3-x64-win.zip -D "$RUNNER_TEMP"
-          7z x -o"$RUNNER_TEMP" "$RUNNER_TEMP/z3-5.3.3-x64-win.zip" > /dev/null
-          echo "$RUNNER_TEMP\\z3-5.3.3-x64-win\\bin" >> "$GITHUB_PATH"
-
-      # The numerical suite needs LAPACK, as liblapack-dev provides on Linux. The
-      # OpenBLAS DLL carries LAPACK and CBLAS and needs no other runtime.
-      - name: Install OpenBLAS
-        shell: bash
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          gh release download v0.3.34 -R OpenMathLib/OpenBLAS -p OpenBLAS-0.3.34-x64.zip -D "$RUNNER_TEMP"
-          7z x -o"$RUNNER_TEMP\\openblas" "$RUNNER_TEMP/OpenBLAS-0.3.34-x64.zip" > /dev/null
-          echo "$RUNNER_TEMP\\openblas\\bin" >> "$GITHUB_PATH"
 
       - name: Run the test suite
         run: cargo test --no-fail-fast
 
-      # The suite drives the library; these steps drive the shipped binary the way a
-      # user and the editor extension do.
       - name: Build the compiler
         run: cargo build --release
 
+      # The installed layout on its own: kestrel.exe finds Clang, Z3 and OpenBLAS beside
+      # itself, with no other compiler, solver or LAPACK on PATH.
       - name: Check, run, build, session and serve
         shell: bash
         run: |
           set -euo pipefail
-          kestrel=target/release/kestrel.exe
+          if [ "${{ matrix.toolchain }}" = bundled ]; then
+            cp target/release/kestrel.exe "$RUNNER_TEMP/kestrel/bin/"
+            kestrel="$RUNNER_TEMP/kestrel/bin/kestrel.exe"
+            PATH=$(printf '%s' "$PATH" | tr ':' '\n' | grep -vi -e llvm -e '_temp/kestrel' | paste -sd: -)
+            for tool in clang z3; do
+              if command -v "$tool"; then echo "$tool is still on PATH"; exit 1; fi
+            done
+          else
+            kestrel=target/release/kestrel.exe
+          fi
           folder="$RUNNER_TEMP/smoke"
           mkdir -p "$folder"
           printf 'print("Hello, Kestrel!")\n' > "$folder/hello.kes"
@@ -127,6 +138,8 @@ jobs:
           test "$("$kestrel" run "$folder/hello.kes")" = "Hello, Kestrel!"
           "$kestrel" build -o "$folder/hello" "$folder/hello.kes"
           test "$("$folder/hello.exe")" = "Hello, Kestrel!"
+          printf 'import std.linalg\nlet A := Tensor([2.0, 1.0, 1.0, 3.0], shape = (2, 2))\nprint((A @ linalg.inverse(A) - Tensor([1.0, 0.0, 0.0, 1.0], shape = (2, 2))).norm() < 1e-12)\ntheorem positive(n : Int) : n > 0 requires h : n >= 1 {smt}\n' > "$folder/batteries.kes"
+          test "$("$kestrel" run "$folder/batteries.kes")" = true
           printf 'let n := 40\nprint(n + 2)\n:quit\n' | "$kestrel" session --root "$folder" | tee "$folder/session.txt"
           grep -qx 42 "$folder/session.txt"
           printf '{"id":1,"op":"ping"}\n{"id":2,"op":"shutdown"}\n' | "$kestrel" serve --root "$folder" | tee "$folder/serve.txt"

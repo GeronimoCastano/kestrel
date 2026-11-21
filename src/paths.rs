@@ -44,6 +44,19 @@ fn plain_drive_path(path: &str) -> bool {
         })
 }
 
+/// A tool shipped with the compiler. The Windows install keeps `kestrel.exe` in `bin`,
+/// Clang in `toolchain/bin` and Z3 in `z3` beside it. `None` means the tool comes
+/// from `PATH`.
+pub fn bundled(tool: &str) -> Option<PathBuf> {
+    let executable = std::env::current_exe().ok()?;
+    let root = executable.parent()?.parent()?;
+    let file = format!("{tool}{}", std::env::consts::EXE_SUFFIX);
+    [root.join("toolchain").join("bin"), root.join(tool)]
+        .into_iter()
+        .map(|folder| folder.join(&file))
+        .find(|path| path.is_file())
+}
+
 #[cfg(test)]
 mod tests {
     use super::plain_drive_path;

@@ -10,6 +10,9 @@ typedef struct { KTensor first, second, third; } KNumericalParts;
 static void *k_lapack_handle = NULL;
 static pthread_once_t k_lapack_once = PTHREAD_ONCE_INIT;
 static void k_lapack_initialize(void) {
+    /* KESTREL_LAPACK names a library outside the search path, as Homebrew's OpenBLAS is. */
+    const char *chosen = getenv("KESTREL_LAPACK");
+    if (chosen && *chosen && (k_lapack_handle = dlopen(chosen, RTLD_LAZY | RTLD_LOCAL))) return;
     const char *libraries[] = {"/System/Library/Frameworks/Accelerate.framework/Accelerate", "liblapack.so.3", "libopenblas.so.0", "liblapack.so", "libopenblas.dll", "openblas.dll", "liblapack.dll", NULL};
     for (int i = 0; libraries[i]; ++i) {
         k_lapack_handle = dlopen(libraries[i], RTLD_LAZY | RTLD_LOCAL);

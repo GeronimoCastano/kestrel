@@ -873,10 +873,12 @@ fn intercept_close(program: &Program, implementation: &str) -> Output {
     let source = native::emit_c(program)
         .unwrap()
         .replace("fclose(", "k_test_close(");
-    // <setjmp.h> follows <stdio.h> in the runtime on every platform.
+    // KLocation is the runtime's first declaration, after every header on every platform.
+    let anchor = "typedef struct { const char *file; size_t line, column; const char *expression; } KLocation;";
+    assert!(source.contains(anchor));
     let source = source.replacen(
-        "#include <setjmp.h>",
-        &format!("#include <setjmp.h>\nstatic int k_test_close(FILE *file) {{ {implementation} }}"),
+        anchor,
+        &format!("static int k_test_close(FILE *file) {{ {implementation} }}\n{anchor}"),
         1,
     );
     execute_c(&source)

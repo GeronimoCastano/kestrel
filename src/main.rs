@@ -13,6 +13,17 @@ use std::{
 };
 
 fn main() -> ExitCode {
+    // The Windows install ships OpenBLAS beside the compiler. Programs that kestrel runs
+    // find it through KESTREL_LAPACK even when PATH does not name the install folder yet.
+    if std::env::var_os("KESTREL_LAPACK").is_none()
+        && let Some(library) = env::current_exe()
+            .ok()
+            .and_then(|path| Some(path.parent()?.join("libopenblas.dll")))
+            .filter(|path| path.is_file())
+    {
+        // SAFETY: no other thread exists yet.
+        unsafe { env::set_var("KESTREL_LAPACK", library) };
+    }
     // Windows gives the main thread 1 MiB of stack, where macOS and Linux give 8 MiB. The
     // checker recurses on deep programs, so it runs on a thread with room to spare there.
     if cfg!(windows) {

@@ -22,8 +22,45 @@ use std::{
     fs, io,
     path::{Path, PathBuf},
     process::{Command, ExitStatus},
-    sync::atomic::{AtomicU64, Ordering},
+    sync::{
+        OnceLock,
+        atomic::{AtomicU64, Ordering},
+    },
 };
+
+/// The C compiler Kestrel drives: `KESTREL_CC` when set, else the Clang shipped beside
+/// the compiler (the Windows install bundles one), else `clang` on `PATH`.
+pub fn c_compiler() -> &'static Path {
+    static COMPILER: OnceLock<PathBuf> = OnceLock::new();
+    COMPILER.get_or_init(|| {
+        std::env::var_os("KESTREL_CC")
+            .filter(|name| !name.is_empty())
+            .map(PathBuf::from)
+            .or_else(|| crate::paths::bundled("clang"))
+            .unwrap_or_else(|| PathBuf::from("clang"))
+    })
+}
+
+/// A command that runs the C compiler.
+pub fn clang_command() -> Command {
+    Command::new(c_compiler())
+}
+
+/// Whether Clang targets the MinGW ABI, as the bundled Windows toolchain does, rather
+/// than MSVC. The two take different linker flags and C runtimes.
+pub fn mingw() -> bool {
+    static MINGW: OnceLock<bool> = OnceLock::new();
+    *MINGW.get_or_init(|| {
+        cfg!(windows)
+            && clang_command()
+                .arg("-dumpmachine")
+                .output()
+                .is_ok_and(|output| {
+                    let target = String::from_utf8_lossy(&output.stdout);
+                    target.contains("mingw") || target.contains("windows-gnu")
+                })
+    })
+}
 
 fn bigint_constant(text: &str) -> String {
     let spelling = text
@@ -2863,6 +2900,14 @@ fn platform_link_flags(folder: &Path) -> Result<Vec<std::ffi::OsString>, String>
     }
     let resource = folder.join("manifest.res");
     fs::write(&resource, manifest_resource(WINDOWS_MANIFEST)).map_err(|e| e.to_string())?;
+    if mingw() {
+        // The MinGW linker takes GNU-style flags, reads the .res file as an input, and
+        // writes no manifest of its own.
+        return Ok(vec![
+            "-Wl,--stack,8388608".into(),
+            resource.into_os_string(),
+        ]);
+    }
     Ok(vec![
         "-Xlinker".into(),
         "/STACK:8388608".into(),
@@ -2883,12 +2928,24 @@ pub fn sanitizer_runtime_path() -> Option<std::ffi::OsString> {
     // Clang releases keep the DLL in the per-target runtime folder or in lib/windows under
     // the resource folder, depending on how LLVM was built; put both first.
     let ask = |flag: &str| {
-        let output = Command::new("clang").arg(flag).output().ok()?;
+        let output = clang_command().arg(flag).output().ok()?;
         Some(PathBuf::from(String::from_utf8(output.stdout).ok()?.trim()))
     };
     let mut folders = vec![];
     folders.extend(ask("-print-runtime-dir"));
-    folders.extend(ask("-print-resource-dir").map(|root| root.join("lib").join("windows")));
+    let resource = ask("-print-resource-dir");
+    folders.extend(resource.iter().map(|root| root.join("lib").join("windows")));
+    // llvm-mingw keeps its runtime DLLs in the target folder at the toolchain root,
+    // three levels above lib/clang/<version>.
+    folders.extend(resource.iter().filter_map(|root| {
+        Some(
+            root.parent()?
+                .parent()?
+                .parent()?
+                .join("x86_64-w64-mingw32")
+                .join("bin"),
+        )
+    }));
     let rest = std::env::var_os("PATH").unwrap_or_default();
     std::env::join_paths(folders.into_iter().chain(std::env::split_paths(&rest))).ok()
 }
@@ -2927,7 +2984,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
     let mut objects = vec![];
     for (index, source) in program.c_sources.iter().enumerate() {
         let object = temp.path.join(format!("source{index}.o"));
-        let output = Command::new("clang")
+        let output = clang_command()
             .args(["-std=c11", "-O3", "-c"])
             .args(thread_flags())
             .arg(source)
@@ -2947,7 +3004,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
         }
         objects.push(object);
     }
-    let output = Command::new("clang")
+    let output = clang_command()
         .args(thread_flags())
         .args([
             "-std=c11",

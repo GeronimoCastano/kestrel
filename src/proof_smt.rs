@@ -552,7 +552,9 @@ impl Kernel<'_> {
             and(&defined),
             goal.text
         ));
-        let executable = std::env::var_os("KESTREL_Z3").unwrap_or_else(|| "z3".into());
+        let executable = std::env::var_os("KESTREL_Z3")
+            .or_else(|| crate::paths::bundled("z3").map(Into::into))
+            .unwrap_or_else(|| "z3".into());
         match solver(
             Path::new(&executable),
             &query,

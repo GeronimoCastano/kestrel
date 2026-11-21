@@ -1,12 +1,7 @@
 //! C headers are read with Clang; their signatures map onto the std.c boundary types.
 use crate::paths::CanonicalPath;
 use crate::types::Type;
-use std::{
-    collections::BTreeMap,
-    io::Write,
-    path::PathBuf,
-    process::{Command, Stdio},
-};
+use std::{collections::BTreeMap, io::Write, path::PathBuf, process::Stdio};
 
 /// The std.c boundary types, in the order C programs usually list them.
 pub const C_TYPES: [&str; 10] = [
@@ -42,7 +37,7 @@ pub fn read_header(header: &str, directories: &[PathBuf]) -> Result<Header, Stri
         .as_deref()
         .and_then(|path| path.to_str())
         .unwrap_or(header);
-    let mut command = Command::new("clang");
+    let mut command = crate::native::clang_command();
     command.args([
         "-fsyntax-only",
         "-Xclang",

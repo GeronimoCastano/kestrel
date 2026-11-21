@@ -23,7 +23,10 @@ static KBlasDscal k_blas_dscal_fn = NULL;
 static KBlasDdot k_blas_ddot_fn = NULL;
 
 static void k_blas_initialize(void) {
+    /* KESTREL_LAPACK names a library outside the search path, as Homebrew's OpenBLAS is. */
+    const char *chosen = getenv("KESTREL_LAPACK");
     const char *libraries[] = {
+        chosen && *chosen ? chosen : "",
         "/System/Library/Frameworks/Accelerate.framework/Accelerate",
         "libopenblas.so.0",
         "libblas.so.3",
@@ -33,6 +36,7 @@ static void k_blas_initialize(void) {
         NULL,
     };
     for (int i = 0; libraries[i]; ++i) {
+        if (!*libraries[i]) continue;
         void *handle = dlopen(libraries[i], RTLD_LAZY | RTLD_LOCAL);
         if (!handle) continue;
         void *gemm = dlsym(handle, "cblas_dgemm");

@@ -306,7 +306,7 @@ fn compile(command: &mut Command) -> Result<(), String> {
 /// Clang for one session module. On Windows every module links the DLL C runtime, so the
 /// host, the runtime and each entry share one heap and one standard output buffer.
 fn clang(shared: bool) -> Command {
-    let mut command = Command::new("clang");
+    let mut command = super::clang_command();
     command.args([
         "-std=c11",
         "-O2",
@@ -323,9 +323,10 @@ fn clang(shared: bool) -> Command {
     if cfg!(target_os = "linux") {
         command.arg("-ldl");
     }
-    if cfg!(windows) {
+    if cfg!(windows) && !super::mingw() {
         // Clang's driver links the static C runtime by default even with the DLL runtime
-        // selected; two runtimes in one module leave the DLL imports unresolved.
+        // selected; two runtimes in one module leave the DLL imports unresolved. MinGW
+        // links the system's DLL C runtime already.
         command.args(["-fms-runtime-lib=dll", "-lkernel32"]);
         for library in ["libcmt", "libucrt", "libvcruntime"] {
             command
@@ -463,6 +464,13 @@ impl Runtime {
             .args(if cfg!(windows) { None } else { Some("-lm") })
             .arg("-o")
             .arg(path.join(dylib("kestrel_runtime")));
+        if super::mingw() {
+            // The MinGW linker reads an import library, not the DLL, so write one where
+            // -lkestrel_runtime finds it.
+            let mut implib = std::ffi::OsString::from("-Wl,--out-implib,");
+            implib.push(path.join("libkestrel_runtime.dll.a"));
+            runtime.arg(implib);
+        }
         compile(&mut runtime)?;
         fs::write(path.join("host.c"), include_str!("session_host.c"))
             .map_err(|e| e.to_string())?;
@@ -580,7 +588,7 @@ impl Runtime {
                 ));
             }
             let library = path.join(dylib(&format!("foreign{}", self.c_sources.len())));
-            let mut command = Command::new("clang");
+            let mut command = super::clang_command();
             command.args(["-std=c11", "-O2", "-pthread"]);
             command.args(shared_flags());
             if std::env::var_os("KESTREL_SANITIZE").is_some() {
