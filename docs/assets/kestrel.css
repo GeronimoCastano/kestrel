@@ -26,3 +26,11 @@
 ::selection {
   background: rgba(201, 162, 39, 0.4);
 }
+
+/* Keep module names on one line in the reference tables. */
+@media (min-width: 60em) {
+  .md-typeset table:not([class]) td:first-child,
+  .md-typeset table:not([class]) th:first-child {
+    white-space: nowrap;
+  }
+}
