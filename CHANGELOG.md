@@ -4,6 +4,11 @@ All notable changes to Kestrel. Versions follow the policy in the README: within
 `0.1`, a patch release fixes bugs; a syntax or feature change bumps the minor
 number.
 
+## Unreleased
+
+- `kestrel session` loads project C files on Windows, with the bundled Clang
+  and with Clang for MSVC.
+
 ## 0.1.3 - 2026-11-21
 
 - Windows is supported. One PowerShell command installs the compiler with its

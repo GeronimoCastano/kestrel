@@ -49,9 +49,9 @@ install folder:
 $env:KESTREL_VERSION = '0.1.3'; irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
 ```
 
-Python interop and project C files inside `kestrel session` are not available on
-Windows yet; both stop with an error that says so. `kestrel run` and
-`kestrel build` compile project C files as on the other platforms.
+Python interop is not available on Windows yet; it stops with an error that says
+so. `kestrel run`, `kestrel build` and `kestrel session` compile project C files
+as on the other platforms.
 `kestrel build -o hello hello.kes` writes `hello.exe`.
 
 ## Release archives
@@ -86,7 +86,9 @@ sudo install target/release/kestrel /usr/local/bin/
 
 A debug build works too, but its first standard-library check is several times
 slower. On Windows, a source build uses Clang for MSVC, which needs LLVM and the
-Visual Studio Build Tools; the installer above needs neither.
+Visual Studio Build Tools; the installer above needs neither. With Clang for
+MSVC, a session that loads project C files also runs `llvm-nm`, which LLVM
+installs beside `clang`.
 
 ## Choosing the tools
 

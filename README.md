@@ -389,11 +389,10 @@ CI runs the full test suite on macOS, Linux and Windows for every pull request,
 installs each release the way the commands above do, and checks that a program
 using Clang, LAPACK and Z3 runs. Kestrel is benchmarked on macOS.
 
-On Windows, Python interop and project C files inside `kestrel session` are not
-available yet; both stop with an error that says so. `kestrel run` and
-`kestrel build` compile project C files as on the other platforms. Kestrel also
-runs with Clang for MSVC when LLVM and the Visual Studio Build Tools are on
-`PATH`.
+On Windows, Python interop is not available yet; it stops with an error that
+says so. `kestrel run`, `kestrel build` and `kestrel session` compile project C
+files as on the other platforms. Kestrel also runs with Clang for MSVC when LLVM
+and the Visual Studio Build Tools are on `PATH`.
 
 ## Commands
 
