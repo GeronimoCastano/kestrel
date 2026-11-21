@@ -66,6 +66,7 @@ nav:
   - Install: install.md
   - Language:
       - Reference manual: manual.md
+  - Packages: packages.md
   - Standard library:
       - Overview: std/index.md
       - Core:

@@ -95,6 +95,7 @@ fn run() -> Result<bool, String> {
             | "run"
             | "fetch"
             | "update"
+            | "new"
             | "session"
             | "test"
             | "notebook"
@@ -115,6 +116,9 @@ fn run() -> Result<bool, String> {
     let mut output: Option<PathBuf> = None;
     let mut emit_c: Option<PathBuf> = None;
     let mut libraries = vec![];
+    let mut lib_template = false;
+    let mut bin_template = false;
+    let mut git = false;
     let mut filter = None;
     let mut jobs = None;
     let mut timeout = None;
@@ -171,6 +175,9 @@ fn run() -> Result<bool, String> {
             "--tree" => tree = true,
             "--notebook" if command == "check" => notebook = true,
             "--trusted" if command == "check" => trusted = true,
+            "--lib" if command == "new" => lib_template = true,
+            "--bin" if command == "new" => bin_template = true,
+            "--git" if command == "new" => git = true,
             "--stdin-path" if command == "check" => {
                 stdin_path = Some(args.next().ok_or("--stdin-path needs a file path.")?.into())
             }
@@ -255,6 +262,46 @@ fn run() -> Result<bool, String> {
             let count = kestrel::modules::update_package(&root, name)?;
             println!("Updated `{name}`; {count} Git package(s) are locked.");
         }
+        return Ok(true);
+    }
+    if command == "new" {
+        if project
+            || tree
+            || output.is_some()
+            || emit_c.is_some()
+            || !libraries.is_empty()
+            || !script_args.is_empty()
+            || root_given
+        {
+            return Err("new takes one package name and the flags --lib, --bin and --git.".into());
+        }
+        if paths.len() != 1 {
+            return Err("new takes one package name.".into());
+        }
+        if lib_template && bin_template {
+            return Err("`--lib` and `--bin` exclude each other.".into());
+        }
+        let template = if lib_template {
+            kestrel::scaffold::Template::Lib
+        } else {
+            kestrel::scaffold::Template::Bin
+        };
+        let created = kestrel::scaffold::create(Path::new(&paths[0]), template, git)?;
+        if created.folder == Path::new(&created.name) {
+            println!("Created package `{}`.", created.name);
+        } else {
+            println!(
+                "Created package `{}` in {}.",
+                created.name,
+                created.folder.display()
+            );
+        }
+        println!();
+        println!("  cd {}", created.folder.display());
+        if created.template == kestrel::scaffold::Template::Bin {
+            println!("  kestrel run main.kes");
+        }
+        println!("  kestrel test");
         return Ok(true);
     }
     if command == "test" {
@@ -663,7 +710,7 @@ fn help() {
     println!(
         "Kestrel compiler (compiler and native session)\n\nUsage:\n  kestrel session [--root DIRECTORY] [--link LIBRARY] [-- ARG...]\n  kestrel notebook [--root DIRECTORY] [--link LIBRARY]\n  kestrel serve [--root DIRECTORY]
   kestrel goals [--root DIRECTORY] [--line N] [--column N] [--json] FILE
-  kestrel game [--port N] [--root DIRECTORY]\n  kestrel parse [--tree] [--project] FILE...\n  kestrel tokens FILE...\n  kestrel check [--root DIRECTORY] [--trusted] [--notebook] [--stdin-path FILE] FILE...\n  kestrel build [--root DIRECTORY] [-o EXECUTABLE] [--emit-c FILE] [--link LIBRARY] FILE\n  kestrel run [--root DIRECTORY] [--emit-c FILE] [--link LIBRARY] FILE [-- ARG...]\n  kestrel fetch [--root DIRECTORY]\n  kestrel update NAME [--root DIRECTORY]\n  kestrel test [FOLDER] [--filter TEXT] [--jobs N] [--timeout SECONDS|none] [--link LIBRARY]\n\nUse - as a file path to read standard input. --stdin-path FILE treats that
-input as an unsaved version of FILE, so project-local imports resolve.\n\nparse checks grammar only. check resolves imports and checks supported\nnames and types, effects, mutation permissions, moves, borrows, contracts,\nfiles and tasks. build and run compile the supported native subset using\nClang. session keeps live values and runs each entry once; :quit ends it.\n:test [FILTER] runs saved package tests without clearing session values.\ntest runs the @test functions in a package's tests folder, each in its own\nprocess. See README.md for current limits."
+  kestrel game [--port N] [--root DIRECTORY]\n  kestrel parse [--tree] [--project] FILE...\n  kestrel tokens FILE...\n  kestrel check [--root DIRECTORY] [--trusted] [--notebook] [--stdin-path FILE] FILE...\n  kestrel build [--root DIRECTORY] [-o EXECUTABLE] [--emit-c FILE] [--link LIBRARY] FILE\n  kestrel run [--root DIRECTORY] [--emit-c FILE] [--link LIBRARY] FILE [-- ARG...]\n  kestrel fetch [--root DIRECTORY]\n  kestrel update NAME [--root DIRECTORY]\n  kestrel new NAME [--lib] [--bin] [--git]\n  kestrel test [FOLDER] [--filter TEXT] [--jobs N] [--timeout SECONDS|none] [--link LIBRARY]\n\nUse - as a file path to read standard input. --stdin-path FILE treats that
+input as an unsaved version of FILE, so project-local imports resolve.\n\nparse checks grammar only. check resolves imports and checks supported\nnames and types, effects, mutation permissions, moves, borrows, contracts,\nfiles and tasks. build and run compile the supported native subset using\nClang. session keeps live values and runs each entry once; :quit ends it.\n:test [FILTER] runs saved package tests without clearing session values.\ntest runs the @test functions in a package's tests folder, each in its own\nprocess. new writes a package folder with a manifest, an entry point, a module\nand a test. See README.md for current limits."
     );
 }

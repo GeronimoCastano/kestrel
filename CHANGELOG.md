@@ -4,6 +4,14 @@ All notable changes to Kestrel. Versions follow the policy in the README: within
 `0.1`, a patch release fixes bugs; a syntax or feature change bumps the minor
 number.
 
+## 0.2.0 - 2026-11-21
+
+- `kestrel new NAME` scaffolds a package: `kestrel.project`, an entry point, a
+  module and a test that passes on the first run. `--lib` writes the module and
+  test without an entry point; `--git` starts a repository.
+- A Packages page documents the project file, dependencies, tests and the
+  scaffold command.
+
 ## 0.1.3 - 2026-11-21
 
 - Windows is supported. One PowerShell command installs the compiler with its

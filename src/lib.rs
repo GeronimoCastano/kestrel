@@ -17,6 +17,7 @@ pub mod paths;
 mod probability;
 pub mod proof;
 pub mod resolution;
+pub mod scaffold;
 pub mod server;
 pub mod session;
 pub mod source;
