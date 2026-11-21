@@ -72,7 +72,7 @@ fn run() -> Result<bool, String> {
         .into_iter();
     let Some(command) = args.next() else {
         help();
-        return Ok(true);
+        return Err("No command given. Run `kestrel --help` for the list.".into());
     };
     if matches!(command.as_str(), "--help" | "-h" | "help") {
         help();
@@ -80,8 +80,9 @@ fn run() -> Result<bool, String> {
     }
     if matches!(command.as_str(), "--version" | "-V") {
         println!(
-            "kestrel {} (compiler and native session)",
-            env!("CARGO_PKG_VERSION")
+            "kestrel {} (compiler and native session, commit {})",
+            env!("CARGO_PKG_VERSION"),
+            env!("KESTREL_COMMIT")
         );
         return Ok(true);
     }

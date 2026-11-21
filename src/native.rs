@@ -2979,6 +2979,22 @@ pub fn thread_flags() -> &'static [&'static str] {
     if cfg!(windows) { &[] } else { &["-pthread"] }
 }
 
+/// Flags for `KESTREL_SANITIZE=1`: AddressSanitizer and UBSan around the
+/// generated C, so a memory error in the runtime or in emitted code stops the
+/// program instead of passing quietly.
+fn sanitizer_flags() -> &'static [&'static str] {
+    if std::env::var_os("KESTREL_SANITIZE").is_some() {
+        &[
+            "-fsanitize=address,undefined",
+            "-fno-sanitize-recover=undefined",
+            "-fno-omit-frame-pointer",
+            "-g",
+        ]
+    } else {
+        &[]
+    }
+}
+
 pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
     let destination = &executable_path(destination);
     let source = emit_c(program)?;
@@ -3001,6 +3017,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
         let object = temp.path.join(format!("source{index}.o"));
         let output = clang_command()
             .args(["-std=c11", "-O3", "-c"])
+            .args(sanitizer_flags())
             .args(thread_flags())
             .arg(source)
             .args(&includes)
@@ -3019,6 +3036,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
     }
     let output = clang_command()
         .args(thread_flags())
+        .args(sanitizer_flags())
         .args([
             "-std=c11",
             "-O3",

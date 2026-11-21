@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -186,3 +187,54 @@ jobs:
 
       - name: Run the Node tests
         run: node --test test/*.test.js
+
+  sanitizers:
+    name: Sanitizers (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang liblapack-dev libblas-dev z3 python3-dev
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@1.95.0
+
+      - name: Cache the build
+        uses: Swatinem/rust-cache@v2
+
+      # Programs built during these tests carry AddressSanitizer and UBSan. The
+      # leak detector is off because the runtime pool is intentionally kept.
+      - name: Run the tests under the sanitizers
+        env:
+          KESTREL_SANITIZE: "1"
+          ASAN_OPTIONS: "detect_leaks=0"
+          LSAN_OPTIONS: "detect_leaks=0"
+        run: cargo test --test session --test cli --test contracts
+
+  benchmarks:
+    name: Benchmarks
+    # Timings differ between machines and are noisy, so the gate runs on main
+    # and by hand, not on every pull request.
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/main')
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@1.95.0
+
+      - name: Cache the build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Compare with the recorded results
+        run: python3 tools/check_benchmarks.py --runs 3 --current benchmarks/current.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: benchmarks
+          path: benchmarks/current.json
+          if-no-files-found: ignore

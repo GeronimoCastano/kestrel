@@ -75,6 +75,8 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--runs", type=int, default=3)
     parser.add_argument("--only", nargs="*", default=NAMES)
+    parser.add_argument("--out", type=Path, default=BENCH / "results.json")
+    parser.add_argument("--languages", nargs="*", default=["kestrel", "rust", "java", "python"])
     arguments = parser.parse_args()
     subprocess.run(["cargo", "build", "--release", "--quiet"], cwd=ROOT, check=True)
     results = {
@@ -91,7 +93,7 @@ def main():
     for name in arguments.only:
         rows = {}
         expected = None
-        for language in ["kestrel", "rust", "java", "python"]:
+        for language in arguments.languages:
             compile_seconds, command = build(language, name)
             times, peaks, output = [], [], None
             # The first launch of a new binary can include a system security scan.
@@ -112,7 +114,8 @@ def main():
             }
             print(f"{name:12} {language:8} {rows[language]['seconds']:8.3f} s  {rows[language]['peak_bytes'] / 2**20:8.1f} MiB  compile {compile_seconds:6.2f} s", flush=True)
         results["benchmarks"][name] = rows
-    (BENCH / "results.json").write_text(json.dumps(results, indent=2) + "\n")
+    arguments.out.parent.mkdir(parents=True, exist_ok=True)
+    arguments.out.write_text(json.dumps(results, indent=2) + "\n")
 
 
 if __name__ == "__main__":
