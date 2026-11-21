@@ -68,7 +68,17 @@ nav:
       - Reference manual: manual.md
   - Standard library:
       - Overview: std/index.md
-      - std.path: std/path.md
+      - System:
+          - std.path: std/path.md
+          - std.fs: std/fs.md
+          - std.io: std/io.md
+          - std.args: std/args.md
+          - std.time: std/time.md
+      - Text and data:
+          - std.json: std/json.md
+          - std.csv: std/csv.md
+      - Numbers:
+          - std.statistics: std/statistics.md
   - Mathematics: math.md
   - Neural networks: kesnet.md
   - Editor: editors/vscode.md

@@ -32,8 +32,8 @@ until a module has one; this table says which pages exist.
 
 | Module | What it holds | Page |
 |---|---|---|
-| `std.json` | JSON text to a `Json` value and back, following RFC 8259. | planned |
-| `std.csv` | Comma-separated text, following RFC 4180, to and from a frame. | planned |
+| `std.json` | JSON text to a `Json` value and back, following RFC 8259. | [documented](json.md) |
+| `std.csv` | Comma-separated text, following RFC 4180, to and from a frame. | [documented](csv.md) |
 | `std.toml` | TOML 1.0 configuration text to a `Toml` value. | planned |
 | `std.regex` | Regular expressions: match, search, replace, capture. | planned |
 | `std.encoding` | Base64, hex, CRC-32 and SHA-256 over the UTF-8 bytes of a string. | planned |
@@ -46,7 +46,7 @@ until a module has one; this table says which pages exist.
 | `std.math` | Elementary functions: `exp`, `log`, trigonometry, rounding. | planned |
 | `std.linalg` | Matrices, vectors, solves, decompositions. | planned |
 | `std.stats` | Statistics over tensors. | planned |
-| `std.statistics` | Summaries of a `List` of doubles. | planned |
+| `std.statistics` | Summaries of a `List` of doubles. | [documented](statistics.md) |
 | `std.prob` | Probability distributions and their sampling. | planned |
 | `std.random` | Random numbers and seeded generators. | planned |
 | `std.complex` | Double-precision complex numbers. | planned |
@@ -57,12 +57,12 @@ until a module has one; this table says which pages exist.
 
 | Module | What it holds | Page |
 |---|---|---|
-| `std.fs` | Files and directories: read, write, list, copy, remove. | planned |
+| `std.fs` | Files and directories: read, write, list, copy, remove. | [documented](fs.md) |
 | `std.path` | Paths as strings: split, join, walk. | [documented](path.md) |
-| `std.io` | Reading input and writing output. | planned |
-| `std.args` | Command-line flags and options. | planned |
+| `std.io` | Reading input and writing output. | [documented](io.md) |
+| `std.args` | Command-line flags and options. | [documented](args.md) |
 | `std.term` | ANSI colours and styles, a progress bar, and logs. | planned |
-| `std.time` | Clocks, wall time, monotonic time, sleeping. | planned |
+| `std.time` | Clocks, wall time, monotonic time, sleeping. | [documented](time.md) |
 | `std.datetime` | Calendar dates and times in UTC, Unix seconds and ISO 8601. | planned |
 | `std.process` | Running commands, environment variables, exit status. | planned |
 | `std.python` | Embedding Python and moving values across the boundary. | planned |
