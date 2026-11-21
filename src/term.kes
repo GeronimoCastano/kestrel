@@ -7,32 +7,37 @@ import std.process
 function style(code : String, text : String) : String = "\u001b[" + code + "m" + text + "\u001b[0m"
 
 public function bold(text : String) : String = style("1", text)
+
 public function dim(text : String) : String = style("2", text)
+
 public function underline(text : String) : String = style("4", text)
+
 public function red(text : String) : String = style("31", text)
+
 public function green(text : String) : String = style("32", text)
+
 public function yellow(text : String) : String = style("33", text)
+
 public function blue(text : String) : String = style("34", text)
+
 public function magenta(text : String) : String = style("35", text)
+
 public function cyan(text : String) : String = style("36", text)
 
 // A bar such as `[#####.....]  50%` for `done` out of `total`.
 public function progressBar(done : Int, total : Int, width : Int = 20) : String {
     let fraction := if total <= 0 then 1.0 else (done.clamp(0, total)).toDouble() / total.toDouble()
-    let filled := match (fraction * width.toDouble()).floor().checkedToInt() {
-        n => n,
-        _ => 0,
-    }
-    let percent := match (fraction * 100.0).round().checkedToInt() {
-        n => n,
-        _ => 0,
-    }
+    let filled := match (fraction * width.toDouble()).floor().checkedToInt() { n => n, _ => 0 }
+    let percent := match (fraction * 100.0).round().checkedToInt() { n => n, _ => 0 }
     return "[" + "#" * filled + "." * (width - filled) + "] " + f"{percent:>3}%"
 }
 
 public const DEBUG : Int = 10
+
 public const INFO : Int = 20
+
 public const WARNING : Int = 30
+
 public const ERROR : Int = 40
 
 // Writes `message` to standard error when `level` is at least `threshold`.
@@ -41,7 +46,13 @@ public function log(threshold : Int, level : Int, message : String) : void with 
         return
     }
     let plain := process.env("NO_COLOR").isSome()
-    let label := if level >= ERROR then "ERROR" else if level >= WARNING then "WARNING" else if level >= INFO then "INFO" else "DEBUG"
-    let shown := if plain then label else if level >= ERROR then red(label) else if level >= WARNING then yellow(label) else if level >= INFO then green(label) else dim(label)
+    let label :=
+        if level >= ERROR then "ERROR"
+        else if level >= WARNING then "WARNING" else if level >= INFO then "INFO" else "DEBUG"
+    let shown :=
+        if plain then label
+        else if level >= ERROR then red(label)
+        else if level >= WARNING then yellow(label)
+        else if level >= INFO then green(label) else dim(label)
     io.eprint(shown + ": " + message)
 }

@@ -1,7 +1,6 @@
 import testdata.language.cycleodd as odd
 
-public function even(n : Int) : Bool =
-    if n == 0 then true else odd.odd(n - 1)
+public function even(n : Int) : Bool = if n == 0 then true else odd.odd(n - 1)
 
 public function relay(text : String, n : Int) : String =
     if n == 0 then text else odd.relay(text, n - 1)

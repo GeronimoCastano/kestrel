@@ -1,7 +1,8 @@
 function identity[T : Equals](x : T) : T = x
 
-theorem same[T : Equals](x : T) : identity(x) = x {rfl}
-theorem natural(n : Nat) : identity(n) = n {same(n)}
+theorem same[T : Equals](x : T) : identity(x) = x { rfl }
+
+theorem natural(n : Nat) : identity(n) = n { same(n) }
 
 function keep[U : Equals](x : U) : U requires same(x) = identity(x)
 

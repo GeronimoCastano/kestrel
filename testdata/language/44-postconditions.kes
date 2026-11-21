@@ -1,5 +1,5 @@
 function nonnegative(n : Int) : Int ensures result >= 0 {
-    if n < 0 {return 0}
+    if n < 0 { return 0 }
     n
 }
 

@@ -6,7 +6,9 @@ import std.ml.{StandardScaler}
 
 import std.process.{args}
 
-let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 300 }) else 300
+let REPETITIONS :=
+    if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 300 })
+    else 300
 
 let X := Tensor.generate((100000, 20), (i, j) => ((i * 13 + j * 7) % 100).toDouble() / 10.0)
 let mut totalMeans := 0.0

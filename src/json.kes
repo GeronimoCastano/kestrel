@@ -24,7 +24,8 @@ class JsonReader {
         this.at = 0
     }
 
-    public function peek() : Int = if this.at < this.text.byteLength() then this.text.byteAt(this.at) else -1
+    public function peek() : Int =
+        if this.at < this.text.byteLength() then this.text.byteAt(this.at) else -1
 
     public mut function skipSpace() : void {
         while this.at < this.text.byteLength() {
@@ -40,17 +41,16 @@ class JsonReader {
 }
 
 function expectWord(mut r : JsonReader, word : String) : void or Error {
-    if r.at + word.byteLength() > r.text.byteLength() || r.text.byteSlice(r.at, r.at + word.byteLength()) != word {
-        return r.fail(f"expected {word}")
-    }
+    if r.at + word.byteLength() > r.text.byteLength() ||
+        r.text.byteSlice(r.at, r.at + word.byteLength()) != word {
+            return r.fail(f"expected {word}")
+        }
     r.at += word.byteLength()
 }
 
 function hexValue(b : Int) : Int =
     if b >= 48 && b <= 57 then b - 48
-    else if b >= 97 && b <= 102 then b - 87
-    else if b >= 65 && b <= 70 then b - 55
-    else -1
+    else if b >= 97 && b <= 102 then b - 87 else if b >= 65 && b <= 70 then b - 55 else -1
 
 function readHex4(mut r : JsonReader) : Int or Error {
     let mut value := 0
@@ -139,7 +139,9 @@ function readNumber(mut r : JsonReader) : Json or Error {
     }
     if r.peek() == 46 {
         r.at += 1
-        if r.peek() < 48 || r.peek() > 57 { return r.fail("expected digits after the decimal point") }
+        if r.peek() < 48 || r.peek() > 57 {
+            return r.fail("expected digits after the decimal point")
+        }
         while r.peek() >= 48 && r.peek() <= 57 { r.at += 1 }
     }
     if r.peek() == 101 || r.peek() == 69 {
@@ -149,10 +151,7 @@ function readNumber(mut r : JsonReader) : Json or Error {
         while r.peek() >= 48 && r.peek() <= 57 { r.at += 1 }
     }
     let text := r.text.byteSlice(start, r.at)
-    return match parseDouble(text) {
-        x => JNumber(x),
-        _ => r.fail(f"bad number {text}"),
-    }
+    return match parseDouble(text) { x => JNumber(x), _ => r.fail(f"bad number {text}") }
 }
 
 function readValue(mut r : JsonReader, depth : Int) : Json or Error {
@@ -261,11 +260,9 @@ function quote(s : String) : String {
             parts.append(s.byteSlice(start, i))
             parts.append(
                 if b == 34 then "\\\""
-                else if b == 92 then "\\\\"
-                else if b == 10 then "\\n"
-                else if b == 13 then "\\r"
-                else if b == 9 then "\\t"
-                else f"\\u{b:04x}"
+                    else if b == 92 then "\\\\"
+                    else if b == 10 then "\\n"
+                    else if b == 13 then "\\r" else if b == 9 then "\\t" else f"\\u{b:04x}",
             )
             start = i + 1
         }
@@ -281,10 +278,7 @@ function number(x : double) : String {
         return "null"
     }
     if x == x.floor() && x.abs() < 1000000000000000.0 {
-        return match x.checkedToInt() {
-            n => f"{n}",
-            _ => f"{x}",
-        }
+        return match x.checkedToInt() { n => f"{n}", _ => f"{x}" }
     }
     return f"{x}"
 }
@@ -302,14 +296,22 @@ function write(value : Json, indent : Int, level : Int) : String {
             if items.isEmpty() {
                 "[]"
             } else {
-                "[" + breakLine + items.map(item => write(item, indent, level + 1)).join("," + breakLine) + closeLine + "]"
+                "[" +
+                    breakLine +
+                    items.map(item => write(item, indent, level + 1)).join("," + breakLine) +
+                    closeLine + "]"
             }
         },
         JObject(fields) => {
             if fields.isEmpty() {
                 "{}"
             } else {
-                "{" + breakLine + fields.map(field => quote(field[0]) + colon + write(field[1], indent, level + 1)).join("," + breakLine) + closeLine + "}"
+                "{" +
+                    breakLine +
+                    fields.map(
+                        field => quote(field[0]) + colon + write(field[1], indent, level + 1),
+                    ).join("," + breakLine) +
+                    closeLine + "}"
             }
         },
     }

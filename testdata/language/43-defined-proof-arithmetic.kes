@@ -2,10 +2,13 @@ function discarded(n : Int) : Int {
     let unused := n + 1
     0
 }
+
 theorem bounded(n : Int) : discarded(n) = 0 requires room : n < 9223372036854775807 { rfl }
+
 function certified(n : Int) : Int requires bounded(n) { n }
+
 function guarded(n : Int) : Int or Error requires n < 9223372036854775807 { certified(n) }
 
-print(match guarded(5) { n => n.text(), _ => "blocked", })
+print(match guarded(5) { n => n.text(), _ => "blocked" })
 function boundary() : Int = 9223372036854775807
-print(match guarded(boundary()) { n => n.text(), _ => "blocked", })
+print(match guarded(boundary()) { n => n.text(), _ => "blocked" })

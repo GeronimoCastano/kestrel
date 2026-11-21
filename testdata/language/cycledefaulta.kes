@@ -1,10 +1,14 @@
-import testdata.language.cycledefaultb.{base, label}
 import std.str.{length}
+import testdata.language.cycledefaultb.{base, label}
+
 public class Token {
     public final name : String
-    new(name : String = label()) {this.name=name}
+    new(name : String = label()) { this.name = name }
     public function size(extra : Int = base()) : Int = length(this.name) + extra
 }
+
 public function value(n : Int = base()) : Int = n + 1
+
 public function empty[T](items : List[T] = []) : List[T] = items
+
 public function read(token : Token = Token()) : String = token.name

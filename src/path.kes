@@ -47,7 +47,8 @@ public function join(base : String, part : String) : String {
 public function isAbsolute(path : String) : Bool = path.startsWith("/")
 
 // The non-empty parts between slashes.
-public function parts(path : String) : List[String] = path.split("/").filter(p => !p.isEmpty()).toList()
+public function parts(path : String) : List[String] =
+    path.split("/").filter(p => !p.isEmpty()).toList()
 
 // Every file below `root`, in name order, with paths that start with `root`.
 public function walk(root : String) : List[String] or Error with Effects {

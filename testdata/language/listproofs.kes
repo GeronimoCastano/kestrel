@@ -3,26 +3,18 @@
 
 @simp
 public theorem appendEmpty(xs : List[T]) : xs + [] = xs {
-    induction xs {
-        [] => rfl,
-        [x, ..rest] ih => congrArg(r => [x] + r, ih),
-    }
+    induction xs { [] => rfl, [x, ..rest] ih => congrArg(r => [x] + r, ih) }
 }
 
 public theorem appendAssoc(xs ys zs : List[T]) : (xs + ys) + zs = xs + (ys + zs) {
-    induction xs {
-        [] => rfl,
-        [x, ..rest] ih => congrArg(r => [x] + r, ih),
-    }
+    induction xs { [] => rfl, [x, ..rest] ih => congrArg(r => [x] + r, ih) }
 }
 
 public theorem reverseAppend(xs ys : List[T]) : (xs + ys).reversed() = ys.reversed() + xs.reversed() {
     induction xs {
         [] => symm(appendEmpty(ys.reversed())),
-        [x, ..rest] ih => trans(
-            congrArg(r => r + [x], ih),
-            appendAssoc(ys.reversed(), rest.reversed(), [x]),
-        ),
+        [x, ..rest] ih =>
+            trans(congrArg(r => r + [x], ih), appendAssoc(ys.reversed(), rest.reversed(), [x])),
     }
 }
 
@@ -38,15 +30,15 @@ function insert(x : Int, xs : List[Int]) : List[Int] = match xs {
     [y, ..rest] => if x <= y { [x] + xs } else { [y] + insert(x, rest) },
 }
 
-function insertionSort(xs : List[Int]) : List[Int] = match xs {
-    [] => [],
-    [x, ..rest] => insert(x, insertionSort(rest)),
-}
+function insertionSort(xs : List[Int]) : List[Int] =
+    match xs { [] => [], [x, ..rest] => insert(x, insertionSort(rest)) }
 
 // These theorems use the existing constant-time native length() operation.
 // Its logical definition unfolds by the empty and nonempty list cases.
-theorem chooseLength(b : Bool, left right : List[Int], n : Int) : (if b { left } else { right }).length() = n requires hl : left.length() = n requires hr : right.length() = n {
-    match b { true => hl, false => hr, }
+theorem chooseLength(b : Bool, left right : List[Int], n : Int) : (
+    if b { left } else { right }
+).length() = n requires hl : left.length() = n requires hr : right.length() = n {
+    match b { true => hl, false => hr }
 }
 
 theorem insertLength(x : Int, xs : List[Int]) : insert(x, xs).length() = 1 + xs.length() {
@@ -69,9 +61,11 @@ theorem sortLength(xs : List[Int]) : insertionSort(xs).length() = xs.length() {
 theorem sortExample() : insertionSort([3, 1, 2, 1]) = [1, 1, 2, 3] { rfl }
 
 theorem doubleNot(b : Bool) : !(!b) = b by {
-    cases b { true => { rfl } false => { rfl } }
+    cases b {
+        true => { rfl } false => { rfl }
+    }
 }
 
 theorem optionCases(o : Option[T]) : o.isSome() or o.isNone() {
-    match o { Some(x) => Left(decide), None => Right(decide), }
+    match o { Some(x) => Left(decide), None => Right(decide) }
 }

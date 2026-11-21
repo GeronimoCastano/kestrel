@@ -1,7 +1,7 @@
 // panels4: a 2x2 grid of four 1,000-point line panels.
-import std.kesplot as plt
-import std.math.{sin, cos}
 import c "stdlib.h"
+import std.kesplot as plt
+import std.math.{cos, sin}
 
 function quote(text : String) : String = "'" + text.replace("'", "'\\''") + "'"
 
@@ -9,7 +9,7 @@ function reportSize(path : String) : void or Error with Effects {
     let sizePath := path + ".size"
     let status := unsafe { system("wc -c < " + quote(path) + " > " + quote(sizePath)) }
     if status.toInt() != 0 { return Error("cannot measure " + path) }
-    using reader := open(sizePath)? {
+    using reader := open(sizePath)?{
         let line := reader.readLine()?
         print(parseInt(line.trim())?)
     }

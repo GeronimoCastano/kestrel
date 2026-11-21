@@ -1,16 +1,31 @@
 // A gallery of kesplot's chart types. Run with:
 //     kestrel run examples/kesplot_gallery.kes
 // It writes kesplot-gallery-*.svg in the current directory.
+import std.kesdas.{DataFrame, Series}
 import std.kesplot as plt
-import std.kesdas.{Series, DataFrame}
-import std.math.{sin, cos}
+import std.math.{cos, sin}
 
 function lines() : void or Error with Effects {
     let xs := [i.toDouble() / 20.0 for i in range(121)]
     let fig := plt.Figure(style = plt.Style.science())
     fig.plot(xs, [sin(x) for x in xs], label = "$\\sin(x)$", color = "C0")
-    fig.plot(xs, [cos(x) for x in xs], label = "$\\cos(x)$", color = "C1", lineStyle = "--", lineWidth = 1.4)
-    fig.plot(xs, [sin(2.0 * x) for x in xs], label = "$\\sin(2x)$", color = "C2", lineStyle = ":", marker = "o", markerSize = 3.0)
+    fig.plot(
+        xs,
+        [cos(x) for x in xs],
+        label = "$\\cos(x)$",
+        color = "C1",
+        lineStyle = "--",
+        lineWidth = 1.4,
+    )
+    fig.plot(
+        xs,
+        [sin(2.0 * x) for x in xs],
+        label = "$\\sin(2x)$",
+        color = "C2",
+        lineStyle = ":",
+        marker = "o",
+        markerSize = 3.0,
+    )
     fig.title("Line styles and markers")
     fig.xLabel("x")
     fig.yLabel("y")
@@ -20,12 +35,21 @@ function lines() : void or Error with Effects {
 
 function scatter() : void or Error with Effects {
     let n := 55
-    let frame := DataFrame([
-        Series([i.toDouble() for i in range(n)], name = "x"),
-        Series([i.toDouble() * 0.5 + 10.0 * sin(i.toDouble() / 8.0) for i in range(n)], name = "y"),
-        Series([if i % 3 == 0 then "a" else if i % 3 == 1 then "b" else "c" for i in range(n)], name = "group"),
-        Series([1.0 + i.toDouble() / 20.0 for i in range(n)], name = "size"),
-    ])
+    let frame :=
+        DataFrame(
+            [
+                Series([i.toDouble() for i in range(n)], name = "x"),
+                Series(
+                    [i.toDouble() * 0.5 + 10.0 * sin(i.toDouble() / 8.0) for i in range(n)],
+                    name = "y",
+                ),
+                Series(
+                    [if i % 3 == 0 then "a" else if i % 3 == 1 then "b" else "c" for i in range(n)],
+                    name = "group",
+                ),
+                Series([1.0 + i.toDouble() / 20.0 for i in range(n)], name = "size"),
+            ],
+        )
     let fig := plt.Figure(style = plt.Style.science())
     fig.scatterFrame(frame, x = "x", y = "y", colorBy = "group", sizeBy = "size")?
     fig.title("Scatter with colour and size")
@@ -36,11 +60,14 @@ function scatter() : void or Error with Effects {
 }
 
 function bars() : void or Error with Effects {
-    let frame := DataFrame([
-        Series(["alpha", "beta", "gamma", "delta"], name = "category"),
-        Series([12, 8, 15, 10], name = "north"),
-        Series([9, 14, 7, 12], name = "south"),
-    ])
+    let frame :=
+        DataFrame(
+            [
+                Series(["alpha", "beta", "gamma", "delta"], name = "category"),
+                Series([12, 8, 15, 10], name = "north"),
+                Series([9, 14, 7, 12], name = "south"),
+            ],
+        )
     let fig := plt.Figure(style = plt.Style.science())
     fig.barFrame(frame, x = "category", y = ["north", "south"])?
     fig.title("Grouped bars")
@@ -68,11 +95,14 @@ function histograms() : void or Error with Effects {
     fig.legend()
     fig.save("kesplot-gallery-hist.svg")?
 
-    let frame := DataFrame([
-        Series([1.0, 2.0, 2.2, 3.0, 4.0, 10.0, 2.5, 2.8], name = "A"),
-        Series([2.0, 3.0, 3.4, 4.0, 5.0, 6.0, 3.2, 3.8], name = "B"),
-        Series([0.5, 1.0, 1.1, 1.5, 2.0, 4.5, 1.2, 1.4], name = "C"),
-    ])
+    let frame :=
+        DataFrame(
+            [
+                Series([1.0, 2.0, 2.2, 3.0, 4.0, 10.0, 2.5, 2.8], name = "A"),
+                Series([2.0, 3.0, 3.4, 4.0, 5.0, 6.0, 3.2, 3.8], name = "B"),
+                Series([0.5, 1.0, 1.1, 1.5, 2.0, 4.5, 1.2, 1.4], name = "C"),
+            ],
+        )
     let box := plt.Figure(style = plt.Style.science())
     box.boxFrame(frame)?
     box.title("Distribution by category")
@@ -83,7 +113,12 @@ function histograms() : void or Error with Effects {
 function matrices() : void or Error with Effects {
     let rows := 7
     let cols := 6
-    let matrix := [[sin(r.toDouble() * 0.8) * cos(c.toDouble() * 0.6) for c in range(cols)] for r in range(rows)]
+    let matrix :=
+        [
+            [sin(r.toDouble() * 0.8) * cos(c.toDouble() * 0.6) for c in range(cols)] for r in range(
+                rows,
+            )
+        ]
     let rowLabels := ["r" + r.text() for r in range(rows)]
     let colLabels := ["c" + c.text() for c in range(cols)]
     let fig := plt.Figure(style = plt.Style.science())
@@ -92,7 +127,8 @@ function matrices() : void or Error with Effects {
     fig.save("kesplot-gallery-heatmap.svg")?
 
     let contourFig := plt.Figure(style = plt.Style.science())
-    let smooth := [[sin(r.toDouble() / 3.0) * cos(c.toDouble() / 4.0) for c in range(40)] for r in range(24)]
+    let smooth :=
+        [[sin(r.toDouble() / 3.0) * cos(c.toDouble() / 4.0) for c in range(40)] for r in range(24)]
     contourFig.contour(smooth, 7, "viridis", 1.0, [], [], true, "z")
     contourFig.title("Contour lines")
     contourFig.save("kesplot-gallery-contour.svg")?
@@ -100,7 +136,13 @@ function matrices() : void or Error with Effects {
 
 function pieChart() : void or Error with Effects {
     let fig := plt.Figure(style = plt.Style.science())
-    fig.pie([35.0, 25.0, 20.0, 12.0, 8.0], ["North", "South", "East", "West", "Other"], startAngle = 90.0, autoPercent = true, donut = 0.4)
+    fig.pie(
+        [35.0, 25.0, 20.0, 12.0, 8.0],
+        ["North", "South", "East", "West", "Other"],
+        startAngle = 90.0,
+        autoPercent = true,
+        donut = 0.4,
+    )
     fig.title("Share of sales")
     fig.legend("outside right")
     fig.save("kesplot-gallery-pie.svg")?

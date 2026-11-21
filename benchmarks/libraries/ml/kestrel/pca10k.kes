@@ -5,9 +5,15 @@ import std.ml.{PCA}
 
 import std.process.{args}
 
-let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 1500 }) else 1500
+let REPETITIONS :=
+    if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 1500 })
+    else 1500
 
-let X := Tensor.generate((10000, 30), (i, j) => ((i * 1103515245 + j * 12345 + 7) % 2147483648).toDouble() / 2147483648.0 - 0.5)
+let X :=
+    Tensor.generate(
+        (10000, 30),
+        (i, j) => ((i * 1103515245 + j * 12345 + 7) % 2147483648).toDouble() / 2147483648.0 - 0.5,
+    )
 let mut totalVariance := 0.0
 let mut totalTransformed := 0.0
 for (step in range(REPETITIONS)) {

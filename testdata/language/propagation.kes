@@ -1,2 +1,3 @@
 function parse(s : String) : Int or Error = 42
+
 function total(s : String) : Int = parse(s)?

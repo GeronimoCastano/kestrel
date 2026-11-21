@@ -9,17 +9,13 @@ class Node {
     }
 }
 
-function nextLabel(nodes : Arena[Node], h : ArenaRef[Node]) : String =
-    match nodes.get(h) {
-        Some(node) => match node.next {
-            Some(next) => match nodes.get(next) {
-                Some(link) => link.label,
-                None => "missing",
-            },
-            None => "end",
-        },
-        None => "missing",
-    }
+function nextLabel(nodes : Arena[Node], h : ArenaRef[Node]) : String = match nodes.get(h) {
+    Some(node) => match node.next {
+        Some(next) => match nodes.get(next) { Some(link) => link.label, None => "missing" },
+        None => "end",
+    },
+    None => "missing",
+}
 
 function graph() : void or Error with Effects {
     let nodes := Arena[Node]()

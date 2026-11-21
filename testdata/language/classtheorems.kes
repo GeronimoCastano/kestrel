@@ -13,8 +13,7 @@ theorem pointX(p : Point) : p.x = p.x { rfl }
 
 theorem squareArea(s : Square) : s.area() = s.side * s.side { rfl }
 
-theorem areaScales(s : Square, k : Int) :
-    s.scaled(k).area() = k * k * s.area() { smt }
+theorem areaScales(s : Square, k : Int) : s.scaled(k).area() = k * k * s.area() { smt }
 
 function side(s : Square) : Int = s.side
 

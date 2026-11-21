@@ -11,8 +11,7 @@ import std.math
 
 function indexRange(n : Int) : List[Int] = range(n).toList()
 
-function pick(xs : List[Int], positions : List[Int]) : List[Int] =
-    [xs.at(i) for i in positions]
+function pick(xs : List[Int], positions : List[Int]) : List[Int] = [xs.at(i) for i in positions]
 
 function pick(xs : List[double], positions : List[Int]) : List[double] =
     [xs.at(i) for i in positions]
@@ -20,8 +19,7 @@ function pick(xs : List[double], positions : List[Int]) : List[double] =
 function pick(xs : List[String], positions : List[Int]) : List[String] =
     [xs.at(i) for i in positions]
 
-function pick(xs : List[Bool], positions : List[Int]) : List[Bool] =
-    [xs.at(i) for i in positions]
+function pick(xs : List[Bool], positions : List[Int]) : List[Bool] = [xs.at(i) for i in positions]
 
 function reversedPositions(n : Int) : List[Int] = [n - 1 - i for i in range(n)]
 
@@ -58,12 +56,21 @@ function sliceString(text : String, start : Int, stop : Int) : String =
 
 // fixedDecimals writes x with exactly n decimals, for n from 1 to 17.
 function fixedDecimals(x : double, n : Int) : String =
-    if n == 1 then f"{x:.1f}" else if n == 2 then f"{x:.2f}" else if n == 3 then f"{x:.3f}"
-    else if n == 4 then f"{x:.4f}" else if n == 5 then f"{x:.5f}" else if n == 6 then f"{x:.6f}"
-    else if n == 7 then f"{x:.7f}" else if n == 8 then f"{x:.8f}" else if n == 9 then f"{x:.9f}"
-    else if n == 10 then f"{x:.10f}" else if n == 11 then f"{x:.11f}" else if n == 12 then f"{x:.12f}"
-    else if n == 13 then f"{x:.13f}" else if n == 14 then f"{x:.14f}" else if n == 15 then f"{x:.15f}"
-    else if n == 16 then f"{x:.16f}" else f"{x:.17f}"
+    if n == 1 then f"{x:.1f}"
+    else if n == 2 then f"{x:.2f}"
+    else if n == 3 then f"{x:.3f}"
+    else if n == 4 then f"{x:.4f}"
+    else if n == 5 then f"{x:.5f}"
+    else if n == 6 then f"{x:.6f}"
+    else if n == 7 then f"{x:.7f}"
+    else if n == 8 then f"{x:.8f}"
+    else if n == 9 then f"{x:.9f}"
+    else if n == 10 then f"{x:.10f}"
+    else if n == 11 then f"{x:.11f}"
+    else if n == 12 then f"{x:.12f}"
+    else if n == 13 then f"{x:.13f}"
+    else if n == 14 then f"{x:.14f}"
+    else if n == 15 then f"{x:.15f}" else if n == 16 then f"{x:.16f}" else f"{x:.17f}"
 
 // reprFloat gives the shortest text that reads back as the same double, as Python's repr does.
 function reprFloat(x : double) : String {
@@ -91,8 +98,11 @@ function formatFloat(x : double) : String {
 // ---------------------------------------------------------------- columns
 
 const KIND_INT : Int = 0
+
 const KIND_FLOAT : Int = 1
+
 const KIND_BOOL : Int = 2
+
 const KIND_STR : Int = 3
 
 public class Column {
@@ -104,7 +114,15 @@ public class Column {
     public final missing : List[Bool]
     public final size : Int
 
-    new(kind : Int, ints : List[Int], floats : List[double], bools : List[Bool], strs : List[String], missing : List[Bool], size : Int) {
+    new(
+        kind : Int,
+        ints : List[Int],
+        floats : List[double],
+        bools : List[Bool],
+        strs : List[String],
+        missing : List[Bool],
+        size : Int,
+    ) {
         this.kind = kind
         this.ints = ints
         this.floats = floats
@@ -171,8 +189,7 @@ public class Column {
     public function dtype() : String =
         if this.kind == KIND_INT then "int64"
         else if this.kind == KIND_FLOAT then "float64"
-        else if this.kind == KIND_BOOL then "bool"
-        else "str"
+        else if this.kind == KIND_BOOL then "bool" else "str"
 
     public function isNumeric() : Bool = this.kind == KIND_INT || this.kind == KIND_FLOAT
 
@@ -181,7 +198,8 @@ public class Column {
         __columnOrder(this, start, ascending, naFirst)
 
     // topPositions selects the n largest or smallest present rows in rank order.
-    public function topPositions(n : Int, ascending : Bool) : List[Int] = __columnTop(this, n, ascending)
+    public function topPositions(n : Int, ascending : Bool) : List[Int] =
+        __columnTop(this, n, ascending)
 
     // gather builds a column from the given row positions, in that order.
     public function gather(positions : List[Int]) : Column = __columnGather(this, positions)
@@ -222,10 +240,14 @@ public class Column {
         if this.kind == KIND_INT {
             [if m then "NaN" else x.text() for (x, m) in this.ints.zip(this.missing)]
         } else if this.kind == KIND_FLOAT {
-            let shown := [if m then "NaN" else formatFloat(x) for (x, m) in this.floats.zip(this.missing)]
+            let shown :=
+                [if m then "NaN" else formatFloat(x) for (x, m) in this.floats.zip(this.missing)]
             alignDecimals(shown)
         } else if this.kind == KIND_BOOL {
-            [if m then "NaN" else if x then "True" else "False" for (x, m) in this.bools.zip(this.missing)]
+            [
+                if m then "NaN"
+                    else if x then "True" else "False" for (x, m) in this.bools.zip(this.missing)
+            ]
         } else {
             [if m then "NaN" else x for (x, m) in this.strs.zip(this.missing)]
         }
@@ -250,10 +272,7 @@ function floatKey(x : double) : String =
     if x == x.floor() && x.abs() < 9.0e15 then "n" + wholeInt(x).text() else "d" + x.text()
 
 // wholeInt converts a double to an Int by rounding down; values outside the range give 0.
-function wholeInt(x : double) : Int = match x.floor().checkedToInt() {
-    n => n,
-    _ => 0,
-}
+function wholeInt(x : double) : Int = match x.floor().checkedToInt() { n => n, _ => 0 }
 
 // charAt finds the first position of a one-character text, or -1.
 function charAt(text : String, ch : String) : Int {
@@ -304,7 +323,8 @@ public class Scalar {
     public static function ofFloat(value : double) : Scalar =
         if value != value then Scalar.missing() else Scalar(KIND_FLOAT, 0, value, false, "")
     public static function ofBool(value : Bool) : Scalar = Scalar(KIND_BOOL, 0, 0.0, value, "")
-    public static function ofString(value : String) : Scalar = Scalar(KIND_STR, 0, 0.0, false, value)
+    public static function ofString(value : String) : Scalar =
+        Scalar(KIND_STR, 0, 0.0, false, value)
     public static function missing() : Scalar = Scalar(-1, 0, 0.0, false, "")
 
     public function isMissing() : Bool = this.kind < 0
@@ -314,14 +334,12 @@ public class Scalar {
     public function asDouble() : double =
         if this.kind == KIND_INT then this.whole.toDouble()
         else if this.kind == KIND_FLOAT then this.real
-        else if this.kind == KIND_BOOL then (if this.flag then 1.0 else 0.0)
-        else 0.0 / 0.0
+        else if this.kind == KIND_BOOL then (if this.flag then 1.0 else 0.0) else 0.0 / 0.0
 
     public function asInt() : Int =
         if this.kind == KIND_INT then this.whole
         else if this.kind == KIND_FLOAT then wholeInt(this.real)
-        else if this.kind == KIND_BOOL then (if this.flag then 1 else 0)
-        else 0
+        else if this.kind == KIND_BOOL then (if this.flag then 1 else 0) else 0
 
     public function asString() : String = this.text()
     public function asBool() : Bool = this.kind == KIND_BOOL && this.flag
@@ -330,12 +348,14 @@ public class Scalar {
         if this.kind == KIND_INT then this.whole.text()
         else if this.kind == KIND_FLOAT then reprFloat(this.real)
         else if this.kind == KIND_BOOL then (if this.flag then "True" else "False")
-        else if this.kind == KIND_STR then this.word
-        else "NaN"
+        else if this.kind == KIND_STR then this.word else "NaN"
 
     public function equals(other : Scalar) : Bool {
-        let sameReal := this.real == other.real || (this.real != this.real && other.real != other.real)
-        this.kind == other.kind && this.whole == other.whole && this.flag == other.flag && this.word == other.word && sameReal
+        let sameReal :=
+            this.real == other.real || (this.real != this.real && other.real != other.real)
+        this.kind == other.kind &&
+            this.whole == other.whole &&
+            this.flag == other.flag && this.word == other.word && sameReal
     }
 }
 
@@ -367,8 +387,7 @@ function scalarKey(s : Scalar) : String =
     if s.isMissing() then "~"
     else if s.kind == KIND_INT then "n" + s.whole.text()
     else if s.kind == KIND_FLOAT then floatKey(s.real)
-    else if s.kind == KIND_BOOL then (if s.flag then "b1" else "b0")
-    else "s" + s.word
+    else if s.kind == KIND_BOOL then (if s.flag then "b1" else "b0") else "s" + s.word
 
 // replaceInColumn swaps one value for another throughout a column. The result takes the
 // narrowest kind that holds both the old and the new value.
@@ -376,12 +395,22 @@ function scalarCopy(s : Scalar) : Scalar = Scalar(s.kind, s.whole, s.real, s.fla
 
 function replaceInColumn(c : Column, old : Scalar, replacement : Scalar) : Column {
     let target := scalarKey(old)
-    columnOfScalars([if scalarKey(scalarAt(c, i)) == target then scalarCopy(replacement) else scalarAt(c, i) for i in range(c.size)])
+    columnOfScalars(
+        [
+            if scalarKey(scalarAt(c, i)) == target then scalarCopy(replacement)
+                else scalarAt(c, i) for i in range(c.size)
+        ],
+    )
 }
 
 // whereInColumn keeps an entry where the mask is true and puts the replacement elsewhere.
 function whereInColumn(c : Column, mask : List[Bool], replacement : Scalar, invert : Bool) : Column {
-    columnOfScalars([if (mask.toArray()[i] != invert) then scalarAt(c, i) else scalarCopy(replacement) for i in range(c.size)])
+    columnOfScalars(
+        [
+            if (mask.toArray()[i] != invert) then scalarAt(c, i)
+                else scalarCopy(replacement) for i in range(c.size)
+        ],
+    )
 }
 
 // normalizeIndex turns a negative position into its distance from the end. It gives -1
@@ -494,7 +523,8 @@ function skewOf(xs : List[double]) : double {
     }
     if m2 == 0.0 { return nanValue() }
     let spread := sqrt(m2 / (n - 1).toDouble())
-    let value := m3 * n.toDouble() / ((n - 1).toDouble() * (n - 2).toDouble() * (spread * spread * spread))
+    let value :=
+        m3 * n.toDouble() / ((n - 1).toDouble() * (n - 2).toDouble() * (spread * spread * spread))
     if value.abs() < 1.0e-12 { 0.0 } else { value }
 }
 
@@ -512,7 +542,9 @@ function kurtosisOf(xs : List[double]) : double {
     }
     if m2 == 0.0 { return nanValue() }
     let nf := n.toDouble()
-    let value := (nf * (nf + 1.0) * (nf - 1.0) * m4 / ((nf - 2.0) * (nf - 3.0) * m2 * m2)) - (3.0 * (nf - 1.0) * (nf - 1.0) / ((nf - 2.0) * (nf - 3.0)))
+    let value :=
+        (nf * (nf + 1.0) * (nf - 1.0) * m4 / ((nf - 2.0) * (nf - 3.0) * m2 * m2)) -
+            (3.0 * (nf - 1.0) * (nf - 1.0) / ((nf - 2.0) * (nf - 3.0)))
     if value.abs() < 1.0e-12 { 0.0 } else { value }
 }
 
@@ -591,7 +623,8 @@ function positionSet(items : List[Int]) : MutSet[Int] {
 
 // firstOccurrences keeps the first position of every distinct key.
 function columnCodes(column : Column) : (List[Int], Int) =
-    if column.kind == KIND_FLOAT then __factorCodes(column.keys().toList()) else __columnCodes(column)
+    if column.kind == KIND_FLOAT then __factorCodes(column.keys().toList())
+    else __columnCodes(column)
 
 // distinctFirsts codes a column once and returns its distinct first rows.
 function distinctFirsts(column : Column) : (List[Int], List[Int], Int) {
@@ -663,6 +696,7 @@ function groupRuns(keys : List[String]) : List[List[Int]] {
     }
     groups.toList()
 }
+
 function groupRunsCodes(codes : List[Int]) : List[List[Int]] {
     let items := codes.toArray()
     let n := items.length()
@@ -748,26 +782,34 @@ function groupRunsCodesWidth(codes : List[Int], width : Int) : List[List[Int]] {
     groups.toList()
 }
 
-function firstOf(group : List[Int]) : Int = match group.first() {
-    Some(i) => i,
-    None => 0,
-}
+function firstOf(group : List[Int]) : Int = match group.first() { Some(i) => i, None => 0 }
 
 // ---------------------------------------------------------------- column arithmetic
 
 const OP_ADD : Int = 0
+
 const OP_SUB : Int = 1
+
 const OP_MUL : Int = 2
+
 const OP_DIV : Int = 3
+
 const OP_FLOORDIV : Int = 4
+
 const OP_MOD : Int = 5
+
 const OP_POW : Int = 6
 
 const CMP_EQ : Int = 0
+
 const CMP_NE : Int = 1
+
 const CMP_LT : Int = 2
+
 const CMP_LE : Int = 3
+
 const CMP_GT : Int = 4
+
 const CMP_GE : Int = 5
 
 function applyFloats(op : Int, x : double, y : double) : double =
@@ -776,16 +818,14 @@ function applyFloats(op : Int, x : double, y : double) : double =
     else if op == OP_MUL then x * y
     else if op == OP_DIV then x / y
     else if op == OP_FLOORDIV then (x / y).floor()
-    else if op == OP_MOD then x - y * (x / y).floor()
-    else x.pow(y)
+    else if op == OP_MOD then x - y * (x / y).floor() else x.pow(y)
 
 function applyInts(op : Int, x : Int, y : Int) : Int =
     if op == OP_ADD then x + y
     else if op == OP_SUB then x - y
     else if op == OP_MUL then x * y
     else if op == OP_FLOORDIV then floorDivide(x, y)
-    else if op == OP_MOD then x - y * floorDivide(x, y)
-    else x ** y
+    else if op == OP_MOD then x - y * floorDivide(x, y) else x ** y
 
 function floorDivide(x : Int, y : Int) : Int {
     let quotient := x / y
@@ -797,9 +837,10 @@ function combine(a : List[Bool], b : List[Bool]) : List[Bool] = [x || y for (x, 
 // arithmetic combines two columns entry by entry. Whole numbers stay whole except for
 // division and a zero divisor, which turn the result into doubles.
 function arithmetic(op : Int, left : Column, right : Column) : Column {
-    if left.isNumeric() && right.isNumeric() && (left.kind == KIND_FLOAT || right.kind == KIND_FLOAT) {
-        return __columnArithmetic(op, left, right)
-    }
+    if left.isNumeric() &&
+        right.isNumeric() && (left.kind == KIND_FLOAT || right.kind == KIND_FLOAT) {
+            return __columnArithmetic(op, left, right)
+        }
     let gone := combine(left.missing, right.missing)
     if left.kind == KIND_STR && right.kind == KIND_STR && op == OP_ADD {
         let joined := [x + y for (x, y) in left.strs.zip(right.strs)]
@@ -809,9 +850,14 @@ function arithmetic(op : Int, left : Column, right : Column) : Column {
         let ys := right.ints.toArray()
         let xs := left.ints.toArray()
         let masks := gone.toArray()
-        let safe := [masks[i] || (ys[i] == 0 && (op == OP_FLOORDIV || op == OP_MOD)) for i in range(xs.length())]
+        let safe :=
+            [
+                masks[i] ||
+                    (ys[i] == 0 && (op == OP_FLOORDIV || op == OP_MOD)) for i in range(xs.length())
+            ]
         let flags := safe.toArray()
-        let values := [if flags[i] then 0 else applyInts(op, xs[i], ys[i]) for i in range(xs.length())]
+        let values :=
+            [if flags[i] then 0 else applyInts(op, xs[i], ys[i]) for i in range(xs.length())]
         return Column.ofInts(values, safe)
     }
     let xs := left.toFloats()
@@ -821,13 +867,17 @@ function arithmetic(op : Int, left : Column, right : Column) : Column {
 
 function arithmeticWithFloat(op : Int, column : Column, other : double, flipped : Bool) : Column {
     let xs := column.toFloats()
-    let values := if flipped then xs.map(x => applyFloats(op, other, x)).toList() else xs.map(x => applyFloats(op, x, other)).toList()
+    let values :=
+        if flipped then xs.map(x => applyFloats(op, other, x)).toList()
+        else xs.map(x => applyFloats(op, x, other)).toList()
     Column.ofFloats(values, column.missing)
 }
 
 function arithmeticWithInt(op : Int, column : Column, other : Int, flipped : Bool) : Column {
     if column.kind == KIND_INT && op != OP_DIV && op != OP_POW && other != 0 {
-        let values := if flipped then column.ints.map(x => applyInts(op, other, if x == 0 then 1 else x)).toList() else column.ints.map(x => applyInts(op, x, other)).toList()
+        let values :=
+            if flipped then column.ints.map(x => applyInts(op, other, if x == 0 then 1 else x)).toList()
+            else column.ints.map(x => applyInts(op, x, other)).toList()
         return Column.ofInts(values, column.missing)
     }
     arithmeticWithFloat(op, column, other.toDouble(), flipped)
@@ -837,22 +887,23 @@ function matches(op : Int, order : Int) : Bool =
     if op == CMP_EQ then order == 0
     else if op == CMP_NE then order != 0
     else if op == CMP_LT then order < 0
-    else if op == CMP_LE then order <= 0
-    else if op == CMP_GT then order > 0
-    else order >= 0
+    else if op == CMP_LE then order <= 0 else if op == CMP_GT then order > 0 else order >= 0
 
 function compareColumns(op : Int, left : Column, right : Column) : Column {
     let gone := combine(left.missing, right.missing)
-    let verdicts : List[Bool] =
-        if left.kind == KIND_STR && right.kind == KIND_STR {
-            [matches(op, x.compare(y)) for (x, y) in left.strs.zip(right.strs)]
-        } else if left.kind == KIND_BOOL && right.kind == KIND_BOOL {
-            [matches(op, (if x then 1 else 0) - (if y then 1 else 0)) for (x, y) in left.bools.zip(right.bools)]
-        } else if left.isNumeric() && right.isNumeric() {
-            [matches(op, x.compare(y)) for (x, y) in left.toFloats().zip(right.toFloats())]
-        } else {
-            [false for i in range(left.size)]
-        }
+    let verdicts : List[Bool] = if left.kind == KIND_STR && right.kind == KIND_STR {
+        [matches(op, x.compare(y)) for (x, y) in left.strs.zip(right.strs)]
+    } else if left.kind == KIND_BOOL && right.kind == KIND_BOOL {
+        [
+            matches(op, (if x then 1 else 0) - (if y then 1 else 0)) for (x, y) in left.bools.zip(
+                right.bools,
+            )
+        ]
+    } else if left.isNumeric() && right.isNumeric() {
+        [matches(op, x.compare(y)) for (x, y) in left.toFloats().zip(right.toFloats())]
+    } else {
+        [false for i in range(left.size)]
+    }
     let answers := [if m then op == CMP_NE else v for (v, m) in verdicts.zip(gone)]
     Column.bools(answers)
 }
@@ -861,49 +912,82 @@ function compareWithFloat(op : Int, column : Column, other : double) : Column {
     if column.kind == KIND_INT || column.kind == KIND_FLOAT {
         return __columnCompareFloat(column, op, other)
     }
-    let answers := [if m then op == CMP_NE else matches(op, x.compare(other)) for (x, m) in column.toFloats().zip(column.missing)]
+    let answers :=
+        [
+            if m then op == CMP_NE
+                else matches(op, x.compare(other)) for (x, m) in column.toFloats().zip(
+                    column.missing,
+                )
+        ]
     Column.bools(if column.isNumeric() then answers else [op == CMP_NE for i in range(column.size)])
 }
 
 function compareWithString(op : Int, column : Column, other : String) : Column {
     if column.kind != KIND_STR { return Column.bools([op == CMP_NE for i in range(column.size)]) }
-    Column.bools([if m then op == CMP_NE else matches(op, x.compare(other)) for (x, m) in column.strs.zip(column.missing)])
+    Column.bools(
+        [
+            if m then op == CMP_NE
+                else matches(op, x.compare(other)) for (x, m) in column.strs.zip(column.missing)
+        ],
+    )
 }
 
 function compareWithBool(op : Int, column : Column, other : Bool) : Column {
     if column.kind != KIND_BOOL { return Column.bools([op == CMP_NE for i in range(column.size)]) }
     let target := if other then 1 else 0
-    Column.bools([if m then op == CMP_NE else matches(op, (if x then 1 else 0) - target) for (x, m) in column.bools.zip(column.missing)])
+    Column.bools(
+        [
+            if m then op == CMP_NE
+                else matches(op, (if x then 1 else 0) - target) for (x, m) in column.bools.zip(
+                    column.missing,
+                )
+        ],
+    )
 }
 
 // ---------------------------------------------------------------- rendering
 
 function spaces(n : Int) : String = [" " for i in range(n)].join("")
+
 function padLeft(text : String, width : Int) : String = spaces(width - text.length()) + text
+
 function padRight(text : String, width : Int) : String = text + spaces(width - text.length())
 
-function widest(texts : List[String]) : Int = match texts.map(t => t.length()).toList().max() {
-    Some(w) => w,
-    None => 0,
-}
+function widest(texts : List[String]) : Int =
+    match texts.map(t => t.length()).toList().max() { Some(w) => w, None => 0 }
 
 function htmlEscape(text : String) : String =
     text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 const MAX_ROWS : Int = 60
+
 const SHOWN_EDGE : Int = 5
 
 // seriesLines prints the rows of a series, cutting the middle of a long one. A number that
 // is not negative gets a leading space where a minus sign would go, as pandas prints it.
-function seriesLines(indexTexts : List[String], valueTexts : List[String], numeric : Bool) : List[String] {
+function seriesLines(
+    indexTexts : List[String],
+    valueTexts : List[String],
+    numeric : Bool,
+) : List[String] {
     let n := valueTexts.length()
     let cut := n > MAX_ROWS
-    let positions := if cut then joinLists(indexRange(MAX_ROWS / 2), [n - MAX_ROWS / 2 + i for i in range(MAX_ROWS / 2)]) else indexRange(n)
+    let positions :=
+        if cut then joinLists(
+            indexRange(MAX_ROWS / 2),
+            [n - MAX_ROWS / 2 + i for i in range(MAX_ROWS / 2)],
+        )
+        else indexRange(n)
     let shownIndex := pick(indexTexts, positions)
-    let shownValues := pick(valueTexts, positions).map(v => if numeric && v.startsWith("-") then v else " " + v).toList()
+    let shownValues :=
+        pick(valueTexts, positions).map(v => if numeric && v.startsWith("-") then v else " " + v).toList()
     let indexWidth := widest(shownIndex)
     let valueWidth := widest(shownValues)
-    let rows := [padRight(i, indexWidth) + "   " + padLeft(v, valueWidth) for (i, v) in shownIndex.zip(shownValues)]
+    let rows :=
+        [
+            padRight(i, indexWidth) +
+                "   " + padLeft(v, valueWidth) for (i, v) in shownIndex.zip(shownValues)
+        ]
     if cut {
         let half := MAX_ROWS / 2
         joinLists(joinLists(takeStrings(rows, half), ["..."]), dropStrings(rows, half))
@@ -912,14 +996,29 @@ function seriesLines(indexTexts : List[String], valueTexts : List[String], numer
     }
 }
 
-function takeStrings(xs : List[String], n : Int) : List[String] = pick(xs, indexRange(min(n, xs.length())))
-function dropStrings(xs : List[String], n : Int) : List[String] = pick(xs, [n + i for i in range(xs.length() - n)])
+function takeStrings(xs : List[String], n : Int) : List[String] =
+    pick(xs, indexRange(min(n, xs.length())))
+
+function dropStrings(xs : List[String], n : Int) : List[String] =
+    pick(xs, [n + i for i in range(xs.length() - n)])
 
 // tableLines prints a data frame: a header, then each row, with "..." cutting a long middle.
-function tableLines(headers : List[String], indexTexts : List[String], columns : List[List[String]], indexName : String, columnsLabel : String, collapse : List[Bool]) : List[String] {
+function tableLines(
+    headers : List[String],
+    indexTexts : List[String],
+    columns : List[List[String]],
+    indexName : String,
+    columnsLabel : String,
+    collapse : List[Bool],
+) : List[String] {
     let n := indexTexts.length()
     let cut := n > MAX_ROWS
-    let positions := if cut then joinLists(indexRange(SHOWN_EDGE), [n - SHOWN_EDGE + i for i in range(SHOWN_EDGE)]) else indexRange(n)
+    let positions :=
+        if cut then joinLists(
+            indexRange(SHOWN_EDGE),
+            [n - SHOWN_EDGE + i for i in range(SHOWN_EDGE)],
+        )
+        else indexRange(n)
     let shownIndex := pick(indexTexts, positions)
     let shown := columns.map(column => pick(column, positions)).toList()
     let indexWidth := max(widest(shownIndex), max(indexName.length(), columnsLabel.length()))
@@ -927,13 +1026,54 @@ function tableLines(headers : List[String], indexTexts : List[String], columns :
     // pandas separates a text column from its neighbour with one space and a number or
     // Bool column with two. An all-NaN column is laid out like text.
     let firstIsNaN := headers.length() > 0 && shown.toArray()[0].all(v => v == "NaN")
-    let seps := [if i == 0 then (if firstIsNaN then " " else "  ") else if collapse.toArray()[i] then " " else "  " for i in range(headers.length())]
-    let head := padRight(columnsLabel, indexWidth) + joinTexts([seps.toArray()[i] + padLeft(h, widths.toArray()[i]) for (i, h) in headers.enumerate()])
-    let named := if indexName == "" then [head] else [head, padRight(indexName, indexWidth) + joinTexts([seps.toArray()[i] + spaces(widths.toArray()[i]) for i in range(widths.length())])]
-    let body := [padRight(shownIndex.toArray()[r], indexWidth) + joinTexts([seps.toArray()[i] + padLeft(column.toArray()[r], widths.toArray()[i]) for (i, column) in shown.enumerate()]) for r in range(shownIndex.length())]
+    let seps :=
+        [
+            if i == 0 then (if firstIsNaN then " " else "  ")
+                else if collapse.toArray()[i] then " " else "  " for i in range(headers.length())
+        ]
+    let head :=
+        padRight(columnsLabel, indexWidth) +
+            joinTexts(
+                [
+                    seps.toArray()[i] +
+                        padLeft(h, widths.toArray()[i]) for (i, h) in headers.enumerate()
+                ],
+            )
+    let named :=
+        if indexName == "" then [head]
+        else [
+            head,
+            padRight(indexName, indexWidth) +
+                joinTexts(
+                    [
+                        seps.toArray()[i] +
+                            spaces(widths.toArray()[i]) for i in range(widths.length())
+                    ],
+                ),
+        ]
+    let body :=
+        [
+            padRight(shownIndex.toArray()[r], indexWidth) +
+                joinTexts(
+                    [
+                        seps.toArray()[i] +
+                            padLeft(column.toArray()[r], widths.toArray()[i]) for (i, column) in shown.enumerate()
+                    ],
+                ) for r in range(shownIndex.length())
+        ]
     if cut {
-        let dots := padRight("...", indexWidth) + joinTexts([seps.toArray()[i] + padLeft("...", widths.toArray()[i]) for i in range(widths.length())])
-        joinLists(joinLists(joinLists(named, takeStrings(body, SHOWN_EDGE)), [dots]), dropStrings(body, SHOWN_EDGE))
+        let dots :=
+            padRight("...", indexWidth) +
+                joinTexts(
+                    [
+                        seps.toArray()[i] +
+                            padLeft("...", widths.toArray()[i]) for i in range(widths.length())
+                    ],
+                )
+        joinLists(
+            joinLists(joinLists(named, takeStrings(body, SHOWN_EDGE)), [dots]),
+            dropStrings(body, SHOWN_EDGE),
+        )
     } else {
         joinLists(named, body)
     }
@@ -941,27 +1081,55 @@ function tableLines(headers : List[String], indexTexts : List[String], columns :
 
 function joinTexts(parts : List[String]) : String = parts.join("")
 
-function tableHtml(headers : List[String], indexTexts : List[String], columns : List[List[String]], indexName : String) : String {
+function tableHtml(
+    headers : List[String],
+    indexTexts : List[String],
+    columns : List[List[String]],
+    indexName : String,
+) : String {
     let n := indexTexts.length()
     let cut := n > MAX_ROWS
-    let positions := if cut then joinLists(indexRange(SHOWN_EDGE), [n - SHOWN_EDGE + i for i in range(SHOWN_EDGE)]) else indexRange(n)
+    let positions :=
+        if cut then joinLists(
+            indexRange(SHOWN_EDGE),
+            [n - SHOWN_EDGE + i for i in range(SHOWN_EDGE)],
+        )
+        else indexRange(n)
     let shownIndex := pick(indexTexts, positions)
     let shown := columns.map(column => pick(column, positions)).toList()
-    let head := "<tr style=\"text-align: right;\"><th>" + htmlEscape(indexName) + "</th>" + joinTexts(headers.map(h => "<th>" + htmlEscape(h) + "</th>").toList()) + "</tr>"
+    let head :=
+        "<tr style=\"text-align: right;\"><th>" +
+            htmlEscape(indexName) +
+            "</th>" +
+            joinTexts(headers.map(h => "<th>" + htmlEscape(h) + "</th>").toList()) + "</tr>"
     let rows := [rowHtml(shownIndex.toArray()[r], shown, r) for r in range(shownIndex.length())]
     let dots := "<tr><th>...</th>" + joinTexts(headers.map(h => "<td>...</td>").toList()) + "</tr>"
-    let middle := if cut then joinTexts(takeStrings(rows, SHOWN_EDGE)) + dots + joinTexts(dropStrings(rows, SHOWN_EDGE)) else joinTexts(rows)
-    "<div><style scoped>.dataframe tbody tr th:only-of-type { vertical-align: middle; } .dataframe tbody tr th { vertical-align: top; } .dataframe thead th { text-align: right; }</style><table border=\"1\" class=\"dataframe\"><thead>" + head + "</thead><tbody>" + middle + "</tbody></table></div>"
+    let middle :=
+        if cut then joinTexts(takeStrings(rows, SHOWN_EDGE)) +
+            dots + joinTexts(dropStrings(rows, SHOWN_EDGE))
+        else joinTexts(rows)
+    "<div><style scoped>.dataframe tbody tr th:only-of-type { vertical-align: middle; } .dataframe tbody tr th { vertical-align: top; } .dataframe thead th { text-align: right; }</style><table border=\"1\" class=\"dataframe\"><thead>" +
+        head + "</thead><tbody>" + middle + "</tbody></table></div>"
 }
 
 function rowHtml(label : String, columns : List[List[String]], r : Int) : String =
-    "<tr><th>" + htmlEscape(label) + "</th>" + joinTexts(columns.map(column => "<td>" + htmlEscape(column.toArray()[r]) + "</td>").toList()) + "</tr>"
+    "<tr><th>" +
+        htmlEscape(label) +
+        "</th>" +
+        joinTexts(
+            columns.map(column => "<td>" + htmlEscape(column.toArray()[r]) + "</td>").toList(),
+        ) +
+        "</tr>"
 
 // ---------------------------------------------------------------- column statistics
 
 function sumColumn(c : Column) : Scalar {
-    if c.kind == KIND_INT { return Scalar.ofInt([x for (x, m) in c.ints.zip(c.missing) if !m].sum()) }
-    if c.kind == KIND_BOOL { return Scalar.ofInt([if x then 1 else 0 for (x, m) in c.bools.zip(c.missing) if !m].sum()) }
+    if c.kind == KIND_INT {
+        return Scalar.ofInt([x for (x, m) in c.ints.zip(c.missing) if !m].sum())
+    }
+    if c.kind == KIND_BOOL {
+        return Scalar.ofInt([if x then 1 else 0 for (x, m) in c.bools.zip(c.missing) if !m].sum())
+    }
     if c.kind == KIND_FLOAT { return Scalar.ofFloat(validFloats(c).sum()) }
     Scalar.ofString([x for (x, m) in c.strs.zip(c.missing) if !m].join(""))
 }
@@ -1013,11 +1181,14 @@ function toKind(c : Column, kind : Int) : Column {
             let parsed := c.strs.map(s => match parseInt(s) { n => n, _ => 0 }).toList()
             return Column.ofInts(parsed, c.missing)
         }
-        let truncated := c.toFloats().map(x => wholeInt(if x < 0.0 then x.ceil() else x.floor())).toList()
+        let truncated :=
+            c.toFloats().map(x => wholeInt(if x < 0.0 then x.ceil() else x.floor())).toList()
         return Column.ofInts(truncated, c.missing)
     }
     if kind == KIND_BOOL {
-        if c.kind == KIND_STR { return Column.ofBools(c.strs.map(s => s == "True" || s == "true").toList(), c.missing) }
+        if c.kind == KIND_STR {
+            return Column.ofBools(c.strs.map(s => s == "True" || s == "true").toList(), c.missing)
+        }
         return Column.ofBools(c.toFloats().map(x => x != 0.0).toList(), c.missing)
     }
     Column.ofStrings(c.texts(), c.missing)
@@ -1058,7 +1229,10 @@ function gatherGaps(c : Column, positions : List[Int]) : Column {
 }
 
 function shiftColumn(c : Column, periods : Int) : Column =
-    gatherGaps(c, [i - periods for i in range(c.size)].map(p => if p < 0 || p >= c.size then -1 else p).toList())
+    gatherGaps(
+        c,
+        [i - periods for i in range(c.size)].map(p => if p < 0 || p >= c.size then -1 else p).toList(),
+    )
 
 function diffColumn(c : Column, periods : Int) : Column =
     if c.isNumeric() then arithmetic(OP_SUB, c, shiftColumn(c, periods)) else c.copy()
@@ -1079,8 +1253,9 @@ function roundColumn(c : Column, decimals : Int) : Column {
 function clipColumn(c : Column, low : double, high : double) : Column {
     if !c.isNumeric() { return c.copy() }
     let clipped := c.toFloats().map(x => x.max(low).min(high)).toList()
-    if c.kind == KIND_INT { Column.ofInts(clipped.map(x => wholeInt(x)).toList(), c.missing) }
-    else { Column.ofFloats(clipped, c.missing) }
+    if c.kind == KIND_INT { Column.ofInts(clipped.map(x => wholeInt(x)).toList(), c.missing) } else {
+        Column.ofFloats(clipped, c.missing)
+    }
 }
 
 function runningTotals(c : Column, op : Int) : Column {
@@ -1183,13 +1358,15 @@ function interpolateColumn(c : Column) : Column {
                 out[i] = xs[previous]
             } else {
                 let span := (next - previous).toDouble()
-                out[i] = xs[previous] + (xs[next] - xs[previous]) * ((i - previous).toDouble() / span)
+                out[i] =
+                    xs[previous] + (xs[next] - xs[previous]) * ((i - previous).toDouble() / span)
             }
             filled[i] = false
         }
     }
     Column.ofFloats(out.toList(), filled.toList())
 }
+
 function windowed(c : Column, window : Int, needed : Int, statistic : Int) : Column {
     let xs := c.toFloats().toArray()
     let n := xs.length()
@@ -1200,7 +1377,9 @@ function windowed(c : Column, window : Int, needed : Int, statistic : Int) : Col
         if statistic == 5 {
             // pandas validates count against the rows the window covers, then
             // reports how many of those rows are present.
-            out.append(if min(i + 1, window) < needed then nanValue() else present.length().toDouble())
+            out.append(
+                if min(i + 1, window) < needed then nanValue() else present.length().toDouble(),
+            )
         } else if present.length() < needed {
             out.append(nanValue())
         } else if statistic == 0 {
@@ -1235,7 +1414,8 @@ function windowed(c : Column, window : Int, needed : Int, statistic : Int) : Col
 // Numeric rolling means run over the contiguous column storage in C; the
 // Kestrel loop below remains for other kinds.
 function rollingMean(c : Column, window : Int, needed : Int) : Column =
-    if c.isNumeric() then __columnRollingMean(c, window, needed) else rollingMeanSlow(c, window, needed)
+    if c.isNumeric() then __columnRollingMean(c, window, needed)
+    else rollingMeanSlow(c, window, needed)
 
 function rollingMeanSlow(c : Column, window : Int, needed : Int) : Column {
     let xs := c.toFloats().toArray()
@@ -1324,7 +1504,14 @@ function windowedApply(c : Column, window : Int, needed : Int, f : List[double] 
 }
 
 // ewmColumn computes one exponentially weighted statistic for every row.
-function ewmColumn(c : Column, alpha : double, adjust : Bool, minPeriods : Int, statistic : Int, bias : Bool) : Column {
+function ewmColumn(
+    c : Column,
+    alpha : double,
+    adjust : Bool,
+    minPeriods : Int,
+    statistic : Int,
+    bias : Bool,
+) : Column {
     let xs := c.toFloats().toArray()
     let gone := c.missing.toArray()
     let n := xs.length()
@@ -1370,12 +1557,10 @@ function ewmColumn(c : Column, alpha : double, adjust : Bool, minPeriods : Int, 
                 } else if statistic == 1 {
                     out.append(sumWX)
                 } else if statistic == 2 || statistic == 3 {
-                    let variance :=
-                        if bias then deviation / sumW
-                        else {
-                            let denominator := sumW - (sumW2 / sumW)
-                            if denominator <= 0.0 then nanValue() else deviation / denominator
-                        }
+                    let variance := if bias then deviation / sumW else {
+                        let denominator := sumW - (sumW2 / sumW)
+                        if denominator <= 0.0 then nanValue() else deviation / denominator
+                    }
                     out.append(if statistic == 3 then sqrt(variance) else variance)
                 } else {
                     out.append(count.toDouble())
@@ -1389,9 +1574,22 @@ function ewmColumn(c : Column, alpha : double, adjust : Bool, minPeriods : Int, 
 // ---------------------------------------------------------------- series
 
 public class Series {
-    has (Text, Addable, Subtractable, Multipliable, Divisible, Negatable,
-        RightAddable[double], RightSubtractable[double], RightMultipliable[double], RightDivisible[double],
-        RightAddable[Int], RightSubtractable[Int], RightMultipliable[Int], RightDivisible[Int])
+    has (
+        Text,
+        Addable,
+        Subtractable,
+        Multipliable,
+        Divisible,
+        Negatable,
+        RightAddable[double],
+        RightSubtractable[double],
+        RightMultipliable[double],
+        RightDivisible[double],
+        RightAddable[Int],
+        RightSubtractable[Int],
+        RightMultipliable[Int],
+        RightDivisible[Int],
+    )
 
     public final name : String
     public final data : Column
@@ -1435,7 +1633,8 @@ public class Series {
 
     // ---- basics
 
-    public function copy() : Series = Series(this.name, this.data.copy(), this.index.copy(), this.indexName)
+    public function copy() : Series =
+        Series(this.name, this.data.copy(), this.index.copy(), this.indexName)
     public function length() : Int = this.data.size
     public function size() : Int = this.data.size
     public function ndim() : Int = 1
@@ -1449,7 +1648,8 @@ public class Series {
         Series(this.name, this.data.gather(positions), this.index.gather(positions), this.indexName)
 
     // toScalars lifts every entry out of the column, missing entries included.
-    public function toScalars() : List[Scalar] = [scalarAt(this.data, i) for i in range(this.data.size)]
+    public function toScalars() : List[Scalar] =
+        [scalarAt(this.data, i) for i in range(this.data.size)]
 
     // items pairs each index label with its value.
     public function items() : List[(Scalar, Scalar)] =
@@ -1458,7 +1658,8 @@ public class Series {
     public function equals(other : Series) : Bool =
         this.data.keys() == other.data.keys() && this.index.keys() == other.index.keys()
 
-    public function rename(name : String) : Series = Series(name, this.data.copy(), this.index.copy(), this.indexName)
+    public function rename(name : String) : Series =
+        Series(name, this.data.copy(), this.index.copy(), this.indexName)
 
     public function withIndex(labels : List[String]) : Series =
         Series(this.name, this.data.copy(), Column.strings(labels), this.indexName)
@@ -1483,8 +1684,7 @@ public class Series {
         let kind :=
             if dtype == "int64" || dtype == "int" then KIND_INT
             else if dtype == "float64" || dtype == "float" || dtype == "double" then KIND_FLOAT
-            else if dtype == "bool" then KIND_BOOL
-            else KIND_STR
+            else if dtype == "bool" then KIND_BOOL else KIND_STR
         this.derive(toKind(this.data, kind))
     }
 
@@ -1524,32 +1724,32 @@ public class Series {
 
     // takeGaps keeps the row at each position; a negative position becomes missing.
     public function takeGaps(positions : List[Int]) : Series =
-        Series(this.name, gatherGaps(this.data, positions), gatherGaps(this.index, positions), this.indexName)
+        Series(
+            this.name,
+            gatherGaps(this.data, positions),
+            gatherGaps(this.index, positions),
+            this.indexName,
+        )
 
-    public function positionOf(label : Int) : Option[Int] = this.index.keys().index("n" + label.text())
+    public function positionOf(label : Int) : Option[Int] =
+        this.index.keys().index("n" + label.text())
     public function positionOf(label : String) : Option[Int] = this.index.keys().index("s" + label)
-    public function positionOf(label : double) : Option[Int] = this.index.keys().index(floatKey(label))
-    public function positionOf(label : Bool) : Option[Int] = this.index.keys().index(if label then "b1" else "b0")
+    public function positionOf(label : double) : Option[Int] =
+        this.index.keys().index(floatKey(label))
+    public function positionOf(label : Bool) : Option[Int] =
+        this.index.keys().index(if label then "b1" else "b0")
 
-    public function loc(label : Int) : Scalar = match this.positionOf(label) {
-        Some(p) => scalarAt(this.data, p),
-        None => Scalar.missing(),
-    }
+    public function loc(label : Int) : Scalar =
+        match this.positionOf(label) { Some(p) => scalarAt(this.data, p), None => Scalar.missing() }
 
-    public function loc(label : String) : Scalar = match this.positionOf(label) {
-        Some(p) => scalarAt(this.data, p),
-        None => Scalar.missing(),
-    }
+    public function loc(label : String) : Scalar =
+        match this.positionOf(label) { Some(p) => scalarAt(this.data, p), None => Scalar.missing() }
 
-    public function loc(label : double) : Scalar = match this.positionOf(label) {
-        Some(p) => scalarAt(this.data, p),
-        None => Scalar.missing(),
-    }
+    public function loc(label : double) : Scalar =
+        match this.positionOf(label) { Some(p) => scalarAt(this.data, p), None => Scalar.missing() }
 
-    public function loc(label : Bool) : Scalar = match this.positionOf(label) {
-        Some(p) => scalarAt(this.data, p),
-        None => Scalar.missing(),
-    }
+    public function loc(label : Bool) : Scalar =
+        match this.positionOf(label) { Some(p) => scalarAt(this.data, p), None => Scalar.missing() }
 
     // at and iat are the label and position spellings for one cell.
     public function at(label : Int) : Scalar = this.loc(label)
@@ -1558,7 +1758,8 @@ public class Series {
     public function at(label : Bool) : Scalar = this.loc(label)
 
     // filter keeps the rows where the mask is true: pandas s[mask].
-    public function filter(mask : Series) : Series = this.take(truePositions(presentMask(mask.data)))
+    public function filter(mask : Series) : Series =
+        this.take(truePositions(presentMask(mask.data)))
 
     public function where(mask : Series, other : Scalar) : Series {
         let kept := presentMask(mask.data)
@@ -1567,10 +1768,13 @@ public class Series {
 
     public function where(mask : Series, other : Series) : Series {
         let kept := presentMask(mask.data).toArray()
-        
+
         let mut items : Array[Scalar] = Array.empty()
         for (i in range(this.data.size)) {
-            items.append(if kept[i] || other.data.size == 0 then scalarAt(this.data, i) else scalarAt(other.data, min(i, other.data.size - 1)))
+            items.append(
+                if kept[i] || other.data.size == 0 then scalarAt(this.data, i)
+                    else scalarAt(other.data, min(i, other.data.size - 1)),
+            )
         }
         this.derive(columnOfScalars(items.toList()))
     }
@@ -1583,10 +1787,14 @@ public class Series {
     // ---- sorting
 
     public function sortValues(ascending : Bool = true, naPosition : String = "last") : Series =
-        this.take(orderByWithNa(this.data, indexRange(this.data.size), ascending, naPosition == "first"))
+        this.take(
+            orderByWithNa(this.data, indexRange(this.data.size), ascending, naPosition == "first"),
+        )
 
     public function sortIndex(ascending : Bool = true, naPosition : String = "last") : Series =
-        this.take(orderByWithNa(this.index, indexRange(this.data.size), ascending, naPosition == "first"))
+        this.take(
+            orderByWithNa(this.index, indexRange(this.data.size), ascending, naPosition == "first"),
+        )
 
     public function nlargest(n : Int = 5) : Series = this.sortValues(ascending = false).head(n)
     public function nsmallest(n : Int = 5) : Series = this.sortValues().head(n)
@@ -1596,53 +1804,98 @@ public class Series {
 
     // ---- arithmetic
 
-    public function add(other : Series) : Series = this.derive(arithmetic(OP_ADD, this.data, other.data))
-    public function subtract(other : Series) : Series = this.derive(arithmetic(OP_SUB, this.data, other.data))
-    public function multiply(other : Series) : Series = this.derive(arithmetic(OP_MUL, this.data, other.data))
-    public function divide(other : Series) : Series = this.derive(arithmetic(OP_DIV, this.data, other.data))
-    public function floorDivide(other : Series) : Series = this.derive(arithmetic(OP_FLOORDIV, this.data, other.data))
-    public function mod(other : Series) : Series = this.derive(arithmetic(OP_MOD, this.data, other.data))
-    public function pow(other : Series) : Series = this.derive(arithmetic(OP_POW, this.data, other.data))
+    public function add(other : Series) : Series =
+        this.derive(arithmetic(OP_ADD, this.data, other.data))
+    public function subtract(other : Series) : Series =
+        this.derive(arithmetic(OP_SUB, this.data, other.data))
+    public function multiply(other : Series) : Series =
+        this.derive(arithmetic(OP_MUL, this.data, other.data))
+    public function divide(other : Series) : Series =
+        this.derive(arithmetic(OP_DIV, this.data, other.data))
+    public function floorDivide(other : Series) : Series =
+        this.derive(arithmetic(OP_FLOORDIV, this.data, other.data))
+    public function mod(other : Series) : Series =
+        this.derive(arithmetic(OP_MOD, this.data, other.data))
+    public function pow(other : Series) : Series =
+        this.derive(arithmetic(OP_POW, this.data, other.data))
 
-    public function add(other : double) : Series = this.derive(arithmeticWithFloat(OP_ADD, this.data, other, false))
-    public function subtract(other : double) : Series = this.derive(arithmeticWithFloat(OP_SUB, this.data, other, false))
-    public function multiply(other : double) : Series = this.derive(arithmeticWithFloat(OP_MUL, this.data, other, false))
-    public function divide(other : double) : Series = this.derive(arithmeticWithFloat(OP_DIV, this.data, other, false))
-    public function floorDivide(other : double) : Series = this.derive(arithmeticWithFloat(OP_FLOORDIV, this.data, other, false))
-    public function mod(other : double) : Series = this.derive(arithmeticWithFloat(OP_MOD, this.data, other, false))
-    public function pow(other : double) : Series = this.derive(arithmeticWithFloat(OP_POW, this.data, other, false))
+    public function add(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_ADD, this.data, other, false))
+    public function subtract(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_SUB, this.data, other, false))
+    public function multiply(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_MUL, this.data, other, false))
+    public function divide(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_DIV, this.data, other, false))
+    public function floorDivide(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_FLOORDIV, this.data, other, false))
+    public function mod(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_MOD, this.data, other, false))
+    public function pow(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_POW, this.data, other, false))
 
-    public function add(other : Int) : Series = this.derive(arithmeticWithInt(OP_ADD, this.data, other, false))
-    public function subtract(other : Int) : Series = this.derive(arithmeticWithInt(OP_SUB, this.data, other, false))
-    public function multiply(other : Int) : Series = this.derive(arithmeticWithInt(OP_MUL, this.data, other, false))
-    public function divide(other : Int) : Series = this.derive(arithmeticWithInt(OP_DIV, this.data, other, false))
-    public function floorDivide(other : Int) : Series = this.derive(arithmeticWithInt(OP_FLOORDIV, this.data, other, false))
-    public function mod(other : Int) : Series = this.derive(arithmeticWithInt(OP_MOD, this.data, other, false))
-    public function pow(other : Int) : Series = this.derive(arithmeticWithInt(OP_POW, this.data, other, false))
+    public function add(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_ADD, this.data, other, false))
+    public function subtract(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_SUB, this.data, other, false))
+    public function multiply(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_MUL, this.data, other, false))
+    public function divide(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_DIV, this.data, other, false))
+    public function floorDivide(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_FLOORDIV, this.data, other, false))
+    public function mod(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_MOD, this.data, other, false))
+    public function pow(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_POW, this.data, other, false))
 
-    public function add(other : String) : Series = this.derive(Column.ofStrings(this.data.strs.map(s => s + other).toList(), this.data.missing))
+    public function add(other : String) : Series =
+        this.derive(
+            Column.ofStrings(this.data.strs.map(s => s + other).toList(), this.data.missing),
+        )
 
-    public function rightAdd(other : double) : Series = this.derive(arithmeticWithFloat(OP_ADD, this.data, other, true))
-    public function rightSubtract(other : double) : Series = this.derive(arithmeticWithFloat(OP_SUB, this.data, other, true))
-    public function rightMultiply(other : double) : Series = this.derive(arithmeticWithFloat(OP_MUL, this.data, other, true))
-    public function rightDivide(other : double) : Series = this.derive(arithmeticWithFloat(OP_DIV, this.data, other, true))
-    public function rightAdd(other : Int) : Series = this.derive(arithmeticWithInt(OP_ADD, this.data, other, true))
-    public function rightSubtract(other : Int) : Series = this.derive(arithmeticWithInt(OP_SUB, this.data, other, true))
-    public function rightMultiply(other : Int) : Series = this.derive(arithmeticWithInt(OP_MUL, this.data, other, true))
-    public function rightDivide(other : Int) : Series = this.derive(arithmeticWithInt(OP_DIV, this.data, other, true))
+    public function rightAdd(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_ADD, this.data, other, true))
+    public function rightSubtract(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_SUB, this.data, other, true))
+    public function rightMultiply(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_MUL, this.data, other, true))
+    public function rightDivide(other : double) : Series =
+        this.derive(arithmeticWithFloat(OP_DIV, this.data, other, true))
+    public function rightAdd(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_ADD, this.data, other, true))
+    public function rightSubtract(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_SUB, this.data, other, true))
+    public function rightMultiply(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_MUL, this.data, other, true))
+    public function rightDivide(other : Int) : Series =
+        this.derive(arithmeticWithInt(OP_DIV, this.data, other, true))
 
     public function negate() : Series = this.derive(arithmeticWithInt(OP_MUL, this.data, -1, false))
     public function abs() : Series =
-        if this.data.kind == KIND_INT then this.derive(Column.ofInts(this.data.ints.map(x => x.abs()).toList(), this.data.missing))
-        else this.derive(Column.ofFloats(this.data.toFloats().map(x => x.abs()).toList(), this.data.missing))
+        if this.data.kind ==
+            KIND_INT then this.derive(
+                Column.ofInts(this.data.ints.map(x => x.abs()).toList(), this.data.missing),
+            )
+        else this.derive(
+            Column.ofFloats(this.data.toFloats().map(x => x.abs()).toList(), this.data.missing),
+        )
 
     public function round(decimals : Int = 0) : Series {
         let scale := 10.0.pow(decimals.toDouble())
         if this.data.kind == KIND_INT { return this.copy() }
-        this.derive(Column.ofFloats(this.data.toFloats().map(x => (x * scale).round() / scale).toList(), this.data.missing))
+        this.derive(
+            Column.ofFloats(
+                this.data.toFloats().map(x => (x * scale).round() / scale).toList(),
+                this.data.missing,
+            ),
+        )
     }
 
-    public function sqrt() : Series = this.derive(Column.ofFloats(this.data.toFloats().map(x => sqrt(x)).toList(), this.data.missing))
+    public function sqrt() : Series =
+        this.derive(
+            Column.ofFloats(this.data.toFloats().map(x => sqrt(x)).toList(), this.data.missing),
+        )
 
     public function clip(low : double, high : double) : Series {
         let clipped := this.data.toFloats().map(x => x.max(low).min(high)).toList()
@@ -1653,7 +1906,8 @@ public class Series {
         }
     }
 
-    public function clip(low : Int, high : Int) : Series = this.clip(low.toDouble(), high.toDouble())
+    public function clip(low : Int, high : Int) : Series =
+        this.clip(low.toDouble(), high.toDouble())
 
     // item reads one value; without a position it asks for the only entry.
     public function item(position : Int = 0) : Scalar {
@@ -1661,7 +1915,8 @@ public class Series {
         this.iloc(position)
     }
 
-    public function isUnique() : Bool = firstOccurrences(this.data.keys().toList()).length() == this.data.size
+    public function isUnique() : Bool =
+        firstOccurrences(this.data.keys().toList()).length() == this.data.size
 
     // isMonotonic reports whether the present entries never reverse direction.
     public function isMonotonic(increasing : Bool = true) : Bool {
@@ -1679,7 +1934,9 @@ public class Series {
         if this.data.kind == KIND_BOOL {
             let xs := this.data.bools.toArray()
             for (k in range(1, valid.length())) {
-                let order := (if xs[valid.toArray()[k]] then 1 else 0) - (if xs[valid.toArray()[k - 1]] then 1 else 0)
+                let order :=
+                    (if xs[valid.toArray()[k]] then 1 else 0) -
+                        (if xs[valid.toArray()[k - 1]] then 1 else 0)
                 if increasing && order < 0 { return false }
                 if !increasing && order > 0 { return false }
             }
@@ -1706,44 +1963,73 @@ public class Series {
 
     // ---- comparison and logic; each gives a Bool series
 
-    public function eq(other : Series) : Series = this.derive(compareColumns(CMP_EQ, this.data, other.data))
-    public function ne(other : Series) : Series = this.derive(compareColumns(CMP_NE, this.data, other.data))
-    public function lt(other : Series) : Series = this.derive(compareColumns(CMP_LT, this.data, other.data))
-    public function le(other : Series) : Series = this.derive(compareColumns(CMP_LE, this.data, other.data))
-    public function gt(other : Series) : Series = this.derive(compareColumns(CMP_GT, this.data, other.data))
-    public function ge(other : Series) : Series = this.derive(compareColumns(CMP_GE, this.data, other.data))
+    public function eq(other : Series) : Series =
+        this.derive(compareColumns(CMP_EQ, this.data, other.data))
+    public function ne(other : Series) : Series =
+        this.derive(compareColumns(CMP_NE, this.data, other.data))
+    public function lt(other : Series) : Series =
+        this.derive(compareColumns(CMP_LT, this.data, other.data))
+    public function le(other : Series) : Series =
+        this.derive(compareColumns(CMP_LE, this.data, other.data))
+    public function gt(other : Series) : Series =
+        this.derive(compareColumns(CMP_GT, this.data, other.data))
+    public function ge(other : Series) : Series =
+        this.derive(compareColumns(CMP_GE, this.data, other.data))
 
-    public function eq(other : double) : Series = this.derive(compareWithFloat(CMP_EQ, this.data, other))
-    public function ne(other : double) : Series = this.derive(compareWithFloat(CMP_NE, this.data, other))
-    public function lt(other : double) : Series = this.derive(compareWithFloat(CMP_LT, this.data, other))
-    public function le(other : double) : Series = this.derive(compareWithFloat(CMP_LE, this.data, other))
-    public function gt(other : double) : Series = this.derive(compareWithFloat(CMP_GT, this.data, other))
-    public function ge(other : double) : Series = this.derive(compareWithFloat(CMP_GE, this.data, other))
+    public function eq(other : double) : Series =
+        this.derive(compareWithFloat(CMP_EQ, this.data, other))
+    public function ne(other : double) : Series =
+        this.derive(compareWithFloat(CMP_NE, this.data, other))
+    public function lt(other : double) : Series =
+        this.derive(compareWithFloat(CMP_LT, this.data, other))
+    public function le(other : double) : Series =
+        this.derive(compareWithFloat(CMP_LE, this.data, other))
+    public function gt(other : double) : Series =
+        this.derive(compareWithFloat(CMP_GT, this.data, other))
+    public function ge(other : double) : Series =
+        this.derive(compareWithFloat(CMP_GE, this.data, other))
 
-    public function eq(other : Int) : Series = this.derive(compareWithFloat(CMP_EQ, this.data, other.toDouble()))
-    public function ne(other : Int) : Series = this.derive(compareWithFloat(CMP_NE, this.data, other.toDouble()))
-    public function lt(other : Int) : Series = this.derive(compareWithFloat(CMP_LT, this.data, other.toDouble()))
-    public function le(other : Int) : Series = this.derive(compareWithFloat(CMP_LE, this.data, other.toDouble()))
-    public function gt(other : Int) : Series = this.derive(compareWithFloat(CMP_GT, this.data, other.toDouble()))
-    public function ge(other : Int) : Series = this.derive(compareWithFloat(CMP_GE, this.data, other.toDouble()))
+    public function eq(other : Int) : Series =
+        this.derive(compareWithFloat(CMP_EQ, this.data, other.toDouble()))
+    public function ne(other : Int) : Series =
+        this.derive(compareWithFloat(CMP_NE, this.data, other.toDouble()))
+    public function lt(other : Int) : Series =
+        this.derive(compareWithFloat(CMP_LT, this.data, other.toDouble()))
+    public function le(other : Int) : Series =
+        this.derive(compareWithFloat(CMP_LE, this.data, other.toDouble()))
+    public function gt(other : Int) : Series =
+        this.derive(compareWithFloat(CMP_GT, this.data, other.toDouble()))
+    public function ge(other : Int) : Series =
+        this.derive(compareWithFloat(CMP_GE, this.data, other.toDouble()))
 
-    public function eq(other : String) : Series = this.derive(compareWithString(CMP_EQ, this.data, other))
-    public function ne(other : String) : Series = this.derive(compareWithString(CMP_NE, this.data, other))
-    public function lt(other : String) : Series = this.derive(compareWithString(CMP_LT, this.data, other))
-    public function le(other : String) : Series = this.derive(compareWithString(CMP_LE, this.data, other))
-    public function gt(other : String) : Series = this.derive(compareWithString(CMP_GT, this.data, other))
-    public function ge(other : String) : Series = this.derive(compareWithString(CMP_GE, this.data, other))
+    public function eq(other : String) : Series =
+        this.derive(compareWithString(CMP_EQ, this.data, other))
+    public function ne(other : String) : Series =
+        this.derive(compareWithString(CMP_NE, this.data, other))
+    public function lt(other : String) : Series =
+        this.derive(compareWithString(CMP_LT, this.data, other))
+    public function le(other : String) : Series =
+        this.derive(compareWithString(CMP_LE, this.data, other))
+    public function gt(other : String) : Series =
+        this.derive(compareWithString(CMP_GT, this.data, other))
+    public function ge(other : String) : Series =
+        this.derive(compareWithString(CMP_GE, this.data, other))
 
-    public function eq(other : Bool) : Series = this.derive(compareWithBool(CMP_EQ, this.data, other))
-    public function ne(other : Bool) : Series = this.derive(compareWithBool(CMP_NE, this.data, other))
+    public function eq(other : Bool) : Series =
+        this.derive(compareWithBool(CMP_EQ, this.data, other))
+    public function ne(other : Bool) : Series =
+        this.derive(compareWithBool(CMP_NE, this.data, other))
 
     public function both(other : Series) : Series =
-        if this.data.kind == KIND_BOOL && other.data.kind == KIND_BOOL then
-            this.derive(__columnBoth(this.data, other.data))
-        else
-            this.derive(Column.bools([x && y for (x, y) in presentMask(this.data).zip(presentMask(other.data))]))
+        if this.data.kind == KIND_BOOL &&
+            other.data.kind == KIND_BOOL then this.derive(__columnBoth(this.data, other.data))
+        else this.derive(
+            Column.bools([x && y for (x, y) in presentMask(this.data).zip(presentMask(other.data))]),
+        )
     public function either(other : Series) : Series =
-        this.derive(Column.bools([x || y for (x, y) in presentMask(this.data).zip(presentMask(other.data))]))
+        this.derive(
+            Column.bools([x || y for (x, y) in presentMask(this.data).zip(presentMask(other.data))]),
+        )
     public function invert() : Series =
         this.derive(Column.bools(presentMask(this.data).map(x => !x).toList()))
 
@@ -1751,10 +2037,14 @@ public class Series {
     public function between(low : Int, high : Int) : Series = this.ge(low).both(this.le(high))
     public function between(low : String, high : String) : Series = this.ge(low).both(this.le(high))
 
-    public function isIn(values : List[Int]) : Series = this.isInKeys(values.map(v => "n" + v.text()).toList())
-    public function isIn(values : List[double]) : Series = this.isInKeys(values.map(v => floatKey(v)).toList())
-    public function isIn(values : List[String]) : Series = this.isInKeys(values.map(v => "s" + v).toList())
-    public function isIn(values : List[Bool]) : Series = this.isInKeys(values.map(v => if v then "b1" else "b0").toList())
+    public function isIn(values : List[Int]) : Series =
+        this.isInKeys(values.map(v => "n" + v.text()).toList())
+    public function isIn(values : List[double]) : Series =
+        this.isInKeys(values.map(v => floatKey(v)).toList())
+    public function isIn(values : List[String]) : Series =
+        this.isInKeys(values.map(v => "s" + v).toList())
+    public function isIn(values : List[Bool]) : Series =
+        this.isInKeys(values.map(v => if v then "b1" else "b0").toList())
 
     function isInKeys(wanted : List[String]) : Series {
         let set := keySet(wanted)
@@ -1764,15 +2054,26 @@ public class Series {
     // ---- missing values
 
     public function isNa() : Series = this.derive(Column.bools(this.data.missing))
-    public function notNa() : Series = this.derive(Column.bools(this.data.missing.map(m => !m).toList()))
-    public function fillNa(value : double) : Series = this.derive(fillColumn(this.data, Scalar.ofFloat(value)))
+    public function notNa() : Series =
+        this.derive(Column.bools(this.data.missing.map(m => !m).toList()))
+    public function fillNa(value : double) : Series =
+        this.derive(fillColumn(this.data, Scalar.ofFloat(value)))
     public function fillNa(value : Int) : Series =
-        this.derive(fillColumn(this.data, if this.data.kind == KIND_FLOAT then Scalar.ofFloat(value.toDouble()) else Scalar.ofInt(value)))
-    public function fillNa(value : String) : Series = this.derive(fillColumn(this.data, Scalar.ofString(value)))
-    public function fillNa(value : Bool) : Series = this.derive(fillColumn(this.data, Scalar.ofBool(value)))
+        this.derive(
+            fillColumn(
+                this.data,
+                if this.data.kind == KIND_FLOAT then Scalar.ofFloat(value.toDouble())
+                    else Scalar.ofInt(value),
+            ),
+        )
+    public function fillNa(value : String) : Series =
+        this.derive(fillColumn(this.data, Scalar.ofString(value)))
+    public function fillNa(value : Bool) : Series =
+        this.derive(fillColumn(this.data, Scalar.ofBool(value)))
     public function fillNa(value : Scalar) : Series = this.derive(fillColumn(this.data, value))
 
-    public function dropNa() : Series = this.take(truePositions(this.data.missing.map(m => !m).toList()))
+    public function dropNa() : Series =
+        this.take(truePositions(this.data.missing.map(m => !m).toList()))
 
     // ffill carries the last valid entry forward; bfill carries the next one back.
     public function ffill() : Series {
@@ -1810,21 +2111,27 @@ public class Series {
     public function max() : Scalar = extremum(this.data, true)
     public function mean() : Scalar = Scalar.ofFloat(meanOf(validFloats(this.data)))
     public function median() : Scalar = Scalar.ofFloat(quantileOf(validFloats(this.data), 0.5))
-    public function quantile(q : double) : Scalar = Scalar.ofFloat(quantileOf(validFloats(this.data), q))
+    public function quantile(q : double) : Scalar =
+        Scalar.ofFloat(quantileOf(validFloats(this.data), q))
     public function quantile(qs : List[double]) : Series {
         let values := qs.map(q => quantileOf(validFloats(this.data), q)).toList()
         Series(this.name, Column.floats(values), Column.floats(qs), "")
     }
-    public function std(ddof : Int = 1) : Scalar = Scalar.ofFloat(sqrt(varianceOf(validFloats(this.data), ddof)))
-    public function variance(ddof : Int = 1) : Scalar = Scalar.ofFloat(varianceOf(validFloats(this.data), ddof))
+    public function std(ddof : Int = 1) : Scalar =
+        Scalar.ofFloat(sqrt(varianceOf(validFloats(this.data), ddof)))
+    public function variance(ddof : Int = 1) : Scalar =
+        Scalar.ofFloat(varianceOf(validFloats(this.data), ddof))
     public function sem(ddof : Int = 1) : Scalar = Scalar.ofFloat(semOf(validFloats(this.data)))
     public function skew() : Scalar = Scalar.ofFloat(skewOf(validFloats(this.data)))
     public function kurt() : Scalar = Scalar.ofFloat(kurtosisOf(validFloats(this.data)))
-    public function prod() : Scalar = Scalar.ofFloat(validFloats(this.data).fold(1.0, (a, b) => a * b))
+    public function prod() : Scalar =
+        Scalar.ofFloat(validFloats(this.data).fold(1.0, (a, b) => a * b))
     public function any() : Bool = truthyColumn(this.data).any(x => x)
     public function all() : Bool = truthyPresent(this.data).all(x => x)
 
-    public function nunique() : Int = firstOccurrences(this.data.keys().toList()).length() - (if countValid(this.data) < this.data.size then 1 else 0)
+    public function nunique() : Int =
+        firstOccurrences(this.data.keys().toList()).length() -
+            (if countValid(this.data) < this.data.size then 1 else 0)
 
     public function idxMax() : Scalar = this.extremeLabel(true)
     public function idxMin() : Scalar = this.extremeLabel(false)
@@ -1835,10 +2142,7 @@ public class Series {
     function extremePosition(wantMax : Bool) : Int {
         let valid := [i for (i, m) in indexRange(this.data.size).zip(this.data.missing) if !m]
         if valid.length() == 0 { return -1 }
-        match orderBy(this.data, valid, !wantMax).first() {
-            Some(p) => p,
-            None => -1,
-        }
+        match orderBy(this.data, valid, !wantMax).first() { Some(p) => p, None => -1 }
     }
 
     function extremeLabel(wantMax : Bool) : Scalar {
@@ -1860,7 +2164,12 @@ public class Series {
     public function dropDuplicates(keep : String = "first") : Series =
         this.take(keepPositions(this.data.keys().toList(), keep))
 
-    public function valueCounts(ascending : Bool = false, normalize : Bool = false, sort : Bool = true, dropNa : Bool = true) : Series {
+    public function valueCounts(
+        ascending : Bool = false,
+        normalize : Bool = false,
+        sort : Bool = true,
+        dropNa : Bool = true,
+    ) : Series {
         // Text columns skip the key strings and the per-group position lists:
         // the values themselves are the map keys.
         if this.data.kind == KIND_STR && dropNa {
@@ -1880,25 +2189,51 @@ public class Series {
             let keptCodes := kept.toList()
             let counts := [tally[c] for c in keptCodes]
             let firsts := [firstSeen[c] for c in keptCodes]
-            let order : List[Int] = if sort then indexRange(counts.length()).sorted(key = i => if ascending then counts.toArray()[i] else -counts.toArray()[i]) else indexRange(counts.length())
+            let order : List[Int] =
+                if sort then indexRange(counts.length()).sorted(
+                    key = i => if ascending then counts.toArray()[i] else -counts.toArray()[i],
+                )
+                else indexRange(counts.length())
             let firstTable := firsts.toArray()
             let positions := [firstTable[i] for i in order]
-            let valuesOut := if normalize then
-                if counts.length() == 0 then Column.floats([]) else Column.floats(pick(counts, order).map(c => c.toDouble() / counts.sum().toDouble()).toList())
-            else Column.ints(pick(counts, order))
-            return Series(if normalize then "proportion" else "count", valuesOut, this.data.gather(positions), this.name)
+            let valuesOut :=
+                if normalize then if counts.length() == 0 then Column.floats([])
+                else Column.floats(
+                    pick(counts, order).map(c => c.toDouble() / counts.sum().toDouble()).toList(),
+                )
+                else Column.ints(pick(counts, order))
+            return Series(
+                if normalize then "proportion" else "count",
+                valuesOut,
+                this.data.gather(positions),
+                this.name,
+            )
         }
         let groups := groupRuns(this.data.keys().toList())
-        let wanted := if dropNa then groups.filter(group => !this.data.missing.toArray()[firstOf(group)]).toList() else groups
+        let wanted :=
+            if dropNa then groups.filter(group => !this.data.missing.toArray()[firstOf(group)]).toList()
+            else groups
         let counts := wanted.map(group => group.length()).toList()
         let firsts := wanted.map(group => firstOf(group)).toList()
-        let order : List[Int] = if sort then indexRange(counts.length()).sorted(key = i => if ascending then counts.toArray()[i] else -counts.toArray()[i]) else indexRange(counts.length())
+        let order : List[Int] =
+            if sort then indexRange(counts.length()).sorted(
+                key = i => if ascending then counts.toArray()[i] else -counts.toArray()[i],
+            )
+            else indexRange(counts.length())
         let table := firsts.toArray()
         let positions := [table[i] for i in order]
-        let values := if normalize then
-            if counts.length() == 0 then Column.floats([]) else Column.floats(pick(counts, order).map(c => c.toDouble() / counts.sum().toDouble()).toList())
-        else Column.ints(pick(counts, order))
-        Series(if normalize then "proportion" else "count", values, this.data.gather(positions), this.name)
+        let values :=
+            if normalize then if counts.length() == 0 then Column.floats([])
+            else Column.floats(
+                pick(counts, order).map(c => c.toDouble() / counts.sum().toDouble()).toList(),
+            )
+            else Column.ints(pick(counts, order))
+        Series(
+            if normalize then "proportion" else "count",
+            values,
+            this.data.gather(positions),
+            this.name,
+        )
     }
 
     public function mode() : Series {
@@ -1906,7 +2241,12 @@ public class Series {
         if counts.length() == 0 { return counts }
         let top := counts.data.ints.toArray()[0]
         let winners := truePositions(counts.data.ints.map(c => c == top).toList())
-        Series(this.name, counts.index.gather(winners), Column.ints(indexRange(winners.length())), "")
+        Series(
+            this.name,
+            counts.index.gather(winners),
+            Column.ints(indexRange(winners.length())),
+            "",
+        )
     }
 
     // ---- running and shifted values
@@ -1917,11 +2257,19 @@ public class Series {
     public function cumMin() : Series = this.derive(runningTotals(this.data, 3))
 
     public function shift(periods : Int = 1) : Series =
-        this.derive(gatherGaps(this.data, [i - periods for i in range(this.data.size)].map(p => if p < 0 || p >= this.data.size then -1 else p).toList()))
+        this.derive(
+            gatherGaps(
+                this.data,
+                [i - periods for i in range(this.data.size)].map(
+                    p => if p < 0 || p >= this.data.size then -1 else p,
+                ).toList(),
+            ),
+        )
 
     public function diff(periods : Int = 1) : Series = this.subtract(this.shift(periods))
 
-    public function pctChange(periods : Int = 1) : Series = this.divide(this.shift(periods)).subtract(1)
+    public function pctChange(periods : Int = 1) : Series =
+        this.divide(this.shift(periods)).subtract(1)
 
     public function rolling(window : Int, minPeriods : Int = -1) : Rolling =
         Rolling(this.copy(), window, if minPeriods < 0 then window else minPeriods)
@@ -1933,15 +2281,28 @@ public class Series {
         EWM(this.copy(), alpha, adjust, minPeriods)
 
     public function ewmSpan(span : Int, adjust : Bool = true, minPeriods : Int = 0) : EWM =
-        EWM(this.copy(), if span <= 0 then 1.0 else 2.0 / (span.toDouble() + 1.0), adjust, minPeriods)
+        EWM(
+            this.copy(),
+            if span <= 0 then 1.0 else 2.0 / (span.toDouble() + 1.0),
+            adjust,
+            minPeriods,
+        )
 
     public function ewmHalfLife(halflife : double, adjust : Bool = true, minPeriods : Int = 0) : EWM =
-        EWM(this.copy(), if halflife <= 0.0 then 1.0 else 1.0 - 0.5.pow(1.0 / halflife), adjust, minPeriods)
+        EWM(
+            this.copy(),
+            if halflife <= 0.0 then 1.0 else 1.0 - 0.5.pow(1.0 / halflife),
+            adjust,
+            minPeriods,
+        )
 
     // rank gives each entry its place in sorted order. Ties average by default; method may
     // be "average", "min", "max", "first" or "dense". pct scales ranks to (0, 1].
-    public function rank(ascending : Bool = true, method : String = "average", pct : Bool = false) : Series =
-        this.derive(rankColumn(this.data, ascending, method, pct))
+    public function rank(
+        ascending : Bool = true,
+        method : String = "average",
+        pct : Bool = false,
+    ) : Series = this.derive(rankColumn(this.data, ascending, method, pct))
 
     // ---- element-wise functions
 
@@ -1949,7 +2310,9 @@ public class Series {
         this.derive(Column.ofFloats(this.data.toFloats().map(f).toList(), this.data.missing))
 
     public function applyInt(f : Int -> Int) : Series =
-        this.derive(Column.ofInts(toKind(this.data, KIND_INT).ints.map(f).toList(), this.data.missing))
+        this.derive(
+            Column.ofInts(toKind(this.data, KIND_INT).ints.map(f).toList(), this.data.missing),
+        )
 
     public function applyString(f : String -> String) : Series =
         this.derive(Column.ofStrings(this.data.texts().map(f).toList(), this.data.missing))
@@ -1962,17 +2325,38 @@ public class Series {
         this.derive(columnOfScalars(this.toScalars().map(f).toList()))
 
     public function replace(old : String, replacement : String) : Series =
-        this.derive(Column.ofStrings(this.data.strs.map(s => if s == old then replacement else s).toList(), this.data.missing))
+        this.derive(
+            Column.ofStrings(
+                this.data.strs.map(s => if s == old then replacement else s).toList(),
+                this.data.missing,
+            ),
+        )
 
     public function replace(old : Int, replacement : Int) : Series =
-        if this.data.kind == KIND_INT then this.derive(Column.ofInts(this.data.ints.map(x => if x == old then replacement else x).toList(), this.data.missing))
+        if this.data.kind ==
+            KIND_INT then this.derive(
+                Column.ofInts(
+                    this.data.ints.map(x => if x == old then replacement else x).toList(),
+                    this.data.missing,
+                ),
+            )
         else this.replace(old.toDouble(), replacement.toDouble())
 
     public function replace(old : double, replacement : double) : Series =
-        this.derive(Column.ofFloats(this.data.toFloats().map(x => if x == old then replacement else x).toList(), this.data.missing))
+        this.derive(
+            Column.ofFloats(
+                this.data.toFloats().map(x => if x == old then replacement else x).toList(),
+                this.data.missing,
+            ),
+        )
 
     public function replace(old : Bool, replacement : Bool) : Series =
-        this.derive(Column.ofBools(this.data.bools.map(x => if x == old then replacement else x).toList(), this.data.missing))
+        this.derive(
+            Column.ofBools(
+                this.data.bools.map(x => if x == old then replacement else x).toList(),
+                this.data.missing,
+            ),
+        )
 
     public function replace(old : Scalar, replacement : Scalar) : Series =
         this.derive(replaceInColumn(this.data, old, replacement))
@@ -1992,7 +2376,13 @@ public class Series {
     // mapValues looks each text up in a fixed table; an absent key becomes missing.
     public function mapValues(mapping : Map[String, String]) : Series {
         let texts := this.data.strs
-        let gone := [m || match mapping.get(t) { Some(_) => false, None => true } for (t, m) in texts.zip(this.data.missing)]
+        let gone :=
+            [
+                m ||
+                    match mapping.get(t) { Some(_) => false, None => true } for (t, m) in texts.zip(
+                        this.data.missing,
+                    )
+            ]
         let mapped := [match mapping.get(t) { Some(value) => value, None => "" } for t in texts]
         this.derive(Column.ofStrings(mapped, gone))
     }
@@ -2019,7 +2409,8 @@ public class Series {
     public function cov(other : Series, ddof : Int = 1) : Scalar =
         Scalar.ofFloat(covarianceColumns(this.data, other.data, ddof))
 
-    public function corr(other : Series) : Scalar = Scalar.ofFloat(correlationColumns(this.data, other.data))
+    public function corr(other : Series) : Scalar =
+        Scalar.ofFloat(correlationColumns(this.data, other.data))
 
     // autocorr is the correlation of the series with its own lagged values.
     public function autocorr(lag : Int = 1) : Scalar {
@@ -2046,16 +2437,35 @@ public class Series {
         }
         let gone := this.data.missing.toArray()
         let keyArray := keys.toArray()
-        let codes := [if gone[i] then -1 else match lookup.get(keyArray[i]) { Some(code) => code, None => -1 } for i in range(this.data.size)]
-        (Series("", Column.ints(codes), this.index.copy(), this.indexName), Series(this.name, uniques, Column.ints(indexRange(uniqueCount)), ""))
+        let codes :=
+            [
+                if gone[i] then -1
+                    else match lookup.get(keyArray[i]) { Some(code) => code, None => -1 } for i in range(
+                        this.data.size,
+                    )
+            ]
+        (
+            Series("", Column.ints(codes), this.index.copy(), this.indexName),
+            Series(this.name, uniques, Column.ints(indexRange(uniqueCount)), ""),
+        )
     }
 
-    public function toCsv(separator : String = ",", header : Bool = true, includeIndex : Bool = true) : String {
+    public function toCsv(
+        separator : String = ",",
+        header : Bool = true,
+        includeIndex : Bool = true,
+    ) : String {
         let mut lines : Array[String] = Array.empty()
         if header {
-            lines.append(joinLists([csvField(this.indexName, separator)], [csvField(this.name, separator)]).join(separator))
+            lines.append(
+                joinLists([csvField(this.indexName, separator)], [csvField(this.name, separator)]).join(
+                    separator,
+                ),
+            )
         }
-        let exact := if this.data.kind == KIND_FLOAT then this.data.floats.map(x => x.text()).toList() else this.data.texts()
+        let exact :=
+            if this.data.kind == KIND_FLOAT then this.data.floats.map(x => x.text()).toList()
+            else this.data.texts()
         let indexTexts := this.index.texts()
         let gone := this.data.missing.toArray()
         for (i in range(this.data.size)) {
@@ -2066,7 +2476,8 @@ public class Series {
         lines.toList().join("\n") + "\n"
     }
 
-    public function toTensor() : DynTensor[double] = Tensor(this.data.toFloats(), shape = (this.data.size,))
+    public function toTensor() : DynTensor[double] =
+        Tensor(this.data.toFloats(), shape = (this.data.size,))
 
     // concat stacks series one below the other, keeping each series' own values.
     public static function concat(parts : List[Series]) : Series {
@@ -2098,7 +2509,11 @@ public class Series {
     public function combineFirst(other : Series) : Series {
         let left := this.data.missing.toArray()
         let n := min(this.data.size, other.data.size)
-        let items := [if i < n && left[i] then scalarAt(other.data, i) else scalarAt(this.data, i) for i in range(this.data.size)]
+        let items :=
+            [
+                if i < n && left[i] then scalarAt(other.data, i)
+                    else scalarAt(this.data, i) for i in range(this.data.size)
+            ]
         this.derive(columnOfScalars(items))
     }
 
@@ -2106,7 +2521,11 @@ public class Series {
     public function update(other : Series) : Series {
         let right := other.data.missing.toArray()
         let n := min(this.data.size, other.data.size)
-        let items := [if i < n && !right[i] then scalarAt(other.data, i) else scalarAt(this.data, i) for i in range(this.data.size)]
+        let items :=
+            [
+                if i < n && !right[i] then scalarAt(other.data, i)
+                    else scalarAt(this.data, i) for i in range(this.data.size)
+            ]
         this.derive(columnOfScalars(items))
     }
 
@@ -2116,13 +2535,28 @@ public class Series {
         if this.data.isNumeric() {
             let xs := validFloats(this.data)
             let labels := ["count", "mean", "std", "min", "25%", "50%", "75%", "max"]
-            let values := [xs.length().toDouble(), meanOf(xs), sqrt(varianceOf(xs, 1)), quantileOf(xs, 0.0), quantileOf(xs, 0.25), quantileOf(xs, 0.5), quantileOf(xs, 0.75), quantileOf(xs, 1.0)]
+            let values :=
+                [
+                    xs.length().toDouble(),
+                    meanOf(xs),
+                    sqrt(varianceOf(xs, 1)),
+                    quantileOf(xs, 0.0),
+                    quantileOf(xs, 0.25),
+                    quantileOf(xs, 0.5),
+                    quantileOf(xs, 0.75),
+                    quantileOf(xs, 1.0),
+                ]
             return Series(this.name, Column.floats(values), Column.strings(labels), "")
         }
         let counts := this.valueCounts()
         let top := match counts.index.texts().first() { Some(t) => t, None => "NaN" }
         let freq := match counts.data.ints.first() { Some(c) => c.text(), None => "0" }
-        Series(this.name, Column.strings([this.count().text(), this.nunique().text(), top, freq]), Column.strings(["count", "unique", "top", "freq"]), "")
+        Series(
+            this.name,
+            Column.strings([this.count().text(), this.nunique().text(), top, freq]),
+            Column.strings(["count", "unique", "top", "freq"]),
+            "",
+        )
     }
 
     public function toFrame() : DataFrame = DataFrame([this.copy()])
@@ -2136,12 +2570,21 @@ public class Series {
         let label := if this.name == "" then "" else "Name: " + this.name + ", "
         let length := if n > MAX_ROWS then "Length: " + n.text() + ", " else ""
         let footer := label + length + "dtype: " + this.data.dtype()
-        if n == 0 { return "Series([], " + (if this.name == "" then "" else "Name: " + this.name + ", ") + "dtype: " + this.data.dtype() + ")" }
+        if n == 0 {
+            return "Series([], " +
+                (if this.name == "" then "" else "Name: " + this.name + ", ") +
+                "dtype: " + this.data.dtype() + ")"
+        }
         joinLists(joinLists(header, lines), [footer]).join("\n")
     }
 
     public function html() : String {
-        tableHtml([if this.name == "" then "0" else this.name], this.index.texts(), [this.data.texts()], this.indexName)
+        tableHtml(
+            [if this.name == "" then "0" else this.name],
+            this.index.texts(),
+            [this.data.texts()],
+            this.indexName,
+        )
     }
 }
 
@@ -2164,17 +2607,28 @@ public class Rolling {
         this.minPeriods = minPeriods
     }
 
-    public function mean() : Series = this.series.derive(rollingMean(this.series.data, this.window, this.minPeriods))
-    public function sum() : Series = this.series.derive(rollingSum(this.series.data, this.window, this.minPeriods))
-    public function min() : Series = this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 2))
-    public function max() : Series = this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 3))
-    public function std() : Series = this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 4))
-    public function variance() : Series = this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 7))
-    public function median() : Series = this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 6))
-    public function count() : Series = this.series.derive(rollingCount(this.series.data, this.window, this.minPeriods))
-    public function sem() : Series = this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 8))
-    public function skew() : Series = this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 9))
-    public function kurt() : Series = this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 10))
+    public function mean() : Series =
+        this.series.derive(rollingMean(this.series.data, this.window, this.minPeriods))
+    public function sum() : Series =
+        this.series.derive(rollingSum(this.series.data, this.window, this.minPeriods))
+    public function min() : Series =
+        this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 2))
+    public function max() : Series =
+        this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 3))
+    public function std() : Series =
+        this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 4))
+    public function variance() : Series =
+        this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 7))
+    public function median() : Series =
+        this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 6))
+    public function count() : Series =
+        this.series.derive(rollingCount(this.series.data, this.window, this.minPeriods))
+    public function sem() : Series =
+        this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 8))
+    public function skew() : Series =
+        this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 9))
+    public function kurt() : Series =
+        this.series.derive(windowed(this.series.data, this.window, this.minPeriods, 10))
     public function quantile(q : double) : Series =
         this.series.derive(windowedQuantile(this.series.data, this.window, this.minPeriods, q))
     public function apply(f : List[double] -> double) : Series =
@@ -2193,15 +2647,24 @@ public class Expanding {
 
     function window() : Int = max(1, this.series.data.size)
 
-    public function mean() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 0))
-    public function sum() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 1))
-    public function min() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 2))
-    public function max() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 3))
-    public function std() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 4))
-    public function variance() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 7))
-    public function median() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 6))
-    public function count() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 5))
-    public function sem() : Series = this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 8))
+    public function mean() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 0))
+    public function sum() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 1))
+    public function min() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 2))
+    public function max() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 3))
+    public function std() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 4))
+    public function variance() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 7))
+    public function median() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 6))
+    public function count() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 5))
+    public function sem() : Series =
+        this.series.derive(windowed(this.series.data, this.window(), this.minPeriods, 8))
     public function quantile(q : double) : Series =
         this.series.derive(windowedQuantile(this.series.data, this.window(), this.minPeriods, q))
     public function apply(f : List[double] -> double) : Series =
@@ -2228,7 +2691,8 @@ public class EWM {
 
     public function mean() : Series = this.series.derive(this.values(0, true))
     public function sum() : Series = this.series.derive(this.values(1, true))
-    public function variance(bias : Bool = false) : Series = this.series.derive(this.values(2, bias))
+    public function variance(bias : Bool = false) : Series =
+        this.series.derive(this.values(2, bias))
     public function std(bias : Bool = false) : Series = this.series.derive(this.values(3, bias))
     public function count() : Series = this.series.derive(this.values(4, true))
 }
@@ -2243,10 +2707,14 @@ public class StringMethods {
     }
 
     function mapped(f : String -> String) : Series =
-        this.series.derive(Column.ofStrings(this.series.data.strs.map(f).toList(), this.series.data.missing))
+        this.series.derive(
+            Column.ofStrings(this.series.data.strs.map(f).toList(), this.series.data.missing),
+        )
 
     function tested(f : String -> Bool) : Series =
-        this.series.derive(Column.ofBools(this.series.data.strs.map(f).toList(), this.series.data.missing))
+        this.series.derive(
+            Column.ofBools(this.series.data.strs.map(f).toList(), this.series.data.missing),
+        )
 
     public function upper() : Series = this.mapped(s => s.toUpper())
     public function lower() : Series = this.mapped(s => s.toLower())
@@ -2254,41 +2722,86 @@ public class StringMethods {
     public function strip() : Series = this.mapped(s => s.trim())
     public function stripLeading() : Series = this.mapped(s => trimLeading(s))
     public function stripTrailing() : Series = this.mapped(s => trimTrailing(s))
-    public function replace(old : String, replacement : String) : Series = this.mapped(s => s.replace(old, replacement))
-    public function capitalize() : Series = this.mapped(s => if s.length() == 0 then s else s[0].toUpper() + sliceString(s, 1, s.length()).toLower())
+    public function replace(old : String, replacement : String) : Series =
+        this.mapped(s => s.replace(old, replacement))
+    public function capitalize() : Series =
+        this.mapped(
+            s =>
+                if s.length() == 0 then s
+                else s[0].toUpper() + sliceString(s, 1, s.length()).toLower(),
+        )
     public function title() : Series = this.mapped(s => titleCase(s))
-    public function slice(start : Int, stop : Int) : Series = this.mapped(s => sliceString(s, min(start, s.length()), min(stop, s.length())))
+    public function slice(start : Int, stop : Int) : Series =
+        this.mapped(s => sliceString(s, min(start, s.length()), min(stop, s.length())))
     public function sliceReplace(start : Int, stop : Int, replacement : String) : Series =
-        this.mapped(s => sliceString(s, 0, min(start, s.length())) + replacement + sliceString(s, min(stop, s.length()), s.length()))
+        this.mapped(
+            s =>
+                sliceString(s, 0, min(start, s.length())) +
+                    replacement + sliceString(s, min(stop, s.length()), s.length()),
+        )
     public function cat(other : String) : Series = this.mapped(s => s + other)
     public function repeat(times : Int) : Series = this.mapped(s => repeatText(s, max(0, times)))
     public function pad(width : Int) : Series = this.mapped(s => padLeft(s, width))
     public function ljust(width : Int) : Series = this.mapped(s => padRight(s, width))
     public function rjust(width : Int) : Series = this.mapped(s => padLeft(s, width))
     public function center(width : Int) : Series = this.mapped(s => centerText(s, width))
-    public function zfill(width : Int) : Series = this.mapped(s => repeatText("0", max(0, width - s.length())) + s)
+    public function zfill(width : Int) : Series =
+        this.mapped(s => repeatText("0", max(0, width - s.length())) + s)
     public function contains(part : String) : Series = this.tested(s => s.contains(part))
     public function startsWith(part : String) : Series = this.tested(s => s.startsWith(part))
     public function endsWith(part : String) : Series = this.tested(s => s.endsWith(part))
     public function isEmpty() : Series = this.tested(s => s.length() == 0)
 
     public function len() : Series =
-        this.series.derive(Column.ofInts(this.series.data.strs.map(s => s.length()).toList(), this.series.data.missing))
+        this.series.derive(
+            Column.ofInts(
+                this.series.data.strs.map(s => s.length()).toList(),
+                this.series.data.missing,
+            ),
+        )
 
     public function count(part : String) : Series =
-        this.series.derive(Column.ofInts(this.series.data.strs.map(s => textCount(s, part)).toList(), this.series.data.missing))
+        this.series.derive(
+            Column.ofInts(
+                this.series.data.strs.map(s => textCount(s, part)).toList(),
+                this.series.data.missing,
+            ),
+        )
 
     public function find(part : String) : Series =
-        this.series.derive(Column.ofInts(this.series.data.strs.map(s => findPart(s, part)).toList(), this.series.data.missing))
+        this.series.derive(
+            Column.ofInts(
+                this.series.data.strs.map(s => findPart(s, part)).toList(),
+                this.series.data.missing,
+            ),
+        )
 
     public function rfind(part : String) : Series =
-        this.series.derive(Column.ofInts(this.series.data.strs.map(s => rfindPart(s, part)).toList(), this.series.data.missing))
+        this.series.derive(
+            Column.ofInts(
+                this.series.data.strs.map(s => rfindPart(s, part)).toList(),
+                this.series.data.missing,
+            ),
+        )
 
     // get keeps the character at one position; a position outside a text is missing.
     public function get(position : Int) : Series {
         let texts := this.series.data.strs
-        let gone := [m || position < 0 || position >= t.length() for (t, m) in texts.zip(this.series.data.missing)]
-        this.series.derive(Column.ofStrings([if t.length() == 0 then "" else t[min(max(position, 0), t.length() - 1)] for t in texts], gone))
+        let gone :=
+            [
+                m ||
+                    position < 0 ||
+                    position >= t.length() for (t, m) in texts.zip(this.series.data.missing)
+            ]
+        this.series.derive(
+            Column.ofStrings(
+                [
+                    if t.length() == 0 then ""
+                        else t[min(max(position, 0), t.length() - 1)] for t in texts
+                ],
+                gone,
+            ),
+        )
     }
 
     // splitPart splits each text at a separator and keeps the part at the given position.
@@ -2348,17 +2861,22 @@ function centerText(text : String, width : Int) : String {
 
 function trimLeading(text : String) : String {
     let mut start := 0
-    while start < text.length() && (text[start] == " " || text[start] == "\t" || text[start] == "\n" || text[start] == "\r") {
-        start = start + 1
-    }
+    while start < text.length() &&
+        (text[start] == " " || text[start] == "\t" || text[start] == "\n" || text[start] == "\r") {
+            start = start + 1
+        }
     sliceString(text, start, text.length())
 }
 
 function trimTrailing(text : String) : String {
     let mut stop := text.length()
-    while stop > 0 && (text[stop - 1] == " " || text[stop - 1] == "\t" || text[stop - 1] == "\n" || text[stop - 1] == "\r") {
-        stop = stop - 1
-    }
+    while stop > 0 &&
+        (
+            text[stop - 1] == " " ||
+                text[stop - 1] == "\t" || text[stop - 1] == "\n" || text[stop - 1] == "\r"
+        ) {
+            stop = stop - 1
+        }
     sliceString(text, 0, stop)
 }
 
@@ -2422,7 +2940,12 @@ function aggregateGroups(c : Column, owner : Array[Int], groups : Int, statistic
                 }
             }
         }
-        return Column.floats([if counts[g] == 0 then nanValue() else sums[g] / counts[g].toDouble() for g in range(groups)])
+        return Column.floats(
+            [
+                if counts[g] == 0 then nanValue()
+                    else sums[g] / counts[g].toDouble() for g in range(groups)
+            ],
+        )
     }
     // A whole-number column keeps an exact whole-number sum. Accumulating in a
     // double would round values above 2^53, so Int sums stay Int.
@@ -2482,7 +3005,12 @@ function aggregate(c : Column, statistic : String) : Scalar {
 
 // statisticNeedsNumbers says whether the named statistic only makes sense for number columns.
 function statisticNeedsNumbers(statistic : String) : Bool =
-    statistic == "sum" || statistic == "mean" || statistic == "median" || statistic == "std" || statistic == "var" || statistic == "prod" || statistic == "sem" || statistic == "skew" || statistic == "kurt"
+    statistic == "sum" ||
+        statistic == "mean" ||
+        statistic == "median" ||
+        statistic == "std" ||
+        statistic == "var" ||
+        statistic == "prod" || statistic == "sem" || statistic == "skew" || statistic == "kurt"
 
 // columnOfScalars builds one column from a list of scalars, widening Int to double when mixed.
 function columnOfScalars(items : List[Scalar]) : Column {
@@ -2526,7 +3054,11 @@ function parseCsvRecords(physical : List[String], separator : String) : List[Lis
         let clean := if line.contains("\r") then line.replace("\r", "") else line
         if !quoted && !hasPending && !clean.contains("\"") {
             let fields := clean.split(separator)
-            let blank := match fields.first() { Some(first) => fields.length() == 1 && first.trim().length() == 0, None => true }
+            let blank :=
+                match fields.first() {
+                    Some(first) => fields.length() == 1 && first.trim().length() == 0,
+                    None => true,
+                }
             if !blank { rows.append(fields) }
             continue
         }
@@ -2542,7 +3074,11 @@ function parseCsvRecords(physical : List[String], separator : String) : List[Lis
         if quotes % 2 == 1 { quoted = !quoted }
         if !quoted {
             let fields := splitCsvLine(pending, separator)
-            let blank := match fields.first() { Some(first) => fields.length() == 1 && first.trim().length() == 0, None => true }
+            let blank :=
+                match fields.first() {
+                    Some(first) => fields.length() == 1 && first.trim().length() == 0,
+                    None => true,
+                }
             if !blank { rows.append(fields) }
             pending = ""
             hasPending = false
@@ -2550,7 +3086,11 @@ function parseCsvRecords(physical : List[String], separator : String) : List[Lis
     }
     if hasPending {
         let fields := splitCsvLine(pending, separator)
-        let blank := match fields.first() { Some(first) => fields.length() == 1 && first.trim().length() == 0, None => true }
+        let blank :=
+            match fields.first() {
+                Some(first) => fields.length() == 1 && first.trim().length() == 0,
+                None => true,
+            }
         if !blank { rows.append(fields) }
     }
     rows.toList()
@@ -2590,7 +3130,11 @@ function parseCsvFlat(physical : List[String], separator : String) : (Array[Stri
         if quotes % 2 == 1 { quoted = !quoted }
         if !quoted {
             let parts := splitCsvLine(pending, separator)
-            let blank := match parts.first() { Some(first) => parts.length() == 1 && first.trim().length() == 0, None => true }
+            let blank :=
+                match parts.first() {
+                    Some(first) => parts.length() == 1 && first.trim().length() == 0,
+                    None => true,
+                }
             if !blank { appendFields(parts.toArray()) }
             pending = ""
             hasPending = false
@@ -2598,7 +3142,11 @@ function parseCsvFlat(physical : List[String], separator : String) : (Array[Stri
     }
     if hasPending {
         let parts := splitCsvLine(pending, separator)
-        let blank := match parts.first() { Some(first) => parts.length() == 1 && first.trim().length() == 0, None => true }
+        let blank :=
+            match parts.first() {
+                Some(first) => parts.length() == 1 && first.trim().length() == 0,
+                None => true,
+            }
         if !blank { appendFields(parts.toArray()) }
     }
     (fields, width, rows)
@@ -2641,19 +3189,14 @@ function splitCsvLine(line : String, separator : String) : List[String] {
 }
 
 function isMissingText(text : String) : Bool =
-    text == "" || text == "NaN" || text == "nan" || text == "NA" || text == "N/A" || text == "null" || text == "NULL" || text == "None"
+    text == "" ||
+        text == "NaN" ||
+        text == "nan" ||
+        text == "NA" || text == "N/A" || text == "null" || text == "NULL" || text == "None"
 
-function isIntText(text : String) : Bool =
-    match parseInt(text) {
-        n => true,
-        _ => false,
-    }
+function isIntText(text : String) : Bool = match parseInt(text) { n => true, _ => false }
 
-function isFloatText(text : String) : Bool =
-    match parseDouble(text) {
-        x => true,
-        _ => false,
-    }
+function isFloatText(text : String) : Bool = match parseDouble(text) { x => true, _ => false }
 
 function isBoolText(text : String) : Bool =
     text == "True" || text == "False" || text == "true" || text == "false"
@@ -2710,10 +3253,24 @@ function columnFromTexts(texts : List[String]) : Column {
             if shape == 0 { allNumeric = false }
         }
         if allInts {
-            return Column.ofInts([if m then 0 else match parseInt(t) { n => n, _ => 0 } for (t, m) in texts.zip(missing)], missing)
+            return Column.ofInts(
+                [
+                    if m then 0
+                        else match parseInt(t) { n => n, _ => 0 } for (t, m) in texts.zip(missing)
+                ],
+                missing,
+            )
         }
         if allNumeric {
-            return Column.ofFloats([if m then 0.0 else match parseDouble(t) { x => x, _ => 0.0 } for (t, m) in texts.zip(missing)], missing)
+            return Column.ofFloats(
+                [
+                    if m then 0.0
+                        else match parseDouble(t) { x => x, _ => 0.0 } for (t, m) in texts.zip(
+                            missing,
+                        )
+                ],
+                missing,
+            )
         }
         if present.all(t => isBoolText(t)) {
             return Column.ofBools([t == "True" || t == "true" for t in texts], missing)
@@ -2902,13 +3459,10 @@ public class DataFrame {
         true
     }
 
-    function position(name : String) : Int = match this.names.index(name) {
-        Some(i) => i,
-        None => -1,
-    }
+    function position(name : String) : Int =
+        match this.names.index(name) { Some(i) => i, None => -1 }
 
     public function copy() : DataFrame = this.transformColumns(0, 0, Scalar.missing())
-
 
     public static function empty() : DataFrame {
         let none : Array[Column] = Array.empty()
@@ -2933,7 +3487,11 @@ public class DataFrame {
             } else if mode == 3 {
                 out.append(Column.bools(c.missing.map(m => !m).toList()))
             } else if mode == 4 {
-                let compatible := (c.kind == KIND_FLOAT && value.isNumeric()) || (c.kind == KIND_INT && value.kind == KIND_INT) || (c.kind == KIND_STR && value.kind == KIND_STR) || (c.kind == KIND_BOOL && value.kind == KIND_BOOL)
+                let compatible :=
+                    (c.kind == KIND_FLOAT && value.isNumeric()) ||
+                        (c.kind == KIND_INT && value.kind == KIND_INT) ||
+                        (c.kind == KIND_STR && value.kind == KIND_STR) ||
+                        (c.kind == KIND_BOOL && value.kind == KIND_BOOL)
                 if compatible {
                     out.append(fillColumn(c, value))
                 } else if c.kind == KIND_FLOAT && value.kind == KIND_INT {
@@ -3027,7 +3585,8 @@ public class DataFrame {
         this.take([from + i for i in range(max(0, to - from))])
     }
 
-    public function iloc(positions : List[Int]) : DataFrame = this.takeGaps(normalizeIndexes(positions, this.index.size))
+    public function iloc(positions : List[Int]) : DataFrame =
+        this.takeGaps(normalizeIndexes(positions, this.index.size))
 
     public function takeGaps(positions : List[Int]) : DataFrame {
         let mut out : Array[Column] = Array.empty()
@@ -3050,14 +3609,18 @@ public class DataFrame {
     public function at(row : Int, column : String) : Scalar or Error {
         let gone := this.firstMissing([column])
         if gone != "" { return MissingColumn(gone) }
-        if row < 0 || row >= this.index.size { return BadArgument("row " + row.text() + " is outside the frame") }
+        if row < 0 || row >= this.index.size {
+            return BadArgument("row " + row.text() + " is outside the frame")
+        }
         scalarAt(this.store[this.position(column)], row)
     }
 
     public function iat(row : Int, column : Int) : Scalar or Error {
         let at := normalizeIndex(row, this.index.size)
         if at < 0 { return BadArgument("row " + row.text() + " is outside the frame") }
-        if column < 0 || column >= this.store.length() { return BadArgument("column " + column.text() + " is outside the frame") }
+        if column < 0 || column >= this.store.length() {
+            return BadArgument("column " + column.text() + " is outside the frame")
+        }
         scalarAt(this.store[column], at)
     }
 
@@ -3065,30 +3628,58 @@ public class DataFrame {
     public function iterrows() : List[(Scalar, Series)] =
         [(scalarAt(this.index, i), this.row(i)) for i in range(this.index.size)]
 
-    public function filter(mask : Series) : DataFrame = this.take(truePositions(presentMask(mask.data)))
+    public function filter(mask : Series) : DataFrame =
+        this.take(truePositions(presentMask(mask.data)))
 
-    public function loc(label : Int) : DataFrame = this.take(truePositions(this.index.keys().map(k => k == "n" + label.text()).toList()))
-    public function loc(label : String) : DataFrame = this.take(truePositions(this.index.keys().map(k => k == "s" + label).toList()))
+    public function loc(label : Int) : DataFrame =
+        this.take(truePositions(this.index.keys().map(k => k == "n" + label.text()).toList()))
+    public function loc(label : String) : DataFrame =
+        this.take(truePositions(this.index.keys().map(k => k == "s" + label).toList()))
 
     // ---- sorting
 
-    public function sortValues(by : String, ascending : Bool = true, naPosition : String = "last") : DataFrame or Error {
+    public function sortValues(
+        by : String,
+        ascending : Bool = true,
+        naPosition : String = "last",
+    ) : DataFrame or Error {
         let gone := this.firstMissing([by])
         if gone != "" { return MissingColumn(gone) }
-        this.take(orderByWithNa(this.store[this.position(by)], indexRange(this.index.size), ascending, naPosition == "first"))
+        this.take(
+            orderByWithNa(
+                this.store[this.position(by)],
+                indexRange(this.index.size),
+                ascending,
+                naPosition == "first",
+            ),
+        )
     }
 
-    public function sortValues(by : List[String], ascending : Bool = true, naPosition : String = "last") : DataFrame or Error {
+    public function sortValues(
+        by : List[String],
+        ascending : Bool = true,
+        naPosition : String = "last",
+    ) : DataFrame or Error {
         let gone := this.firstMissing(by)
         if gone != "" { return MissingColumn(gone) }
         let mut order := indexRange(this.index.size)
         for (name in reversedStrings(by)) {
-            order = orderByWithNa(this.store[this.position(name)], order, ascending, naPosition == "first")
+            order =
+                orderByWithNa(
+                    this.store[this.position(name)],
+                    order,
+                    ascending,
+                    naPosition == "first",
+                )
         }
         this.take(order)
     }
 
-    public function sortValues(by : List[String], ascending : List[Bool], naPosition : String = "last") : DataFrame or Error {
+    public function sortValues(
+        by : List[String],
+        ascending : List[Bool],
+        naPosition : String = "last",
+    ) : DataFrame or Error {
         let gone := this.firstMissing(by)
         if gone != "" { return MissingColumn(gone) }
         let mut order := indexRange(this.index.size)
@@ -3096,13 +3687,21 @@ public class DataFrame {
         let flags := ascending.toArray()
         for (k in range(by.length())) {
             let i := by.length() - 1 - k
-            order = orderByWithNa(this.store[this.position(names[i])], order, if i < flags.length() then flags[i] else true, naPosition == "first")
+            order =
+                orderByWithNa(
+                    this.store[this.position(names[i])],
+                    order,
+                    if i < flags.length() then flags[i] else true,
+                    naPosition == "first",
+                )
         }
         this.take(order)
     }
 
     public function sortIndex(ascending : Bool = true, naPosition : String = "last") : DataFrame =
-        this.take(orderByWithNa(this.index, indexRange(this.index.size), ascending, naPosition == "first"))
+        this.take(
+            orderByWithNa(this.index, indexRange(this.index.size), ascending, naPosition == "first"),
+        )
 
     public function nlargest(n : Int, by : String) : DataFrame or Error {
         let gone := this.firstMissing([by])
@@ -3169,10 +3768,14 @@ public class DataFrame {
         DataFrame(names.toList(), out, this.index.copy(), this.indexName)
     }
 
-    public function assign(name : String, values : List[Int]) : DataFrame = this.assign(name, Series(values))
-    public function assign(name : String, values : List[double]) : DataFrame = this.assign(name, Series(values))
-    public function assign(name : String, values : List[String]) : DataFrame = this.assign(name, Series(values))
-    public function assign(name : String, values : List[Bool]) : DataFrame = this.assign(name, Series(values))
+    public function assign(name : String, values : List[Int]) : DataFrame =
+        this.assign(name, Series(values))
+    public function assign(name : String, values : List[double]) : DataFrame =
+        this.assign(name, Series(values))
+    public function assign(name : String, values : List[String]) : DataFrame =
+        this.assign(name, Series(values))
+    public function assign(name : String, values : List[Bool]) : DataFrame =
+        this.assign(name, Series(values))
 
     // A scalar assign broadcasts one value to every row.
     public function assign(name : String, value : Int) : DataFrame =
@@ -3217,8 +3820,7 @@ public class DataFrame {
         let kind :=
             if dtype == "int64" || dtype == "int" then KIND_INT
             else if dtype == "float64" || dtype == "float" || dtype == "double" then KIND_FLOAT
-            else if dtype == "bool" then KIND_BOOL
-            else KIND_STR
+            else if dtype == "bool" then KIND_BOOL else KIND_STR
         this.transformColumns(1, kind, Scalar.missing())
     }
 
@@ -3232,9 +3834,11 @@ public class DataFrame {
             let wanted :=
                 if dtype == "number" || dtype == "numeric" then c.isNumeric()
                 else if dtype == "int64" || dtype == "int" then c.kind == KIND_INT
-                else if dtype == "float64" || dtype == "float" || dtype == "double" then c.kind == KIND_FLOAT
+                else if dtype == "float64" ||
+                    dtype == "float" || dtype == "double" then c.kind == KIND_FLOAT
                 else if dtype == "bool" then c.kind == KIND_BOOL
-                else if dtype == "str" || dtype == "string" || dtype == "object" then c.kind == KIND_STR
+                else if dtype == "str" ||
+                    dtype == "string" || dtype == "object" then c.kind == KIND_STR
                 else false
             if wanted {
                 names.append(this.names.toArray()[i])
@@ -3246,7 +3850,16 @@ public class DataFrame {
 
     // numericTransform applies one numeric-only operation. Modes: 0 round, 1 abs, 2 clip,
     // 3 diff, 4 pctChange, 5 cumSum, 6 cumProd, 7 cumMax, 8 cumMin, 9 rank, 10 interpolate.
-    function numericTransform(mode : Int, decimals : Int, low : double, high : double, periods : Int, ascending : Bool, method : String, pct : Bool) : DataFrame {
+    function numericTransform(
+        mode : Int,
+        decimals : Int,
+        low : double,
+        high : double,
+        periods : Int,
+        ascending : Bool,
+        method : String,
+        pct : Bool,
+    ) : DataFrame {
         let mut out : Array[Column] = Array.empty()
         for (c in this.store) {
             if !c.isNumeric() {
@@ -3303,13 +3916,20 @@ public class DataFrame {
     public function pctChange(periods : Int = 1) : DataFrame =
         this.numericTransform(4, 0, 0.0, 0.0, periods, true, "average", false)
 
-    public function cumSum() : DataFrame = this.numericTransform(5, 0, 0.0, 0.0, 1, true, "average", false)
-    public function cumProd() : DataFrame = this.numericTransform(6, 0, 0.0, 0.0, 1, true, "average", false)
-    public function cumMax() : DataFrame = this.numericTransform(7, 0, 0.0, 0.0, 1, true, "average", false)
-    public function cumMin() : DataFrame = this.numericTransform(8, 0, 0.0, 0.0, 1, true, "average", false)
+    public function cumSum() : DataFrame =
+        this.numericTransform(5, 0, 0.0, 0.0, 1, true, "average", false)
+    public function cumProd() : DataFrame =
+        this.numericTransform(6, 0, 0.0, 0.0, 1, true, "average", false)
+    public function cumMax() : DataFrame =
+        this.numericTransform(7, 0, 0.0, 0.0, 1, true, "average", false)
+    public function cumMin() : DataFrame =
+        this.numericTransform(8, 0, 0.0, 0.0, 1, true, "average", false)
 
-    public function rank(ascending : Bool = true, method : String = "average", pct : Bool = false) : DataFrame =
-        this.numericTransform(9, 0, 0.0, 0.0, 1, ascending, method, pct)
+    public function rank(
+        ascending : Bool = true,
+        method : String = "average",
+        pct : Bool = false,
+    ) : DataFrame = this.numericTransform(9, 0, 0.0, 0.0, 1, ascending, method, pct)
 
     public function interpolate() : DataFrame =
         this.numericTransform(10, 0, 0.0, 0.0, 1, true, "average", false)
@@ -3320,7 +3940,9 @@ public class DataFrame {
         let mut out : Array[Column] = Array.empty()
         for (name in this.names) {
             let c := this.store[this.position(name)]
-            let kept := if mask.hasColumn(name) then presentMask(mask.keyColumn(name)) else Column.noneMissing(this.index.size)
+            let kept :=
+                if mask.hasColumn(name) then presentMask(mask.keyColumn(name))
+                else Column.noneMissing(this.index.size)
             out.append(whereInColumn(c, kept, other, false))
         }
         DataFrame(this.names, out, this.index.copy(), this.indexName)
@@ -3332,7 +3954,9 @@ public class DataFrame {
         let mut out : Array[Column] = Array.empty()
         for (name in this.names) {
             let c := this.store[this.position(name)]
-            let kept := if mask.hasColumn(name) then presentMask(mask.keyColumn(name)) else Column.noneMissing(this.index.size)
+            let kept :=
+                if mask.hasColumn(name) then presentMask(mask.keyColumn(name))
+                else Column.noneMissing(this.index.size)
             out.append(whereInColumn(c, kept, other, true))
         }
         DataFrame(this.names, out, this.index.copy(), this.indexName)
@@ -3366,8 +3990,16 @@ public class DataFrame {
     // insert adds a column at a position, shifting the later columns right.
     public function insert(position : Int, name : String, series : Series) : DataFrame or Error {
         if this.hasColumn(name) { return BadArgument("column " + name + " already exists") }
-        if position < 0 || position > this.names.length() { return BadArgument("column position " + position.text() + " is outside the frame") }
-        if series.length() != this.index.size { return BadArgument("column " + name + " has " + series.length().text() + " rows, expected " + this.index.size.text()) }
+        if position < 0 || position > this.names.length() {
+            return BadArgument("column position " + position.text() + " is outside the frame")
+        }
+        if series.length() != this.index.size {
+            return BadArgument(
+                "column " +
+                    name +
+                    " has " + series.length().text() + " rows, expected " + this.index.size.text(),
+            )
+        }
         let mut order : Array[String] = Array.empty()
         let existing := this.names.toArray()
         let mut i := 0
@@ -3384,10 +4016,14 @@ public class DataFrame {
     public function isNa() : DataFrame = this.transformColumns(2, 0, Scalar.missing())
     public function notNa() : DataFrame = this.transformColumns(3, 0, Scalar.missing())
 
-    public function fillNa(value : double) : DataFrame = this.transformColumns(4, 0, Scalar.ofFloat(value))
-    public function fillNa(value : Int) : DataFrame = this.transformColumns(4, 0, Scalar.ofInt(value))
-    public function fillNa(value : String) : DataFrame = this.transformColumns(4, 0, Scalar.ofString(value))
-    public function fillNa(value : Bool) : DataFrame = this.transformColumns(4, 0, Scalar.ofBool(value))
+    public function fillNa(value : double) : DataFrame =
+        this.transformColumns(4, 0, Scalar.ofFloat(value))
+    public function fillNa(value : Int) : DataFrame =
+        this.transformColumns(4, 0, Scalar.ofInt(value))
+    public function fillNa(value : String) : DataFrame =
+        this.transformColumns(4, 0, Scalar.ofString(value))
+    public function fillNa(value : Bool) : DataFrame =
+        this.transformColumns(4, 0, Scalar.ofBool(value))
 
     // dropNa keeps the rows with enough present entries. how="any" removes a row with any
     // missing entry, how="all" removes only a row whose entries are all missing, and thresh
@@ -3395,7 +4031,11 @@ public class DataFrame {
     public function dropNa(how : String = "any", thresh : Int = 0) : DataFrame =
         this.dropMissing(this.names, how, thresh)
 
-    public function dropNa(subset : List[String], how : String = "any", thresh : Int = 0) : DataFrame or Error {
+    public function dropNa(
+        subset : List[String],
+        how : String = "any",
+        thresh : Int = 0,
+    ) : DataFrame or Error {
         let gone := this.firstMissing(subset)
         if gone != "" { return MissingColumn(gone) }
         this.dropMissing(subset, how, thresh)
@@ -3443,17 +4083,19 @@ public class DataFrame {
     public function dropDuplicates(keep : String = "first") : DataFrame =
         this.take(keepPositions(this.rowKeys(this.names), keep))
 
-    public function dropDuplicates(subset : List[String], keep : String = "first") : DataFrame or Error {
-        let gone := this.firstMissing(subset)
-        if gone != "" { return MissingColumn(gone) }
-        this.take(keepPositions(this.rowKeys(subset), keep))
-    }
+    public function dropDuplicates(subset : List[String], keep : String = "first") : DataFrame or
+        Error {
+            let gone := this.firstMissing(subset)
+            if gone != "" { return MissingColumn(gone) }
+            this.take(keepPositions(this.rowKeys(subset), keep))
+        }
 
     // ---- reductions over columns; each gives a Series indexed by the column names
 
     function reduceColumns(statistic : String) : Series {
         let numbersOnly := statisticNeedsNumbers(statistic)
-        let wanted := [i for i in range(this.store.length()) if !numbersOnly || this.store[i].isNumeric()]
+        let wanted :=
+            [i for i in range(this.store.length()) if !numbersOnly || this.store[i].isNumeric()]
         let items := [aggregate(this.store[i], statistic) for i in wanted]
         let labels := pick(this.names, wanted)
         Series("", columnOfScalars(items), Column.strings(labels), "")
@@ -3527,15 +4169,28 @@ public class DataFrame {
     }
 
     function specValues(spec : List[(String, String)]) : List[Scalar] {
-        [aggregate(this.store[this.position(name)], statistic) for (name, statistic) in spec if this.hasColumn(name) && (!statisticNeedsNumbers(statistic) || this.store[this.position(name)].isNumeric())]
+        [
+            aggregate(this.store[this.position(name)], statistic) for (name, statistic) in spec if this.hasColumn(
+                name,
+            ) &&
+                (!statisticNeedsNumbers(statistic) || this.store[this.position(name)].isNumeric())
+        ]
     }
 
     public function agg(spec : List[(String, String)]) : Series =
-        Series("", columnOfScalars(this.specValues(spec)), Column.strings(this.specLabels(spec)), "")
+        Series(
+            "",
+            columnOfScalars(this.specValues(spec)),
+            Column.strings(this.specLabels(spec)),
+            "",
+        )
 
     public function quantile(q : double) : Series {
         let wanted := this.numericNames()
-        let values := [Scalar.ofFloat(quantileOf(validFloats(this.store[this.position(name)]), q)) for name in wanted]
+        let values :=
+            [
+                Scalar.ofFloat(quantileOf(validFloats(this.store[this.position(name)]), q)) for name in wanted
+            ]
         Series(q.text(), columnOfScalars(values), Column.strings(wanted), "")
     }
 
@@ -3571,7 +4226,9 @@ public class DataFrame {
         for (a in wanted) {
             let mut values : Array[double] = Array.empty()
             for (b in wanted) {
-                values.append(correlationColumns(this.store[this.position(a)], this.store[this.position(b)]))
+                values.append(
+                    correlationColumns(this.store[this.position(a)], this.store[this.position(b)]),
+                )
             }
             out.append(Column.floats(values.toList()))
         }
@@ -3584,7 +4241,13 @@ public class DataFrame {
         for (a in wanted) {
             let mut values : Array[double] = Array.empty()
             for (b in wanted) {
-                values.append(covarianceColumns(this.store[this.position(a)], this.store[this.position(b)], ddof))
+                values.append(
+                    covarianceColumns(
+                        this.store[this.position(a)],
+                        this.store[this.position(b)],
+                        ddof,
+                    ),
+                )
             }
             out.append(Column.floats(values.toList()))
         }
@@ -3593,8 +4256,15 @@ public class DataFrame {
 
     // corrwith correlates each numeric column with the same-named column in another frame.
     public function corrwith(other : DataFrame) : Series {
-        let wanted := [name for name in this.numericNames() if other.hasColumn(name) && other.keyColumn(name).isNumeric()]
-        let values := [correlationColumns(this.store[this.position(name)], other.keyColumn(name)) for name in wanted]
+        let wanted :=
+            [
+                name for name in this.numericNames() if other.hasColumn(name) &&
+                    other.keyColumn(name).isNumeric()
+            ]
+        let values :=
+            [
+                correlationColumns(this.store[this.position(name)], other.keyColumn(name)) for name in wanted
+            ]
         Series("", Column.floats(values), Column.strings(wanted), "")
     }
 
@@ -3607,7 +4277,10 @@ public class DataFrame {
 
     // valueCounts over several columns gives one row per distinct combination, in
     // descending count order.
-    public function valueCounts(subset : List[String] = [], normalize : Bool = false) : DataFrame or Error {
+    public function valueCounts(
+        subset : List[String] = [],
+        normalize : Bool = false,
+    ) : DataFrame or Error {
         let wanted := if subset.length() == 0 then this.names else subset
         let gone := this.firstMissing(wanted)
         if gone != "" { return MissingColumn(gone) }
@@ -3623,7 +4296,12 @@ public class DataFrame {
             out.append(this.keyColumn(name).gather(chosen))
         }
         names.append(if normalize then "proportion" else "count")
-        out.append(if normalize then Column.floats(pick(counts, order).map(c => c.toDouble() / this.index.size.toDouble()).toList()) else Column.ints(pick(counts, order)))
+        out.append(
+            if normalize then Column.floats(
+                pick(counts, order).map(c => c.toDouble() / this.index.size.toDouble()).toList(),
+            )
+                else Column.ints(pick(counts, order)),
+        )
         DataFrame(names.toList(), out, Column.ints(indexRange(order.length())), "")
     }
 
@@ -3641,7 +4319,13 @@ public class DataFrame {
         GroupBy(this.copy(), keys)
     }
 
-    public function merge(other : DataFrame, on : String, how : String = "inner", leftSuffix : String = "_x", rightSuffix : String = "_y") : DataFrame or Error {
+    public function merge(
+        other : DataFrame,
+        on : String,
+        how : String = "inner",
+        leftSuffix : String = "_x",
+        rightSuffix : String = "_y",
+    ) : DataFrame or Error {
         let gone := this.firstMissing([on])
         let goneRight := other.firstMissing([on])
         if gone != "" { return MissingColumn(gone) }
@@ -3649,7 +4333,13 @@ public class DataFrame {
         mergeFrames(this, other, [on], [on], how, leftSuffix, rightSuffix)
     }
 
-    public function merge(other : DataFrame, on : List[String], how : String = "inner", leftSuffix : String = "_x", rightSuffix : String = "_y") : DataFrame or Error {
+    public function merge(
+        other : DataFrame,
+        on : List[String],
+        how : String = "inner",
+        leftSuffix : String = "_x",
+        rightSuffix : String = "_y",
+    ) : DataFrame or Error {
         let gone := this.firstMissing(on)
         let goneRight := other.firstMissing(on)
         if gone != "" { return MissingColumn(gone) }
@@ -3657,7 +4347,14 @@ public class DataFrame {
         mergeFrames(this, other, on, on, how, leftSuffix, rightSuffix)
     }
 
-    public function merge(other : DataFrame, leftOn : String, rightOn : String, how : String = "inner", leftSuffix : String = "_x", rightSuffix : String = "_y") : DataFrame or Error {
+    public function merge(
+        other : DataFrame,
+        leftOn : String,
+        rightOn : String,
+        how : String = "inner",
+        leftSuffix : String = "_x",
+        rightSuffix : String = "_y",
+    ) : DataFrame or Error {
         let gone := this.firstMissing([leftOn])
         let goneRight := other.firstMissing([rightOn])
         if gone != "" { return MissingColumn(gone) }
@@ -3684,7 +4381,9 @@ public class DataFrame {
             let mut stacked := Column.ints([])
             let mut started := false
             for (frame in frames) {
-                let piece := if frame.hasColumn(name) then frame.store[frame.position(name)].copy() else Column.empty(KIND_FLOAT, frame.length())
+                let piece :=
+                    if frame.hasColumn(name) then frame.store[frame.position(name)].copy()
+                    else Column.empty(KIND_FLOAT, frame.length())
                 stacked = if started then joinMixed(stacked, piece) else piece
                 started = true
             }
@@ -3693,7 +4392,8 @@ public class DataFrame {
         DataFrame(names.toList(), out, index, "")
     }
 
-    public function append(other : DataFrame) : DataFrame = DataFrame.concat([this.copy(), other.copy()])
+    public function append(other : DataFrame) : DataFrame =
+        DataFrame.concat([this.copy(), other.copy()])
 
     // concatColumns places frames side by side. This library is positional, so every frame
     // must have the same row count and the column names must be distinct.
@@ -3707,7 +4407,9 @@ public class DataFrame {
         for (frame in frames) {
             if frame.length() != rows { return BadArgument("concatColumns needs equal row counts") }
             for (name in frame.names) {
-                if names.toList().contains(name) { return BadArgument("column " + name + " appears twice") }
+                if names.toList().contains(name) {
+                    return BadArgument("column " + name + " appears twice")
+                }
                 names.append(name)
                 out.append(frame.keyColumn(name))
             }
@@ -3716,7 +4418,12 @@ public class DataFrame {
     }
 
     // pivotTable lays one column's values across the top, aggregating a third column.
-    public function pivotTable(index : String, columns : String, values : String, aggfunc : String = "mean") : DataFrame or Error {
+    public function pivotTable(
+        index : String,
+        columns : String,
+        values : String,
+        aggfunc : String = "mean",
+    ) : DataFrame or Error {
         let gone := this.firstMissing([index, columns, values])
         if gone != "" { return MissingColumn(gone) }
         let rowKeys := this.seriesAt(this.position(index))
@@ -3729,13 +4436,27 @@ public class DataFrame {
         let columnLabels := columnKeys.data.gather(columnGroups).texts()
         let source := this.store[this.position(values)].copy()
         if aggfunc == "count" || ((aggfunc == "sum" || aggfunc == "mean") && source.isNumeric()) {
-            let out := pivotFastColumns(source, rowCodes, columnCodes, rowWidth, columnWidth, rowGroups, columnGroups, aggfunc)
+            let out :=
+                pivotFastColumns(
+                    source,
+                    rowCodes,
+                    columnCodes,
+                    rowWidth,
+                    columnWidth,
+                    rowGroups,
+                    columnGroups,
+                    aggfunc,
+                )
             let mut pivoted := DataFrame(columnLabels, out, rowLabels, index)
             pivoted.columnsLabel = columns
             return pivoted
         }
-        let rowOf := if rowKeys.data.kind == KIND_STR then rowKeys.data.strs.toList() else rowKeys.data.keys()
-        let columnOf := if columnKeys.data.kind == KIND_STR then columnKeys.data.strs.toList() else columnKeys.data.keys()
+        let rowOf :=
+            if rowKeys.data.kind == KIND_STR then rowKeys.data.strs.toList()
+            else rowKeys.data.keys()
+        let columnOf :=
+            if columnKeys.data.kind == KIND_STR then columnKeys.data.strs.toList()
+            else columnKeys.data.keys()
         let mut out : Array[Column] = Array.empty()
         for ((cl, cp) in columnLabels.zip(columnGroups)) {
             let items := [pivotCell(source, rowOf, columnOf, rp, cp, aggfunc) for rp in rowGroups]
@@ -3747,10 +4468,17 @@ public class DataFrame {
     }
 
     // melt turns wide columns into rows: one row per (original row, value column).
-    public function melt(idVars : List[String] = [], valueVars : List[String] = [], varName : String = "variable", valueName : String = "value") : DataFrame or Error {
+    public function melt(
+        idVars : List[String] = [],
+        valueVars : List[String] = [],
+        varName : String = "variable",
+        valueName : String = "value",
+    ) : DataFrame or Error {
         let gone := this.firstMissing(joinLists(idVars, valueVars))
         if gone != "" { return MissingColumn(gone) }
-        let values := if valueVars.length() == 0 then [name for name in this.names if !idVars.contains(name)] else valueVars
+        let values :=
+            if valueVars.length() == 0 then [name for name in this.names if !idVars.contains(name)]
+            else valueVars
         let rows := this.index.size * values.length()
         let mut names : Array[String] = Array.empty()
         let mut out : Array[Column] = Array.empty()
@@ -3764,9 +4492,9 @@ public class DataFrame {
         let mut started := false
         for (name in values) {
             let piece := this.store[this.position(name)].copy()
-            valueColumn = if started then
-                if valueColumn.kind == piece.kind then valueColumn.concat(piece) else joinMixed(valueColumn, piece)
-            else piece
+            valueColumn =
+                if started then if valueColumn.kind == piece.kind then valueColumn.concat(piece)
+                else joinMixed(valueColumn, piece) else piece
             started = true
         }
         names.append(valueName)
@@ -3781,7 +4509,10 @@ public class DataFrame {
         if gone != "" { return MissingColumn(gone) }
         let pairs := this.rowKeys([index, columns])
         if firstOccurrences(pairs).length() != pairs.length() {
-            return BadArgument("pivot needs unique (" + index + ", " + columns + ") pairs; use pivotTable to aggregate duplicates")
+            return BadArgument(
+                "pivot needs unique (" +
+                    index + ", " + columns + ") pairs; use pivotTable to aggregate duplicates",
+            )
         }
         this.pivotTable(index, columns, values, "first")
     }
@@ -3807,10 +4538,22 @@ public class DataFrame {
 
     // getDummies replaces the selected text and Bool columns with one Bool column per
     // observed value. An empty selection uses every text and Bool column.
-    public function getDummies(columns : List[String] = [], prefix : String = "", dropFirst : Bool = false, dummyNa : Bool = false) : DataFrame or Error {
+    public function getDummies(
+        columns : List[String] = [],
+        prefix : String = "",
+        dropFirst : Bool = false,
+        dummyNa : Bool = false,
+    ) : DataFrame or Error {
         let gone := this.firstMissing(columns)
         if gone != "" { return MissingColumn(gone) }
-        let chosen := if columns.length() == 0 then [name for name in this.names if this.store[this.position(name)].kind == KIND_STR || this.store[this.position(name)].kind == KIND_BOOL] else columns
+        let chosen :=
+            if columns.length() ==
+                0 then [
+                    name for name in this.names if this.store[this.position(name)].kind ==
+                            KIND_STR ||
+                        this.store[this.position(name)].kind == KIND_BOOL
+                ]
+            else columns
         let mut names : Array[String] = Array.empty()
         let mut out : Array[Column] = Array.empty()
         for (name in this.names) {
@@ -3847,7 +4590,9 @@ public class DataFrame {
         if this.store.length() == 0 { return DataFrame.empty() }
         let kind := this.store[0].kind
         let mut numeric := true
-        for (c in this.store) { if !c.isNumeric() { numeric = false } }
+        for (c in this.store) {
+            if !c.isNumeric() { numeric = false }
+        }
         if !numeric {
             for (c in this.store) {
                 if c.kind != kind { return BadArgument("transpose needs columns of one kind") }
@@ -3858,7 +4603,12 @@ public class DataFrame {
             let items := [scalarAt(this.store[c], r) for c in range(this.store.length())]
             out.append(columnOfScalars(items))
         }
-        DataFrame(this.index.texts(), out, Column.strings(this.names), if this.columnsLabel == "" then "" else this.columnsLabel)
+        DataFrame(
+            this.index.texts(),
+            out,
+            Column.strings(this.names),
+            if this.columnsLabel == "" then "" else this.columnsLabel,
+        )
     }
 
     // ---- conversion
@@ -3867,22 +4617,38 @@ public class DataFrame {
         let mut flat : Array[double] = Array.empty()
         let wanted := this.numericNames()
         for (i in range(this.index.size)) {
-            for (name in wanted) { flat.append(this.store[this.position(name)].toFloats().toArray()[i]) }
+            for (name in wanted) {
+                flat.append(this.store[this.position(name)].toFloats().toArray()[i])
+            }
         }
         Tensor(flat.toList(), shape = (this.index.size, wanted.length()))
     }
 
-    public function toCsv(separator : String = ",", header : Bool = true, includeIndex : Bool = false) : String {
+    public function toCsv(
+        separator : String = ",",
+        header : Bool = true,
+        includeIndex : Bool = false,
+    ) : String {
         let mut lines : Array[String] = Array.empty()
         let cells := this.csvCells(separator)
         if header {
-            let labels := if includeIndex then joinLists([csvField(this.indexName, separator)], this.names.map(n => csvField(n, separator)).toList()) else this.names.map(n => csvField(n, separator)).toList()
+            let labels :=
+                if includeIndex then joinLists(
+                    [csvField(this.indexName, separator)],
+                    this.names.map(n => csvField(n, separator)).toList(),
+                )
+                else this.names.map(n => csvField(n, separator)).toList()
             lines.append(labels.join(separator))
         }
         let indexTexts := this.index.texts()
         for (r in range(this.index.size)) {
             let fields := cells.map(column => column.toArray()[r]).toList()
-            let withIndex := if includeIndex then joinLists([csvField(indexTexts.toArray()[r], separator)], fields) else fields
+            let withIndex :=
+                if includeIndex then joinLists(
+                    [csvField(indexTexts.toArray()[r], separator)],
+                    fields,
+                )
+                else fields
             lines.append(withIndex.join(separator))
         }
         lines.toList().join("\n") + "\n"
@@ -3891,18 +4657,29 @@ public class DataFrame {
     function csvCells(separator : String) : List[List[String]] {
         let mut out : Array[List[String]] = Array.empty()
         for (c in this.store) {
-            let exact := if c.kind == KIND_FLOAT then c.floats.map(x => x.text()).toList() else c.texts()
-            out.append([if m then "" else csvField(t, separator) for (t, m) in exact.zip(c.missing)])
+            let exact :=
+                if c.kind == KIND_FLOAT then c.floats.map(x => x.text()).toList() else c.texts()
+            out.append(
+                [if m then "" else csvField(t, separator) for (t, m) in exact.zip(c.missing)],
+            )
         }
         out.toList()
     }
 
-    public static function parseCsv(text : String, separator : String = ",", header : Bool = true, skipRows : Int = 0, nRows : Int = -1) : DataFrame {
+    public static function parseCsv(
+        text : String,
+        separator : String = ",",
+        header : Bool = true,
+        skipRows : Int = 0,
+        nRows : Int = -1,
+    ) : DataFrame {
         let rows := dropCsvRows(parseCsvRows(text, separator), skipRows)
         match rows.first() {
             None => DataFrame.empty(),
             Some(firstRow) => {
-                let names := if header then firstRow.map(n => n.trim()).toList() else [i.text() for i in range(firstRow.length())]
+                let names :=
+                    if header then firstRow.map(n => n.trim()).toList()
+                    else [i.text() for i in range(firstRow.length())]
                 let rawBody := if header then dropCsvRows(rows, 1) else rows
                 let body := if nRows >= 0 then takeCsvRows(rawBody, nRows) else rawBody
                 let mut out : Array[Column] = Array.empty()
@@ -3914,14 +4691,19 @@ public class DataFrame {
         }
     }
 
-    public static function parseCsvLines(lines : List[String], separator : String = ",", header : Bool = true, skipRows : Int = 0, nRows : Int = -1) : DataFrame {
+    public static function parseCsvLines(
+        lines : List[String],
+        separator : String = ",",
+        header : Bool = true,
+        skipRows : Int = 0,
+        nRows : Int = -1,
+    ) : DataFrame {
         let (flat, width, rowCount) := parseCsvFlat(lines, separator)
         let first := skipRows
         if first >= rowCount || width == 0 { return DataFrame.empty() }
-        let names := if header then
-            [flat[first * width + k].trim() for k in range(width)]
-        else
-            [i.text() for i in range(width)]
+        let names :=
+            if header then [flat[first * width + k].trim() for k in range(width)]
+            else [i.text() for i in range(width)]
         let bodyStart := if header then first + 1 else first
         let bodyEnd := if nRows >= 0 then min(rowCount, bodyStart + nRows) else rowCount
         let n := max(0, bodyEnd - bodyStart)
@@ -3943,13 +4725,24 @@ public class DataFrame {
 
     public function text() : String {
         if this.names.length() == 0 || this.index.size == 0 {
-            return "Empty DataFrame\nColumns: [" + this.names.join(", ") + "]\nIndex: [" + this.index.texts().join(", ") + "]"
+            return "Empty DataFrame\nColumns: [" +
+                this.names.join(", ") + "]\nIndex: [" + this.index.texts().join(", ") + "]"
         }
         let collapse := [c.kind == KIND_STR || c.texts().all(v => v == "NaN") for c in this.store]
-        let lines := tableLines(this.names, this.index.texts(), this.columnTexts(), this.indexName, this.columnsLabel, collapse)
+        let lines :=
+            tableLines(
+                this.names,
+                this.index.texts(),
+                this.columnTexts(),
+                this.indexName,
+                this.columnsLabel,
+                collapse,
+            )
         let body := lines.join("\n")
         if this.index.size > MAX_ROWS {
-            body + "\n\n[" + this.index.size.text() + " rows x " + this.names.length().text() + " columns]"
+            body +
+                "\n\n[" +
+                this.index.size.text() + " rows x " + this.names.length().text() + " columns]"
         } else {
             body
         }
@@ -3957,11 +4750,14 @@ public class DataFrame {
 
     public function html() : String {
         if this.names.length() == 0 || this.index.size == 0 {
-            return "<div><p>Empty DataFrame</p><p>Columns: [" + htmlEscape(this.names.join(", ")) + "]</p></div>"
+            return "<div><p>Empty DataFrame</p><p>Columns: [" +
+                htmlEscape(this.names.join(", ")) + "]</p></div>"
         }
         let table := tableHtml(this.names, this.index.texts(), this.columnTexts(), this.indexName)
         if this.index.size > MAX_ROWS {
-            table + "<p>" + this.index.size.text() + " rows × " + this.names.length().text() + " columns</p>"
+            table +
+                "<p>" +
+                this.index.size.text() + " rows × " + this.names.length().text() + " columns</p>"
         } else {
             table
         }
@@ -3971,7 +4767,11 @@ public class DataFrame {
     public function cell(row : Int, column : String) : Scalar or Error {
         let gone := this.firstMissing([column])
         if gone != "" { return MissingColumn(gone) }
-        if row < 0 || row >= this.index.size { return BadArgument("row " + row.text() + " is outside 0 to " + (this.index.size - 1).text()) }
+        if row < 0 || row >= this.index.size {
+            return BadArgument(
+                "row " + row.text() + " is outside 0 to " + (this.index.size - 1).text(),
+            )
+        }
         scalarAt(this.store[this.position(column)], row)
     }
 
@@ -3998,36 +4798,72 @@ public class DataFrame {
         FrameEWM(this.copy(), alpha, adjust, minPeriods)
 
     // saveCsv writes the frame to a file.
-    public function saveCsv(path : String, separator : String = ",", includeIndex : Bool = false) : void or Error with Effects {
-        using w := create(path)? {
+    public function saveCsv(
+        path : String,
+        separator : String = ",",
+        includeIndex : Bool = false,
+    ) : void or Error with Effects {
+        using w := create(path)?{
             w.writeLine(this.toCsv(separator = separator, includeIndex = includeIndex).trim())?
         }
     }
 
     public function info() : void with Effects {
         let n := this.index.size
-        let counts := [countValid(this.store[i]).text() + " non-null" for i in range(this.store.length())]
+        let counts :=
+            [countValid(this.store[i]).text() + " non-null" for i in range(this.store.length())]
         let kinds := [this.store[i].dtype() for i in range(this.store.length())]
         let nameWidth := max(6, widest(this.names))
         let countWidth := max(14, widest(counts))
         let last := if n == 0 then "" else " to " + this.index.texts().toArray()[n - 1]
         print("<class 'kesdas.DataFrame'>")
-        print("RangeIndex: " + n.text() + " entries, " + (if n == 0 then "" else this.index.texts().toArray()[0]) + last)
+        print(
+            "RangeIndex: " +
+                n.text() +
+                " entries, " + (if n == 0 then "" else this.index.texts().toArray()[0]) + last,
+        )
         print("Data columns (total " + this.names.length().text() + " columns):")
-        print(" #   " + padRight("Column", nameWidth) + "  " + padRight("Non-Null Count", countWidth) + "  Dtype")
-        print("---  " + padRight("------", nameWidth) + "  " + padRight("--------------", countWidth) + "  -----")
+        print(
+            " #   " +
+                padRight("Column", nameWidth) +
+                "  " + padRight("Non-Null Count", countWidth) + "  Dtype",
+        )
+        print(
+            "---  " +
+                padRight("------", nameWidth) +
+                "  " + padRight("--------------", countWidth) + "  -----",
+        )
         for (i in range(this.names.length())) {
-            print(" " + padRight(i.text(), 3) + " " + padRight(this.names.toArray()[i], nameWidth) + "  " + padRight(counts.toArray()[i], countWidth) + "  " + kinds.toArray()[i])
+            print(
+                " " +
+                    padRight(i.text(), 3) +
+                    " " +
+                    padRight(this.names.toArray()[i], nameWidth) +
+                    "  " + padRight(counts.toArray()[i], countWidth) + "  " + kinds.toArray()[i],
+            )
         }
         let groups := sortedDistinct(kinds)
-        let summary := [label + "(" + [k for k in kinds if k == label].length().text() + ")" for label in groups]
+        let summary :=
+            [
+                label +
+                    "(" + [k for k in kinds if k == label].length().text() + ")" for label in groups
+            ]
         print("dtypes: " + summary.join(", "))
     }
 }
 
 // pivotFastColumns fills the pivot matrix in one pass. It handles the common
 // sum, mean and count statistics; the general path below keeps the rest.
-function pivotFastColumns(source : Column, rowCodes : List[Int], columnCodes : List[Int], rowWidth : Int, columnWidth : Int, rowGroups : List[Int], columnGroups : List[Int], statistic : String) : Array[Column] {
+function pivotFastColumns(
+    source : Column,
+    rowCodes : List[Int],
+    columnCodes : List[Int],
+    rowWidth : Int,
+    columnWidth : Int,
+    rowGroups : List[Int],
+    columnGroups : List[Int],
+    statistic : String,
+) : Array[Column] {
     let rows := rowGroups.length()
     let columns := columnGroups.length()
     let sums := Array(rows * columns, 0.0)
@@ -4080,22 +4916,31 @@ function pivotFastColumns(source : Column, rowCodes : List[Int], columnCodes : L
     }
     let mut out : Array[Column] = Array.empty()
     for (c in range(columns)) {
-        let items := [if counts[r * columns + c] == 0 then
-            Scalar.missing()
-        else if statistic == "count" then
-            Scalar.ofInt(counts[r * columns + c])
-        else if statistic == "mean" then
-            Scalar.ofFloat(sums[r * columns + c] / counts[r * columns + c].toDouble())
-        else if source.kind == KIND_INT then
-            Scalar.ofInt(wholeInt(sums[r * columns + c]))
-        else
-            Scalar.ofFloat(sums[r * columns + c]) for r in range(rows)]
+        let items :=
+            [
+                if counts[r * columns + c] == 0 then Scalar.missing()
+                    else if statistic == "count" then Scalar.ofInt(counts[r * columns + c])
+                    else if statistic ==
+                        "mean" then Scalar.ofFloat(
+                            sums[r * columns + c] / counts[r * columns + c].toDouble(),
+                        )
+                    else if source.kind ==
+                        KIND_INT then Scalar.ofInt(wholeInt(sums[r * columns + c]))
+                    else Scalar.ofFloat(sums[r * columns + c]) for r in range(rows)
+            ]
         out.append(columnOfScalars(items))
     }
     out
 }
 
-function pivotCell(source : Column, rowOf : List[String], columnOf : List[String], rp : Int, cp : Int, aggfunc : String) : Scalar {
+function pivotCell(
+    source : Column,
+    rowOf : List[String],
+    columnOf : List[String],
+    rp : Int,
+    cp : Int,
+    aggfunc : String,
+) : Scalar {
     let rows := rowOf.toArray()
     let cols := columnOf.toArray()
     let cells := [i for i in range(rows.length()) if rows[i] == rows[rp] && cols[i] == cols[cp]]
@@ -4104,9 +4949,15 @@ function pivotCell(source : Column, rowOf : List[String], columnOf : List[String
 
 // readCsv reads a CSV file into a frame: the first line names the columns, and each column
 // takes the narrowest kind that fits its entries.
-function readCsvSlow(path : String, separator : String, header : Bool, skipRows : Int, nRows : Int) : DataFrame or Error with Effects {
+function readCsvSlow(
+    path : String,
+    separator : String,
+    header : Bool,
+    skipRows : Int,
+    nRows : Int,
+) : DataFrame or Error with Effects {
     let mut lines : Array[String] = Array.empty()
-    using f := open(path)? {
+    using f := open(path)?{
         let mut reading := true
         while reading {
             match f.readLine() {
@@ -4118,13 +4969,24 @@ function readCsvSlow(path : String, separator : String, header : Bool, skipRows 
     DataFrame.parseCsvLines(lines.toList(), separator, header, skipRows, nRows)
 }
 
-
-function readCsvNative(path : String, separator : String, header : Bool, skipRows : Int, nRows : Int) : (List[String], List[Column], String) with Effects =
+function readCsvNative(
+    path : String,
+    separator : String,
+    header : Bool,
+    skipRows : Int,
+    nRows : Int,
+) : (List[String], List[Column], String) with Effects =
     __kesdasReadCsv(path, separator, header, skipRows, nRows)
 
 // readCsv takes the native columnar path for ordinary unquoted CSV. Quoted
 // records fall back to the general line parser so RFC 4180 quoting stays exact.
-public function readCsv(path : String, separator : String = ",", header : Bool = true, skipRows : Int = 0, nRows : Int = -1) : DataFrame or Error with Effects {
+public function readCsv(
+    path : String,
+    separator : String = ",",
+    header : Bool = true,
+    skipRows : Int = 0,
+    nRows : Int = -1,
+) : DataFrame or Error with Effects {
     let (names, columns, problem) := readCsvNative(path, separator, header, skipRows, nRows)
     let mut frame := DataFrame.empty()
     if problem == "__KESDAS_CSV_FALLBACK__" {
@@ -4134,7 +4996,10 @@ public function readCsv(path : String, separator : String = ",", header : Bool =
     } else if columns.length() == 0 {
         frame = DataFrame.empty()
     } else {
-        let first := match columns.first() { Some(column) => column, None => return DataFrame.empty() }
+        let first := match columns.first() {
+            Some(column) => column,
+            None => return DataFrame.empty(),
+        }
         let n := first.size
         let mut store : Array[Column] = Array.empty()
         for (column in columns) { store.append(column.copy()) }
@@ -4162,7 +5027,8 @@ function nthField(row : List[String], k : Int) : String {
     if k < items.length() { items[k] } else { "" }
 }
 
-function reversedStrings(xs : List[String]) : List[String] = pick(xs, reversedPositions(xs.length()))
+function reversedStrings(xs : List[String]) : List[String] =
+    pick(xs, reversedPositions(xs.length()))
 
 function rowRepresentatives(series : Series) : List[Int] = {
     let column := series.data
@@ -4171,8 +5037,7 @@ function rowRepresentatives(series : Series) : List[Int] = {
     orderBy(column, firstOccurrences(keys), true)
 }
 
-function correlation(a : Series, b : Series) : double =
-    __columnCorrelation(a.data, b.data)
+function correlation(a : Series, b : Series) : double = __columnCorrelation(a.data, b.data)
 
 function joinAll(groups : List[List[Int]]) : List[Int] {
     let mut out : Array[Int] = Array.empty()
@@ -4205,7 +5070,12 @@ public class FrameRolling {
             let c := this.frame.keyColumn(name)
             if c.isNumeric() {
                 names.append(name)
-                out.append(if statistic == 0 then rollingMean(c, this.window, this.minPeriods) else if statistic == 1 then rollingSum(c, this.window, this.minPeriods) else if statistic == 5 then rollingCount(c, this.window, this.minPeriods) else windowed(c, this.window, this.minPeriods, statistic))
+                out.append(
+                    if statistic == 0 then rollingMean(c, this.window, this.minPeriods)
+                        else if statistic == 1 then rollingSum(c, this.window, this.minPeriods)
+                        else if statistic == 5 then rollingCount(c, this.window, this.minPeriods)
+                        else windowed(c, this.window, this.minPeriods, statistic),
+                )
             }
         }
         DataFrame(names.toList(), out, this.frame.index.copy(), this.frame.indexName)
@@ -4391,12 +5261,34 @@ public class GroupBy {
                 let column := this.frame.keyColumn(name)
                 if !statisticNeedsNumbers(statistic) || column.isNumeric() {
                     names.append(name)
-                    if this.hasCodes && statistic != "count" then
-                        out.append(__columnGroupStat(column, this.codes, this.codeRank, this.groups.length(), if statistic == "sum" then 0 else 1))
-                    else if this.hasCodes then
-                        out.append(__columnGroupStat(column, this.codes, this.codeRank, this.groups.length(), 2))
-                    else
-                        out.append(aggregateGroups(column, this.ownerArray(), this.groups.length(), statistic))
+                    if this.hasCodes &&
+                            statistic !=
+                                "count" then out.append(
+                                    __columnGroupStat(
+                                        column,
+                                        this.codes,
+                                        this.codeRank,
+                                        this.groups.length(),
+                                        if statistic == "sum" then 0 else 1,
+                                    ),
+                                )
+                        else if this.hasCodes then out.append(
+                            __columnGroupStat(
+                                column,
+                                this.codes,
+                                this.codeRank,
+                                this.groups.length(),
+                                2,
+                            ),
+                        )
+                        else out.append(
+                            aggregateGroups(
+                                column,
+                                this.ownerArray(),
+                                this.groups.length(),
+                                statistic,
+                            ),
+                        )
                 }
             }
             return this.assemble(names.toList(), out)
@@ -4407,7 +5299,11 @@ public class GroupBy {
             let column := this.frame.keyColumn(name)
             if !statisticNeedsNumbers(statistic) || column.isNumeric() {
                 names.append(name)
-                out.append(columnOfScalars([aggregate(column.gather(group), statistic) for group in this.groups]))
+                out.append(
+                    columnOfScalars(
+                        [aggregate(column.gather(group), statistic) for group in this.groups],
+                    ),
+                )
             }
         }
         this.assemble(names.toList(), out)
@@ -4512,7 +5408,12 @@ public class GroupBy {
 
     // getGroup returns the rows of one group. It needs exactly one grouping column.
     function groupFor(label : Scalar) : DataFrame or Error {
-        if this.keys.length() != 1 { return BadArgument("getGroup needs exactly one grouping column; this GroupBy has " + this.keys.length().text()) }
+        if this.keys.length() != 1 {
+            return BadArgument(
+                "getGroup needs exactly one grouping column; this GroupBy has " +
+                    this.keys.length().text(),
+            )
+        }
         let keyName := match this.keys.first() { Some(k) => k, None => "" }
         let keyColumn := this.frame.keyColumn(keyName)
         let target := scalarKey(label)
@@ -4525,9 +5426,12 @@ public class GroupBy {
     }
 
     public function getGroup(label : Int) : DataFrame or Error = this.groupFor(Scalar.ofInt(label))
-    public function getGroup(label : String) : DataFrame or Error = this.groupFor(Scalar.ofString(label))
-    public function getGroup(label : double) : DataFrame or Error = this.groupFor(Scalar.ofFloat(label))
-    public function getGroup(label : Bool) : DataFrame or Error = this.groupFor(Scalar.ofBool(label))
+    public function getGroup(label : String) : DataFrame or Error =
+        this.groupFor(Scalar.ofString(label))
+    public function getGroup(label : double) : DataFrame or Error =
+        this.groupFor(Scalar.ofFloat(label))
+    public function getGroup(label : Bool) : DataFrame or Error =
+        this.groupFor(Scalar.ofBool(label))
 
     // transformAll gives every row the statistic of its group for every value column.
     public function transformAll(statistic : String) : DataFrame {
@@ -4553,7 +5457,12 @@ public class GroupBy {
                 if from >= 0 && from < group.length() { positions[i] = group.toArray()[from] }
             }
         }
-        Series(column, gatherGaps(source, positions.toList()), this.frame.index.copy(), this.frame.indexName)
+        Series(
+            column,
+            gatherGaps(source, positions.toList()),
+            this.frame.index.copy(),
+            this.frame.indexName,
+        )
     }
 
     public function diff(column : String, periods : Int = 1) : Series {
@@ -4596,7 +5505,10 @@ public class GroupBy {
                 }
             }
         }
-        let values := if source.kind == KIND_INT then Column.ofInts(out.map(x => wholeInt(x)).toList(), gone.toList()) else Column.ofFloats(out.toList(), gone.toList())
+        let values :=
+            if source.kind ==
+                KIND_INT then Column.ofInts(out.map(x => wholeInt(x)).toList(), gone.toList())
+            else Column.ofFloats(out.toList(), gone.toList())
         Series(column, values, this.frame.index.copy(), this.frame.indexName)
     }
 
@@ -4605,7 +5517,12 @@ public class GroupBy {
     public function cumMax(column : String) : Series = this.groupCumulative(column, 2)
     public function cumMin(column : String) : Series = this.groupCumulative(column, 3)
 
-    public function rank(column : String, ascending : Bool = true, method : String = "average", pct : Bool = false) : Series {
+    public function rank(
+        column : String,
+        ascending : Bool = true,
+        method : String = "average",
+        pct : Bool = false,
+    ) : Series {
         let source := this.frame.keyColumn(column)
         let gone := source.missing.toArray()
         let out := Array(this.frame.length(), 0.0)
@@ -4614,7 +5531,12 @@ public class GroupBy {
             let ranks := rankColumn(part, ascending, method, pct).toFloats().toArray()
             for ((k, i) in group.enumerate()) { out[i] = ranks[k] }
         }
-        Series(column, Column.ofFloats(out.toList(), gone.toList()), this.frame.index.copy(), this.frame.indexName)
+        Series(
+            column,
+            Column.ofFloats(out.toList(), gone.toList()),
+            this.frame.index.copy(),
+            this.frame.indexName,
+        )
     }
 
     public function sem() : DataFrame = this.aggregate("sem")
@@ -4626,7 +5548,11 @@ public class GroupBy {
     // quantile gives each numeric value column its group-wise quantile.
     function quantileColumn(name : String, q : double) : Column {
         let column := this.frame.keyColumn(name)
-        columnOfScalars([Scalar.ofFloat(quantileOf(validFloats(column.gather(group)), q)) for group in this.groups])
+        columnOfScalars(
+            [
+                Scalar.ofFloat(quantileOf(validFloats(column.gather(group)), q)) for group in this.groups
+            ],
+        )
     }
 
     public function quantile(q : double) : DataFrame {
@@ -4644,7 +5570,11 @@ public class GroupBy {
             if this.frame.hasColumn(name) {
                 let column := this.frame.keyColumn(name)
                 names.append(name + "_" + statistic)
-                out.append(columnOfScalars([aggregate(column.gather(group), statistic) for group in this.groups]))
+                out.append(
+                    columnOfScalars(
+                        [aggregate(column.gather(group), statistic) for group in this.groups],
+                    ),
+                )
             }
         }
         this.assemble(names.toList(), out)
@@ -4660,16 +5590,32 @@ public class GroupBy {
     // transform gives every row the statistic of its group, in the original row order.
     public function transform(column : String, statistic : String) : Series {
         let source := this.frame.keyColumn(column)
-        let results := columnOfScalars([aggregate(source.gather(group), statistic) for group in this.groups])
+        let results :=
+            columnOfScalars([aggregate(source.gather(group), statistic) for group in this.groups])
         let mut owner : Array[Int] = Array.generate(this.frame.length(), i => 0)
         for ((g, group) in this.groups.enumerate()) {
             for (i in group) { owner[i] = g }
         }
-        Series(column, results.gather(owner.toList()), this.frame.index.copy(), this.frame.indexName)
+        Series(
+            column,
+            results.gather(owner.toList()),
+            this.frame.index.copy(),
+            this.frame.indexName,
+        )
     }
 }
 
-function mergeRows(left : DataFrame, right : DataFrame, leftOn : List[String], rightOn : List[String], how : String, leftSuffix : String, rightSuffix : String, leftPositions : List[Int], rightPositions : List[Int]) : DataFrame {
+function mergeRows(
+    left : DataFrame,
+    right : DataFrame,
+    leftOn : List[String],
+    rightOn : List[String],
+    how : String,
+    leftSuffix : String,
+    rightSuffix : String,
+    leftPositions : List[Int],
+    rightPositions : List[Int],
+) : DataFrame {
     let mut names : Array[String] = Array.empty()
     let mut columns : Array[Column] = Array.empty()
     for ((k, rk) in leftOn.zip(rightOn)) {
@@ -4680,17 +5626,22 @@ function mergeRows(left : DataFrame, right : DataFrame, leftOn : List[String], r
     }
     for (name in left.names) {
         if !leftOn.contains(name) {
-            names.append(if right.hasColumn(name) && !rightOn.contains(name) then name + leftSuffix else name)
+            names.append(
+                if right.hasColumn(name) && !rightOn.contains(name) then name + leftSuffix else name,
+            )
             columns.append(gatherGaps(left.keyColumn(name), leftPositions))
         }
     }
     for (name in right.names) {
         if !rightOn.contains(name) {
-            names.append(if left.hasColumn(name) && !leftOn.contains(name) then name + rightSuffix else name)
+            names.append(
+                if left.hasColumn(name) && !leftOn.contains(name) then name + rightSuffix else name,
+            )
             columns.append(gatherGaps(right.keyColumn(name), rightPositions))
         }
     }
-    let result := DataFrame(names.toList(), columns, Column.ints(indexRange(leftPositions.length())), "")
+    let result :=
+        DataFrame(names.toList(), columns, Column.ints(indexRange(leftPositions.length())), "")
     if how == "outer" {
         // pandas orders the rows of an outer merge by their keys.
         let mut order := indexRange(result.length())
@@ -4702,7 +5653,15 @@ function mergeRows(left : DataFrame, right : DataFrame, leftOn : List[String], r
     result
 }
 
-function mergeFrames(left : DataFrame, right : DataFrame, leftOn : List[String], rightOn : List[String], how : String, leftSuffix : String, rightSuffix : String) : DataFrame {
+function mergeFrames(
+    left : DataFrame,
+    right : DataFrame,
+    leftOn : List[String],
+    rightOn : List[String],
+    how : String,
+    leftSuffix : String,
+    rightSuffix : String,
+) : DataFrame {
     let leftKeys := compositeKeys(left, leftOn)
     let rightKeys := compositeKeys(right, rightOn)
     if how == "left" && leftOn.length() == 1 && rightOn.length() == 1 {
@@ -4766,7 +5725,17 @@ function mergeFrames(left : DataFrame, right : DataFrame, leftOn : List[String],
             }
         }
     }
-    mergeRows(left, right, leftOn, rightOn, how, leftSuffix, rightSuffix, leftRows.toList(), rightRows.toList())
+    mergeRows(
+        left,
+        right,
+        leftOn,
+        rightOn,
+        how,
+        leftSuffix,
+        rightSuffix,
+        leftRows.toList(),
+        rightRows.toList(),
+    )
 }
 
 function compositeKeys(frame : DataFrame, names : List[String]) : List[String] {

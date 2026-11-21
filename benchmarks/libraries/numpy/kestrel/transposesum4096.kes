@@ -5,7 +5,7 @@ let mut checksum := 0.0
 let mut sliceTotal := 0.0
 for (let rep : Int = 0; rep < reps; rep = rep + 1) {
     checksum = checksum + A.T.sum()
-    sliceTotal = sliceTotal + A[0:1024, 0:1024].sum()
+    sliceTotal = sliceTotal + A[0 : 1024, 0 : 1024].sum()
 }
 print(f"{checksum:.6f}")
 print(f"{sliceTotal:.6f}")

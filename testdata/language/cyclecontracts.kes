@@ -1,9 +1,10 @@
 import testdata.language.cyclecontracta as a
 import testdata.language.cyclecontractb as b
-print(match b.value(4) {4 => true, _ => false,})
-print(match b.zero() {RuntimeError.Contract(_) => true, _ => false,})
+
+print(match b.value(4) { 4 => true, _ => false })
+print(match b.zero() { RuntimeError.Contract(_) => true, _ => false })
 let gate := a.Gate()
-print(match b.gate(gate,0) {RuntimeError.Contract(_) => true, _ => false,})
-print(match b.gate(gate,3) {3 => true, _ => false,})
+print(match b.gate(gate, 0) { RuntimeError.Contract(_) => true, _ => false })
+print(match b.gate(gate, 3) { 3 => true, _ => false })
 let guard := a.checked(_)
-print(match guard(0) {RuntimeError.Contract(_) => true, _ => false,})
+print(match guard(0) { RuntimeError.Contract(_) => true, _ => false })

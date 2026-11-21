@@ -4,10 +4,8 @@ import std.kesnet.{LSTM, Linear, mseLoss}
 import std.kesnet.optim.{Adam}
 
 Variable.seed(13)
-let sequence := Tensor([
-    1.0, 0.0, 0.5, 1.0, 1.5, 0.0,
-    0.0, 1.0, 0.5, 0.0, 1.5, 1.0,
-], shape = (3, 2, 2))
+let sequence :=
+    Tensor([1.0, 0.0, 0.5, 1.0, 1.5, 0.0, 0.0, 1.0, 0.5, 0.0, 1.5, 1.0], shape = (3, 2, 2))
 let inputs := Variable.fromTensor(sequence)
 let expected := Variable.fromArray([3.0, 3.0].toArray(), (2, 1))
 

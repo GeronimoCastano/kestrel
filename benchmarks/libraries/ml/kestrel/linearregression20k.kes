@@ -5,7 +5,9 @@ import std.ml.{LinearRegression, meanSquaredError}
 
 import std.process.{args}
 
-let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 500 }) else 500
+let REPETITIONS :=
+    if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 500 })
+    else 500
 
 let X := Tensor.generate((20000, 16), (i, j) => (((i * 31 + j * 17) % 101) - 50).toDouble() / 10.0)
 let y := Tensor.generate((20000,), i => 3.0 * X[i, 0] - 2.0 * X[i, 1] + 0.5 * X[i, 2] + 1.0)

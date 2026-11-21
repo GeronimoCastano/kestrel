@@ -1,7 +1,7 @@
 // scatter20k: 20,000 scatter points with per-point sizes.
+import c "stdlib.h"
 import std.kesplot as plt
 import std.math.{sin}
-import c "stdlib.h"
 
 function quote(text : String) : String = "'" + text.replace("'", "'\\''") + "'"
 
@@ -9,7 +9,7 @@ function reportSize(path : String) : void or Error with Effects {
     let sizePath := path + ".size"
     let status := unsafe { system("wc -c < " + quote(path) + " > " + quote(sizePath)) }
     if status.toInt() != 0 { return Error("cannot measure " + path) }
-    using reader := open(sizePath)? {
+    using reader := open(sizePath)?{
         let line := reader.readLine()?
         print(parseInt(line.trim())?)
     }
@@ -31,7 +31,14 @@ function main() : void or Error with Effects {
     }
 
     let fig := plt.Figure(width = 8.0, height = 6.0)
-    fig.scatter(xs.toList(), ys.toList(), sizes.toList(), label = "points", marker = "o", alpha = 0.8)
+    fig.scatter(
+        xs.toList(),
+        ys.toList(),
+        sizes.toList(),
+        label = "points",
+        marker = "o",
+        alpha = 0.8,
+    )
     fig.title("20,000 scatter points")
     fig.xLabel("x")
     fig.yLabel("y")

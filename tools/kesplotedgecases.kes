@@ -1,5 +1,5 @@
 import std.kesplot as plt
-import std.math.{sin, cos}
+import std.math.{cos, sin}
 
 function base() : plt.Figure {
     let fig := plt.Figure(style = plt.Style.standard())
@@ -15,6 +15,7 @@ function empty(out : String) : void or Error with Effects {
     fig.title("Empty")
     fig.save(out + "/empty.png")?
 }
+
 function one(out : String) : void or Error with Effects {
     let fig := base()
     fig.plot([1.0], [2.0], marker = "o", label = "one")
@@ -22,6 +23,7 @@ function one(out : String) : void or Error with Effects {
     fig.legend()
     fig.save(out + "/one.png")?
 }
+
 function nans(out : String) : void or Error with Effects {
     let nan := 0.0 / 0.0
     let fig := base()
@@ -29,6 +31,7 @@ function nans(out : String) : void or Error with Effects {
     fig.title("Missing values")
     fig.save(out + "/nans.png")?
 }
+
 function infinities(out : String) : void or Error with Effects {
     let inf := 1.0 / 0.0
     let fig := base()
@@ -36,12 +39,14 @@ function infinities(out : String) : void or Error with Effects {
     fig.title("Infinity")
     fig.save(out + "/inf.png")?
 }
+
 function constants(out : String) : void or Error with Effects {
     let fig := base()
     fig.plot([0.0, 1.0, 2.0], [2.0, 2.0, 2.0], label = "constant")
     fig.title("Constant")
     fig.save(out + "/constant.png")?
 }
+
 function negative(out : String) : void or Error with Effects {
     let fig := base()
     fig.bar(["a", "b", "c"], [-2.0, 3.0, -1.0], label = "delta")
@@ -49,6 +54,7 @@ function negative(out : String) : void or Error with Effects {
     fig.hLine(0.0, color = "black")
     fig.save(out + "/negative.png")?
 }
+
 function stacked(out : String) : void or Error with Effects {
     let fig := base()
     fig.bar(["a", "b", "c"], [1.0, 2.0, 3.0], label = "a")
@@ -57,6 +63,7 @@ function stacked(out : String) : void or Error with Effects {
     fig.legend()
     fig.save(out + "/stacked.png")?
 }
+
 function dense(out : String) : void or Error with Effects {
     let names := ["category " + i.text() for i in range(24)]
     let values := [sin(i.toDouble()) * 5.0 + 6.0 for i in range(24)]
@@ -66,6 +73,7 @@ function dense(out : String) : void or Error with Effects {
     fig.xLabel("category name")
     fig.save(out + "/dense.png")?
 }
+
 function logzero(out : String) : void or Error with Effects {
     let fig := base()
     fig.plot([0.0, 1.0, 2.0, 3.0], [0.0, 1.0, 10.0, 100.0], label = "log")
@@ -73,13 +81,17 @@ function logzero(out : String) : void or Error with Effects {
     fig.title("Log with zero")
     fig.save(out + "/logzero.png")?
 }
+
 function longtitle(out : String) : void or Error with Effects {
     let fig := base()
     fig.plot([0.0, 1.0], [0.0, 1.0])
-    fig.title("A deliberately very long figure title that must not be clipped at the edge of the canvas")
+    fig.title(
+        "A deliberately very long figure title that must not be clipped at the edge of the canvas",
+    )
     fig.xLabel("A deliberately very long x axis label that also needs enough room")
     fig.save(out + "/longtitle.png")?
 }
+
 function multiline(out : String) : void or Error with Effects {
     let fig := base()
     fig.plot([0.0, 1.0], [0.0, 1.0])
@@ -87,6 +99,7 @@ function multiline(out : String) : void or Error with Effects {
     fig.xLabel("one\ntwo")
     fig.save(out + "/multiline.png")?
 }
+
 function unicode(out : String) : void or Error with Effects {
     let fig := base()
     fig.plot([0.0, 1.0], [0.0, 1.0], label = "café")
@@ -95,6 +108,7 @@ function unicode(out : String) : void or Error with Effects {
     fig.legend()
     fig.save(out + "/unicode.png")?
 }
+
 function badmath(out : String) : void with Effects {
     let fig := base()
     fig.plot([0.0, 1.0], [0.0, 1.0])
@@ -104,12 +118,14 @@ function badmath(out : String) : void with Effects {
         _ => { print("badmath unexpectedly saved") },
     }
 }
+
 function zeroPie(out : String) : void or Error with Effects {
     let fig := base()
     fig.pie([0.0, 0.0, 0.0], ["a", "b", "c"])
     fig.title("Zero pie")
     fig.save(out + "/zeropie.png")?
 }
+
 function flatHeat(out : String) : void or Error with Effects {
     let matrix := [[1.0, 1.0], [1.0, 1.0]]
     let fig := base()
@@ -117,6 +133,7 @@ function flatHeat(out : String) : void or Error with Effects {
     fig.title("Flat heatmap")
     fig.save(out + "/flatheat.png")?
 }
+
 function flatContour(out : String) : void or Error with Effects {
     let matrix := [[1.0, 1.0, 1.0], [1.0, 1.0, 1.0], [1.0, 1.0, 1.0]]
     let fig := base()
@@ -124,6 +141,7 @@ function flatContour(out : String) : void or Error with Effects {
     fig.title("Flat contour")
     fig.save(out + "/flatcontour.png")?
 }
+
 function emptyHist(out : String) : void or Error with Effects {
     let fig := base()
     let values : List[double] = []
@@ -131,6 +149,7 @@ function emptyHist(out : String) : void or Error with Effects {
     fig.title("Empty histogram")
     fig.save(out + "/emptyhist.png")?
 }
+
 function ninePanels(out : String) : void or Error with Effects {
     let fig := base()
     fig.subplots(3, 3)
@@ -141,6 +160,7 @@ function ninePanels(out : String) : void or Error with Effects {
     }
     fig.save(out + "/nine.png")?
 }
+
 function main() : void or Error with Effects {
     let out := "/tmp/kesplot-edge"
     empty(out)?

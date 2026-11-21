@@ -1,12 +1,18 @@
 // Accents may be separate character codes; spelling stays exact.
 function sommé(á : Int, b́ : Int = 2) : Int = á + b́
+
 class ǅata[T] {
     public final valeuŕ : T
-    new(move valeuŕ : T) {this.valeuŕ=valeuŕ}
+    new(move valeuŕ : T) { this.valeuŕ = valeuŕ }
 }
-enum État { Prêt
-Attente }
-function numéro(état : État) : Int = match état {Prêt => 1, Attente => 0,}
+
+enum État {
+    Prêt
+    Attente
+}
+
+function numéro(état : État) : Int = match état { Prêt => 1, Attente => 0 }
+
 const LIMITÉ : Int = 3
 let 数 := 4
 let café := 5

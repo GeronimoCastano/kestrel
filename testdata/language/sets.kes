@@ -6,7 +6,15 @@ theorem setApply[U](x : U, A : Set[U], B : Set[U], h1 : A ⊆ B, h2 : x ∈ A) :
     exact h1(h2)
 }
 
-theorem setHave[U](x : U, A : Set[U], B : Set[U], C : Set[U], h1 : A ⊆ B, h2 : B ⊆ C, h3 : x ∈ A) : x ∈ C by {
+theorem setHave[U](
+    x : U,
+    A : Set[U],
+    B : Set[U],
+    C : Set[U],
+    h1 : A ⊆ B,
+    h2 : B ⊆ C,
+    h3 : x ∈ A,
+) : x ∈ C by {
     have h4 := h1(h3)
     exact h2(h4)
 }
@@ -32,7 +40,14 @@ theorem useTrans[U](A : Set[U], B : Set[U], C : Set[U], h1 : A ⊆ B, h2 : B ⊆
     exact subsetTrans(A, B, C)
 }
 
-theorem setImp[U](x : U, A : Set[U], B : Set[U], C : Set[U], h1 : A ⊆ B, h2 : x ∈ B -> x ∈ C) : x ∈ A -> x ∈ C by {
+theorem setImp[U](
+    x : U,
+    A : Set[U],
+    B : Set[U],
+    C : Set[U],
+    h1 : A ⊆ B,
+    h2 : x ∈ B -> x ∈ C,
+) : x ∈ A -> x ∈ C by {
     intro h3
     have h4 := h1(h3)
     exact h2(h4)
