@@ -43,11 +43,13 @@ assert.strictEqual(
     '/work/app',
     tree('/work/app/kestrel.project', '/work/app/vendor/kestrel.project')
   ),
-  path.resolve('/work/app')
+  '/work/app'
 );
+// The workspace folder comes back as given; a found package is a resolved path, which
+// on Windows gains the drive.
 assert.strictEqual(
   project.rootFor('/work/app/thing.kes', '/work/app', tree('/work/app/kestrel.project')),
-  path.resolve('/work/app')
+  '/work/app'
 );
 assert.strictEqual(
   project.rootFor('/work/planner/src/thing.kes', '/work', tree('/work/planner/kestrel.project')),

@@ -6,6 +6,11 @@ const path = require('path');
 const { execFileSync } = require('child_process');
 const imports = require('../out/imports');
 const { loadExtension, labelsAt, hoverAt, signatureAt } = require('../test-support/harness');
+// A file URL Git accepts on every platform: file:///C:/... on Windows.
+const fileUrl = folder => {
+  const slashed = folder.split(path.sep).join('/');
+  return slashed.startsWith('/') ? `file://${slashed}` : `file:///${slashed}`;
+};
 const temporary = fs.mkdtempSync(path.join(os.tmpdir(), 'kestrel-locked-editor-'));
 const previous = process.env.XDG_CACHE_HOME;
 process.env.XDG_CACHE_HOME = path.join(temporary, 'cache');
@@ -33,7 +38,7 @@ private theorem hidden():0=0{rfl}
   git(['init', '--quiet']); git(['add', '.']);
   git(['-c','user.name=Editor test','-c','user.email=editor@example.invalid','commit','--quiet','-m','Fixture']);
   const commit = git(['rev-parse','HEAD']).toString().trim();
-  fs.writeFileSync(path.join(app, 'kestrel.project'), `package app\ndepends geometry from "file://${upstream}" at "${commit}"\n`);
+  fs.writeFileSync(path.join(app, 'kestrel.project'), `package app\ndepends geometry from "${fileUrl(upstream)}" at "${commit}"\n`);
   const compiler = path.resolve(__dirname, '../../../target/release/kestrel');
   execFileSync(compiler, ['fetch'], {cwd:app, stdio:'pipe'});
   const filename = path.join(app, 'main.kes');
