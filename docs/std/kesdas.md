@@ -20,6 +20,8 @@ print(revenue.groupBy("region")?.sum())
 A frame is built from named columns. Every operation returns a new frame or a
 `Series`; nothing is changed in place unless the method says `mut`.
 
+This is the guide. The [reference](kesdas-api.md) lists every member of `std.kesdas` with its signature and arguments.
+
 ## Types
 
 | Type | Holds |

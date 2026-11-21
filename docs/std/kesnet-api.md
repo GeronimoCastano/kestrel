@@ -1,5 +1,7 @@
 # std.kesnet reference
 
+Part of [`std.kesnet`](kesnet.md); this page lists its members, the guide explains the workflow.
+
 Every public member of `std.kesnet`, `std.kesnet.data` and `std.kesnet.optim`.
 
 Three module paths make up the library, and each binds the last part of its

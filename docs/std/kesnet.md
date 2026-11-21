@@ -30,6 +30,8 @@ A model is a `Module`: a class with `forward`, and the parameters it registers.
 `Sequential` runs its children in order. `box` wraps a value so a
 `List[Module]` can hold different subclasses.
 
+This is the guide. The [reference](kesnet-api.md) lists every member of `std.kesnet` with its signature and arguments.
+
 ## Variables
 
 | Call | Meaning |

@@ -1,5 +1,7 @@
 # std.kesdas reference
 
+Part of [`std.kesdas`](kesdas.md); this page lists its members, the guide explains the workflow.
+
 Every public member of `std.kesdas`, grouped by type. The signature column
 names each argument with its type and its default; a method's receiver is implicit.
 

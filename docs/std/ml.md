@@ -23,6 +23,8 @@ The shape of the API is the same everywhere: a static `fit` returns a *fitted*
 value, and the fitted value answers `predict` or `transform`. The training data
 is not kept.
 
+This is the guide. The [reference](ml-api.md) lists every member of `std.ml` with its signature and arguments.
+
 ## Preprocessing
 
 | Class | Fitted value | Methods and fields |

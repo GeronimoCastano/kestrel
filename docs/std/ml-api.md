@@ -1,5 +1,7 @@
 # std.ml reference
 
+Part of [`std.ml`](ml.md); this page lists its members, the guide explains the workflow.
+
 Every public member of `std.ml`. The path of each member is written from the
 package root, as in `ml.LinearRegression.fit`; after `import std.ml` the
 namespace is `ml`.
