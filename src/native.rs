@@ -2146,7 +2146,7 @@ impl Emitter<'_> {
                     if !self.program.python_sites.is_empty() {
                         self.line(
                             depth + 1,
-                            "environment->python_callback = k_python_callback_depth != 0;",
+                            "environment->python_callback = k_python_depth() != 0;",
                         );
                     }
                     for (i, (atom, ty, mode)) in captures.iter().enumerate() {
@@ -2652,7 +2652,7 @@ fn emit_tasks(program: &Program, output: &mut String) -> Result<(), String> {
             }
             writeln!(output,"}} KTaskEnv_{id};\nstatic KError k_task_run_{id}(void *payload) {{\n    KTaskEnv_{id} *environment = payload;").unwrap();
             if !program.python_sites.is_empty() {
-                writeln!(output, "    size_t previous_callback = k_python_callback_depth;\n    k_python_callback_depth = environment->python_callback ? 1 : 0;").unwrap();
+                writeln!(output, "    size_t previous_callback = k_python_depth();\n    k_python_set_depth(environment->python_callback ? 1 : 0);").unwrap();
             }
             let mut function = Function {
                 name: format!("task_{id}"),
@@ -2769,7 +2769,7 @@ fn emit_tasks(program: &Program, output: &mut String) -> Result<(), String> {
             emitter.drop_slots(&owned, 1);
             output.push_str(&emitter.output);
             if !program.python_sites.is_empty() {
-                writeln!(output, "    k_python_callback_depth = previous_callback;").unwrap();
+                writeln!(output, "    k_python_set_depth(previous_callback);").unwrap();
             }
             writeln!(output, "    return error;\n}}").unwrap();
         }
