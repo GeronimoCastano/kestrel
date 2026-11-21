@@ -34,22 +34,29 @@ they share one toolchain.
 
 ## Try it
 
-You need Rust 1.95 or newer and Clang. Kestrel ships as one binary.
+One command installs Kestrel and puts `kestrel` on your `PATH`.
+
+macOS and Linux, with [Homebrew](https://brew.sh):
 
 ```sh
-git clone https://github.com/GeronimoCastano/kestrel
-cd kestrel
-cargo build --release
+brew install GeronimoCastano/kestrel/kestrel
 ```
 
-Hello world is a single line. Save it as `hello.kes`:
+Windows, in PowerShell:
+
+```powershell
+irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
+```
+
+Both bring everything Kestrel uses: a C compiler, LAPACK for linear algebra and
+Z3 for `smt` proofs. Hello world is a single line. Save it as `hello.kes`:
 
 ```kestrel
 print("Hello, Kestrel!")
 ```
 
 ```sh
-./target/release/kestrel run hello.kes
+kestrel run hello.kes
 ```
 
 ```text
@@ -347,18 +354,25 @@ workloads Kestrel still loses.
 
 ## Install
 
-Homebrew puts the compiler on your `PATH` in one step:
+| Platform | Command | What it brings |
+|---|---|---|
+| macOS (Apple silicon, Intel) | `brew install GeronimoCastano/kestrel/kestrel` | The compiler and Z3. Clang comes with the Command Line Tools Homebrew installs, LAPACK with macOS. |
+| Linux x86_64 | `brew install GeronimoCastano/kestrel/kestrel` | The compiler, Clang, OpenBLAS and Z3 from Homebrew. |
+| Windows 10 1903 or newer, x86_64 | `irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 \| iex` | The compiler with its own Clang (llvm-mingw), OpenBLAS and Z3. No Visual Studio, no administrator rights. |
 
-```sh
-brew install GeronimoCastano/kestrel/kestrel
-```
+`brew upgrade kestrel` updates a Homebrew install; running the Windows command
+again updates a Windows one. The Windows installer writes to
+`%LOCALAPPDATA%\Programs\Kestrel`, adds its `bin` folder to your user `PATH`, and
+installs the VS Code extension when `code` is on `PATH`. To remove it, delete that
+folder and its `PATH` entry.
 
-A plain `brew install kestrel` needs the formula in Homebrew core, and this
-project is not there yet, so the tapped name carries the owner. The tap builds
-from source, so Homebrew fetches Rust as a build dependency and the build takes
-about a minute.
+Every [release](https://github.com/GeronimoCastano/kestrel/releases) also has the
+archives these commands use: `kestrel-<target>.tar.gz` for macOS and Linux, and a
+complete `kestrel-x86_64-pc-windows-msvc.zip`, with `SHA256SUMS`. An unpacked
+macOS or Linux archive needs Clang on `PATH`; Linux also wants `liblapack` or
+OpenBLAS from your distribution for `std.linalg`.
 
-From source, with Rust and Clang:
+From source, with Rust 1.95 or newer and Clang:
 
 ```sh
 git clone https://github.com/GeronimoCastano/kestrel
@@ -366,43 +380,20 @@ cd kestrel
 cargo build --release
 ```
 
-| Piece | Requirement |
-|---|---|
-| Compiler | Rust 1.95 or newer (`cargo build --release`) |
-| Running and building | Clang on `PATH` |
-| Plots as PNG, JPEG or PDF | `rsvg-convert`, ImageMagick or `sips` for JPEG, `latex` and `dvisvgm` for TeX labels |
-| `smt` goals in proofs | Z3 on `PATH` (optional) |
-| Jupyter | Python 3.9 or newer and `ipykernel` |
+`KESTREL_CC`, `KESTREL_LAPACK` and `KESTREL_Z3` name a C compiler, a LAPACK
+library and a Z3 executable when you want ones other than Kestrel would find.
 
 ### Supported platforms
 
-| Platform | Status | C toolchain |
-|---|---|---|
-| macOS, Apple silicon and Intel | Supported, the reference platform | Xcode Command Line Tools (`xcode-select --install`) |
-| Linux x86_64 (glibc) | Supported | `clang` from your distribution |
-| Windows 10 1903 or newer, x86_64 | Supported | LLVM and the Visual Studio Build Tools |
+CI runs the full test suite on macOS, Linux and Windows for every pull request,
+installs each release the way the commands above do, and checks that a program
+using Clang, LAPACK and Z3 runs. Kestrel is benchmarked on macOS.
 
-CI runs the full test suite on all three for every pull request, and each
-release ships a binary for each: tarballs for macOS and Linux, a zip for
-Windows. Kestrel is benchmarked on macOS.
-
-On Windows, install LLVM for `clang` and the Build Tools for the MSVC linker and
-the Windows SDK, which Clang finds on its own:
-
-```powershell
-winget install LLVM.LLVM
-winget install Microsoft.VisualStudio.2022.BuildTools --override "--quiet --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
-```
-
-Then unpack the release zip and put `kestrel.exe` on your `PATH`, or build it
-with `cargo build --release`. `kestrel build -o hello hello.kes` writes
-`hello.exe`. Two features wait on Windows and stop with an error that says so:
-Python interop, and project C files inside `kestrel session` (`kestrel run` and
-`kestrel build` compile them).
-
-The numerical layer links your system's LAPACK, the standard linear-algebra
-library: Accelerate on macOS, `liblapack` or OpenBLAS on Linux, and
-`libopenblas.dll` on your `PATH` on Windows.
+On Windows, Python interop and project C files inside `kestrel session` are not
+available yet; both stop with an error that says so. `kestrel run` and
+`kestrel build` compile project C files as on the other platforms. Kestrel also
+runs with Clang for MSVC when LLVM and the Visual Studio Build Tools are on
+`PATH`.
 
 ## Commands
 
@@ -483,8 +474,11 @@ search **Kestrel for VS Code**, published by `kestrel-lang`. The packaged VSIX i
 also on the [releases page](https://github.com/GeronimoCastano/kestrel/releases):
 
 ```sh
-code --install-extension kestrel-vscode-0.4.4.vsix
+code --install-extension kestrel.vsix
 ```
+
+The extension finds `kestrel` on `PATH`, or in the folders the installers use, so
+it works right after an install without restarting the editor.
 
 From a checkout, `./editors/install-vscode-extension.sh` builds and installs it.
 [docs/editors/vscode.md](docs/editors/vscode.md) covers the compiler path, Code
