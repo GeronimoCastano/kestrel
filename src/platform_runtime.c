@@ -246,10 +246,20 @@ static long sysconf(int name) {
     DWORD count = GetActiveProcessorCount(ALL_PROCESSOR_GROUPS);
     return count ? (long)count : 1;
 }
+/* Standard input may be shared with the session that started this program, which reads
+   the next entry from the same pipe. The C runtime reads ahead of a line even when
+   unbuffered, so take standard input one byte at a time from its handle. */
+static int k_win_next_byte(FILE *file, HANDLE raw) {
+    if (raw == INVALID_HANDLE_VALUE) return getc(file);
+    unsigned char byte;
+    DWORD got = 0;
+    return ReadFile(raw, &byte, 1, &got, NULL) && got == 1 ? byte : EOF;
+}
 static ssize_t getline(char **line, size_t *capacity, FILE *file) {
+    HANDLE raw = file == stdin ? (HANDLE)_get_osfhandle(_fileno(stdin)) : INVALID_HANDLE_VALUE;
     size_t length = 0;
     int c;
-    while ((c = getc(file)) != EOF) {
+    while ((c = k_win_next_byte(file, raw)) != EOF) {
         if (length + 2 > *capacity) {
             size_t grown = *capacity ? *capacity * 2 : 128;
             char *next = realloc(*line, grown);
