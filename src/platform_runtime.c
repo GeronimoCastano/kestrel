@@ -296,15 +296,21 @@ static int clock_gettime(int clock, struct timespec *now) {
     now->tv_nsec = (long)((counter.QuadPart % frequency.QuadPart) * 1000000000 / frequency.QuadPart);
     return 0;
 }
+/* Sleep can wake up to one timer tick early, so wait on the performance counter until the
+   whole interval has passed, as POSIX nanosleep promises. */
 static int nanosleep(const struct timespec *wait, struct timespec *rest) {
     if (rest) { rest->tv_sec = 0; rest->tv_nsec = 0; }
-    uint64_t milliseconds = (uint64_t)wait->tv_sec * 1000 + ((uint64_t)wait->tv_nsec + 999999) / 1000000;
-    while (milliseconds > 0) {
-        DWORD step = milliseconds > 0x7fffffff ? 0x7fffffff : (DWORD)milliseconds;
-        Sleep(step);
-        milliseconds -= step;
+    LARGE_INTEGER frequency, start, now;
+    QueryPerformanceFrequency(&frequency);
+    QueryPerformanceCounter(&start);
+    double total = (double)wait->tv_sec + (double)wait->tv_nsec / 1e9;
+    for (;;) {
+        QueryPerformanceCounter(&now);
+        double left = total - (double)(now.QuadPart - start.QuadPart) / (double)frequency.QuadPart;
+        if (left <= 0) return 0;
+        double milliseconds = left * 1000.0;
+        Sleep(milliseconds >= 0x7fffffff ? 0x7fffffff : milliseconds < 1.0 ? 0 : (DWORD)milliseconds);
     }
-    return 0;
 }
 
 /* The UCRT starts a program in the "C" locale and a Kestrel program never changes it,

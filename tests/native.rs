@@ -789,6 +789,7 @@ fn assert_sanitizer_clean_with_args(program: &Program, expected: &Output, argume
     let run = Command::new(&binary)
         .args(arguments)
         .env("ASAN_OPTIONS", "detect_leaks=0")
+        .envs(native::sanitizer_runtime_path().map(|path| ("PATH", path)))
         .output()
         .unwrap();
     assert!(

@@ -346,6 +346,7 @@ function fails() : void or Error {
         let run = Command::new(&binary)
             .arg(index.to_string())
             .env("ASAN_OPTIONS", "detect_leaks=0")
+            .envs(kestrel::native::sanitizer_runtime_path().map(|path| ("PATH", path)))
             .output()
             .unwrap();
         let stderr = String::from_utf8_lossy(&run.stderr);

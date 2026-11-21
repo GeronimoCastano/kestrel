@@ -575,8 +575,14 @@ ba7816bf8f01cfea414140de5dae2223b00361a396177a9cb410ff61f20015ad
 
 #[test]
 fn files_console_time_and_processes() {
+    // process.run hands the command to the system shell: sh, or cmd.exe on Windows.
+    let command = if cfg!(windows) {
+        "echo hello& exit 3"
+    } else {
+        "echo hello; exit 3"
+    };
     let output = stdout(
-        r####"import std.fs
+        &r####"import std.fs
 import std.io
 import std.time
 import std.process
@@ -604,15 +610,16 @@ function main() : void or Error with Effects {
     time.sleep(0.01)
     print(time.monotonic() - start >= 10000000)
     print(time.now() > 1700000000.0)
-    print(process.env("HOME").isSome())
+    print(process.env("PATH").isSome())
     print(process.env("KESTREL_NOT_SET_ANYWHERE"))
     print(process.cwd().length() > 0)
-    let (status, output) := process.run("echo hello; exit 3")?
+    let (status, output) := process.run("COMMAND")?
     print(status)
     print(output.trim())
 }
 main()?
-"####,
+"####
+            .replace("COMMAND", command),
     );
     assert_eq!(
         output,

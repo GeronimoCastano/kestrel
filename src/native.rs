@@ -1684,7 +1684,7 @@ impl Emitter<'_> {
                     ),
                     "isNaN" => format!("isnan({})", args[0]),
                     "trunc" => format!("trunc({})", args[0]),
-                    "cbrt" => format!("cbrt({})", args[0]),
+                    "cbrt" => format!("k_cbrt({})", args[0]),
                     "hypot" => format!("hypot({}, {})", args[0], args[1]),
                     "atan2" => format!("atan2({}, {})", args[0], args[1]),
                     "isOdd" => format!("(({}) % 2 != 0)", args[0]),
@@ -2869,6 +2869,22 @@ fn platform_link_flags(folder: &Path) -> Result<Vec<std::ffi::OsString>, String>
         "-Xlinker".into(),
         resource.into_os_string(),
     ])
+}
+
+/// On Windows a sanitizer build loads Clang's sanitizer runtime DLL, which lives in
+/// Clang's runtime folder rather than on `PATH`. This is `PATH` with that folder first.
+/// Other platforms link the runtime by full path and need nothing.
+pub fn sanitizer_runtime_path() -> Option<std::ffi::OsString> {
+    if !cfg!(windows) {
+        return None;
+    }
+    let output = Command::new("clang")
+        .arg("-print-runtime-dir")
+        .output()
+        .ok()?;
+    let folder = PathBuf::from(String::from_utf8(output.stdout).ok()?.trim());
+    let rest = std::env::var_os("PATH").unwrap_or_default();
+    std::env::join_paths(std::iter::once(folder).chain(std::env::split_paths(&rest))).ok()
 }
 
 /// Clang flags every C compile shares. Windows Clang has no -pthread: threads come from

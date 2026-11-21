@@ -96,6 +96,17 @@ jobs:
           7z x -o"$RUNNER_TEMP" "$RUNNER_TEMP/z3-5.3.3-x64-win.zip" > /dev/null
           echo "$RUNNER_TEMP\\z3-5.3.3-x64-win\\bin" >> "$GITHUB_PATH"
 
+      # The numerical suite needs LAPACK, as liblapack-dev provides on Linux. The
+      # OpenBLAS DLL carries LAPACK and CBLAS and needs no other runtime.
+      - name: Install OpenBLAS
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download v0.3.34 -R OpenMathLib/OpenBLAS -p OpenBLAS-0.3.34-x64.zip -D "$RUNNER_TEMP"
+          7z x -o"$RUNNER_TEMP\\openblas" "$RUNNER_TEMP/OpenBLAS-0.3.34-x64.zip" > /dev/null
+          echo "$RUNNER_TEMP\\openblas\\bin" >> "$GITHUB_PATH"
+
       - name: Run the test suite
         run: cargo test --no-fail-fast
 

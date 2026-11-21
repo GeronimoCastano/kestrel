@@ -184,7 +184,7 @@ fn fetch_locks_git_dependency_and_build_works_offline_from_verified_cache() {
         ],
     );
     assert_success(output);
-    assert!(executable.is_file());
+    assert!(kestrel::native::executable_path(&executable).is_file());
 }
 
 #[test]

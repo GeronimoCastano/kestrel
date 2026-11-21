@@ -444,7 +444,8 @@ _Noreturn static K_UNUSED void k_os_exit(int64_t code) {
     fflush(stderr);
     exit((int)(code & 255));
 }
-/* Runs a shell command and captures its standard output. */
+/* Runs a command through the system shell, sh or cmd.exe on Windows, and captures its
+   standard output. */
 static K_UNUSED bool k_os_run(KString command, int64_t *status, KString *output, KError *error) {
     char *text = k_c_text(command);
     fflush(stdout);

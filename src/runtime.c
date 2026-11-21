@@ -820,6 +820,26 @@ static KSessionStatic *k_session_static(const char *key, size_t size, void (*ini
     return cell;
 }
 #endif
+/* C libraries round cbrt differently: glibc gives 3.0000000000000004 for cbrt(27.0), and
+   neither glibc nor Apple's libm rounds every result correctly. The library's answer is
+   within one ulp, so keep whichever of it and its two neighbours has the smallest
+   residual c^3 - x. fma makes that residual exact enough to compare, and every platform
+   prints the same digits. */
+static double k_cube_residual(double c, double x) {
+    double square = c * c;
+    return fma(square, c, -x) + fma(c, c, -square) * c;
+}
+static double k_cbrt(double x) {
+    double y = cbrt(x);
+    if (y == 0.0 || !isfinite(y)) return y;
+    double best = y, distance = fabs(k_cube_residual(y, x));
+    double neighbours[2] = { nextafter(y, INFINITY), nextafter(y, -INFINITY) };
+    for (int i = 0; i < 2; ++i) {
+        double candidate = fabs(k_cube_residual(neighbours[i], x));
+        if (candidate < distance) { best = neighbours[i]; distance = candidate; }
+    }
+    return best;
+}
 static uint64_t k_double_bits(double value) { uint64_t bits; memcpy(&bits,&value,sizeof bits); return bits; }
 static double k_bits_double(uint64_t bits) { double value; memcpy(&value,&bits,sizeof value); return value; }
 static bool k_valid_utf8(KString text) {

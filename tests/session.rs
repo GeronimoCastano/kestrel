@@ -530,22 +530,21 @@ fn generic_local_functions_stay_polymorphic_as_new_declarations_are_added() {
     );
 }
 
-#[test]
-fn project_c_state_is_shared_instead_of_being_linked_again_for_each_entry() {
-    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+/// Runs a session over a project with one C file whose function counts its calls.
+fn session_with_project_c(dir: &std::path::Path) -> std::process::Output {
     std::fs::write(
-        dir.path().join("local.h"),
+        dir.join("local.h"),
         "#include <stdint.h>\nint64_t next(void);\n",
     )
     .unwrap();
     std::fs::write(
-        dir.path().join("local.c"),
+        dir.join("local.c"),
         "#include \"local.h\"\nstatic int64_t count; int64_t next(void) { return ++count; }\n",
     )
     .unwrap();
     let mut process = Command::new(env!("CARGO_BIN_EXE_kestrel"))
         .args(["session", "--root"])
-        .arg(dir.path())
+        .arg(dir)
         .stdin(Stdio::piped())
         .stdout(Stdio::piped())
         .stderr(Stdio::piped())
@@ -559,7 +558,28 @@ fn project_c_state_is_shared_instead_of_being_linked_again_for_each_entry() {
             b"import c \"local.h\"\nunsafe { next().toInt() }\n0\nunsafe { next().toInt() }\n",
         )
         .unwrap();
-    let output = process.wait_with_output().unwrap();
+    process.wait_with_output().unwrap()
+}
+
+// A Windows DLL exports only the functions it marks, so sessions there refuse project C
+// files with a message instead of loading them. kestrel run and build still compile them.
+#[cfg(windows)]
+#[test]
+fn project_c_files_in_a_windows_session_stop_with_a_message() {
+    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let output = session_with_project_c(dir.path());
+    let errors = String::from_utf8_lossy(&output.stderr);
+    assert!(
+        errors.contains("Sessions on Windows cannot load project C files yet"),
+        "{errors}"
+    );
+}
+
+#[cfg(not(windows))]
+#[test]
+fn project_c_state_is_shared_instead_of_being_linked_again_for_each_entry() {
+    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let output = session_with_project_c(dir.path());
     assert!(
         output.status.success(),
         "{}",

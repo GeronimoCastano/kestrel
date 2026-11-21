@@ -225,6 +225,8 @@ static KTensor k_tensor_matmul(const KTensor *a, const KTensor *b, KLocation loc
     bool a_transposed = a->rank == 2 && a->transposed;
     bool b_transposed = b->rank == 2 && b->transposed;
     if (k_blas_dgemm(rows, inner, cols, a->items, a_transposed, b->items, b_transposed, result.items)) return result;
+    /* Without CBLAS the loop accumulates, so the fresh storage must start at zero. */
+    for (int64_t i = 0; i < rows * cols; ++i) result.items[i] = 0.0;
     for (int64_t i = 0; i < rows; ++i)
         for (int64_t k = 0; k < inner; ++k) {
             double value = a->rank == 2 ? a->items[a_transposed ? k * rows + i : i * inner + k] : a->items[k];

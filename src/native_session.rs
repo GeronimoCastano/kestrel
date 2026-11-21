@@ -190,7 +190,7 @@ fn runtime_parts(source: &str, windows: bool) -> (String, String) {
             i = skip_quoted(bytes, i);
             continue;
         }
-        if bytes[i] == b'#' && source[start..i].trim().is_empty() {
+        if bytes[i] == b'#' && without_comments(&source[start..i]).trim().is_empty() {
             let mut end = i;
             loop {
                 while end < bytes.len() && bytes[end] != b'\n' {
