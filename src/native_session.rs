@@ -324,7 +324,14 @@ fn clang(shared: bool) -> Command {
         command.arg("-ldl");
     }
     if cfg!(windows) {
+        // Clang's driver links the static C runtime by default even with the DLL runtime
+        // selected; two runtimes in one module leave the DLL imports unresolved.
         command.args(["-fms-runtime-lib=dll", "-lkernel32"]);
+        for library in ["libcmt", "libucrt", "libvcruntime"] {
+            command
+                .arg("-Xlinker")
+                .arg(format!("/NODEFAULTLIB:{library}"));
+        }
     }
     if shared {
         command.args(shared_flags());

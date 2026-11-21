@@ -2878,13 +2878,17 @@ pub fn sanitizer_runtime_path() -> Option<std::ffi::OsString> {
     if !cfg!(windows) {
         return None;
     }
-    let output = Command::new("clang")
-        .arg("-print-runtime-dir")
-        .output()
-        .ok()?;
-    let folder = PathBuf::from(String::from_utf8(output.stdout).ok()?.trim());
+    // Clang releases keep the DLL in the per-target runtime folder or in lib/windows under
+    // the resource folder, depending on how LLVM was built; put both first.
+    let ask = |flag: &str| {
+        let output = Command::new("clang").arg(flag).output().ok()?;
+        Some(PathBuf::from(String::from_utf8(output.stdout).ok()?.trim()))
+    };
+    let mut folders = vec![];
+    folders.extend(ask("-print-runtime-dir"));
+    folders.extend(ask("-print-resource-dir").map(|root| root.join("lib").join("windows")));
     let rest = std::env::var_os("PATH").unwrap_or_default();
-    std::env::join_paths(std::iter::once(folder).chain(std::env::split_paths(&rest))).ok()
+    std::env::join_paths(folders.into_iter().chain(std::env::split_paths(&rest))).ok()
 }
 
 /// What Clang and the linker said about a failed build. The MSVC linker writes its
