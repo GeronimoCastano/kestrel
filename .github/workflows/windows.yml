@@ -77,8 +77,11 @@ jobs:
           "$cdb" -g -G -lines -y "$folder" -c ".ecxr; kn 30; dv /t; q" "$folder/o1.exe" || true
           runtime="$(clang -print-runtime-dir)"; resource="$(clang -print-resource-dir)"
           ls "$runtime" "$resource/lib/windows" 2>/dev/null | grep -i asan | head || true
-          clang -std=c11 -O1 -g -fsanitize=address -Wno-unused-function "$folder/probe.c" -o "$folder/asan.exe" || true
-          PATH="$runtime:$resource/lib/windows:$PATH" "$folder/asan.exe" || echo "asan exit $?"
+          export PATH="$(cygpath -u "$runtime"):$PATH"
+          for sanitizers in address address,undefined; do
+            clang -std=c11 -O1 -g -fsanitize=$sanitizers -Wno-unused-function "$folder/probe.c" -o "$folder/asan.exe" || true
+            "$folder/asan.exe"; echo "$sanitizers exit $?"
+          done
 
       - name: Keep the program and its C
         if: always()

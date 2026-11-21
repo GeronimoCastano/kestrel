@@ -891,10 +891,12 @@ impl Emitter<'_> {
                 };
                 format!("k_owner_{}_new({owned})", suffix(*native))
             }
+            // The value usually points into the owner the step takes. C leaves argument
+            // order open, and Windows Clang evaluates right to left, so read it first.
             Rhs::StepSome(id, value, _, owner) => format!(
-                "k_step_{id}({}, {})",
-                self.atom(value),
-                self.take(owner, Ty::Owner)
+                "({{ __typeof__({value}) step_value_ = {value}; k_step_{id}(step_value_, {}); }})",
+                self.take(owner, Ty::Owner),
+                value = self.atom(value),
             ),
             Rhs::ListAppendOwner(id, output, value, native, owner) => {
                 let LayoutKind::List(element) = self.program.layouts[*id].kind else {
