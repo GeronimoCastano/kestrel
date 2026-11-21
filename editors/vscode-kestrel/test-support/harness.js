@@ -6,6 +6,7 @@
 
 const fs = require('fs');
 const Module = require('module');
+const os = require('os');
 const path = require('path');
 
 class CompletionItem {
@@ -237,7 +238,8 @@ function loadExtension(configuration = {}) {
 // A document whose positions are plain offsets. VS Code positions are
 // line/character pairs, so both directions are implemented through line starts.
 function documentFor(text, name = 'test.kes', notebook = false) {
-  const fsPath = path.isAbsolute(name) ? name : `/tmp/${name}`;
+  // The temporary folder exists on every platform; /tmp does not exist on Windows.
+  const fsPath = path.isAbsolute(name) ? name : path.join(os.tmpdir(), name);
   const lines = text.split('\n');
   const starts = [];
   let offset = 0;

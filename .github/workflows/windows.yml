@@ -1,29 +1,29 @@
-name: Windows
+name: Windows probe
 
-# The port is in progress. This workflow exists to give the work a build loop,
-# not to gate merges: run it by hand, or push to a branch named windows/...
+# CI runs the whole suite on Windows in ci.yml. This workflow runs part of it by hand,
+# with the tests' output, for a Windows failure the CI log does not explain:
+#   gh workflow run windows.yml -f filter="--test session readLine"
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - "windows/**"
+    inputs:
+      filter:
+        description: "cargo test arguments, for example --test session readLine"
+        required: false
+        default: ""
 
 permissions:
   contents: read
 
 env:
   CARGO_TERM_COLOR: always
+  RUST_MIN_STACK: "134217728"
 
 jobs:
   probe:
-    name: Probe build (Windows)
+    name: Probe (Windows)
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: Install LLVM
-        run: choco install llvm --no-progress -y
-        shell: pwsh
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@1.95.0
@@ -31,15 +31,21 @@ jobs:
       - name: Cache the build
         uses: Swatinem/rust-cache@v2
 
-      - name: Build the compiler
-        run: cargo build --release
-        shell: pwsh
+      - name: Install Z3 and OpenBLAS
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download z3-5.3.3 -R Z3Prover/z3 -p z3-5.3.3-x64-win.zip -D "$RUNNER_TEMP"
+          7z x -o"$RUNNER_TEMP" "$RUNNER_TEMP/z3-5.3.3-x64-win.zip" > /dev/null
+          echo "$RUNNER_TEMP\\z3-5.3.3-x64-win\\bin" >> "$GITHUB_PATH"
+          gh release download v0.3.34 -R OpenMathLib/OpenBLAS -p OpenBLAS-0.3.34-x64.zip -D "$RUNNER_TEMP"
+          7z x -o"$RUNNER_TEMP\\openblas" "$RUNNER_TEMP/OpenBLAS-0.3.34-x64.zip" > /dev/null
+          echo "$RUNNER_TEMP\\openblas\\bin" >> "$GITHUB_PATH"
 
-      - name: Compile the test binaries
-        run: cargo test --no-run
-        shell: pwsh
-
-      - name: Run the test suite
-        run: cargo test
-        shell: pwsh
-        continue-on-error: true
+      - name: Run the selected tests
+        shell: bash
+        env:
+          FILTER: ${{ inputs.filter }}
+        # The filter is split into words on purpose: it holds cargo test arguments.
+        run: cargo test $FILTER -- --nocapture

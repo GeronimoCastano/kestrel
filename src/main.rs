@@ -1,3 +1,4 @@
+use kestrel::paths::CanonicalPath;
 use kestrel::{
     lexer::{TokenKind, lex},
     modules::{ProjectCheck, check_path, check_source, check_text},
@@ -12,6 +13,39 @@ use std::{
 };
 
 fn main() -> ExitCode {
+    // The Windows install ships OpenBLAS beside the compiler. Programs that kestrel runs
+    // find it through KESTREL_LAPACK even when PATH does not name the install folder yet.
+    if std::env::var_os("KESTREL_LAPACK").is_none()
+        && let Some(library) = env::current_exe()
+            .ok()
+            .and_then(|path| Some(path.parent()?.join("libopenblas.dll")))
+            .filter(|path| path.is_file())
+    {
+        // SAFETY: no other thread exists yet.
+        unsafe { env::set_var("KESTREL_LAPACK", library) };
+    }
+    // Windows gives the main thread 1 MiB of stack, where macOS and Linux give 8 MiB. The
+    // checker recurses on deep programs, so it runs on a thread with room to spare there.
+    if cfg!(windows) {
+        return std::thread::Builder::new()
+            .stack_size(64 << 20)
+            .spawn(start)
+            .map_or_else(
+                |error| {
+                    eprintln!("kestrel: cannot start the compiler thread: {error}");
+                    ExitCode::from(2)
+                },
+                |thread| {
+                    thread
+                        .join()
+                        .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
+                },
+            );
+    }
+    start()
+}
+
+fn start() -> ExitCode {
     match run() {
         Ok(success) => {
             if success {
@@ -577,14 +611,14 @@ fn native_command(
     });
     let resolved = |path: &Path| -> Result<PathBuf, String> {
         if path.exists() {
-            return path.canonicalize().map_err(|e| e.to_string());
+            return path.canonical().map_err(|e| e.to_string());
         }
         let parent = path
             .parent()
             .filter(|p| !p.as_os_str().is_empty())
             .unwrap_or(Path::new("."));
         Ok(parent
-            .canonicalize()
+            .canonical()
             .map_err(|e| e.to_string())?
             .join(path.file_name().ok_or("Output needs a file name.")?))
     };
@@ -614,7 +648,10 @@ fn native_command(
     }
     if command == "build" {
         kestrel::native::build(&program, &destination)?;
-        println!("Built {}", destination.display());
+        println!(
+            "Built {}",
+            kestrel::native::executable_path(&destination).display()
+        );
         Ok(true)
     } else {
         Ok(kestrel::native::run_with_args(&program, &arguments)?.success())

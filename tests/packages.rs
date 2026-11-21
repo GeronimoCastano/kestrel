@@ -325,19 +325,15 @@ function fails() : void or Error {
         .collect::<Vec<_>>();
     let program = kestrel::core::lower_tests(&project, &spans).unwrap();
     let source = dir.path().join("tests.c");
-    let binary = dir.path().join("tests");
+    let binary = kestrel::native::executable_path(&dir.path().join("tests"));
     fs::write(&source, kestrel::native::emit_c(&program).unwrap()).unwrap();
     let built = Command::new("clang")
-        .args([
-            "-std=c11",
-            "-O1",
-            "-g",
-            "-pthread",
-            "-fsanitize=address,undefined",
-        ])
+        .args(["-std=c11", "-O1", "-g", "-fsanitize=address,undefined"])
+        .args(kestrel::native::thread_flags())
         .args(["-fno-sanitize-recover=undefined", "-Wno-unused-function"])
         .arg(&source)
-        .args(["-lm", "-o"])
+        .args(kestrel::native::system_libraries())
+        .arg("-o")
         .arg(&binary)
         .output()
         .unwrap();
@@ -350,6 +346,7 @@ function fails() : void or Error {
         let run = Command::new(&binary)
             .arg(index.to_string())
             .env("ASAN_OPTIONS", "detect_leaks=0")
+            .envs(kestrel::native::sanitizer_runtime_path().map(|path| ("PATH", path)))
             .output()
             .unwrap();
         let stderr = String::from_utf8_lossy(&run.stderr);

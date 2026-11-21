@@ -6,6 +6,7 @@
 // always wins, so this guesses only when nothing is configured.
 
 const fs = require('fs');
+const os = require('os');
 const path = require('path');
 
 function executable(file) {
@@ -53,12 +54,27 @@ function releaseSibling(real) {
   return release;
 }
 
+// Where the installers put the compiler: install.ps1 on Windows, Homebrew elsewhere. An
+// editor opened from the Dock or the Start menu keeps the PATH it started with, so it can
+// miss a compiler installed after it launched.
+function installed(platform = process.platform, env = process.env, home = os.homedir()) {
+  const candidates = platform === 'win32'
+    ? [path.join(env.LOCALAPPDATA || path.join(home, 'AppData', 'Local'), 'Programs', 'Kestrel', 'bin', 'kestrel.exe')]
+    : ['/opt/homebrew/bin/kestrel', '/usr/local/bin/kestrel', '/home/linuxbrew/.linuxbrew/bin/kestrel',
+      path.join(home, '.linuxbrew', 'bin', 'kestrel')];
+  return candidates.find(executable) || '';
+}
+
 // `{ command, note }`. `note` is logged once when it changes which binary runs.
 function resolveCompiler(configured) {
   const setting = typeof configured === 'string' ? configured.trim() : '';
   if (setting) return { command: setting, note: '' };
   const found = onPath('kestrel');
-  if (!found) return { command: 'kestrel', note: '' };
+  if (!found) {
+    const fallback = installed();
+    if (fallback) return { command: fallback, note: `Using ${fallback}; kestrel is not on this editor's PATH.` };
+    return { command: 'kestrel', note: '' };
+  }
   const release = releaseSibling(found.real);
   if (release) {
     return {
@@ -81,4 +97,4 @@ function compilerStamp(command) {
   }
 }
 
-module.exports = { resolveCompiler, onPath, compilerStamp };
+module.exports = { resolveCompiler, onPath, installed, compilerStamp };

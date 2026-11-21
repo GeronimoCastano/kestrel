@@ -1,0 +1,161 @@
+name: Install
+
+# Installs Kestrel the way a user does, on fresh runners, and runs a program that uses
+# Clang, LAPACK and Z3. Pull requests install this branch's build through the same
+# formula and installer the release uses. A manual run with `published` set tests the
+# commands the README prints, against the latest release.
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      published:
+        description: "Install the latest release with the README's commands"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  HOMEBREW_NO_AUTO_UPDATE: "1"
+  HOMEBREW_NO_INSTALL_CLEANUP: "1"
+  HOMEBREW_NO_ENV_HINTS: "1"
+
+jobs:
+  homebrew:
+    name: Homebrew (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-latest
+          - name: Linux
+            os: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Put Homebrew on PATH
+        if: runner.os == 'Linux'
+        run: echo /home/linuxbrew/.linuxbrew/bin >> "$GITHUB_PATH"
+
+      - name: Install Rust
+        if: ${{ !inputs.published }}
+        uses: dtolnay/rust-toolchain@1.95.0
+
+      - name: Cache the build
+        if: ${{ !inputs.published }}
+        uses: Swatinem/rust-cache@v2
+
+      # The formula comes from the release script, pointed at a tarball of this build.
+      - name: Install this build through a local tap
+        if: ${{ !inputs.published }}
+        run: |
+          set -euo pipefail
+          cargo build --release
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+          case "$RUNNER_OS-$(uname -m)" in
+            macOS-arm64) target=aarch64-apple-darwin ;;
+            macOS-x86_64) target=x86_64-apple-darwin ;;
+            *) target=x86_64-unknown-linux-gnu ;;
+          esac
+          folder="kestrel-$version-$target"
+          mkdir -p "dist/$folder"
+          cp target/release/kestrel README.md LICENSE "dist/$folder/"
+          tar -czf "$RUNNER_TEMP/kestrel-$target.tar.gz" -C dist "$folder"
+          cd "$RUNNER_TEMP"
+          for other in aarch64-apple-darwin x86_64-apple-darwin x86_64-unknown-linux-gnu; do
+            [ -f "kestrel-$other.tar.gz" ] || cp "kestrel-$target.tar.gz" "kestrel-$other.tar.gz"
+          done
+          shasum -a 256 kestrel-*.tar.gz > SHA256SUMS
+          cd "$GITHUB_WORKSPACE"
+          brew tap-new --no-git kestrel/local
+          tools/homebrew-formula.sh "$version" "$RUNNER_TEMP/SHA256SUMS" "file://$RUNNER_TEMP" \
+            > "$(brew --repository)/Library/Taps/kestrel/homebrew-local/Formula/kestrel.rb"
+          brew install kestrel/local/kestrel
+          brew test kestrel/local/kestrel
+
+      - name: Install the latest release
+        if: ${{ inputs.published }}
+        run: |
+          brew install GeronimoCastano/kestrel/kestrel
+          brew test GeronimoCastano/kestrel/kestrel
+
+      - name: Run a program from PATH
+        run: |
+          set -euo pipefail
+          cd "$RUNNER_TEMP"
+          printf 'print("Hello, Kestrel!")\n' > hello.kes
+          test "$(kestrel run hello.kes)" = "Hello, Kestrel!"
+          kestrel build -o hello hello.kes
+          test "$(./hello)" = "Hello, Kestrel!"
+
+  windows:
+    name: Windows installer
+    runs-on: windows-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        if: ${{ !inputs.published }}
+        uses: dtolnay/rust-toolchain@1.95.0
+
+      - name: Cache the build
+        if: ${{ !inputs.published }}
+        uses: Swatinem/rust-cache@v2
+
+      - name: Package this build as the release does
+        if: ${{ !inputs.published }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo build --release
+          version=$(sed -n 's/^version = "\(.*\)"/\1/p' Cargo.toml | head -1)
+          folder="kestrel-$version-x86_64-pc-windows-msvc"
+          mkdir -p "dist/$folder"
+          cp README.md LICENSE SYNTAX.md "dist/$folder/"
+          tools/windows-bundle.sh target/release/kestrel.exe "dist/$folder"
+          (cd dist && 7z a -tzip -mx=9 "$RUNNER_TEMP/kestrel-x86_64-pc-windows-msvc.zip" "$folder" > /dev/null)
+          ls -l "$RUNNER_TEMP/kestrel-x86_64-pc-windows-msvc.zip"
+
+      # Windows PowerShell 5.1 is what Windows 10 and 11 open by default.
+      - name: Run the installer
+        shell: powershell
+        run: |
+          if ('${{ inputs.published }}' -ne 'true') {
+            $env:KESTREL_ARCHIVE = "$env:RUNNER_TEMP\kestrel-x86_64-pc-windows-msvc.zip"
+            Get-Content -Raw install.ps1 | Invoke-Expression
+          } else {
+            irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
+          }
+
+      # A new terminal reads PATH from the registry. Nothing else on the runner may help:
+      # its own LLVM leaves PATH too.
+      - name: Run programs from a new terminal
+        shell: powershell
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $machine = [Environment]::GetEnvironmentVariable('Path', 'Machine') -split ';' | Where-Object { $_ -and $_ -notmatch 'LLVM' }
+          $env:Path = ([Environment]::GetEnvironmentVariable('Path', 'User') + ';' + ($machine -join ';'))
+          if (Get-Command clang -ErrorAction SilentlyContinue) { throw 'Another Clang is still on PATH.' }
+          Set-Location $env:RUNNER_TEMP
+          Set-Content hello.kes 'print("Hello, Kestrel!")' -Encoding ascii
+          if ((kestrel run hello.kes) -ne 'Hello, Kestrel!') { throw 'kestrel run failed' }
+          kestrel build -o hello hello.kes
+          if ((.\hello.exe) -ne 'Hello, Kestrel!') { throw 'the built program failed' }
+          Set-Content batteries.kes @(
+            'import std.linalg',
+            'let A := Tensor([2.0, 1.0, 1.0, 3.0], shape = (2, 2))',
+            'print((A @ linalg.inverse(A) - Tensor([1.0, 0.0, 0.0, 1.0], shape = (2, 2))).norm() < 1e-12)',
+            'theorem positive(n : Int) : n > 0 requires h : n >= 1 {smt}'
+          ) -Encoding ascii
+          if ((kestrel run batteries.kes) -ne 'true') { throw 'LAPACK or Z3 is missing' }
+          'let n := 40', 'print(n + 2)', ':quit' | kestrel session --root . | Tee-Object -Variable session
+          if (-not ($session -contains '42')) { throw 'the session failed' }
+          Write-Host 'Kestrel runs from a fresh terminal with nothing else installed.'

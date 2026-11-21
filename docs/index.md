@@ -96,6 +96,5 @@ Hello, Kestrel!
 
 ## Status
 
-Kestrel is version 0.1. macOS is the platform it is developed on, Linux is
-tested on every commit, and Windows is in progress. [Install](install.md) has
-the details.
+Kestrel is version 0.1. It runs on macOS, Linux and Windows, and CI tests all
+three on every pull request. [Install](install.md) has the details.

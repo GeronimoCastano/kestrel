@@ -1,5 +1,6 @@
 //! Reproducible Git package pins and the per-user source cache.
 use crate::modules::{GitSource, PROJECT_FILE, Package, PackageDependency, read_package};
+use crate::paths::CanonicalPath;
 use sha2::{Digest, Sha256};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -156,7 +157,7 @@ pub fn update_package(root: &Path, name: &str) -> Result<usize, String> {
 
 fn synchronize(root: &Path, update: Option<&str>) -> Result<usize, String> {
     let root = root
-        .canonicalize()
+        .canonical()
         .map_err(|error| format!("Cannot open package folder {}: {error}", root.display()))?;
     let Some(package) = read_package(&root)? else {
         return Err(format!("{} has no {PROJECT_FILE}.", root.display()));
@@ -425,7 +426,7 @@ impl SyncState<'_> {
 /// Loads source dependencies only from the committed lockfile and verified cache.
 pub fn load_packages(root: &Path) -> Result<Vec<Package>, String> {
     let root = root
-        .canonicalize()
+        .canonical()
         .map_err(|error| format!("Cannot open package folder {}: {error}", root.display()))?;
     let Some(package) = read_package(&root)? else {
         return Ok(vec![]);
@@ -635,7 +636,7 @@ fn git_identity(source: &GitSource) -> String {
 }
 
 fn local_identity(path: &Path) -> String {
-    let canonical = path.canonicalize().unwrap_or_else(|_| path.to_owned());
+    let canonical = path.canonical().unwrap_or_else(|_| path.to_owned());
     format!("local\0{}", canonical.display())
 }
 
@@ -729,7 +730,7 @@ fn tree_hash(root: &Path) -> Result<String, String> {
         ));
     }
     let root = root
-        .canonicalize()
+        .canonical()
         .map_err(|error| format!("{} does not exist: {error}", root.display()))?;
     if !root.is_dir() {
         return Err(format!("{} is not a directory.", root.display()));
@@ -774,7 +775,7 @@ fn hash_directory(root: &Path, directory: &Path, hasher: &mut Sha256) -> Result<
                 ));
             }
             let resolved = path
-                .canonicalize()
+                .canonical()
                 .map_err(|_| format!("{} is a broken symlink.", path.display()))?;
             if !resolved.starts_with(root) {
                 return Err(format!(

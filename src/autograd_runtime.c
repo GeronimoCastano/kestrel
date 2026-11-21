@@ -2131,26 +2131,18 @@ static void k_ad_backward(KVariable root, bool retain_graph, KLocation loc) {
                 break;
             case K_AD_OP_BCE:
                 if (a && b) {
-                    double *ga = calloc((size_t)n, sizeof(double));
-                    if (!ga) k_fatal("Out of memory");
-                    int64_t ai = 0, bi = 0;
-                    for (int64_t flat = 0; flat < node->length; ++flat) {
-                        int64_t rest = flat;
-                        // node is a scalar for BCE; recompute from the broadcast plan.
-                        (void)rest;
-                        double x = op->saved_a.items[ai];
-                        double y = op->saved_b.items[bi];
-                        (void)x; (void)y;
-                    }
-                    // The broadcast is saved in flat form by k_ad_binary_cross_entropy_with_logits.
+                    // The loss is a scalar, so the gradient has one entry per logit, not per
+                    // entry of the result node, and it accumulates into the logits' shape.
                     int64_t total = op->saved_a.length;
+                    double *ga = calloc((size_t)(total ? total : 1), sizeof(double));
+                    if (!ga) k_fatal("Out of memory");
                     for (int64_t i = 0; i < total; ++i) {
                         double x = op->saved_a.items[i];
                         double y = op->saved_b.items[i % (op->saved_b.length ? op->saved_b.length : 1)];
                         double sigmoid = 1.0 / (1.0 + exp(-x));
                         ga[i] = (sigmoid - y) * g[0] / (double)(total ? total : 1);
                     }
-                    k_ad_accumulate(a, node->rank, node->shape, ga);
+                    k_ad_accumulate(a, a->rank, a->shape, ga);
                     free(ga);
                 }
                 break;

@@ -7,11 +7,11 @@ leaving the editor.
 
 ## Install the extension
 
-**From a release.** Download `kestrel-vscode-<version>.vsix` from the
+**From a release.** Download `kestrel.vsix` from the
 [releases page](https://github.com/GeronimoCastano/kestrel/releases), then:
 
 ```sh
-code --install-extension kestrel-vscode-0.4.4.vsix
+code --install-extension kestrel.vsix
 ```
 
 In the editor you can also open the Extensions view, choose the **...** menu,
@@ -134,7 +134,9 @@ the extension's completions also run in notebooks.
 Set `kestrel.compilerPath` to an absolute path, then reload the window.
 
 **"Cannot start Clang".** `kestrel build` and `kestrel run` need a C compiler.
-On macOS, `xcode-select --install` provides it.
+The install commands in [Install](../install.md) bring one: on macOS through the
+Command Line Tools (`xcode-select --install`), on Linux through Homebrew, and on
+Windows inside the Kestrel install itself.
 
 **A `.kes` file opens as plain text.** The extension is installed but not active.
 Reload the window, and check Extensions shows Kestrel enabled.

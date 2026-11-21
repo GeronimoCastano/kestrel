@@ -4,6 +4,12 @@
 use kestrel::{core, modules::check_path, native};
 use std::{fs, path::Path, process::Command};
 
+/// A path as Kestrel text: forward slashes, which Windows accepts, so a backslash never
+/// reads as a string escape.
+fn kes_path(path: &std::path::Path) -> String {
+    path.display().to_string().replace('\\', "/")
+}
+
 fn run_program(source: &str) -> String {
     let dir = native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
     let file = dir.path().join("program.kes");
@@ -282,7 +288,7 @@ fn html_embeds_tex_and_png_pdf_jpeg_are_written() {
     }
     on_big_stack(|| {
         let dir = native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
-        let root = dir.path().display();
+        let root = kes_path(dir.path());
         let source = format!(
             r#"
 import std.kesplot as plt
@@ -370,9 +376,9 @@ print(match go() {{
     _ => "ERROR",
 }})
 "#,
-            nested.join("a figure.svg").display(),
-            nested.join("a figure.png").display(),
-            nested.join("a figure.pdf").display(),
+            kes_path(&nested.join("a figure.svg")),
+            kes_path(&nested.join("a figure.png")),
+            kes_path(&nested.join("a figure.pdf")),
         );
         let got = run_program(&source);
         assert_eq!(got.trim(), "ok");
@@ -472,7 +478,7 @@ print(match go() {{
     _ => "ERROR",
 }})
 "#,
-            target.display()
+            kes_path(&target)
         );
         let got = run_program(&source);
         assert_eq!(got.trim(), "wrote");

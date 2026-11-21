@@ -1,9 +1,11 @@
 // Native BLAS bridge. Matrix products and dot products go through the system's
 // CBLAS when a library is present (Accelerate on macOS, OpenBLAS or a BLAS
-// package on Linux) and fall back to the plain loops in the caller otherwise.
+// package on Linux, OpenBLAS on PATH on Windows) and fall back to the plain loops in the caller otherwise.
 // Nothing here needs a link flag: the library is opened on first use.
 
+#ifndef _WIN32
 #include <dlfcn.h>
+#endif
 
 typedef void (*KBlasDgemm)(int, int, int, int, int, int, double, const double *, int, const double *, int, double, double *, int);
 typedef void (*KBlasDgemv)(int, int, int, int, double, const double *, int, const double *, int, double, double *, int);
@@ -21,14 +23,20 @@ static KBlasDscal k_blas_dscal_fn = NULL;
 static KBlasDdot k_blas_ddot_fn = NULL;
 
 static void k_blas_initialize(void) {
+    /* KESTREL_LAPACK names a library outside the search path, as Homebrew's OpenBLAS is. */
+    const char *chosen = getenv("KESTREL_LAPACK");
     const char *libraries[] = {
+        chosen && *chosen ? chosen : "",
         "/System/Library/Frameworks/Accelerate.framework/Accelerate",
         "libopenblas.so.0",
         "libblas.so.3",
         "libblas.so",
+        "libopenblas.dll",
+        "openblas.dll",
         NULL,
     };
     for (int i = 0; libraries[i]; ++i) {
+        if (!*libraries[i]) continue;
         void *handle = dlopen(libraries[i], RTLD_LAZY | RTLD_LOCAL);
         if (!handle) continue;
         void *gemm = dlsym(handle, "cblas_dgemm");

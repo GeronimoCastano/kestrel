@@ -22,8 +22,45 @@ use std::{
     fs, io,
     path::{Path, PathBuf},
     process::{Command, ExitStatus},
-    sync::atomic::{AtomicU64, Ordering},
+    sync::{
+        OnceLock,
+        atomic::{AtomicU64, Ordering},
+    },
 };
+
+/// The C compiler Kestrel drives: `KESTREL_CC` when set, else the Clang shipped beside
+/// the compiler (the Windows install bundles one), else `clang` on `PATH`.
+pub fn c_compiler() -> &'static Path {
+    static COMPILER: OnceLock<PathBuf> = OnceLock::new();
+    COMPILER.get_or_init(|| {
+        std::env::var_os("KESTREL_CC")
+            .filter(|name| !name.is_empty())
+            .map(PathBuf::from)
+            .or_else(|| crate::paths::bundled("clang"))
+            .unwrap_or_else(|| PathBuf::from("clang"))
+    })
+}
+
+/// A command that runs the C compiler.
+pub fn clang_command() -> Command {
+    Command::new(c_compiler())
+}
+
+/// Whether Clang targets the MinGW ABI, as the bundled Windows toolchain does, rather
+/// than MSVC. The two take different linker flags and C runtimes.
+pub fn mingw() -> bool {
+    static MINGW: OnceLock<bool> = OnceLock::new();
+    *MINGW.get_or_init(|| {
+        cfg!(windows)
+            && clang_command()
+                .arg("-dumpmachine")
+                .output()
+                .is_ok_and(|output| {
+                    let target = String::from_utf8_lossy(&output.stdout);
+                    target.contains("mingw") || target.contains("windows-gnu")
+                })
+    })
+}
 
 fn bigint_constant(text: &str) -> String {
     let spelling = text
@@ -891,10 +928,12 @@ impl Emitter<'_> {
                 };
                 format!("k_owner_{}_new({owned})", suffix(*native))
             }
+            // The value usually points into the owner the step takes. C leaves argument
+            // order open, and Windows Clang evaluates right to left, so read it first.
             Rhs::StepSome(id, value, _, owner) => format!(
-                "k_step_{id}({}, {})",
-                self.atom(value),
-                self.take(owner, Ty::Owner)
+                "({{ __typeof__({value}) step_value_ = {value}; k_step_{id}(step_value_, {}); }})",
+                self.take(owner, Ty::Owner),
+                value = self.atom(value),
             ),
             Rhs::ListAppendOwner(id, output, value, native, owner) => {
                 let LayoutKind::List(element) = self.program.layouts[*id].kind else {
@@ -1684,7 +1723,7 @@ impl Emitter<'_> {
                     ),
                     "isNaN" => format!("isnan({})", args[0]),
                     "trunc" => format!("trunc({})", args[0]),
-                    "cbrt" => format!("cbrt({})", args[0]),
+                    "cbrt" => format!("k_cbrt({})", args[0]),
                     "hypot" => format!("hypot({}, {})", args[0], args[1]),
                     "atan2" => format!("atan2({}, {})", args[0], args[1]),
                     "isOdd" => format!("(({}) % 2 != 0)", args[0]),
@@ -2340,6 +2379,7 @@ fn emit(program: &Program, session: bool) -> Result<String, String> {
             output.push_str("#include \"kestrel_python.h\"\n");
         }
     } else {
+        output.push_str(include_str!("platform_runtime.c"));
         output.push_str(include_str!("runtime.c"));
         output.push_str(include_str!("blas_runtime.c"));
         output.push_str(include_str!("bigint_runtime.c"));
@@ -2503,7 +2543,9 @@ fn emit(program: &Program, session: bool) -> Result<String, String> {
         session::entry_points(program, &mut output);
         return Ok(output);
     }
-    output.push_str("int main(int argc,char **argv) {\n    k_overflow_guard();\n");
+    output.push_str(
+        "int main(int argc,char **argv) {\n    k_platform_start();\n    k_overflow_guard();\n",
+    );
     // A test program's first argument selects the test; script arguments follow it.
     let first_argument = if program.tests {
         output.push_str("    if (argc < 2) { fputs(\"Run this test program through kestrel test.\\n\", stderr); return 2; }\n    k_test_index = strtoll(argv[1], NULL, 10);\n");
@@ -2771,6 +2813,9 @@ fn python_flags(program: &Program) -> Result<Vec<String>, String> {
     if program.python_sites.is_empty() {
         return Ok(vec![]);
     }
+    if cfg!(windows) {
+        return Err("Python interop is not supported on Windows yet: it embeds CPython through python3-config, which Windows installations do not provide.".into());
+    }
     let mut flags = vec![];
     for arguments in [&["--includes"][..], &["--ldflags", "--embed"][..]] {
         let output = Command::new("python3-config")
@@ -2791,7 +2836,151 @@ fn python_flags(program: &Program) -> Result<Vec<String>, String> {
     Ok(flags)
 }
 
+/// The file `build` writes for a requested output path. Windows runs only files with an
+/// executable extension, so a path without one gains `.exe` there.
+pub fn executable_path(destination: &Path) -> PathBuf {
+    if cfg!(windows) && destination.extension().is_none() {
+        destination.with_extension("exe")
+    } else {
+        destination.to_path_buf()
+    }
+}
+
+/// The manifest that makes a Windows program use UTF-8 for its command line, environment
+/// and file names, as Kestrel strings do.
+const WINDOWS_MANIFEST: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings">UTF-8</activeCodePage>
+    </windowsSettings>
+  </application>
+</assembly>
+"#;
+
+/// The system libraries a program's emitted C links: the math library on Unix. The
+/// Windows C runtime includes it.
+pub fn system_libraries() -> &'static [&'static str] {
+    if cfg!(windows) { &[] } else { &["-lm"] }
+}
+
+/// A compiled resource file (`.res`) holding the manifest as resource type 24, id 1.
+/// The linker reads it directly, so the build needs no resource compiler.
+fn manifest_resource(manifest: &str) -> Vec<u8> {
+    fn entry(out: &mut Vec<u8>, data: &[u8], kind: u16, name: u16, language: u16) {
+        let size = u32::try_from(data.len()).expect("a small manifest");
+        out.extend(size.to_le_bytes());
+        out.extend(32u32.to_le_bytes());
+        out.extend([0xFF, 0xFF]);
+        out.extend(kind.to_le_bytes());
+        out.extend([0xFF, 0xFF]);
+        out.extend(name.to_le_bytes());
+        out.extend(0u32.to_le_bytes());
+        out.extend(0x0030u16.to_le_bytes());
+        out.extend(language.to_le_bytes());
+        out.extend(0u32.to_le_bytes());
+        out.extend(0u32.to_le_bytes());
+        out.extend(data);
+        while !out.len().is_multiple_of(4) {
+            out.push(0);
+        }
+    }
+    let mut out = vec![];
+    // Every .res file opens with an empty entry.
+    entry(&mut out, &[], 0, 0, 0);
+    entry(&mut out, manifest.as_bytes(), 24, 1, 0x0409);
+    out
+}
+
+/// Flags for a program's link step on this platform. Windows gives the main thread the
+/// 8 MiB stack that Linux and macOS give it, and embeds the UTF-8 manifest.
+fn platform_link_flags(folder: &Path) -> Result<Vec<std::ffi::OsString>, String> {
+    if !cfg!(windows) {
+        return Ok(system_libraries().iter().map(Into::into).collect());
+    }
+    let resource = folder.join("manifest.res");
+    fs::write(&resource, manifest_resource(WINDOWS_MANIFEST)).map_err(|e| e.to_string())?;
+    if mingw() {
+        // The MinGW linker takes GNU-style flags, reads the .res file as an input, and
+        // writes no manifest of its own.
+        return Ok(vec![
+            "-Wl,--stack,8388608".into(),
+            resource.into_os_string(),
+        ]);
+    }
+    Ok(vec![
+        "-Xlinker".into(),
+        "/STACK:8388608".into(),
+        "-Xlinker".into(),
+        "/MANIFEST:NO".into(),
+        "-Xlinker".into(),
+        resource.into_os_string(),
+    ])
+}
+
+/// On Windows a sanitizer build loads Clang's sanitizer runtime DLL, which lives in
+/// Clang's runtime folder rather than on `PATH`. This is `PATH` with that folder first.
+/// Other platforms link the runtime by full path and need nothing.
+pub fn sanitizer_runtime_path() -> Option<std::ffi::OsString> {
+    if !cfg!(windows) {
+        return None;
+    }
+    // Clang releases keep the DLL in the per-target runtime folder or in lib/windows under
+    // the resource folder, depending on how LLVM was built; put both first.
+    let ask = |flag: &str| {
+        let output = clang_command().arg(flag).output().ok()?;
+        Some(PathBuf::from(String::from_utf8(output.stdout).ok()?.trim()))
+    };
+    let mut folders = vec![];
+    folders.extend(ask("-print-runtime-dir"));
+    let resource = ask("-print-resource-dir");
+    folders.extend(resource.iter().map(|root| root.join("lib").join("windows")));
+    // llvm-mingw keeps its runtime DLLs in the target folder at the toolchain root,
+    // three levels above lib/clang/<version>.
+    folders.extend(resource.iter().filter_map(|root| {
+        Some(
+            root.parent()?
+                .parent()?
+                .parent()?
+                .join("x86_64-w64-mingw32")
+                .join("bin"),
+        )
+    }));
+    let rest = std::env::var_os("PATH").unwrap_or_default();
+    std::env::join_paths(folders.into_iter().chain(std::env::split_paths(&rest))).ok()
+}
+
+/// The message for a C compiler that does not start, with the fix for this platform.
+pub fn missing_clang(error: &io::Error) -> String {
+    let fix = if cfg!(windows) {
+        "Install Kestrel with install.ps1, which brings its own Clang"
+    } else if cfg!(target_os = "macos") {
+        "Install the Command Line Tools with xcode-select --install"
+    } else {
+        "Install Kestrel with Homebrew, which brings Clang, or install clang from your distribution"
+    };
+    format!(
+        "Cannot start Clang ({}): {error}. {fix}, or set KESTREL_CC to a Clang. See https://github.com/GeronimoCastano/kestrel#install.",
+        c_compiler().display()
+    )
+}
+
+/// What Clang and the linker said about a failed build. The MSVC linker writes its
+/// errors to standard output, so both streams count.
+fn compiler_messages(output: &std::process::Output) -> String {
+    let mut text = String::from_utf8_lossy(&output.stdout).into_owned();
+    text.push_str(&String::from_utf8_lossy(&output.stderr));
+    text
+}
+
+/// Clang flags every C compile shares. Windows Clang has no -pthread: threads come from
+/// the Win32 API there.
+pub fn thread_flags() -> &'static [&'static str] {
+    if cfg!(windows) { &[] } else { &["-pthread"] }
+}
+
 pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
+    let destination = &executable_path(destination);
     let source = emit_c(program)?;
     let parent = destination
         .parent()
@@ -2799,7 +2988,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
         .unwrap_or(Path::new("."));
     let temp = TemporaryDirectory::new(parent).map_err(|e| e.to_string())?;
     let c_path = temp.path.join("program.c");
-    let binary = temp.path.join("program");
+    let binary = executable_path(&temp.path.join("program"));
     fs::write(&c_path, source).map_err(|e| e.to_string())?;
     let includes = program
         .c_include_dirs
@@ -2810,16 +2999,15 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
     let mut objects = vec![];
     for (index, source) in program.c_sources.iter().enumerate() {
         let object = temp.path.join(format!("source{index}.o"));
-        let output = Command::new("clang")
-            .args(["-std=c11", "-pthread", "-O3", "-c"])
+        let output = clang_command()
+            .args(["-std=c11", "-O3", "-c"])
+            .args(thread_flags())
             .arg(source)
             .args(&includes)
             .arg("-o")
             .arg(&object)
             .output()
-            .map_err(|e| {
-                format!("Cannot start Clang: {e}. Install a C toolchain with clang on PATH.")
-            })?;
+            .map_err(|e| missing_clang(&e))?;
         if !output.status.success() {
             return Err(format!(
                 "Compiling {} failed:\n{}",
@@ -2829,10 +3017,10 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
         }
         objects.push(object);
     }
-    let output = Command::new("clang")
+    let output = clang_command()
+        .args(thread_flags())
         .args([
             "-std=c11",
-            "-pthread",
             "-O3",
             "-Wall",
             "-Wextra",
@@ -2855,15 +3043,16 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
                 .then_some("-DK_NO_POOL"),
         )
         .args(program.c_libraries.iter().map(|name| format!("-l{name}")))
-        .args(["-lm", "-o"])
+        .args(platform_link_flags(&temp.path)?)
+        .arg("-o")
         .arg(&binary)
         .output()
-        .map_err(|e| {
-            format!("Cannot start Clang: {e}. Install a C toolchain with clang on PATH.")
-        })?;
+        .map_err(|e| missing_clang(&e))?;
     if !output.status.success() {
-        let detail = String::from_utf8_lossy(&output.stderr);
-        let hint = if detail.contains("Undefined symbols") || detail.contains("undefined reference")
+        let detail = compiler_messages(&output);
+        let hint = if detail.contains("Undefined symbols")
+            || detail.contains("undefined reference")
+            || detail.contains("unresolved external symbol")
         {
             "\nA C function's library may be missing; name it with --link, as in --link z."
         } else {
@@ -2893,7 +3082,7 @@ pub fn run(program: &Program) -> Result<ExitStatus, String> {
 
 pub fn run_with_args(program: &Program, arguments: &[String]) -> Result<ExitStatus, String> {
     let temp = TemporaryDirectory::new(&std::env::temp_dir()).map_err(|e| e.to_string())?;
-    let binary = temp.path.join("program");
+    let binary = executable_path(&temp.path.join("program"));
     build(program, &binary)?;
     Command::new(&binary)
         .args(arguments)
@@ -4223,7 +4412,9 @@ static KRecord_$COLUMN$ k_kesdas_group_stat(KRecord_$COLUMN$ *column, KRecord_$I
             out.handle->storage[g].value = stat == 0 ? sums[g] : (counts[g] ? sums[g] / (double)counts[g] : (0.0 / 0.0));
         result.f$FLOATS_FIELD$ = out;
     }
-    result.f$MISSING_FIELD$ = k_list_$MISSING$_blank((size_t)(groups > 0 ? groups : 0));
+    KRecord_$MISSING$ gone = k_list_$MISSING$_blank((size_t)(groups > 0 ? groups : 0));
+    for (int64_t g = 0; g < groups; ++g) gone.handle->storage[g].value = false;
+    result.f$MISSING_FIELD$ = gone;
     free(sums); free(isums); free(counts);
     return result;
 }
@@ -4307,9 +4498,13 @@ static KRecord_$COLUMN$ k_kesdas_index(int64_t count) {
     result.f$KIND_FIELD$ = 0;
     result.f$SIZE_FIELD$ = (int64_t)n;
     KRecord_$INTS$ out = k_list_$INTS$_blank(n);
-    for (size_t i = 0; i < n; ++i) out.handle->storage[i].value = (int64_t)i;
+    KRecord_$MISSING$ gone = k_list_$MISSING$_blank(n);
+    for (size_t i = 0; i < n; ++i) {
+        out.handle->storage[i].value = (int64_t)i;
+        gone.handle->storage[i].value = false;
+    }
     result.f$INTS_FIELD$ = out;
-    result.f$MISSING_FIELD$ = k_list_$MISSING$_blank(n);
+    result.f$MISSING_FIELD$ = gone;
     return result;
 }
 
@@ -4325,8 +4520,10 @@ static KRecord_$COLUMN$ k_kesdas_repeat_names(KRecord_$STRS$ names, int64_t coun
         KString name = names.handle->items[i]->value;
         for (size_t j = 0; j < each; ++j) k_list_$STRS$_append(&out, k_string_copy(name));
     }
+    KRecord_$MISSING$ gone = k_list_$MISSING$_blank(total);
+    for (size_t i = 0; i < total; ++i) gone.handle->storage[i].value = false;
     result.f$STRS_FIELD$ = out;
-    result.f$MISSING_FIELD$ = k_list_$MISSING$_blank(total);
+    result.f$MISSING_FIELD$ = gone;
     return result;
 }
 

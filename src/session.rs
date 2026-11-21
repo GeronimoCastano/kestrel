@@ -1,4 +1,5 @@
 //! Sessions keep accepted source for checking and execute each native entry once.
+use crate::paths::CanonicalPath;
 use crate::{
     core,
     diagnostic::Diagnostic,
@@ -764,7 +765,7 @@ impl Session {
         notebook: bool,
     ) -> Result<Self, String> {
         Ok(Self {
-            root: root.canonicalize().map_err(|e| e.to_string())?,
+            root: root.canonical().map_err(|e| e.to_string())?,
             libraries,
             history: History::default(),
             state: core::SessionState::default(),
@@ -936,13 +937,18 @@ fn incomplete(text: &str) -> bool {
 }
 pub fn run(root: &Path, libraries: Vec<String>, arguments: &[String]) -> Result<bool, String> {
     let interactive = io::stdin().is_terminal();
-    use std::os::fd::AsFd;
-    let mut input = std::fs::File::from(
-        io::stdin()
-            .as_fd()
-            .try_clone_to_owned()
-            .map_err(|e| e.to_string())?,
-    );
+    // A private handle to standard input: the worker inherits the same stream for readLine.
+    #[cfg(unix)]
+    let handle = {
+        use std::os::fd::AsFd;
+        io::stdin().as_fd().try_clone_to_owned()
+    };
+    #[cfg(windows)]
+    let handle = {
+        use std::os::windows::io::AsHandle;
+        io::stdin().as_handle().try_clone_to_owned()
+    };
+    let mut input = std::fs::File::from(handle.map_err(|e| e.to_string())?);
     let mut session = Session::new(root, libraries, arguments, false, false)?;
     let (mut buffer, mut success) = (String::new(), true);
     loop {

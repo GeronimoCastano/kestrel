@@ -7,7 +7,7 @@ const path = require('path');
 const Module = require('module');
 const check = require('../out/check');
 
-const BINARY = path.join(__dirname, '..', '..', '..', 'target', 'release', 'kestrel');
+const BINARY = path.join(__dirname, '..', '..', '..', 'target', 'release', process.platform === 'win32' ? 'kestrel.exe' : 'kestrel');
 const haveBinary = fs.existsSync(BINARY);
 
 // Output of the checker, captured from the release binary.
