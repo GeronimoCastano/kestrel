@@ -13,6 +13,17 @@ print(real.isFinite(1.0 / 0.0))   // false
 `Real` is a name for `double`, not a distinct type, so every `double` is a
 `Real` and the two mix freely.
 
+## Constants
+
+| Name | Value |
+|---|---|
+| `real.PI` | 3.141592653589793 |
+| `real.E` | 2.718281828459045 |
+
+```kestrel
+print(real.PI)   // 3.1415926535897931
+```
+
 ## Functions
 
 ### `abs(x : Real) : Real`

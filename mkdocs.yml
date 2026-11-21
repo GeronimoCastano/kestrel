@@ -95,8 +95,12 @@ nav:
           - std.statistics: std/statistics.md
       - Data and learning:
           - std.kesdas: std/kesdas.md
+          - std.kesdas reference: std/kesdas-api.md
           - std.kesnet: std/kesnet.md
+          - std.kesnet reference: std/kesnet-api.md
           - std.ml: std/ml.md
+          - std.ml reference: std/ml-api.md
+          - std.kesplot: std/kesplot.md
       - System:
           - std.path: std/path.md
           - std.fs: std/fs.md

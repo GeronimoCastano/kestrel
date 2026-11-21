@@ -107,6 +107,9 @@ print(confusionMatrix(actual, predicted))
 print(f1Score(actual, predicted))
 ```
 
+
+The complete member list, with every signature and argument, is in the [std.ml reference](ml-api.md).
+
 ## Notes
 
 - Labels are doubles, so a binary classification uses `0.0` and `1.0`.

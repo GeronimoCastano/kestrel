@@ -38,6 +38,7 @@ arguments, and an example whose output is the one Kestrel prints.
 | `std.regex` | Regular expressions: match, search, replace, capture. | [documented](regex.md) |
 | `std.encoding` | Base64, hex, CRC-32 and SHA-256 over the UTF-8 bytes of a string. | [documented](encoding.md) |
 | `std.kesdas` | Series and DataFrames with a pandas-shaped API: grouping, joins, rolling windows, plots. | [documented](kesdas.md) |
+| `std.kesplot` | Figures, axes, styles and the SVG backend. | [documented](kesplot.md) |
 
 ## Numbers
 

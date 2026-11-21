@@ -113,6 +113,9 @@ optimizer.step()
 | `fromDataFrame(frame, features, target)` | Builds a dataset from a frame. |
 | `trainTestSplit(dataset, testCount, seed = 0)` | Splits into train and test. |
 
+
+The complete member list, with every signature and argument, is in the [std.kesnet reference](kesnet-api.md).
+
 ## Notes
 
 - Everything is eager: each operation runs when it is written, and the graph is

@@ -12,6 +12,9 @@ number.
 - Windows build probe. The port is in progress.
 - The complete standard library reference, one page per module under
   `docs/std/`, published as a documentation site.
+- Complete member references for the data, plotting and learning libraries
+  (`std.kesdas`, `std.kesplot`, `std.kesnet`, `std.ml`), every signature and
+  argument included.
 
 ## 0.1.2 - 2026-11-20
 

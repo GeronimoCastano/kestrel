@@ -102,6 +102,9 @@ aggregations skip it: `sum`, `mean`, `count` and the rest behave as pandas does.
 Use `frame.dropNa()` to remove rows with a missing cell, `series.fillNa(value)` to
 replace them, or `interpolate`, `ffill` and `bfill` to fill from neighbours.
 
+
+The complete member list, with every signature and argument, is in the [std.kesdas reference](kesdas-api.md).
+
 ## Notes
 
 - Columns are found by name, not by position.
