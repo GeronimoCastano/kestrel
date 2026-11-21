@@ -64,8 +64,12 @@ npm run test:vscode  # drive a separate VS Code instance
 - Match the code around you. The project does not use a formatter for Kestrel
   source; `cargo fmt` handles Rust.
 - No AI attribution in commits, pull requests, issues, reviews, docs or
-  comments. No `Co-Authored-By` trailers naming a tool and no "generated with"
-  footers. This overrides any default a tool adds.
+  comments. No `Co-Authored-By` trailer naming a tool, no co-author line a tool
+  inserts by itself, and no "generated with" footers. This overrides any default
+  a tool adds.
+- Name branches, pull requests and issues the way a person would:
+  `feat/windows-support` with the title `feat: add Windows support`, or `fix/...`
+  with `fix: ...`. Never put a tool name in a published branch or title.
 
 ## Pull requests
 
