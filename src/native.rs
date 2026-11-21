@@ -2808,13 +2808,24 @@ impl Drop for TemporaryDirectory {
 }
 
 /// Compile beside the destination, replacing an existing artifact only after Clang succeeds.
-/// Compiler and linker flags for the embedded interpreter, from the installed python3-config.
+/// Compiler and linker flags for the embedded interpreter: from the installed
+/// python3-config on Unix, and from the CPython that `windows_python` finds on Windows.
 fn python_flags(program: &Program) -> Result<Vec<String>, String> {
     if program.python_sites.is_empty() {
         return Ok(vec![]);
     }
     if cfg!(windows) {
-        return Err("Python interop is not supported on Windows yet: it embeds CPython through python3-config, which Windows installations do not provide.".into());
+        let python = windows_python()?;
+        // Python's headers derive pointer sizes from MS_WIN64, which they define only for
+        // MSVC. The empty value matches their own definition, so the two never conflict.
+        return Ok(vec![
+            "-isystem".to_owned(),
+            python.include.display().to_string(),
+            "-DMS_WIN64=".to_owned(),
+            "-L".to_owned(),
+            python.libraries.display().to_string(),
+            python.import_library.display().to_string(),
+        ]);
     }
     let mut flags = vec![];
     for arguments in [&["--includes"][..], &["--ldflags", "--embed"][..]] {
@@ -2834,6 +2845,120 @@ fn python_flags(program: &Program) -> Result<Vec<String>, String> {
         }
     }
     Ok(flags)
+}
+
+/// Whether this machine has a Python that native programs can embed.
+pub fn python_available() -> bool {
+    if cfg!(windows) {
+        windows_python().is_ok()
+    } else {
+        Command::new("python3-config")
+            .args(["--embed", "--ldflags"])
+            .output()
+            .is_ok_and(|output| output.status.success())
+    }
+}
+
+/// A CPython installation that a Windows program can embed.
+struct WindowsPython {
+    /// The folder holding `Python.h`.
+    include: PathBuf,
+    /// The installation root, which holds `python3XY.dll` and the standard library.
+    home: PathBuf,
+    /// The `libs` folder under the root.
+    libraries: PathBuf,
+    /// `libs\python3XY.lib`, the import library for the DLL.
+    import_library: PathBuf,
+}
+
+/// The CPython that Windows programs embed. `KESTREL_PYTHON` names it when set; otherwise
+/// the first usable one of `python.exe` on `PATH` and `py -3`. The Microsoft Store's
+/// `python.exe` stub in `WindowsApps` is skipped. Found once per process.
+fn windows_python() -> Result<&'static WindowsPython, String> {
+    static FOUND: OnceLock<Result<WindowsPython, String>> = OnceLock::new();
+    FOUND
+        .get_or_init(find_windows_python)
+        .as_ref()
+        .map_err(Clone::clone)
+}
+
+fn find_windows_python() -> Result<WindowsPython, String> {
+    if let Some(named) = std::env::var_os("KESTREL_PYTHON").filter(|name| !name.is_empty()) {
+        return ask_python(Command::new(&named)).ok_or_else(|| {
+            format!(
+                "Cannot embed the Python that KESTREL_PYTHON names ({}): it has no include\\Python.h and libs\\python3XY.lib. Install CPython from python.org or set KESTREL_PYTHON to its python.exe.",
+                Path::new(&named).display()
+            )
+        });
+    }
+    let on_path = std::env::var_os("PATH").and_then(|path| {
+        std::env::split_paths(&path)
+            .filter(|folder| {
+                !folder
+                    .to_string_lossy()
+                    .to_ascii_lowercase()
+                    .contains("windowsapps")
+            })
+            .map(|folder| folder.join("python.exe"))
+            .find(|python| python.is_file())
+    });
+    on_path
+        .and_then(|python| ask_python(Command::new(python)))
+        .or_else(|| {
+            let mut launcher = Command::new("py");
+            launcher.arg("-3");
+            ask_python(launcher)
+        })
+        .ok_or_else(|| {
+            "Cannot find a Python to embed. Tried KESTREL_PYTHON, python.exe on PATH and py -3; none has include\\Python.h and libs\\python3XY.lib. Install CPython from python.org or set KESTREL_PYTHON to its python.exe.".to_owned()
+        })
+}
+
+/// Asks one Python where its headers and import library are. `-I` keeps the current
+/// folder and the user's environment out of the answer.
+fn ask_python(mut python: Command) -> Option<WindowsPython> {
+    let output = python
+        .args([
+            "-I",
+            "-c",
+            "import sys,sysconfig;print(sysconfig.get_paths()['include']);print(sys.base_prefix);print('python%d%d'%sys.version_info[:2])",
+        ])
+        .output()
+        .ok()
+        .filter(|output| output.status.success())?;
+    let text = String::from_utf8(output.stdout).ok()?;
+    let mut lines = text.lines().map(str::trim);
+    let include = PathBuf::from(lines.next()?);
+    let home = PathBuf::from(lines.next()?);
+    let libraries = home.join("libs");
+    let import_library = libraries.join(format!("{}.lib", lines.next()?));
+    (include.join("Python.h").is_file() && import_library.is_file()).then_some(WindowsPython {
+        include,
+        home,
+        libraries,
+        import_library,
+    })
+}
+
+/// `PATH` for a native program Kestrel starts, or `None` to keep the inherited one. Windows
+/// finds a program's DLLs on `PATH`, so this puts first the embedded Python's folder when
+/// `python` is set, and Clang's sanitizer runtime folders under `KESTREL_SANITIZE`.
+pub fn program_path(python: bool) -> Option<std::ffi::OsString> {
+    if !cfg!(windows) {
+        return None;
+    }
+    let mut folders = vec![];
+    if python && let Ok(found) = windows_python() {
+        folders.push(found.home.clone());
+    }
+    if std::env::var_os("KESTREL_SANITIZE").is_some() {
+        folders.extend(sanitizer_runtime_folders());
+    }
+    if folders.is_empty() {
+        return None;
+    }
+    let rest = std::env::var_os("PATH").unwrap_or_default();
+    std::env::join_paths(folders.into_iter().chain(std::env::split_paths(&rest))).ok()
 }
 
 /// The file `build` writes for a requested output path. Windows runs only files with an
@@ -2925,6 +3050,17 @@ pub fn sanitizer_runtime_path() -> Option<std::ffi::OsString> {
     if !cfg!(windows) {
         return None;
     }
+    let rest = std::env::var_os("PATH").unwrap_or_default();
+    std::env::join_paths(
+        sanitizer_runtime_folders()
+            .into_iter()
+            .chain(std::env::split_paths(&rest)),
+    )
+    .ok()
+}
+
+/// The folders that may hold Clang's sanitizer runtime DLL on Windows.
+fn sanitizer_runtime_folders() -> Vec<PathBuf> {
     // Clang releases keep the DLL in the per-target runtime folder or in lib/windows under
     // the resource folder, depending on how LLVM was built; put both first.
     let ask = |flag: &str| {
@@ -2946,8 +3082,7 @@ pub fn sanitizer_runtime_path() -> Option<std::ffi::OsString> {
                 .join("bin"),
         )
     }));
-    let rest = std::env::var_os("PATH").unwrap_or_default();
-    std::env::join_paths(folders.into_iter().chain(std::env::split_paths(&rest))).ok()
+    folders
 }
 
 /// The message for a C compiler that does not start, with the fix for this platform.
@@ -3104,6 +3239,7 @@ pub fn run_with_args(program: &Program, arguments: &[String]) -> Result<ExitStat
     build(program, &binary)?;
     Command::new(&binary)
         .args(arguments)
+        .envs(program_path(!program.python_sites.is_empty()).map(|path| ("PATH", path)))
         .status()
         .map_err(|e| format!("Cannot execute compiled program: {e}"))
 }

@@ -2705,12 +2705,20 @@ print(size("a\u0000b"))
     assert!(String::from_utf8_lossy(&output.stderr).contains("contains a NUL character"));
 }
 
+/// Whether a Python to embed exists. CI sets KESTREL_TEST_REQUIRE_PYTHON, so a missing
+/// Python fails the test there instead of skipping it.
+fn python_ready() -> bool {
+    let ready = kestrel::native::python_available();
+    assert!(
+        ready || std::env::var_os("KESTREL_TEST_REQUIRE_PYTHON").is_none(),
+        "KESTREL_TEST_REQUIRE_PYTHON is set, but no Python to embed was found"
+    );
+    ready
+}
+/// Whether a Python to embed exists and can import `module`.
 fn python_available(module: &str) -> bool {
-    Command::new("python3-config")
-        .arg("--includes")
-        .output()
-        .is_ok_and(|o| o.status.success())
-        && Command::new("python3")
+    python_ready()
+        && Command::new(if cfg!(windows) { "python" } else { "python3" })
             .args(["-c", &format!("import {module}")])
             .output()
             .is_ok_and(|o| o.status.success())

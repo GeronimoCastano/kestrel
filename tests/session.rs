@@ -497,14 +497,20 @@ fn native_calls_and_session_arguments_work_after_other_entries() {
     );
 }
 
+/// Whether a Python to embed exists. CI sets KESTREL_TEST_REQUIRE_PYTHON, so a missing
+/// Python fails the test there instead of skipping it.
+fn python_ready() -> bool {
+    let ready = kestrel::native::python_available();
+    assert!(
+        ready || std::env::var_os("KESTREL_TEST_REQUIRE_PYTHON").is_none(),
+        "KESTREL_TEST_REQUIRE_PYTHON is set, but no Python to embed was found"
+    );
+    ready
+}
+
 #[test]
 fn python_interpreter_state_is_shared_by_separate_entries() {
-    if !Command::new("python3-config")
-        .arg("--embed")
-        .arg("--ldflags")
-        .output()
-        .is_ok_and(|o| o.status.success())
-    {
+    if !python_ready() {
         return;
     }
     shows(
@@ -655,16 +661,11 @@ fn boxes_display_through_their_values_and_runtime_errors_keep_the_typed_expressi
     assert!(!errors.contains("session__"), "{errors}");
 }
 
-// The test stops a hung session through its Unix process group. Python interop is not
-// available on Windows, where the test would skip anyway.
+// The test stops a hung session through its Unix process group.
 #[cfg(unix)]
 #[test]
 fn python_background_callbacks_keep_stable_globals_and_dispatch_between_entries() {
-    if !Command::new("python3-config")
-        .args(["--embed", "--ldflags"])
-        .output()
-        .is_ok_and(|o| o.status.success())
-    {
+    if !python_ready() {
         return;
     }
     let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
@@ -774,11 +775,7 @@ let done := start()
 
 #[test]
 fn python_finalizers_cannot_call_into_released_session_values() {
-    if !Command::new("python3-config")
-        .args(["--embed", "--ldflags"])
-        .output()
-        .is_ok_and(|o| o.status.success())
-    {
+    if !python_ready() {
         return;
     }
     let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
@@ -884,11 +881,7 @@ values[1].n
 
 #[test]
 fn python_callback_errors_show_original_session_type_names() {
-    if !Command::new("python3-config")
-        .args(["--embed", "--ldflags"])
-        .output()
-        .is_ok_and(|out| out.status.success())
-    {
+    if !python_ready() {
         return;
     }
     shows(
@@ -936,11 +929,7 @@ fn namespace_imports_keep_aliases_types_and_saved_function_values_in_sessions() 
 
 #[test]
 fn python_worker_reentry_is_a_typed_failure_in_session_libraries() {
-    if !Command::new("python3-config")
-        .args(["--embed", "--ldflags"])
-        .output()
-        .is_ok_and(|output| output.status.success())
-    {
+    if !python_ready() {
         return;
     }
     let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();

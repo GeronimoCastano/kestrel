@@ -589,7 +589,8 @@ fn execute(binary: &Path, index: usize, timeout: Option<Duration>) -> std::io::R
         .arg(index.to_string())
         .stdin(Stdio::null())
         .stdout(Stdio::from(fs::File::create(&stdout)?))
-        .stderr(Stdio::from(fs::File::create(&stderr)?));
+        .stderr(Stdio::from(fs::File::create(&stderr)?))
+        .envs(crate::native::program_path(true).map(|path| ("PATH", path)));
     #[cfg(unix)]
     {
         use std::os::unix::process::CommandExt;
