@@ -330,7 +330,10 @@ mod tests {
         assert_eq!(names, ["abs", "bound", "count", "getenv", "sqrt", "strlen"]);
         // The dump spells unsigned long, which Windows keeps at 32 bits.
         let unsigned_long = Type::named(if cfg!(windows) { "CUInt32" } else { "CUInt64" });
-        assert_eq!(functions[1].parameters, std::slice::from_ref(&unsigned_long));
+        assert_eq!(
+            functions[1].parameters,
+            std::slice::from_ref(&unsigned_long)
+        );
         assert_eq!(functions[2].result, unsigned_long);
         assert_eq!(
             functions[5].parameters,
