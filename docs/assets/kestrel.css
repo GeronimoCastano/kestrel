@@ -12,3 +12,25 @@
 .md-typeset table:not([class]) th {
   font-weight: 600;
 }
+
+/* The default link colour comes from the primary colour, which is dark. Set it
+   explicitly so links stay readable in both schemes. */
+:root {
+  --md-typeset-a-color: #7a5b00;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-typeset-a-color: #e8c766;
+}
+
+::selection {
+  background: rgba(201, 162, 39, 0.4);
+}
+
+/* Keep module names on one line in the reference tables. */
+@media (min-width: 60em) {
+  .md-typeset table:not([class]) td:first-child,
+  .md-typeset table:not([class]) th:first-child {
+    white-space: nowrap;
+  }
+}

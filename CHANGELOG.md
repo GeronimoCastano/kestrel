@@ -23,7 +23,11 @@ number.
   `CUInt64`.
 - The VS Code extension, version 0.4.5, finds a compiler in the installers'
   default folders when the editor's `PATH` does not name it.
-- Standard library reference under `docs/std/` (in progress).
+- The complete standard library reference, one page per module under
+  `docs/std/`, published as a documentation site.
+- Complete member references for the data, plotting and learning libraries
+  (`std.kesdas`, `std.kesplot`, `std.kesnet`, `std.ml`), every signature and
+  argument included.
 
 ## 0.1.2 - 2026-11-20
 

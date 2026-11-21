@@ -68,7 +68,51 @@ nav:
       - Reference manual: manual.md
   - Standard library:
       - Overview: std/index.md
-      - std.path: std/path.md
+      - Core:
+          - std.core: std/core.md
+          - std.collections: std/collections.md
+          - std.str: std/str.md
+          - std.memory: std/memory.md
+          - std.func: std/func.md
+          - std.algebra: std/algebra.md
+          - std.set: std/set.md
+          - std.nat: std/nat.md
+          - std.real: std/real.md
+          - std.test: std/test.md
+      - Text and data:
+          - std.json: std/json.md
+          - std.csv: std/csv.md
+          - std.toml: std/toml.md
+          - std.regex: std/regex.md
+          - std.encoding: std/encoding.md
+      - Numbers:
+          - std.math: std/math.md
+          - std.random: std/random.md
+          - std.complex: std/complex.md
+          - std.prob: std/prob.md
+          - std.linalg: std/linalg.md
+          - std.stats: std/stats.md
+          - std.statistics: std/statistics.md
+      - Data and learning:
+          - std.kesdas: std/kesdas.md
+          - std.kesdas reference: std/kesdas-api.md
+          - std.kesnet: std/kesnet.md
+          - std.kesnet reference: std/kesnet-api.md
+          - std.ml: std/ml.md
+          - std.ml reference: std/ml-api.md
+          - std.kesplot: std/kesplot.md
+      - System:
+          - std.path: std/path.md
+          - std.fs: std/fs.md
+          - std.io: std/io.md
+          - std.args: std/args.md
+          - std.time: std/time.md
+          - std.datetime: std/datetime.md
+          - std.process: std/process.md
+          - std.term: std/term.md
+          - std.python: std/python.md
+          - std.c: std/c.md
+
   - Mathematics: math.md
   - Neural networks: kesnet.md
   - Editor: editors/vscode.md
