@@ -32,6 +32,7 @@
 //!   "edits":[{"start":80,"end":80,"text":"\n    Succ(k) ihk => { },\n"}]}]}
 //! ```
 
+use crate::paths::CanonicalPath;
 use crate::{
     diagnostic::Diagnostic,
     modules::{ModuleCheck, check_source, check_text},
@@ -56,7 +57,7 @@ pub const PROTOCOL: u64 = 1;
 /// folder holding `kestrel.project`, which need not be the workspace folder.
 pub fn run(root: PathBuf) -> Result<(), String> {
     let root = root
-        .canonicalize()
+        .canonical()
         .map_err(|error| format!("Cannot open {}: {error}", root.display()))?;
     let stdin = io::stdin();
     let mut stdout = io::stdout().lock();

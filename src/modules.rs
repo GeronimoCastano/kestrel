@@ -1,3 +1,4 @@
+use crate::paths::CanonicalPath;
 use crate::{
     Parsed,
     checker::{self, Checked, Environment, Symbol, Visibility},
@@ -137,7 +138,7 @@ pub fn read_package(folder: &Path) -> Result<Option<Package>, String> {
     }
     Ok(Some(Package {
         name,
-        root: folder.canonicalize().unwrap_or_else(|_| folder.to_owned()),
+        root: folder.canonical().unwrap_or_else(|_| folder.to_owned()),
         depends,
     }))
 }
@@ -269,8 +270,8 @@ fn virtual_module(name: &str) -> Option<(&'static str, &'static str)> {
 }
 
 pub fn check_path(path: impl AsRef<Path>, root: impl AsRef<Path>) -> io::Result<ProjectCheck> {
-    let root = root.as_ref().canonicalize()?;
-    let path = path.as_ref().canonicalize()?;
+    let root = root.as_ref().canonical()?;
+    let path = path.as_ref().canonical()?;
     let mut loader = Loader {
         entry: None,
         packages: load_packages(&root).map_err(invalid)?,
@@ -302,9 +303,9 @@ pub fn check_text(
     root: impl AsRef<Path>,
     text: String,
 ) -> io::Result<ProjectCheck> {
-    let root = root.as_ref().canonicalize()?;
+    let root = root.as_ref().canonical()?;
     let path = path.as_ref();
-    let path = match path.canonicalize() {
+    let path = match path.canonical() {
         Ok(path) => path,
         Err(_) => {
             let parent = match path.parent() {
@@ -314,7 +315,7 @@ pub fn check_text(
             let name = path.file_name().ok_or_else(|| {
                 io::Error::new(io::ErrorKind::InvalidInput, "The path needs a file name.")
             })?;
-            parent.canonicalize()?.join(name)
+            parent.canonical()?.join(name)
         }
     };
     let mut sources = BTreeMap::new();
@@ -353,7 +354,7 @@ pub(crate) fn check_session_cached(
     root: &Path,
     sources: &mut BTreeMap<PathBuf, String>,
 ) -> io::Result<ProjectCheck> {
-    let root = root.canonicalize()?;
+    let root = root.canonical()?;
     let path = root.join("session.kes");
     let mut loader = Loader {
         entry: None,
@@ -1089,7 +1090,7 @@ fn candidates(root: &Path, name: &str) -> Vec<PathBuf> {
             candidate.push(part);
         }
         candidate.push(format!("{}.kes", parts[split..].join(".")));
-        if let Ok(canonical) = candidate.canonicalize()
+        if let Ok(canonical) = candidate.canonical()
             && canonical.is_file()
         {
             candidates.insert(canonical);

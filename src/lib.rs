@@ -13,6 +13,7 @@ mod numerical;
 pub mod ownership;
 mod package_lock;
 pub mod parser;
+pub mod paths;
 mod probability;
 pub mod proof;
 pub mod resolution;

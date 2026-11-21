@@ -1,4 +1,5 @@
 //! C headers are read with Clang; their signatures map onto the std.c boundary types.
+use crate::paths::CanonicalPath;
 use crate::types::Type;
 use std::{
     collections::BTreeMap,
@@ -29,7 +30,7 @@ pub(crate) fn header_path(header: &str, directories: &[PathBuf]) -> Option<PathB
         .map(|directory| directory.join(header))
         .chain(std::iter::once(PathBuf::from(header)))
         .find(|path| path.is_file())
-        .and_then(|path| path.canonicalize().ok())
+        .and_then(|path| path.canonical().ok())
 }
 
 pub fn read_header(header: &str, directories: &[PathBuf]) -> Result<Header, String> {

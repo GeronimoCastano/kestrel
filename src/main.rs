@@ -1,3 +1,4 @@
+use kestrel::paths::CanonicalPath;
 use kestrel::{
     lexer::{TokenKind, lex},
     modules::{ProjectCheck, check_path, check_source, check_text},
@@ -599,14 +600,14 @@ fn native_command(
     });
     let resolved = |path: &Path| -> Result<PathBuf, String> {
         if path.exists() {
-            return path.canonicalize().map_err(|e| e.to_string());
+            return path.canonical().map_err(|e| e.to_string());
         }
         let parent = path
             .parent()
             .filter(|p| !p.as_os_str().is_empty())
             .unwrap_or(Path::new("."));
         Ok(parent
-            .canonicalize()
+            .canonical()
             .map_err(|e| e.to_string())?
             .join(path.file_name().ok_or("Output needs a file name.")?))
     };

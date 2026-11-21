@@ -1,5 +1,6 @@
 //! `kestrel test`: finds `@test` functions in a package's tests folder, builds one
 //! program per test file, and runs each test as its own process, several at a time.
+use crate::paths::CanonicalPath;
 use crate::{
     core::{self, Program},
     modules::{self, PROJECT_FILE},
@@ -117,7 +118,7 @@ pub fn run(package: &Path, options: &Options, out: &mut impl Write) -> Result<bo
         return Err("A test timeout must be positive.".into());
     }
     let package = package
-        .canonicalize()
+        .canonical()
         .map_err(|e| format!("Cannot open {}: {e}", package.display()))?;
     if modules::load_packages(&package)?.is_empty() {
         return Err(format!(

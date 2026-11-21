@@ -1,4 +1,5 @@
 //! Sessions keep accepted source for checking and execute each native entry once.
+use crate::paths::CanonicalPath;
 use crate::{
     core,
     diagnostic::Diagnostic,
@@ -764,7 +765,7 @@ impl Session {
         notebook: bool,
     ) -> Result<Self, String> {
         Ok(Self {
-            root: root.canonicalize().map_err(|e| e.to_string())?,
+            root: root.canonical().map_err(|e| e.to_string())?,
             libraries,
             history: History::default(),
             state: core::SessionState::default(),
