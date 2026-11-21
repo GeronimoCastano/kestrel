@@ -334,17 +334,17 @@ arbitrary leading dimensions are written by reshaping to rank 3.
 
 ## Examples
 
-- [`examples/kesnet.kes`](examples/kesnet.kes) — regression with a two-layer
+- [`examples/kesnet.kes`](testdata/language/kesnet.kes) — regression with a two-layer
   network, Adam, and a learning-rate schedule.
-- [`examples/kesnetcnn.kes`](examples/kesnetcnn.kes) — convolutional classifier
+- [`examples/kesnetcnn.kes`](testdata/language/kesnetcnn.kes) — convolutional classifier
   with cross entropy.
-- [`examples/kesnettransformer.kes`](examples/kesnettransformer.kes) — a
+- [`examples/kesnettransformer.kes`](testdata/language/kesnettransformer.kes) — a
   transformer encoder trained on a tiny sequence task.
-- [`examples/kesnetrnn.kes`](examples/kesnetrnn.kes) — an LSTM sequence
+- [`examples/kesnetrnn.kes`](testdata/language/kesnetrnn.kes) — an LSTM sequence
   regressor.
-- [`examples/kesnetdata.kes`](examples/kesnetdata.kes) — a `kesdas` DataFrame,
+- [`examples/kesnetdata.kes`](testdata/language/kesnetdata.kes) — a `kesdas` DataFrame,
   `fromDataFrame`, and batched training.
-- [`examples/kesnetstate.kes`](examples/kesnetstate.kes) — saving and loading a
+- [`examples/kesnetstate.kes`](testdata/language/kesnetstate.kes) — saving and loading a
   model's parameters.
 
 Run one with:
@@ -353,5 +353,5 @@ Run one with:
 kestrel run examples/kesnet.kes
 ```
 
-The native tests are in [`tests/kesnet.rs`](tests/kesnet.rs); they compile and
+The native tests are in [`tests/kesnet.rs`](https://github.com/GeronimoCastano/kestrel/blob/main/tests/kesnet.rs); they compile and
 execute real programs through the same backend a user invokes.

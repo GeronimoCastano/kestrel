@@ -15,12 +15,17 @@ print(path.join("runs", "q3.csv"))    // runs/q3.csv
 
 A path here is only text. Nothing in this module checks that a file exists.
 `walk` is the one function that reads the disk; the rest only read the string.
+For the file itself, see [`std.fs`](index.md#system).
 
 ## Functions
 
 ### `fileName(path : String) : String`
 
 The last part of the path. A trailing slash is ignored.
+
+| Argument | Meaning |
+|---|---|
+| `path : String` | The path to read. |
 
 ```kestrel
 path.fileName("a/b.txt")   // "b.txt"
@@ -30,8 +35,13 @@ path.fileName("/")         // ""
 
 ### `parent(path : String) : String`
 
-Everything before the last part. `parent` of a bare name is `""`, and `parent`
-of a path at the root is `"/"`.
+Everything before the last part.
+
+| Argument | Meaning |
+|---|---|
+| `path : String` | The path to read. |
+
+`parent` of a bare name is `""`, and `parent` of a path at the root is `"/"`.
 
 ```kestrel
 path.parent("a/b.txt")     // "a"
@@ -44,6 +54,10 @@ path.parent("/b.txt")      // "/"
 The text after the last dot of the file name, without the dot. A name that
 starts with a dot, or has no dot, has no extension.
 
+| Argument | Meaning |
+|---|---|
+| `path : String` | The path to read. |
+
 ```kestrel
 path.extension("a/b.tar.gz")  // "gz"
 path.extension(".bashrc")     // ""
@@ -53,6 +67,10 @@ path.extension("Makefile")    // ""
 ### `stem(path : String) : String`
 
 The file name without its extension. Only the last dot is removed.
+
+| Argument | Meaning |
+|---|---|
+| `path : String` | The path to read. |
 
 ```kestrel
 path.stem("a/b.tar.gz")    // "b.tar"
@@ -64,6 +82,11 @@ path.stem(".bashrc")       // ".bashrc"
 Joins two paths with exactly one `/`. An absolute `part` replaces `base`, and an
 empty side leaves the other one alone.
 
+| Argument | Meaning |
+|---|---|
+| `base : String` | The path to extend. |
+| `part : String` | The part to append. An absolute `part` replaces `base`. |
+
 ```kestrel
 path.join("a", "b")        // "a/b"
 path.join("a/", "b")       // "a/b"
@@ -74,8 +97,14 @@ path.join("a", "")         // "a"
 
 ### `isAbsolute(path : String) : Bool`
 
-True when the path starts with `/`. This is a syntactic test: on Windows a path
-such as `C:\a` is not absolute by this rule.
+True when the path starts with `/`.
+
+| Argument | Meaning |
+|---|---|
+| `path : String` | The path to test. |
+
+This is a syntactic test. On Windows a path such as `C:\a` is not absolute by
+this rule.
 
 ```kestrel
 path.isAbsolute("/a")      // true
@@ -86,6 +115,10 @@ path.isAbsolute("a")       // false
 
 The non-empty parts between slashes.
 
+| Argument | Meaning |
+|---|---|
+| `path : String` | The path to split. |
+
 ```kestrel
 path.parts("/a//b/")       // ["a", "b"]
 ```
@@ -93,8 +126,13 @@ path.parts("/a//b/")       // ["a", "b"]
 ### `walk(root : String) : List[String] or Error with Effects`
 
 Every file below `root`, with paths that start with `root`. Directories
-themselves are not listed. The walk is depth first, and each directory's entries
-are visited in byte order.
+themselves are not listed.
+
+| Argument | Meaning |
+|---|---|
+| `root : String` | The directory to walk. |
+
+The walk is depth first, and each directory's entries are visited in byte order.
 
 ```kestrel
 for (file in path.walk("src")?) {

@@ -176,7 +176,7 @@ theorem complCompl[U](A : Set[U]) : Aᶜᶜ = A by {
 }
 ```
 
-`tests/fixtures/language/sets.kes` reproduces the six levels of the Subset world in Velleman's
+`testdata/language/sets.kes` reproduces the six levels of the Subset world in Velleman's
 Set Theory Game. `kestrel game` serves them as a **Sets** world with the same
 goal display. Membership here is a proof relation over an abstract set. It is
 unrelated to the runtime hash set's `contains`, which remains a computation.
@@ -237,7 +237,7 @@ theorem builderSingleton[U](a : U) : {x : U | x = a} = {a} by {
 }
 ```
 
-[families.kes](tests/fixtures/language/families.kes)(tests/fixtures/language/families.kes) proves the monotonicity and
+[families.kes](testdata/language/families.kes) proves the monotonicity and
 pair laws, one De Morgan law for families, and the singleton theorem.
 
 ### Code values in sets
@@ -259,7 +259,7 @@ theorem dogInSet(d : Dog, A : Set[Dog], h : d ∈ A) : d ∈ A by {
 The kernel treats a class value as an opaque element. It checks membership and
 subset, but it does not inspect the object's fields or call its methods. A
 generic theorem such as `A ⊆ A` works at `Set[Dog]` without a separate proof.
-[classsets.kes](tests/fixtures/language/classsets.kes)(tests/fixtures/language/classsets.kes) is the runnable version.
+[classsets.kes](testdata/language/classsets.kes) is the runnable version.
 
 ### `sorry`
 
@@ -303,10 +303,10 @@ Immutable classes and records with readable constructors support field and pure
 method expressions in theorems, with no extra marker. Subclass overrides of a
 method used by a theorem are refused across the whole checked program. The same
 reading applies to theorem citations, simplification and executable proof
-arguments; see `tests/fixtures/language/classtheorems.kes`.
+arguments; see `testdata/language/classtheorems.kes`.
 
 A class value can be an element of a proof-level set;
-[classsets.kes](tests/fixtures/language/classsets.kes)(tests/fixtures/language/classsets.kes) proves a membership fact about
+[classsets.kes](testdata/language/classsets.kes) proves a membership fact about
 `Dog` objects.
 
 ## Operator aliases
@@ -337,7 +337,7 @@ The supported declaration forms are:
 | `infixr 10 "⊕" = add` | `a ⊕ b ⊕ c` means `a ⊕ (b ⊕ c)` |
 | `infix 10 "⊕" = add` | Left grouping; chaining is accepted for now |
 
-`tests/fixtures/language/operators.kes` is the runnable version.
+`testdata/language/operators.kes` is the runnable version.
 
 ## Rewriting `add(a, b)` to `a + b`
 
@@ -373,7 +373,7 @@ The same mechanism works for any checked equation. Mark it `@simp` to add it to
 the default rule set, or cite it as `simp [name]` for one proof. Put `←` before
 a rule to use it from right to left: `rw [← h]` turns `x ∈ A` into `x ∈ s`
 when `h : s = A`, and `simp [← h]` does the same inside the simplifier.
-`tests/fixtures/language/rewrite.kes` is the runnable version.
+`testdata/language/rewrite.kes` is the runnable version.
 
 ## Axioms and examples
 
@@ -402,7 +402,7 @@ theorem useAxiom[U](A : Set[U]) : ∃ x : U, x ∈ A by {
 
 The checker reports `W_PROOF_AXIOM`. An axiom is admitted, like a theorem
 proved with `sorry`, so a function cannot use it to remove a run-time check.
-[axioms.kes](tests/fixtures/language/axioms.kes)(tests/fixtures/language/axioms.kes) has both forms.
+[axioms.kes](testdata/language/axioms.kes) has both forms.
 
 ## Tactics
 
@@ -591,7 +591,7 @@ disjunction, existentials, universals, contradiction, case analysis and
 rewriting. A **Sets** world adds the six Subset World levels: exact membership,
 applying a subset proof, `have`, implication, reflexivity and transitivity.
 Those six start with an empty proof so the goal is visible; the solved proofs
-are in `tests/fixtures/language/sets.kes`. Use `sorry` only when you want to move on with a
+are in `testdata/language/sets.kes`. Use `sorry` only when you want to move on with a
 sketch. `src/game.rs` holds them, and `src/game.html` is the client.
 
 ## Standard modules
@@ -607,7 +607,7 @@ sketch. `src/game.rs` holds them, and `src/game.html` is the client.
 | `std.linalg` | The existing dot, norms, solves, decompositions and matrix operations over `Tensor`. |
 | `std.math` | The existing scalar functions and constants. |
 
-`tests/fixtures/language/math.kes` exercises the first five modules together.
+`testdata/language/math.kes` exercises the first five modules together.
 
 ## Kernel scope
 
