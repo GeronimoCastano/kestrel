@@ -6,8 +6,14 @@ build-backend = "setuptools.build_meta"
 name = "kestrel-kernel"
 version = "0.1.0"
 description = "A Jupyter kernel for the Kestrel language"
+readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.9"
 dependencies = ["ipykernel>=6.0"]
+
+[project.urls]
+Homepage = "https://github.com/GeronimoCastano/kestrel"
+
 
 [tool.setuptools]
 packages = ["kestrel_kernel"]

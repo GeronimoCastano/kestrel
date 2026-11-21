@@ -11,3 +11,7 @@ node_modules/
 # Documentation site build output
 .site-src/
 site/
+
+# Python packaging for the Jupyter kernel
+editors/jupyter/dist/
+editors/jupyter/build/
