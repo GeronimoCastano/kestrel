@@ -25,46 +25,21 @@ theorem addZeroR(n : Nat) : add(n, Zero) = n by {
 }
 ```
 
-## Syntax choices
+## Proof syntax
 
-The project requires three options per language feature, scored equally on
-correctness, versatility and performance.
+`by { ... }` opens a tactic block before the term. It keeps every existing term
+proof valid, and it separates tactic parsing from ordinary expression parsing,
+so a name such as `rfl` or `simp` never becomes a keyword outside a proof. The
+parser pays one token of lookahead.
 
-### Proof-script marker
+`forall n : Nat, P` and `exists n : Nat, P` quantify. The spelling matches the
+rest of Kestrel's `name : Type` notation, and the parenthesized
+`forall (n : Nat), P` also parses. A quantifier acts only inside a theorem
+statement, where a value cannot start a term.
 
-| Option | Correctness | Versatility | Performance | Score |
-|---|---:|---:|---:|---:|
-| `by { ... }` before the block (chosen) | 5 | 5 | 5 | 5.00 |
-| `proof { ... }` | 5 | 4 | 5 | 4.67 |
-| A bare `{ ... }` always means tactics | 3 | 5 | 5 | 4.33 |
-
-`by` keeps every existing term proof valid. It separates tactic parsing from
-ordinary expression parsing, so a name such as `rfl` or `simp` never becomes a
-keyword outside a proof. The parser pays one token of lookahead.
-
-### Quantifier syntax
-
-| Option | Correctness | Versatility | Performance | Score |
-|---|---:|---:|---:|---:|
-| `forall n : Nat, P` and `exists n : Nat, P` (chosen) | 5 | 5 | 5 | 5.00 |
-| `forall (n : Nat), P` only | 5 | 4 | 5 | 4.67 |
-| `for all n : Nat, P` | 4 | 4 | 5 | 4.33 |
-
-The first spelling matches the rest of Kestrel's `name : Type` notation. The
-parenthesized form also parses. `forall` and `exists` only act as quantifiers
-inside a theorem statement, where a value cannot start a term.
-
-### Live goal display
-
-| Option | Correctness | Versatility | Performance | Score |
-|---|---:|---:|---:|---:|
-| A Webview view beside the editor (chosen) | 5 | 5 | 4 | 4.67 |
-| Hover text at the cursor | 5 | 2 | 5 | 4.00 |
-| A status-bar item | 4 | 2 | 5 | 3.67 |
-
-The view holds multiple goals, hypothesis context, errors and completion. It
-redraws after a short debounce, so a burst of typing costs one checker request.
-The compiler still does all checking; the webview only formats the reply.
+In the editor, a view beside the code shows the goals, the hypotheses, errors
+and completion. It redraws after a short debounce, so a burst of typing costs
+one checker request; the compiler does the checking.
 
 ## Logic
 
