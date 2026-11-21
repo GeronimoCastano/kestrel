@@ -4223,7 +4223,9 @@ static KRecord_$COLUMN$ k_kesdas_group_stat(KRecord_$COLUMN$ *column, KRecord_$I
             out.handle->storage[g].value = stat == 0 ? sums[g] : (counts[g] ? sums[g] / (double)counts[g] : (0.0 / 0.0));
         result.f$FLOATS_FIELD$ = out;
     }
-    result.f$MISSING_FIELD$ = k_list_$MISSING$_blank((size_t)(groups > 0 ? groups : 0));
+    KRecord_$MISSING$ gone = k_list_$MISSING$_blank((size_t)(groups > 0 ? groups : 0));
+    for (int64_t g = 0; g < groups; ++g) gone.handle->storage[g].value = false;
+    result.f$MISSING_FIELD$ = gone;
     free(sums); free(isums); free(counts);
     return result;
 }
@@ -4307,9 +4309,13 @@ static KRecord_$COLUMN$ k_kesdas_index(int64_t count) {
     result.f$KIND_FIELD$ = 0;
     result.f$SIZE_FIELD$ = (int64_t)n;
     KRecord_$INTS$ out = k_list_$INTS$_blank(n);
-    for (size_t i = 0; i < n; ++i) out.handle->storage[i].value = (int64_t)i;
+    KRecord_$MISSING$ gone = k_list_$MISSING$_blank(n);
+    for (size_t i = 0; i < n; ++i) {
+        out.handle->storage[i].value = (int64_t)i;
+        gone.handle->storage[i].value = false;
+    }
     result.f$INTS_FIELD$ = out;
-    result.f$MISSING_FIELD$ = k_list_$MISSING$_blank(n);
+    result.f$MISSING_FIELD$ = gone;
     return result;
 }
 
@@ -4325,8 +4331,10 @@ static KRecord_$COLUMN$ k_kesdas_repeat_names(KRecord_$STRS$ names, int64_t coun
         KString name = names.handle->items[i]->value;
         for (size_t j = 0; j < each; ++j) k_list_$STRS$_append(&out, k_string_copy(name));
     }
+    KRecord_$MISSING$ gone = k_list_$MISSING$_blank(total);
+    for (size_t i = 0; i < total; ++i) gone.handle->storage[i].value = false;
     result.f$STRS_FIELD$ = out;
-    result.f$MISSING_FIELD$ = k_list_$MISSING$_blank(total);
+    result.f$MISSING_FIELD$ = gone;
     return result;
 }
 
