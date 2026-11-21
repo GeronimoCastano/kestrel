@@ -516,6 +516,22 @@ print(true)
 }
 
 #[test]
+fn binary_cross_entropy_gives_every_logit_its_gradient() {
+    // The loss is a scalar; each logit's gradient is (sigmoid(x) - y) / count.
+    let output = run_program(
+        r#"
+import std.kesnet.{BCEWithLogitsLoss}
+let target := Variable.fromArray([1.0, 0.0, 1.0, 0.0].toArray(), (2, 2))
+let logits := Variable.parameter([0.0, 0.0, 0.0, 0.0].toArray(), (2, 2))
+let loss := BCEWithLogitsLoss().forward(logits, target)
+loss.backward()
+match logits.grad() { Some(g) => print(g), None => print("none") }
+"#,
+    );
+    assert_eq!(output, "[[-0.125, 0.125],\n [-0.125, 0.125]]\n");
+}
+
+#[test]
 fn lstm_fused_cell_trains_the_same_path_as_the_gate_operations() {
     let output = run_program(
         r#"
