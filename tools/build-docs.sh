@@ -18,8 +18,16 @@ cp CHANGELOG.md .site-src/changelog.md
 cp -R testdata .site-src/
 
 case "${1:-build}" in
-  build) mkdocs build ;;
-  strict) mkdocs build --strict ;;
+  build)
+    mkdocs build
+    # The source tree is only an intermediate; leaving it in the repository
+    # makes `kestrel test` pick up a second copy of the example programs.
+    rm -rf .site-src
+    ;;
+  strict)
+    mkdocs build --strict
+    rm -rf .site-src
+    ;;
   serve) mkdocs serve ;;
   *) echo "usage: $0 [build|strict|serve]" >&2; exit 2 ;;
 esac

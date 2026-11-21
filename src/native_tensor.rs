@@ -119,8 +119,9 @@ impl Emitter<'_> {
                 array(2)
             )),
             "slice" => {
-                let parts = args[1..]
-                    .chunks_exact(3)
+                let (groups, _) = args[1..].as_chunks::<3>();
+                let parts = groups
+                    .iter()
                     .map(|p| format!("{{{},{},{}}}", p[0], p[1], p[2]))
                     .collect::<Vec<_>>()
                     .join(",");
