@@ -8,7 +8,10 @@ use std::{fs, process::Command};
 fn run_program(source: &str) -> String {
     let dir = native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
     let file = dir.path().join("program.kes");
-    fs::write(&file, source).unwrap();
+    // Programs that save files name /tmp; they write into this test's folder instead,
+    // spelled with forward slashes so a Windows path needs no escapes in Kestrel text.
+    let folder = dir.path().display().to_string().replace('\\', "/");
+    fs::write(&file, source.replace("/tmp/", &format!("{folder}/"))).unwrap();
     let project = check_path(&file, dir.path()).unwrap();
     assert!(project.is_ok(), "{}", project.render_diagnostics());
     let program = core::lower(&project).unwrap_or_else(|errors| panic!("{errors:#?}"));

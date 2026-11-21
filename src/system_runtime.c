@@ -1,10 +1,12 @@
 /* Format specs, files, processes and clocks (REVIEW2 section 4). */
-#include <dirent.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <sys/wait.h>
 #include <time.h>
+#ifndef _WIN32
+#include <dirent.h>
+#include <sys/wait.h>
 #include <unistd.h>
+#endif
 
 /* Python's format mini-language: [[fill]align][sign][#][0][width][,|_][.precision][type]. */
 typedef struct {
@@ -249,7 +251,13 @@ static K_UNUSED bool k_fs_create_dirs(KString path, KError *error) {
     char *name = k_c_text(path);
     size_t length = strlen(name);
     for (size_t i = 1; i <= length; ++i) {
+#ifdef _WIN32
+        if (name[i] != '/' && name[i] != '\\' && name[i] != 0) continue;
+        /* A drive such as C: is not a folder to create. */
+        if (i == 2 && name[1] == ':') continue;
+#else
         if (name[i] != '/' && name[i] != 0) continue;
+#endif
         char saved = name[i];
         name[i] = 0;
         struct stat info;
@@ -287,6 +295,35 @@ static K_UNUSED bool k_fs_copy(KString from, KString to, KError *error) {
     free(a);
     if (!in) { *error = k_io_error("Cannot open file"); return false; }
     char *b = k_c_text(to);
+#ifdef _WIN32
+    /* Open without truncation so path aliases cannot erase the input. Windows has no inode
+       numbers; the volume serial and file index name a file instead. */
+    int descriptor = _open(b, _O_WRONLY | _O_CREAT | _O_BINARY, _S_IREAD | _S_IWRITE);
+    free(b);
+    if (descriptor < 0) { *error = k_io_error("Cannot create file"); fclose(in); return false; }
+    BY_HANDLE_FILE_INFORMATION input_file, output_file;
+    if (!GetFileInformationByHandle((HANDLE)_get_osfhandle(_fileno(in)), &input_file)
+        || !GetFileInformationByHandle((HANDLE)_get_osfhandle(descriptor), &output_file)) {
+        *error = k_io_error("Cannot inspect files for copying");
+        _close(descriptor);
+        fclose(in);
+        return false;
+    }
+    if (input_file.dwVolumeSerialNumber == output_file.dwVolumeSerialNumber
+        && input_file.nFileIndexHigh == output_file.nFileIndexHigh
+        && input_file.nFileIndexLow == output_file.nFileIndexLow) {
+        *error = k_runtime_error(3, K_TEXT("Cannot copy a file onto itself"));
+        _close(descriptor);
+        fclose(in);
+        return false;
+    }
+    if (_chsize_s(descriptor, 0) != 0) {
+        *error = k_io_error("Cannot truncate destination file");
+        _close(descriptor);
+        fclose(in);
+        return false;
+    }
+#else
     /* Open without truncation so path aliases cannot erase the input. */
     int descriptor = open(b, O_WRONLY | O_CREAT, 0666);
     free(b);
@@ -310,6 +347,7 @@ static K_UNUSED bool k_fs_copy(KString from, KString to, KError *error) {
         fclose(in);
         return false;
     }
+#endif
     FILE *out = fdopen(descriptor, "wb");
     if (!out) {
         *error = k_io_error("Cannot create file stream");
@@ -360,10 +398,18 @@ static K_UNUSED bool k_fs_list_dir(KString path, KString **names, size_t *count,
     return true;
 }
 static K_UNUSED bool k_fs_temp_dir(KString *path, KError *error) {
+#ifdef _WIN32
+    char folder[MAX_PATH + 1];
+    DWORD found = GetTempPathA(sizeof folder, folder);
+    if (!found || found > MAX_PATH) { *error = k_io_error("Cannot find the temporary folder"); return false; }
+    const char *base = folder;
+#else
     const char *base = getenv("TMPDIR");
     if (!base || !*base) base = "/tmp";
+#endif
     char pattern[4096];
-    int length = snprintf(pattern, sizeof pattern, "%s%skestrel-XXXXXX", base, base[strlen(base) - 1] == '/' ? "" : "/");
+    char last = base[strlen(base) - 1];
+    int length = snprintf(pattern, sizeof pattern, "%s%skestrel-XXXXXX", base, last == '/' || last == '\\' ? "" : "/");
     if (length < 0 || (size_t)length >= sizeof pattern || !mkdtemp(pattern)) {
         *error = k_io_error("Cannot create a temporary directory");
         return false;

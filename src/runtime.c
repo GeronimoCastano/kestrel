@@ -15,11 +15,13 @@
 #include <limits.h>
 #include <errno.h>
 #include <locale.h>
-#include <pthread.h>
-#include <sched.h>
 #include <setjmp.h>
 #include <signal.h>
+#ifndef _WIN32
+#include <pthread.h>
+#include <sched.h>
 #include <unistd.h>
+#endif
 
 typedef struct { const char *file; size_t line, column; const char *expression; } KLocation;
 _Noreturn static void k_fatal(const char *message) {
@@ -38,6 +40,52 @@ _Noreturn static void k_fatal(const char *message) {
 #ifndef K_SANITIZED
 #define K_SANITIZED 0
 #endif
+#ifdef _WIN32
+/* Windows raises EXCEPTION_STACK_OVERFLOW on the thread that ran out. Each thread keeps
+   a stack guarantee so the handler has room to report it. */
+static LONG CALLBACK k_overflow_handler(EXCEPTION_POINTERS *exception) {
+    if (exception->ExceptionRecord->ExceptionCode != EXCEPTION_STACK_OVERFLOW) return EXCEPTION_CONTINUE_SEARCH;
+    static const char message[] =
+        "kestrel: stack overflow: a chain of calls went too deep, probably unbounded recursion\n";
+    DWORD written = 0;
+    WriteFile(GetStdHandle(STD_ERROR_HANDLE), message, sizeof message - 1, &written, NULL);
+    TerminateProcess(GetCurrentProcess(), 1);
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+static void *k_overflow_stack_install(void) __attribute__((unused));
+static void *k_overflow_stack_install(void) {
+    ULONG reserve = 1 << 16;
+    if (!K_SANITIZED) SetThreadStackGuarantee(&reserve);
+    return NULL;
+}
+static void k_overflow_stack_remove(void *stack) __attribute__((unused));
+static void k_overflow_stack_remove(void *stack) { (void)stack; }
+static void k_overflow_guard(void) __attribute__((unused));
+static void k_overflow_guard(void) {
+    if (K_SANITIZED) return;
+    k_overflow_stack_install();
+    AddVectoredExceptionHandler(1, k_overflow_handler);
+}
+/* The console shows UTF-8 only in code page 65001; restore the caller's page at exit. */
+static UINT k_console_page;
+static void k_console_restore(void) { if (k_console_page) SetConsoleOutputCP(k_console_page); }
+/* Output is bytes, as on POSIX: no CRLF translation on standard output or error. */
+static void k_platform_start(void) __attribute__((unused));
+static void k_platform_start(void) {
+    _setmode(_fileno(stdout), _O_BINARY);
+    _setmode(_fileno(stderr), _O_BINARY);
+    DWORD mode;
+    if (GetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), &mode) || GetConsoleMode(GetStdHandle(STD_ERROR_HANDLE), &mode)) {
+        UINT page = GetConsoleOutputCP();
+        if (page != CP_UTF8 && SetConsoleOutputCP(CP_UTF8)) {
+            k_console_page = page;
+            atexit(k_console_restore);
+        }
+    }
+}
+#else
+static void k_platform_start(void) __attribute__((unused));
+static void k_platform_start(void) {}
 /* A Kestrel program cannot dereference a bad pointer, so a segmentation fault means the
    stack ran out. Report it from a separate signal stack instead of dying silently. */
 static void k_overflow_handler(int signal_number) {
@@ -87,6 +135,7 @@ static void k_overflow_guard(void) {
     sigaction(SIGSEGV, &action, NULL);
     sigaction(SIGBUS, &action, NULL);
 }
+#endif
 /* Set by a session entry that stopped early on a propagated Error; the host reads it. */
 static int k_session_abort __attribute__((unused));
 /* A notebook host arms these around one entry, so a runtime stop ends the cell and
@@ -365,6 +414,8 @@ static KString k_text_bool(bool value) {
     return value ? (KString) { "true", 4, NULL } : (KString) { "false", 5, NULL };
 }
 static KString k_text_double(double value) {
+    /* C libraries disagree on a NaN's sign and spelling; print it as macOS does. */
+    if (isnan(value)) return (KString) { "nan", 3, NULL };
     char buffer[64];
     locale_t previous = uselocale(k_number_locale());
     int length = snprintf(buffer, sizeof buffer, "%.17g", value);
@@ -378,6 +429,7 @@ static KString k_text_double(double value) {
 }
 static KString k_text_fixed(double value, uint32_t precision) {
     if (precision > INT_MAX) k_fatal("Format precision is too large");
+    if (isnan(value)) return k_string_bytes("nan", 3);
     locale_t previous = uselocale(k_number_locale());
     int length = snprintf(NULL, 0, "%.*f", (int)precision, value);
     uselocale(previous);
@@ -475,6 +527,23 @@ static void k_drop_run(void *value, void (*run)(void *, KDropStack *)) {
     if (stack.tasks != stack.small) free(stack.tasks);
 }
 static void k_drop_free(void *value, KDropStack *stack) { (void)stack; free(value); }
+/* Blocks aligned past max_align_t. The UCRT has no aligned_alloc, and its aligned blocks
+   need their own free. */
+static void *k_aligned_alloc(size_t alignment, size_t size) {
+#ifdef _WIN32
+    return _aligned_malloc(size, alignment);
+#else
+    return aligned_alloc(alignment, size);
+#endif
+}
+static void k_drop_aligned_free(void *value, KDropStack *stack) {
+    (void)stack;
+#ifdef _WIN32
+    _aligned_free(value);
+#else
+    free(value);
+#endif
+}
 
 /* Collection cells and map entries come from per-thread free lists in 16-byte classes.
    A global list keeps every chunk reachable. Sanitizer and leak-check builds use malloc,
@@ -917,6 +986,7 @@ static void k_string_append_bool(KString *target, bool value) {
     else k_string_append_bytes(target, "false", 5);
 }
 static void k_string_append_double(KString *target, double value) {
+    if (isnan(value)) { k_string_append_bytes(target, "nan", 3); return; }
     char buffer[64];
     locale_t previous = uselocale(k_number_locale());
     int length = snprintf(buffer, sizeof buffer, "%.17g", value);

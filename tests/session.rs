@@ -650,6 +650,9 @@ fn boxes_display_through_their_values_and_runtime_errors_keep_the_typed_expressi
     assert!(!errors.contains("session__"), "{errors}");
 }
 
+// The test stops a hung session through its Unix process group. Python interop is not
+// available on Windows, where the test would skip anyway.
+#[cfg(unix)]
 #[test]
 fn python_background_callbacks_keep_stable_globals_and_dispatch_between_entries() {
     if !Command::new("python3-config")

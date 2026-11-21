@@ -1,7 +1,9 @@
 // Probability distributions: parameter validation, densities/masses, CDFs and
 // sampling. The code is shared by object methods and the no-object static API.
 #include <time.h>
+#ifndef _WIN32
 #include <unistd.h>
+#endif
 
 enum {
     K_DIST_NORMAL = 0,

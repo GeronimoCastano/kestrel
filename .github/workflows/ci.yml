@@ -50,12 +50,8 @@ jobs:
         run: ./tools/check_mathlib.sh
 
   linux:
-    name: Build and test (Linux, experimental)
+    name: Build and test (Linux)
     runs-on: ubuntu-latest
-    # Linux support is in progress. The suite passes except two DataFrame
-    # comparisons that disagree with the pandas output recorded on macOS.
-    # Informational until those are fixed; see the job log for the diff.
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
 
@@ -72,6 +68,58 @@ jobs:
 
       - name: Run the test suite
         run: cargo test
+
+  windows:
+    name: Build and test (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@1.95.0
+
+      - name: Cache the build
+        uses: Swatinem/rust-cache@v2
+
+      # The runner image ships LLVM. Clang finds the MSVC linker and the Windows SDK
+      # from the Visual Studio installation on the image.
+      - name: Show the C toolchain
+        run: clang --version
+
+      - name: Run the test suite
+        run: cargo test --no-fail-fast
+
+      # The suite drives the library; these steps drive the shipped binary the way a
+      # user and the editor extension do.
+      - name: Build the compiler
+        run: cargo build --release
+
+      - name: Check, run, build, session and serve
+        shell: bash
+        run: |
+          set -euo pipefail
+          kestrel=target/release/kestrel.exe
+          folder="$RUNNER_TEMP/smoke"
+          mkdir -p "$folder"
+          printf 'print("Hello, Kestrel!")\n' > "$folder/hello.kes"
+          "$kestrel" check "$folder/hello.kes"
+          test "$("$kestrel" run "$folder/hello.kes")" = "Hello, Kestrel!"
+          "$kestrel" build -o "$folder/hello" "$folder/hello.kes"
+          test "$("$folder/hello.exe")" = "Hello, Kestrel!"
+          printf 'let n := 40\nprint(n + 2)\n:quit\n' | "$kestrel" session --root "$folder" | tee "$folder/session.txt"
+          grep -qx 42 "$folder/session.txt"
+          printf '{"id":1,"op":"ping"}\n{"id":2,"op":"shutdown"}\n' | "$kestrel" serve --root "$folder" | tee "$folder/serve.txt"
+          grep -q '"id":1' "$folder/serve.txt"
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Run the editor extension tests
+        working-directory: editors/vscode-kestrel
+        shell: bash
+        run: node --test test/*.test.js
 
   editor:
     name: Editor extension

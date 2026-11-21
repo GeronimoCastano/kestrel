@@ -18,7 +18,7 @@ use std::{
 pub(super) fn entry_points(program: &Program, out: &mut String) {
     let count = program.globals.len();
     let types = program.layouts.len();
-    writeln!(out,"void k_session_step(void ***globals,size_t *count,int argc,char **argv) {{\n    size_t previous=*count;KSessionVersion *version=calloc(1,sizeof *version);if(!version) k_fatal(\"Out of memory\");\n    version->previous=atomic_load_explicit(&k_session_version,memory_order_acquire);\n    version->globals=calloc({},sizeof *version->globals);if(!version->globals) k_fatal(\"Out of memory\");\n    if(previous) memcpy(version->globals,*globals,previous*sizeof *version->globals);\n    k_session_globals=version->globals;*globals=version->globals;*count={count};",count.max(1)).unwrap();
+    writeln!(out,"K_EXPORT void k_session_step(void ***globals,size_t *count,int argc,char **argv) {{\n    size_t previous=*count;KSessionVersion *version=calloc(1,sizeof *version);if(!version) k_fatal(\"Out of memory\");\n    version->previous=atomic_load_explicit(&k_session_version,memory_order_acquire);\n    version->globals=calloc({},sizeof *version->globals);if(!version->globals) k_fatal(\"Out of memory\");\n    if(previous) memcpy(version->globals,*globals,previous*sizeof *version->globals);\n    k_session_globals=version->globals;*globals=version->globals;*count={count};",count.max(1)).unwrap();
     for (index, ty) in program.globals.iter().enumerate() {
         if *ty != Ty::Unit {
             writeln!(out,"    if(!k_session_globals[{index}]) {{k_session_globals[{index}]=calloc(1,sizeof({}));if(!k_session_globals[{index}]) k_fatal(\"Out of memory\");}}",c_type(*ty)).unwrap();
@@ -58,7 +58,7 @@ pub(super) fn entry_points(program: &Program, out: &mut String) {
     if program.statics.iter().any(|field| field.mutable) {
         out.push_str("    k_static_init_all();\n");
     }
-    out.push_str("    (void)argc;(void)argv;k_fn_0();\n    if(fflush(stdout)==EOF) k_fatal(\"Cannot write standard output\");\n}\nvoid k_session_drop(void ***globals) {\n    k_session_globals=*globals;\n");
+    out.push_str("    (void)argc;(void)argv;k_fn_0();\n    if(fflush(stdout)==EOF) k_fatal(\"Cannot write standard output\");\n}\nK_EXPORT void k_session_drop(void ***globals) {\n    k_session_globals=*globals;\n");
     for (index, ty) in program.globals.iter().enumerate().rev() {
         if ty.owns() {
             writeln!(out, "    k_{}_drop(&g{index});", suffix(*ty)).unwrap();
@@ -67,16 +67,66 @@ pub(super) fn entry_points(program: &Program, out: &mut String) {
     for index in 0..program.globals.len() {
         writeln!(out, "    free((*globals)[{index}]);").unwrap();
     }
-    out.push_str("    *globals=NULL;\n}\nvoid k_session_modules_drop(void) {\n");
+    out.push_str("    *globals=NULL;\n}\nK_EXPORT void k_session_modules_drop(void) {\n");
     if !program.python_sites.is_empty() {
         writeln!(out,"    if(!Py_IsInitialized()) return;PyGILState_STATE state=k_python_enter();for(size_t i=0;i<{};++i) {{Py_XDECREF(k_python_modules[i]);k_python_modules[i]=NULL;}}k_python_leave(state);",program.python_modules.len()).unwrap();
     }
     out.push_str("}\n");
 }
 
+/// Whether a top-level declaration without an initializer declares a function rather
+/// than a variable. Attribute, `_Atomic` and `_Alignas` parentheses do not count, and
+/// `(*name)` declares a function pointer variable.
+fn declares_function(declaration: &str) -> bool {
+    let bytes = declaration.as_bytes();
+    let mut i = 0;
+    while i < bytes.len() {
+        if bytes[i] != b'(' {
+            i += 1;
+            continue;
+        }
+        let before = declaration[..i].trim_end();
+        let word = before
+            .rsplit(|c: char| !(c.is_ascii_alphanumeric() || c == '_'))
+            .next()
+            .unwrap_or("");
+        if matches!(
+            word,
+            "__attribute__" | "__declspec" | "_Atomic" | "_Alignas"
+        ) {
+            let mut depth = 0;
+            while i < bytes.len() {
+                match bytes[i] {
+                    b'(' => depth += 1,
+                    b')' => {
+                        depth -= 1;
+                        if depth == 0 {
+                            break;
+                        }
+                    }
+                    _ => {}
+                }
+                i += 1;
+            }
+            i += 1;
+            continue;
+        }
+        return !word.is_empty() && !declaration[i + 1..].trim_start().starts_with('*');
+    }
+    false
+}
+
 /// Split our C runtime's top-level declarations from its definitions. Bodies and
 /// initializers stay in the one shared library; cells include only declarations.
-fn runtime_parts(source: &str) -> (String, String) {
+/// A Windows DLL exports only what it marks, and code outside it reaches DLL data only
+/// through `dllimport`, so `windows` marks functions and data on both sides. Thread-local
+/// data cannot cross a DLL boundary there, so it stays private to the runtime.
+fn runtime_parts(source: &str, windows: bool) -> (String, String) {
+    let export = if windows {
+        "__declspec(dllexport) "
+    } else {
+        ""
+    };
     fn skip_quoted(bytes: &[u8], mut i: usize) -> usize {
         let quote = bytes[i];
         i += 1;
@@ -171,6 +221,7 @@ fn runtime_parts(source: &str) -> (String, String) {
                 }
                 header.push_str(&prefix.replace("static ", "extern ").replace("inline ", ""));
                 header.push_str(";\n");
+                body.push_str(export);
                 body.push_str(&prefix.replace("static ", "").replace("inline ", ""));
                 body.push_str(&source[i..end]);
                 body.push('\n');
@@ -185,12 +236,22 @@ fn runtime_parts(source: &str) -> (String, String) {
             b'}' => braces -= 1,
             b';' if braces == 0 && parens == 0 => {
                 let declaration = &source[start..=i];
+                let local = declaration.contains("_Thread_local");
+                let function = initializer.is_none() && declares_function(&source[start..i]);
+                if declaration.contains("static ") && !local {
+                    body.push_str(export);
+                }
                 body.push_str(&declaration.replace("static ", ""));
-                if declaration.contains("static ") {
+                if declaration.contains("static ") && !(windows && local) {
                     let declaration = source[start..initializer.unwrap_or(i)].trim_end();
-                    header.push_str(&declaration.replace("static ", "extern "));
+                    let external = if windows && !function {
+                        "extern __declspec(dllimport) "
+                    } else {
+                        "extern "
+                    };
+                    header.push_str(&declaration.replace("static ", external));
                     header.push_str(";\n");
-                } else {
+                } else if !declaration.contains("static ") {
                     header.push_str(declaration);
                 }
                 start = i + 1;
@@ -217,12 +278,13 @@ fn compile(command: &mut Command) -> Result<(), String> {
     }
     Ok(())
 }
+/// Clang for one session module. On Windows every module links the DLL C runtime, so the
+/// host, the runtime and each entry share one heap and one standard output buffer.
 fn clang(shared: bool) -> Command {
     let mut command = Command::new("clang");
     command.args([
         "-std=c11",
         "-O2",
-        "-pthread",
         "-Wall",
         "-Wextra",
         "-Werror",
@@ -232,15 +294,15 @@ fn clang(shared: bool) -> Command {
         "-Wno-unused-but-set-variable",
         "-Wno-unused-label",
     ]);
+    command.args(super::thread_flags());
     if cfg!(target_os = "linux") {
         command.arg("-ldl");
     }
+    if cfg!(windows) {
+        command.arg("-fms-runtime-lib=dll");
+    }
     if shared {
-        if cfg!(target_os = "macos") {
-            command.arg("-dynamiclib");
-        } else {
-            command.args(["-shared", "-fPIC"]);
-        }
+        command.args(shared_flags());
     }
     if std::env::var_os("KESTREL_SANITIZE").is_some() {
         command.args([
@@ -256,34 +318,95 @@ fn clang(shared: bool) -> Command {
     }
     command
 }
+fn shared_flags() -> &'static [&'static str] {
+    if cfg!(target_os = "macos") {
+        &["-dynamiclib"]
+    } else if cfg!(windows) {
+        &["-shared"]
+    } else {
+        &["-shared", "-fPIC"]
+    }
+}
+/// The file name of a shared library that `-l{name}` finds. On Windows the linker reads
+/// the import library Clang writes beside `{name}.dll`.
 fn dylib(name: &str) -> String {
-    format!(
-        "lib{name}.{}",
-        if cfg!(target_os = "macos") {
-            "dylib"
-        } else {
-            "so"
-        }
-    )
+    if cfg!(target_os = "macos") {
+        format!("lib{name}.dylib")
+    } else if cfg!(windows) {
+        format!("{name}.dll")
+    } else {
+        format!("lib{name}.so")
+    }
+}
+/// Links a module against the shared runtime in `folder`. Unix records the folder as a
+/// search path; Windows finds the DLL beside the host program.
+fn link_runtime(command: &mut Command, folder: &Path) {
+    command.arg("-L").arg(folder).arg("-lkestrel_runtime");
+    if !cfg!(windows) {
+        command
+            .arg(format!("-Wl,-rpath,{}", folder.display()))
+            .arg("-lm");
+    }
 }
 
 #[cfg(unix)]
+type Control = UnixStream;
+#[cfg(windows)]
+type Control = std::net::TcpStream;
+
+/// Opens the control channel: a Unix socket in the private session folder, or on Windows
+/// a loopback port that only a worker holding the random token can claim. Returns the
+/// listener and the address the worker takes as its first argument.
+#[cfg(unix)]
+fn control_listener(folder: &Path) -> Result<(UnixListener, String, Option<String>), String> {
+    let socket = folder.join("control");
+    let listener = UnixListener::bind(&socket)
+        .map_err(|e| format!("Cannot open session control socket: {e}"))?;
+    Ok((listener, socket.display().to_string(), None))
+}
+#[cfg(windows)]
+fn control_listener(
+    _folder: &Path,
+) -> Result<(std::net::TcpListener, String, Option<String>), String> {
+    use std::hash::{BuildHasher, Hasher};
+    let listener = std::net::TcpListener::bind(("127.0.0.1", 0))
+        .map_err(|e| format!("Cannot open session control socket: {e}"))?;
+    let port = listener.local_addr().map_err(|e| e.to_string())?.port();
+    // Each RandomState carries fresh keys seeded from the operating system.
+    let mut token = String::new();
+    for round in 0..2u64 {
+        let mut hasher = std::collections::hash_map::RandomState::new().build_hasher();
+        hasher.write_u64(round);
+        write!(token, "{:016x}", hasher.finish()).unwrap();
+    }
+    Ok((listener, port.to_string(), Some(token)))
+}
+
 pub struct Runtime {
     directory: TemporaryDirectory,
     worker: Child,
-    control: BufReader<UnixStream>,
+    control: BufReader<Control>,
     python: bool,
     entries: usize,
     c_sources: BTreeMap<PathBuf, PathBuf>,
 }
-#[cfg(unix)]
 impl Runtime {
     pub fn new(arguments: &[String], null_input: bool, marked: bool) -> Result<Self, String> {
-        let directory = TemporaryDirectory::new(Path::new("/tmp")).map_err(|e| e.to_string())?;
-        fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
-            .map_err(|e| e.to_string())?;
+        // A Unix socket path has a short length limit, so Unix sessions live in /tmp.
+        #[cfg(unix)]
+        let directory = {
+            let directory =
+                TemporaryDirectory::new(Path::new("/tmp")).map_err(|e| e.to_string())?;
+            fs::set_permissions(directory.path(), fs::Permissions::from_mode(0o700))
+                .map_err(|e| e.to_string())?;
+            directory
+        };
+        #[cfg(windows)]
+        let directory =
+            TemporaryDirectory::new(&std::env::temp_dir()).map_err(|e| e.to_string())?;
         let path = directory.path();
         let source = [
+            include_str!("platform_runtime.c"),
             include_str!("runtime.c"),
             include_str!("blas_runtime.c"),
             include_str!("bigint_runtime.c"),
@@ -297,41 +420,36 @@ impl Runtime {
             include_str!("regex_runtime.c"),
         ]
         .join("\n");
-        let (header, body) = runtime_parts(&source);
+        let (header, body) = runtime_parts(&source, cfg!(windows));
         fs::write(path.join("runtime.h"), format!("#pragma once\n{header}"))
             .map_err(|e| e.to_string())?;
         fs::write(path.join("runtime.c"), body).map_err(|e| e.to_string())?;
-        compile(
-            clang(true)
-                .arg("-DK_SESSION_RUNTIME")
-                .arg(path.join("runtime.c"))
-                .args(["-lm", "-o"])
-                .arg(path.join(dylib("kestrel_runtime"))),
-        )?;
+        let mut runtime = clang(true);
+        runtime
+            .arg("-DK_SESSION_RUNTIME")
+            .arg(path.join("runtime.c"))
+            .args(if cfg!(windows) { None } else { Some("-lm") })
+            .arg("-o")
+            .arg(path.join(dylib("kestrel_runtime")));
+        compile(&mut runtime)?;
         fs::write(path.join("host.c"), include_str!("session_host.c"))
             .map_err(|e| e.to_string())?;
-        compile(
-            clang(false)
-                .arg(path.join("host.c"))
-                .arg("-I")
-                .arg(path)
-                .arg("-L")
-                .arg(path)
-                .args(["-lkestrel_runtime", "-lm"])
-                .arg(format!("-Wl,-rpath,{}", path.display()))
-                .args(if cfg!(target_os = "macos") {
-                    vec![]
-                } else {
-                    vec!["-ldl"]
-                })
-                .arg("-o")
-                .arg(path.join("host")),
-        )?;
-        let socket = path.join("control");
-        let listener = UnixListener::bind(&socket)
-            .map_err(|e| format!("Cannot open session control socket: {e}"))?;
-        let mut worker = Command::new(path.join("host"))
-            .arg(&socket)
+        let host = super::executable_path(&path.join("host"));
+        let mut command = clang(false);
+        command.arg(path.join("host.c")).arg("-I").arg(path);
+        link_runtime(&mut command, path);
+        if cfg!(windows) {
+            command
+                .args(super::platform_link_flags(path)?)
+                .arg("-lws2_32");
+        } else if !cfg!(target_os = "macos") {
+            command.arg("-ldl");
+        }
+        compile(command.arg("-o").arg(&host))?;
+        let (listener, address, token) = control_listener(path)?;
+        let mut worker = Command::new(&host);
+        worker
+            .arg(&address)
             .args(arguments)
             .env("KESTREL_SESSION_MARKED", if marked { "1" } else { "0" })
             .stdin(if null_input {
@@ -340,7 +458,11 @@ impl Runtime {
                 Stdio::inherit()
             })
             .stdout(Stdio::inherit())
-            .stderr(Stdio::inherit())
+            .stderr(Stdio::inherit());
+        if let Some(token) = &token {
+            worker.env("KESTREL_SESSION_TOKEN", token);
+        }
+        let mut worker = worker
             .spawn()
             .map_err(|e| format!("Cannot start native session: {e}"))?;
         // The worker connects before it loads user code. A short timeout catches startup failure.
@@ -366,10 +488,29 @@ impl Runtime {
             }
         };
         control.set_nonblocking(false).map_err(|e| e.to_string())?;
+        let mut control = BufReader::new(control);
+        if let Some(token) = token {
+            // A loopback port is open to every local program; only our worker knows the token.
+            let mut claimed = String::new();
+            control
+                .get_ref()
+                .set_read_timeout(Some(std::time::Duration::from_secs(10)))
+                .map_err(|e| e.to_string())?;
+            let read = control.read_line(&mut claimed);
+            control
+                .get_ref()
+                .set_read_timeout(None)
+                .map_err(|e| e.to_string())?;
+            if read.is_err() || claimed.trim_end() != token {
+                let _ = worker.kill();
+                let _ = worker.wait();
+                return Err("The native session control channel was not the worker's.".into());
+            }
+        }
         Ok(Self {
             directory,
             worker,
-            control: BufReader::new(control),
+            control,
             python: false,
             entries: 0,
             c_sources: BTreeMap::new(),
@@ -379,38 +520,37 @@ impl Runtime {
     pub fn execute(&mut self, program: &Program) -> Result<bool, String> {
         let path = self.directory.path();
         if !program.python_sites.is_empty() && !self.python {
-            let (header, body) = runtime_parts(include_str!("python_runtime.c"));
+            let (header, body) = runtime_parts(include_str!("python_runtime.c"), cfg!(windows));
             fs::write(
                 path.join("kestrel_python.h"),
                 format!("#pragma once\n{header}"),
             )
             .map_err(|e| e.to_string())?;
             fs::write(path.join("python.c"),format!("#define PY_SSIZE_T_CLEAN\n#include <Python.h>\n#define K_SESSION_RUNTIME\n#include \"runtime.h\"\n{body}")).map_err(|e|e.to_string())?;
-            compile(
-                clang(true)
-                    .arg(path.join("python.c"))
-                    .args(python_flags(program)?)
-                    .arg("-L")
-                    .arg(path)
-                    .arg("-lkestrel_runtime")
-                    .arg(format!("-Wl,-rpath,{}", path.display()))
-                    .arg("-o")
-                    .arg(path.join(dylib("kestrel_python"))),
-            )?;
+            let mut command = clang(true);
+            command
+                .arg(path.join("python.c"))
+                .args(python_flags(program)?);
+            link_runtime(&mut command, path);
+            compile(command.arg("-o").arg(path.join(dylib("kestrel_python"))))?;
             self.python = true;
         }
         for source in &program.c_sources {
             if self.c_sources.contains_key(source) {
                 continue;
             }
+            if cfg!(windows) {
+                // A Windows DLL exports only the functions it marks, and project C files
+                // do not mark theirs.
+                return Err(format!(
+                    "Sessions on Windows cannot load project C files yet ({}); use kestrel run or kestrel build.",
+                    source.display()
+                ));
+            }
             let library = path.join(dylib(&format!("foreign{}", self.c_sources.len())));
             let mut command = Command::new("clang");
             command.args(["-std=c11", "-O2", "-pthread"]);
-            command.args(if cfg!(target_os = "macos") {
-                vec!["-dynamiclib"]
-            } else {
-                vec!["-shared", "-fPIC"]
-            });
+            command.args(shared_flags());
             if std::env::var_os("KESTREL_SANITIZE").is_some() {
                 command.args([
                     "-fsanitize=address,undefined",
@@ -436,6 +576,8 @@ impl Runtime {
             self.entries,
             if cfg!(target_os = "macos") {
                 "dylib"
+            } else if cfg!(windows) {
+                "dll"
             } else {
                 "so"
             }
@@ -451,12 +593,8 @@ impl Runtime {
                     .filter_map(|source| self.c_sources.get(source)),
             )
             .arg("-I")
-            .arg(path)
-            .arg("-L")
-            .arg(path)
-            .arg("-lkestrel_runtime")
-            .arg(format!("-Wl,-rpath,{}", path.display()))
-            .arg("-lm");
+            .arg(path);
+        link_runtime(&mut command, path);
         for folder in &program.c_include_dirs {
             command.arg("-I").arg(folder);
         }
@@ -509,7 +647,6 @@ impl Runtime {
         }
     }
 }
-#[cfg(unix)]
 impl Drop for Runtime {
     fn drop(&mut self) {
         let _ = self.finish();
@@ -518,14 +655,35 @@ impl Drop for Runtime {
 
 #[cfg(test)]
 mod tests {
-    use super::runtime_parts;
+    use super::{declares_function, runtime_parts};
     #[test]
     fn shared_runtime_header_keeps_types_and_erases_bodies_and_initializers() {
         let source = "typedef struct { int n; } Value;\nstatic const Value empty = {0};\nstatic int value(int n) { static int once; return n + once++; }\n";
-        let (header, body) = runtime_parts(source);
+        let (header, body) = runtime_parts(source, false);
         assert!(header.contains("extern const Value empty;"));
         assert!(header.contains("extern int value(int n) ;"));
         assert!(!header.contains("return"));
         assert!(body.contains("int value(int n) { static int once;"));
+    }
+    #[test]
+    fn windows_runtime_header_imports_data_and_keeps_thread_locals_private() {
+        let source = "static int counter;\nstatic _Thread_local int depth;\nstatic void (*hook)(int);\nstatic _Atomic(int) flag;\nstatic void *alloc(size_t n) __attribute__((unused));\nstatic void *alloc(size_t n) { return malloc(n); }\n";
+        let (header, body) = runtime_parts(source, true);
+        assert!(header.contains("extern __declspec(dllimport) int counter;"));
+        assert!(header.contains("extern __declspec(dllimport) void (*hook)(int);"));
+        assert!(header.contains("extern __declspec(dllimport) _Atomic(int) flag;"));
+        assert!(header.contains("extern void *alloc(size_t n) __attribute__((unused));"));
+        assert!(!header.contains("depth"));
+        assert!(body.contains("__declspec(dllexport) int counter;"));
+        assert!(body.contains("\n_Thread_local int depth;"));
+        assert!(
+            body.contains("__declspec(dllexport) \nvoid *alloc(size_t n) { return malloc(n); }")
+        );
+        assert!(declares_function(
+            "static KString k_text(KString value) __attribute__((unused))"
+        ));
+        assert!(!declares_function(
+            "static pthread_t k_thread __attribute__((unused))"
+        ));
     }
 }

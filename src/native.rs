@@ -2340,6 +2340,7 @@ fn emit(program: &Program, session: bool) -> Result<String, String> {
             output.push_str("#include \"kestrel_python.h\"\n");
         }
     } else {
+        output.push_str(include_str!("platform_runtime.c"));
         output.push_str(include_str!("runtime.c"));
         output.push_str(include_str!("blas_runtime.c"));
         output.push_str(include_str!("bigint_runtime.c"));
@@ -2503,7 +2504,9 @@ fn emit(program: &Program, session: bool) -> Result<String, String> {
         session::entry_points(program, &mut output);
         return Ok(output);
     }
-    output.push_str("int main(int argc,char **argv) {\n    k_overflow_guard();\n");
+    output.push_str(
+        "int main(int argc,char **argv) {\n    k_platform_start();\n    k_overflow_guard();\n",
+    );
     // A test program's first argument selects the test; script arguments follow it.
     let first_argument = if program.tests {
         output.push_str("    if (argc < 2) { fputs(\"Run this test program through kestrel test.\\n\", stderr); return 2; }\n    k_test_index = strtoll(argv[1], NULL, 10);\n");
@@ -2771,6 +2774,9 @@ fn python_flags(program: &Program) -> Result<Vec<String>, String> {
     if program.python_sites.is_empty() {
         return Ok(vec![]);
     }
+    if cfg!(windows) {
+        return Err("Python interop is not supported on Windows yet: it embeds CPython through python3-config, which Windows installations do not provide.".into());
+    }
     let mut flags = vec![];
     for arguments in [&["--includes"][..], &["--ldflags", "--embed"][..]] {
         let output = Command::new("python3-config")
@@ -2791,7 +2797,56 @@ fn python_flags(program: &Program) -> Result<Vec<String>, String> {
     Ok(flags)
 }
 
+/// The file `build` writes for a requested output path. Windows runs only files with an
+/// executable extension, so a path without one gains `.exe` there.
+pub fn executable_path(destination: &Path) -> PathBuf {
+    if cfg!(windows) && destination.extension().is_none() {
+        destination.with_extension("exe")
+    } else {
+        destination.to_path_buf()
+    }
+}
+
+/// The manifest that makes a Windows program use UTF-8 for its command line, environment
+/// and file names, as Kestrel strings do.
+const WINDOWS_MANIFEST: &str = r#"<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<assembly manifestVersion="1.0" xmlns="urn:schemas-microsoft-com:asm.v1">
+  <application xmlns="urn:schemas-microsoft-com:asm.v3">
+    <windowsSettings>
+      <activeCodePage xmlns="http://schemas.microsoft.com/SMI/2019/WindowsSettings">UTF-8</activeCodePage>
+    </windowsSettings>
+  </application>
+</assembly>
+"#;
+
+/// Flags for a program's link step on this platform. Windows gives the main thread the
+/// 8 MiB stack that Linux and macOS give it, and embeds the UTF-8 manifest.
+fn platform_link_flags(folder: &Path) -> Result<Vec<std::ffi::OsString>, String> {
+    if !cfg!(windows) {
+        return Ok(vec!["-lm".into()]);
+    }
+    let manifest = folder.join("program.manifest");
+    fs::write(&manifest, WINDOWS_MANIFEST).map_err(|e| e.to_string())?;
+    let mut input = std::ffi::OsString::from("/MANIFESTINPUT:");
+    input.push(manifest.as_os_str());
+    Ok(vec![
+        "-Xlinker".into(),
+        "/STACK:8388608".into(),
+        "-Xlinker".into(),
+        "/MANIFEST:EMBED".into(),
+        "-Xlinker".into(),
+        input,
+    ])
+}
+
+/// Clang flags every C compile shares. Windows Clang has no -pthread: threads come from
+/// the Win32 API there.
+fn thread_flags() -> &'static [&'static str] {
+    if cfg!(windows) { &[] } else { &["-pthread"] }
+}
+
 pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
+    let destination = &executable_path(destination);
     let source = emit_c(program)?;
     let parent = destination
         .parent()
@@ -2799,7 +2854,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
         .unwrap_or(Path::new("."));
     let temp = TemporaryDirectory::new(parent).map_err(|e| e.to_string())?;
     let c_path = temp.path.join("program.c");
-    let binary = temp.path.join("program");
+    let binary = executable_path(&temp.path.join("program"));
     fs::write(&c_path, source).map_err(|e| e.to_string())?;
     let includes = program
         .c_include_dirs
@@ -2811,7 +2866,8 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
     for (index, source) in program.c_sources.iter().enumerate() {
         let object = temp.path.join(format!("source{index}.o"));
         let output = Command::new("clang")
-            .args(["-std=c11", "-pthread", "-O3", "-c"])
+            .args(["-std=c11", "-O3", "-c"])
+            .args(thread_flags())
             .arg(source)
             .args(&includes)
             .arg("-o")
@@ -2830,9 +2886,9 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
         objects.push(object);
     }
     let output = Command::new("clang")
+        .args(thread_flags())
         .args([
             "-std=c11",
-            "-pthread",
             "-O3",
             "-Wall",
             "-Wextra",
@@ -2855,7 +2911,8 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
                 .then_some("-DK_NO_POOL"),
         )
         .args(program.c_libraries.iter().map(|name| format!("-l{name}")))
-        .args(["-lm", "-o"])
+        .args(platform_link_flags(&temp.path)?)
+        .arg("-o")
         .arg(&binary)
         .output()
         .map_err(|e| {
@@ -2863,7 +2920,9 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
         })?;
     if !output.status.success() {
         let detail = String::from_utf8_lossy(&output.stderr);
-        let hint = if detail.contains("Undefined symbols") || detail.contains("undefined reference")
+        let hint = if detail.contains("Undefined symbols")
+            || detail.contains("undefined reference")
+            || detail.contains("unresolved external symbol")
         {
             "\nA C function's library may be missing; name it with --link, as in --link z."
         } else {
@@ -2893,7 +2952,7 @@ pub fn run(program: &Program) -> Result<ExitStatus, String> {
 
 pub fn run_with_args(program: &Program, arguments: &[String]) -> Result<ExitStatus, String> {
     let temp = TemporaryDirectory::new(&std::env::temp_dir()).map_err(|e| e.to_string())?;
-    let binary = temp.path.join("program");
+    let binary = executable_path(&temp.path.join("program"));
     build(program, &binary)?;
     Command::new(&binary)
         .args(arguments)

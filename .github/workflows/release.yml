@@ -1,6 +1,7 @@
 name: Release
 
-# A tag creates a GitHub release with the compiler tarballs and the VSIX.
+# A tag creates a GitHub release with the compiler archives and the VSIX: tarballs
+# for macOS and Linux, a zip for Windows.
 # A manual run only builds and keeps the artifacts, for testing the pipeline.
 on:
   push:
@@ -35,6 +36,9 @@ jobs:
           - name: x86_64-unknown-linux-gnu
             os: ubuntu-latest
             target: x86_64-unknown-linux-gnu
+          - name: x86_64-pc-windows-msvc
+            os: windows-latest
+            target: x86_64-pc-windows-msvc
     steps:
       - uses: actions/checkout@v4
 
@@ -56,10 +60,16 @@ jobs:
           version="${version#v}"
           folder="kestrel-$version-${{ matrix.name }}"
           mkdir -p "dist/$folder"
-          cp "target/${{ matrix.target }}/release/kestrel" "dist/$folder/"
           cp README.md LICENSE SYNTAX.md "dist/$folder/"
-          tar -czf "$folder.tar.gz" -C dist "$folder"
-          echo "ASSET=$folder.tar.gz" >> "$GITHUB_ENV"
+          if [ "$RUNNER_OS" = Windows ]; then
+            cp "target/${{ matrix.target }}/release/kestrel.exe" "dist/$folder/"
+            (cd dist && 7z a -tzip "../$folder.zip" "$folder" > /dev/null)
+            echo "ASSET=$folder.zip" >> "$GITHUB_ENV"
+          else
+            cp "target/${{ matrix.target }}/release/kestrel" "dist/$folder/"
+            tar -czf "$folder.tar.gz" -C dist "$folder"
+            echo "ASSET=$folder.tar.gz" >> "$GITHUB_ENV"
+          fi
 
       - uses: actions/upload-artifact@v4
         with:
