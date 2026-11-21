@@ -794,7 +794,8 @@ fn assert_sanitizer_clean_with_args(program: &Program, expected: &Output, argume
         .unwrap();
     assert!(
         run.status.success(),
-        "{}",
+        "{:?}: {}",
+        run.status,
         String::from_utf8_lossy(&run.stderr)
     );
     assert_eq!(run.stdout, expected.stdout);
@@ -886,7 +887,8 @@ fn prints_close(source: &str, expected: &str) {
     let output = execute(source);
     assert!(
         output.status.success(),
-        "{}",
+        "{:?}: {}",
+        output.status,
         String::from_utf8_lossy(&output.stderr)
     );
     assert!(output.stderr.is_empty());
@@ -912,7 +914,8 @@ fn prints(source: &str, expected: &str) {
     let output = execute(source);
     assert!(
         output.status.success(),
-        "{}",
+        "{:?}: {}",
+        output.status,
         String::from_utf8_lossy(&output.stderr)
     );
     assert!(output.stderr.is_empty());

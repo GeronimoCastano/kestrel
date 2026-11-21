@@ -2887,6 +2887,14 @@ pub fn sanitizer_runtime_path() -> Option<std::ffi::OsString> {
     std::env::join_paths(std::iter::once(folder).chain(std::env::split_paths(&rest))).ok()
 }
 
+/// What Clang and the linker said about a failed build. The MSVC linker writes its
+/// errors to standard output, so both streams count.
+fn compiler_messages(output: &std::process::Output) -> String {
+    let mut text = String::from_utf8_lossy(&output.stdout).into_owned();
+    text.push_str(&String::from_utf8_lossy(&output.stderr));
+    text
+}
+
 /// Clang flags every C compile shares. Windows Clang has no -pthread: threads come from
 /// the Win32 API there.
 pub fn thread_flags() -> &'static [&'static str] {
@@ -2967,7 +2975,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
             format!("Cannot start Clang: {e}. Install a C toolchain with clang on PATH.")
         })?;
     if !output.status.success() {
-        let detail = String::from_utf8_lossy(&output.stderr);
+        let detail = compiler_messages(&output);
         let hint = if detail.contains("Undefined symbols")
             || detail.contains("undefined reference")
             || detail.contains("unresolved external symbol")

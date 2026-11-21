@@ -298,7 +298,7 @@ fn compile(command: &mut Command) -> Result<(), String> {
     if !output.status.success() {
         return Err(format!(
             "Session compilation failed:\n{}",
-            String::from_utf8_lossy(&output.stderr)
+            super::compiler_messages(&output)
         ));
     }
     Ok(())
@@ -324,7 +324,7 @@ fn clang(shared: bool) -> Command {
         command.arg("-ldl");
     }
     if cfg!(windows) {
-        command.arg("-fms-runtime-lib=dll");
+        command.args(["-fms-runtime-lib=dll", "-lkernel32"]);
     }
     if shared {
         command.args(shared_flags());

@@ -299,11 +299,12 @@ static int clock_gettime(int clock, struct timespec *now) {
 /* Sleep can wake up to one timer tick early, so wait on the performance counter until the
    whole interval has passed, as POSIX nanosleep promises. */
 static int nanosleep(const struct timespec *wait, struct timespec *rest) {
+    /* Read the interval first: callers may pass the same struct as both arguments. */
+    double total = (double)wait->tv_sec + (double)wait->tv_nsec / 1e9;
     if (rest) { rest->tv_sec = 0; rest->tv_nsec = 0; }
     LARGE_INTEGER frequency, start, now;
     QueryPerformanceFrequency(&frequency);
     QueryPerformanceCounter(&start);
-    double total = (double)wait->tv_sec + (double)wait->tv_nsec / 1e9;
     for (;;) {
         QueryPerformanceCounter(&now);
         double left = total - (double)(now.QuadPart - start.QuadPart) / (double)frequency.QuadPart;
