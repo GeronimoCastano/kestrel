@@ -374,9 +374,35 @@ cargo build --release
 | `smt` goals in proofs | Z3 on `PATH` (optional) |
 | Jupyter | Python 3.9 or newer and `ipykernel` |
 
-Kestrel is developed and benchmarked on macOS. The compiler emits portable C11,
-and the numerical layer links your system's LAPACK, the standard linear-algebra
-library.
+### Supported platforms
+
+| Platform | Status | C toolchain |
+|---|---|---|
+| macOS, Apple silicon and Intel | Supported, the reference platform | Xcode Command Line Tools (`xcode-select --install`) |
+| Linux x86_64 (glibc) | Supported | `clang` from your distribution |
+| Windows 10 1903 or newer, x86_64 | Supported | LLVM and the Visual Studio Build Tools |
+
+CI runs the full test suite on all three for every pull request, and each
+release ships a binary for each: tarballs for macOS and Linux, a zip for
+Windows. Kestrel is benchmarked on macOS.
+
+On Windows, install LLVM for `clang` and the Build Tools for the MSVC linker and
+the Windows SDK, which Clang finds on its own:
+
+```powershell
+winget install LLVM.LLVM
+winget install Microsoft.VisualStudio.2022.BuildTools --override "--quiet --add Microsoft.VisualStudio.Workload.VCTools --includeRecommended"
+```
+
+Then unpack the release zip and put `kestrel.exe` on your `PATH`, or build it
+with `cargo build --release`. `kestrel build -o hello hello.kes` writes
+`hello.exe`. Two features wait on Windows and stop with an error that says so:
+Python interop, and project C files inside `kestrel session` (`kestrel run` and
+`kestrel build` compile them).
+
+The numerical layer links your system's LAPACK, the standard linear-algebra
+library: Accelerate on macOS, `liblapack` or OpenBLAS on Linux, and
+`libopenblas.dll` on your `PATH` on Windows.
 
 ## Commands
 
