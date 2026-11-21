@@ -2950,6 +2950,21 @@ pub fn sanitizer_runtime_path() -> Option<std::ffi::OsString> {
     std::env::join_paths(folders.into_iter().chain(std::env::split_paths(&rest))).ok()
 }
 
+/// The message for a C compiler that does not start, with the fix for this platform.
+pub fn missing_clang(error: &io::Error) -> String {
+    let fix = if cfg!(windows) {
+        "Install Kestrel with install.ps1, which brings its own Clang"
+    } else if cfg!(target_os = "macos") {
+        "Install the Command Line Tools with xcode-select --install"
+    } else {
+        "Install Kestrel with Homebrew, which brings Clang, or install clang from your distribution"
+    };
+    format!(
+        "Cannot start Clang ({}): {error}. {fix}, or set KESTREL_CC to a Clang. See https://github.com/GeronimoCastano/kestrel#install.",
+        c_compiler().display()
+    )
+}
+
 /// What Clang and the linker said about a failed build. The MSVC linker writes its
 /// errors to standard output, so both streams count.
 fn compiler_messages(output: &std::process::Output) -> String {
@@ -2992,9 +3007,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
             .arg("-o")
             .arg(&object)
             .output()
-            .map_err(|e| {
-                format!("Cannot start Clang: {e}. Install a C toolchain with clang on PATH.")
-            })?;
+            .map_err(|e| missing_clang(&e))?;
         if !output.status.success() {
             return Err(format!(
                 "Compiling {} failed:\n{}",
@@ -3034,9 +3047,7 @@ pub fn build(program: &Program, destination: &Path) -> Result<(), String> {
         .arg("-o")
         .arg(&binary)
         .output()
-        .map_err(|e| {
-            format!("Cannot start Clang: {e}. Install a C toolchain with clang on PATH.")
-        })?;
+        .map_err(|e| missing_clang(&e))?;
     if !output.status.success() {
         let detail = compiler_messages(&output);
         let hint = if detail.contains("Undefined symbols")

@@ -35,6 +35,8 @@
     $work = Join-Path $parent ("kestrel-install-" + [Guid]::NewGuid())
     New-Item -ItemType Directory -Path $work | Out-Null
     try {
+        $base = $null
+        $vsix = $null
         $archive = Join-Path $work $asset
         if ($env:KESTREL_ARCHIVE) {
             Copy-Item $env:KESTREL_ARCHIVE $archive
@@ -95,10 +97,23 @@
         Remove-Item -Recurse -Force $check -ErrorAction SilentlyContinue
     }
 
+    # The release's own VSIX matches the compiler just installed; a local archive falls
+    # back to the Marketplace listing.
     $code = Get-Command code -ErrorAction SilentlyContinue
     if ($code) {
         Step 'Installing the VS Code extension'
-        & $code.Source --install-extension kestrel-lang.kestrel-language --force | Out-Null
+        $extension = 'kestrel-lang.kestrel-language'
+        if ($base) {
+            $vsix = Join-Path ([IO.Path]::GetTempPath()) ("kestrel-" + [Guid]::NewGuid() + '.vsix')
+            try {
+                Invoke-WebRequest -UseBasicParsing -Uri "$base/kestrel.vsix" -OutFile $vsix
+                $extension = $vsix
+            } catch {
+                Step 'The release has no VSIX; using the Marketplace listing'
+            }
+        }
+        & $code.Source --install-extension $extension --force | Out-Null
+        if ($vsix) { Remove-Item $vsix -Force -ErrorAction SilentlyContinue }
     }
 
     Write-Host ''

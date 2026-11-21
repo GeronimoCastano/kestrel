@@ -267,8 +267,15 @@ fn kestrel_type(c: &str) -> Option<Type> {
         "unsigned short" => "CUInt16",
         "int" => "CInt32",
         "unsigned int" => "CUInt32",
+        // Windows keeps long at 32 bits (LLP64); other 64-bit systems widen it to 64.
+        "long" if cfg!(windows) => "CInt32",
+        "unsigned long" if cfg!(windows) => "CUInt32",
         "long" | "long long" => "CInt64",
         "unsigned long" | "unsigned long long" => "CUInt64",
+        // Recent Clang spells the types of sizeof and pointer differences as these
+        // built-in names, with no typedef in the dump to follow.
+        "__size_t" => "CUInt64",
+        "__ptrdiff_t" | "__signed_size_t" => "CInt64",
         _ => return None,
     };
     Some(Type::named(name))
@@ -277,6 +284,13 @@ fn kestrel_type(c: &str) -> Option<Type> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn builtin_size_types_and_long_follow_the_target() {
+        assert_eq!(kestrel_type("__size_t"), Some(Type::named("CUInt64")));
+        assert_eq!(kestrel_type("__ptrdiff_t"), Some(Type::named("CInt64")));
+        let long = if cfg!(windows) { "CInt32" } else { "CInt64" };
+        assert_eq!(kestrel_type("long"), Some(Type::named(long)));
+    }
     #[test]
     fn pointer_targets_keep_each_level_of_const_and_structs_stay_opaque() {
         let int = Type::named("CInt32");
@@ -314,8 +328,10 @@ mod tests {
             .map(|f| f.name.as_str())
             .collect::<Vec<_>>();
         assert_eq!(names, ["abs", "bound", "count", "getenv", "sqrt", "strlen"]);
-        assert_eq!(functions[1].parameters, [Type::named("CUInt64")]);
-        assert_eq!(functions[2].result, Type::named("CUInt64"));
+        // The dump spells unsigned long, which Windows keeps at 32 bits.
+        let unsigned_long = Type::named(if cfg!(windows) { "CUInt32" } else { "CUInt64" });
+        assert_eq!(functions[1].parameters, std::slice::from_ref(&unsigned_long));
+        assert_eq!(functions[2].result, unsigned_long);
         assert_eq!(
             functions[5].parameters,
             [Type::union(

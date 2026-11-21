@@ -42,6 +42,11 @@ pub(crate) fn lex_range(text: &str, start: usize, end: usize) -> Lexed {
     let mut diagnostics = Vec::new();
     let mut i = start;
     let bytes = text.as_bytes();
+    // A byte-order mark opens text from Windows tools: Notepad writes one, and Windows
+    // PowerShell sends one ahead of piped input. It is not part of the program.
+    if i == 0 && text[..end].starts_with('\u{feff}') {
+        i = '\u{feff}'.len_utf8();
+    }
     while i < end {
         let start = i;
         let ch = text[i..end].chars().next().unwrap();

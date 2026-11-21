@@ -292,9 +292,7 @@ fn runtime_parts(source: &str, windows: bool) -> (String, String) {
 }
 
 fn compile(command: &mut Command) -> Result<(), String> {
-    let output = command
-        .output()
-        .map_err(|e| format!("Cannot start Clang: {e}"))?;
+    let output = command.output().map_err(|e| super::missing_clang(&e))?;
     if !output.status.success() {
         return Err(format!(
             "Session compilation failed:\n{}",

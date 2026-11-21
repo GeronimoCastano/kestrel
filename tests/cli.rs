@@ -20,6 +20,29 @@ fn stdin(args: &[&str], source: &str) -> Output {
     process.wait_with_output().unwrap()
 }
 
+// Notepad saves a byte-order mark, and Windows PowerShell sends one ahead of piped text.
+#[test]
+fn a_leading_byte_order_mark_is_not_part_of_the_program() {
+    let output = stdin(&["run", "-"], "\u{feff}print(\"bom\")\n");
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(String::from_utf8(output.stdout).unwrap(), "bom\n");
+    let dir = std::env::temp_dir();
+    let output = stdin(
+        &["session", "--root", dir.to_str().unwrap()],
+        "\u{feff}let n := 40\nprint(n + 2)\n:quit\n",
+    );
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    assert_eq!(String::from_utf8(output.stdout).unwrap(), "42\n");
+}
+
 #[test]
 fn parse_from_standard_input() {
     let result = stdin(&["parse", "-"], "let total := 3");
