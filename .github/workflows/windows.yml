@@ -30,7 +30,7 @@ jobs:
       - name: Run the program under the debugger
         shell: bash
         run: |
-          set -x
+          set -x +e
           folder="$RUNNER_TEMP/probe"
           mkdir -p "$folder"
           cat > "$folder/probe.kes" <<'KES'
@@ -67,14 +67,18 @@ jobs:
           sed -i 's/^          //' "$folder/probe.kes"
           target/release/kestrel.exe build -o "$folder/probe" --emit-c "$folder/probe.c" "$folder/probe.kes"
           "$folder/probe.exe" || echo "exit $?"
-          clang -std=c11 -O0 -g -gcodeview -Wno-unused-function "$folder/probe.c" -o "$folder/debug.exe" -Xlinker /DEBUG
+          clang -std=c11 -O0 -g -Wno-unused-function "$folder/probe.c" -o "$folder/debug.exe" || true
           "$folder/debug.exe" || echo "debug build exit $?"
+          clang -std=c11 -O1 -g -Wno-unused-function "$folder/probe.c" -o "$folder/o1.exe" || true
+          "$folder/o1.exe" || echo "O1 build exit $?"
           cdb="/c/Program Files (x86)/Windows Kits/10/Debuggers/x64/cdb.exe"
           ls "$(dirname "$cdb")" | head -5 || true
-          "$cdb" -g -G -lines -c ".ecxr; kn 30; dv /t; q" "$folder/debug.exe" || true
+          "$cdb" -g -G -lines -y "$folder" -c ".ecxr; kn 30; dv /t; q" "$folder/debug.exe" || true
+          "$cdb" -g -G -lines -y "$folder" -c ".ecxr; kn 30; dv /t; q" "$folder/o1.exe" || true
           runtime="$(clang -print-runtime-dir)"; resource="$(clang -print-resource-dir)"
           ls "$runtime" "$resource/lib/windows" 2>/dev/null | grep -i asan | head || true
-          clang -std=c11 -O1 -g -fsanitize=address -Wno-unused-function "$folder/probe.c" -o "$folder/asan.exe" && PATH="$runtime:$resource/lib/windows:$PATH" "$folder/asan.exe" || echo "asan exit $?"
+          clang -std=c11 -O1 -g -fsanitize=address -Wno-unused-function "$folder/probe.c" -o "$folder/asan.exe" || true
+          PATH="$runtime:$resource/lib/windows:$PATH" "$folder/asan.exe" || echo "asan exit $?"
 
       - name: Keep the program and its C
         if: always()
