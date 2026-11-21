@@ -10,7 +10,8 @@ number.
   Linux x86_64, and packs the editor extension on every tag.
 - Linux CI job. The suite passes except two DataFrame comparisons.
 - Windows build probe. The port is in progress.
-- Standard library reference under `docs/std/` (in progress).
+- The complete standard library reference, one page per module under
+  `docs/std/`, published as a documentation site.
 
 ## 0.1.2 - 2026-11-20
 
