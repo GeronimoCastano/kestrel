@@ -402,6 +402,7 @@ runs with Clang for MSVC when LLVM and the Visual Studio Build Tools are on
 | `kestrel run FILE` | Compile and run in one step |
 | `kestrel build -o OUT FILE` | Save a standalone executable |
 | `kestrel check FILE...` | Names, types, effects, moves, contracts, files, tasks |
+| `kestrel fmt FILE...` | Rewrite `.kes` files in one style |
 | `kestrel test` | Run the `@test` functions in a package |
 | `kestrel session` | Keep values alive between entries |
 | `kestrel notebook` | Jupyter kernel for `.kes` cells |
@@ -413,7 +414,8 @@ runs with Clang for MSVC when LLVM and the Visual Studio Build Tools are on
 Any file argument accepts `-` for standard input. `check --stdin-path FILE -`
 treats that input as an unsaved version of `FILE`, which is how the editor checks
 a buffer you have not saved. `--emit-c PATH` keeps the generated C for
-inspection.
+inspection. `kestrel fmt --check FILE...` reports files that need formatting and
+exits 1; see [the formatter page](docs/formatter.md).
 
 ## A project is a folder
 
@@ -502,14 +504,14 @@ under `testdata/`.
 
 ## Versioning
 
-Kestrel is pre-1.0. Within `0.1`, a patch release such as `0.1.3` fixes bugs and
-leaves the language alone. A new form, a changed rule or a new language feature
-bumps the minor number: `0.2.0`. Every release is listed in
+Kestrel is pre-1.0. Within a minor line, a patch release fixes bugs and leaves
+the language and the formatter output alone. A new form, a changed rule or a new
+feature bumps the minor number: `0.2.0`. Every release is listed in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Limits
 
-Kestrel is version 0.1. It refuses some programs on purpose. Each refusal comes
+Kestrel is version 0.2. It refuses some programs on purpose. Each refusal comes
 with a named diagnostic such as `E_NATIVE_OWNERSHIP` or `E_TRAIT_CONFLICT`,
 never with silent bad output. The short list:
 

@@ -58,6 +58,21 @@ A Homebrew install needs no setting. A checkout usually wants:
 | Diagnostics | Types, effects, moves, contracts, proofs, as you type |
 | Proof state | Goals, hypotheses and the target for the cursor's theorem |
 | Quick fixes | Missing overrides, imports and signatures where the checker asks |
+| Formatting | `kestrel fmt` runs on save, or with the editor's format command |
+
+## Format a file
+
+The extension registers a formatting provider, so **Format Document**
+(`Shift+Alt+F`, `Shift+Option+F` on macOS) and `editor.formatOnSave` both work.
+The provider runs `kestrel fmt --stdin`, which formats the buffer without saving
+it first. It uses `kestrel.compilerPath` when that setting is set, and otherwise
+finds the compiler the same way diagnostics do.
+
+```json
+{
+  "editor.formatOnSave": true
+}
+```
 
 ## Run a file
 

@@ -366,3 +366,160 @@ fn scripts_run_from_folders_with_capitals_and_hyphens() {
     );
     assert_eq!(output.stdout, b"P(x = 1)\n");
 }
+
+#[test]
+fn fmt_from_standard_input_prints_the_formatted_text() {
+    let result = stdin(&["fmt", "--stdin"], "let  x:=1\n");
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert_eq!(String::from_utf8(result.stdout).unwrap(), "let x := 1\n");
+    assert!(result.stderr.is_empty());
+}
+
+#[test]
+fn fmt_check_names_unformatted_files_and_exits_one() {
+    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let file = dir.path().join("check.kes");
+    std::fs::write(&file, "let  x:=1\n").unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg("--check")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert_eq!(result.status.code(), Some(1));
+    assert!(
+        String::from_utf8(result.stdout)
+            .unwrap()
+            .contains("check.kes")
+    );
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "let  x:=1\n");
+
+    std::fs::write(&file, "let x := 1\n").unwrap();
+    let clean = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg("--check")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert_eq!(clean.status.code(), Some(0));
+    assert!(clean.stdout.is_empty());
+}
+
+#[test]
+fn fmt_writes_in_place_and_a_second_run_changes_nothing() {
+    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let file = dir.path().join("write.kes");
+    std::fs::write(
+        &file,
+        "function  f( a:Int ) : Int {\nlet x:=a\nreturn x\n}\n",
+    )
+    .unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(result.stdout.is_empty());
+    let once = std::fs::read_to_string(&file).unwrap();
+    assert_eq!(
+        once,
+        "function f(a : Int) : Int {\n    let x := a\n    return x\n}\n"
+    );
+    let again = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert!(again.status.success());
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), once);
+}
+
+#[test]
+fn fmt_diff_prints_a_unified_diff_without_writing() {
+    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let file = dir.path().join("diff.kes");
+    std::fs::write(&file, "let  x:=1\n").unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg("--diff")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert!(result.status.success());
+    let output = String::from_utf8(result.stdout).unwrap();
+    assert!(
+        output.starts_with("--- ") && output.contains("+++ "),
+        "{output}"
+    );
+    assert!(
+        output.contains("@@") && output.contains("+let x := 1"),
+        "{output}"
+    );
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "let  x:=1\n");
+}
+
+#[test]
+fn fmt_check_with_diff_exits_one() {
+    let result = stdin(&["fmt", "--stdin", "--check", "--diff"], "let  x:=1\n");
+    assert_eq!(result.status.code(), Some(1));
+    let output = String::from_utf8(result.stdout).unwrap();
+    assert!(
+        output.contains("--- -") && output.contains("+let x := 1"),
+        "{output}"
+    );
+}
+
+#[test]
+fn fmt_refuses_a_lexical_error() {
+    let result = stdin(&["fmt", "--stdin"], "let x := \"unclosed\n");
+    assert_eq!(result.status.code(), Some(2));
+    assert!(result.stdout.is_empty());
+    assert!(
+        String::from_utf8(result.stderr)
+            .unwrap()
+            .contains("E_UNCLOSED_STRING")
+    );
+}
+
+#[test]
+fn fmt_reports_the_formatter_revision() {
+    let output = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["fmt", "--version"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("formatter revision 1"), "{text}");
+    assert!(text.contains(env!("CARGO_PKG_VERSION")), "{text}");
+}
+
+#[test]
+fn fmt_rejects_unknown_flags_and_extra_guards() {
+    let output = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["fmt", "--root", ".", "x.kes"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    assert!(
+        String::from_utf8(output.stderr)
+            .unwrap()
+            .contains("fmt takes files")
+    );
+}
+
+#[test]
+fn fmt_diff_reports_a_missing_final_newline() {
+    let result = stdin(&["fmt", "--stdin", "--diff"], "let x := 1");
+    assert!(result.status.success());
+    let output = String::from_utf8(result.stdout).unwrap();
+    assert!(output.contains("\\ No newline at end of file"), "{output}");
+}
