@@ -83,7 +83,7 @@ pub(super) fn drop_body(_program: &Program, id: usize, resource: Resource, out: 
         }
         Resource::Channel(t) => {
             // Frees go on the stack first, so the queued items drop before their chunks.
-            writeln!(out, "    struct KResourceData_{id} *h = value->handle; value->handle = NULL; if (h) {{ pthread_mutex_destroy(&h->mutex); pthread_cond_destroy(&h->ready); k_drop_push(stack,h,k_drop_free); for (KChannelChunk_{id} *c = h->head; c; c = atomic_load_explicit(&c->next,memory_order_relaxed)) k_drop_push(stack,c,k_drop_free);").unwrap();
+            writeln!(out, "    struct KResourceData_{id} *h = value->handle; value->handle = NULL; if (h) {{ pthread_mutex_destroy(&h->mutex); pthread_cond_destroy(&h->ready); k_drop_push(stack,h,k_drop_aligned_free); for (KChannelChunk_{id} *c = h->head; c; c = atomic_load_explicit(&c->next,memory_order_relaxed)) k_drop_push(stack,c,k_drop_free);").unwrap();
             if t.owns() {
                 writeln!(out, "    KChannelChunk_{id} *c = h->head; size_t base = h->taken ? ((h->taken - 1) / K_CHUNK_{id}) * K_CHUNK_{id} : 0; for (size_t p = h->taken; p < h->sent; ++p) {{ while (p >= base + K_CHUNK_{id}) {{ c = atomic_load_explicit(&c->next,memory_order_relaxed); base += K_CHUNK_{id}; }} k_drop_push(stack,&c->items[p - base],k_{}_drop_task); }}", suffix(t)).unwrap();
             }
@@ -175,7 +175,7 @@ fn mutex(program: &Program, id: usize, t: Ty, out: &mut String) {
 fn channel(program: &Program, id: usize, t: Ty, out: &mut String) {
     let c = c_type(t);
     writeln!(out,"static KChannelChunk_{id} *k_channel_{id}_chunk(void) {{ KChannelChunk_{id} *c = malloc(sizeof *c); if (!c) k_fatal(\"Out of memory\"); atomic_init(&c->next,NULL); return c; }}").unwrap();
-    writeln!(out,"static KRecord_{id} k_resource_{id}_new(void) {{ struct KResourceData_{id} *h = aligned_alloc(128,sizeof *h); if (!h) k_fatal(\"Out of memory\"); memset(h,0,sizeof *h); h->head = h->tail = k_channel_{id}_chunk(); if (pthread_mutex_init(&h->mutex,NULL) || pthread_cond_init(&h->ready,NULL)) k_fatal(\"Cannot initialize Channel\"); return (KRecord_{id}) {{h}}; }}").unwrap();
+    writeln!(out,"static KRecord_{id} k_resource_{id}_new(void) {{ struct KResourceData_{id} *h = k_aligned_alloc(128,sizeof *h); if (!h) k_fatal(\"Out of memory\"); memset(h,0,sizeof *h); h->head = h->tail = k_channel_{id}_chunk(); if (pthread_mutex_init(&h->mutex,NULL) || pthread_cond_init(&h->ready,NULL)) k_fatal(\"Cannot initialize Channel\"); return (KRecord_{id}) {{h}}; }}").unwrap();
     writeln!(out,"static void k_channel_{id}_wake(struct KResourceData_{id} *h, bool all) {{ k_pthread_check(pthread_mutex_lock(&h->mutex)); if (all) k_pthread_check(pthread_cond_broadcast(&h->ready)); else k_pthread_check(pthread_cond_signal(&h->ready)); k_pthread_check(pthread_mutex_unlock(&h->mutex)); }}").unwrap();
     // Closing under the send lock orders it after every accepted send.
     writeln!(out,"static void k_resource_{id}_close(KRecord_{id} *channel) {{ struct KResourceData_{id} *h = channel->handle; if (!h) k_fatal(\"Channel was moved\"); k_spin_lock(&h->send_lock); atomic_store_explicit(&h->closed,true,memory_order_seq_cst); k_spin_unlock(&h->send_lock); k_channel_{id}_wake(h,true); }}").unwrap();

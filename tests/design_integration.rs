@@ -96,8 +96,12 @@ public theorem mirrorTwice(t : Tree) : mirror(mirror(t)) = t by {
     fs::write(
         app.join("kestrel.project"),
         format!(
-            "package app\ndepends geometry from \"file://{}\" at \"{commit}\"\n",
-            upstream.display()
+            "package app\ndepends geometry from \"file:///{}\" at \"{commit}\"\n",
+            upstream
+                .display()
+                .to_string()
+                .replace('\\', "/")
+                .trim_start_matches('/')
         ),
     )
     .unwrap();

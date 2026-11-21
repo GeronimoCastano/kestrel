@@ -8,7 +8,10 @@ use std::{fs, process::Command};
 fn run_program(source: &str) -> String {
     let dir = native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
     let file = dir.path().join("program.kes");
-    fs::write(&file, source).unwrap();
+    // Programs that save files name /tmp; they write into this test's folder instead,
+    // spelled with forward slashes so a Windows path needs no escapes in Kestrel text.
+    let folder = dir.path().display().to_string().replace('\\', "/");
+    fs::write(&file, source.replace("/tmp/", &format!("{folder}/"))).unwrap();
     let project = check_path(&file, dir.path()).unwrap();
     assert!(project.is_ok(), "{}", project.render_diagnostics());
     let program = core::lower(&project).unwrap_or_else(|errors| panic!("{errors:#?}"));
@@ -510,6 +513,22 @@ print(true)
         output,
         "[2, 4]\n[2, 4]\n[2, 4]\n[2, 2]\n[2, 2]\n[2, 4]\n[1, 2, 4]\ntrue\n"
     );
+}
+
+#[test]
+fn binary_cross_entropy_gives_every_logit_its_gradient() {
+    // The loss is a scalar; each logit's gradient is (sigmoid(x) - y) / count.
+    let output = run_program(
+        r#"
+import std.kesnet.{BCEWithLogitsLoss}
+let target := Variable.fromArray([1.0, 0.0, 1.0, 0.0].toArray(), (2, 2))
+let logits := Variable.parameter([0.0, 0.0, 0.0, 0.0].toArray(), (2, 2))
+let loss := BCEWithLogitsLoss().forward(logits, target)
+loss.backward()
+match logits.grad() { Some(g) => print(g), None => print("none") }
+"#,
+    );
+    assert_eq!(output, "[[-0.125, 0.125],\n [-0.125, 0.125]]\n");
 }
 
 #[test]

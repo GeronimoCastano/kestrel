@@ -12,6 +12,28 @@ use std::{
 };
 
 fn main() -> ExitCode {
+    // Windows gives the main thread 1 MiB of stack, where macOS and Linux give 8 MiB. The
+    // checker recurses on deep programs, so it runs on a thread with room to spare there.
+    if cfg!(windows) {
+        return std::thread::Builder::new()
+            .stack_size(64 << 20)
+            .spawn(start)
+            .map_or_else(
+                |error| {
+                    eprintln!("kestrel: cannot start the compiler thread: {error}");
+                    ExitCode::from(2)
+                },
+                |thread| {
+                    thread
+                        .join()
+                        .unwrap_or_else(|panic| std::panic::resume_unwind(panic))
+                },
+            );
+    }
+    start()
+}
+
+fn start() -> ExitCode {
     match run() {
         Ok(success) => {
             if success {
@@ -614,7 +636,10 @@ fn native_command(
     }
     if command == "build" {
         kestrel::native::build(&program, &destination)?;
-        println!("Built {}", destination.display());
+        println!(
+            "Built {}",
+            kestrel::native::executable_path(&destination).display()
+        );
         Ok(true)
     } else {
         Ok(kestrel::native::run_with_args(&program, &arguments)?.success())

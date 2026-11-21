@@ -134,7 +134,8 @@ the extension's completions also run in notebooks.
 Set `kestrel.compilerPath` to an absolute path, then reload the window.
 
 **"Cannot start Clang".** `kestrel build` and `kestrel run` need a C compiler.
-On macOS, `xcode-select --install` provides it.
+On macOS, `xcode-select --install` provides it. On Windows, install LLVM and the
+Visual Studio Build Tools, as [Install](../install.md#windows) describes.
 
 **A `.kes` file opens as plain text.** The extension is installed but not active.
 Reload the window, and check Extensions shows Kestrel enabled.

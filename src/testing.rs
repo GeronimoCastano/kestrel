@@ -160,11 +160,7 @@ pub fn run(package: &Path, options: &Options, out: &mut impl Write) -> Result<bo
             .collect::<String>();
         if !misplaced.is_empty() {
             cases.push(Case {
-                file: file
-                    .strip_prefix(&package)
-                    .unwrap_or(file)
-                    .display()
-                    .to_string(),
+                file: package_name(file, &package),
                 name: "(misplaced @test)".into(),
                 binary: None,
                 index: 0,
@@ -174,11 +170,7 @@ pub fn run(package: &Path, options: &Options, out: &mut impl Write) -> Result<bo
             });
         }
         if parsed.is_ok() {
-            let shown = file
-                .strip_prefix(&package)
-                .unwrap_or(file)
-                .display()
-                .to_string();
+            let shown = package_name(file, &package);
             doctests.extend(collect_doctests(
                 &package,
                 file,
@@ -190,11 +182,7 @@ pub fn run(package: &Path, options: &Options, out: &mut impl Write) -> Result<bo
     }
     let mut builds = vec![];
     for (number, file) in files.iter().enumerate() {
-        let shown = file
-            .strip_prefix(&package)
-            .unwrap_or(file)
-            .display()
-            .to_string();
+        let shown = package_name(file, &package);
         let project = modules::check_path(file, &package)
             .map_err(|e| format!("Cannot check {shown}: {e}"))?;
         let module = project.modules.last().unwrap();
@@ -633,6 +621,17 @@ fn execute(binary: &Path, index: usize, timeout: Option<Duration>) -> std::io::R
         passed: !expired && status.success(),
         output,
     })
+}
+
+/// A file's path inside its package, as the report prints it. The separator is `/` on
+/// every platform, so a report reads the same on Windows.
+fn package_name(file: &Path, package: &Path) -> String {
+    let relative = file.strip_prefix(package).unwrap_or(file);
+    if cfg!(windows) {
+        relative.display().to_string().replace('\\', "/")
+    } else {
+        relative.display().to_string()
+    }
 }
 
 /// The declaration's name, without the documentation block in front of it.

@@ -10,7 +10,7 @@ const os = require('os');
 const path = require('path');
 const { CheckDaemon } = require('../out/daemon');
 
-const BINARY = path.join(__dirname, '..', '..', '..', 'target', 'release', 'kestrel');
+const BINARY = path.join(__dirname, '..', '..', '..', 'target', 'release', process.platform === 'win32' ? 'kestrel.exe' : 'kestrel');
 if (!fs.existsSync(BINARY)) {
   console.log('skipped the daemon runs: no release binary at ' + BINARY);
   process.exit(0);

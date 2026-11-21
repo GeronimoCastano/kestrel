@@ -7,7 +7,7 @@ const path = require('path');
 const { spawnSync } = require('child_process');
 const project = require('../out/project');
 
-const BINARY = path.join(__dirname, '..', '..', '..', 'target', 'release', 'kestrel');
+const BINARY = path.join(__dirname, '..', '..', '..', 'target', 'release', process.platform === 'win32' ? 'kestrel.exe' : 'kestrel');
 const haveBinary = fs.existsSync(BINARY);
 
 // A fake tree answers the walk without touching the disk, which keeps these cases

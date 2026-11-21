@@ -5,7 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { loadExtension, documentFor } = require('../test-support/harness');
 
-const BINARY = path.join(__dirname, '..', '..', '..', 'target', 'release', 'kestrel');
+const BINARY = path.join(__dirname, '..', '..', '..', 'target', 'release', process.platform === 'win32' ? 'kestrel.exe' : 'kestrel');
 if (!fs.existsSync(BINARY)) {
   console.log('skipped code action runs: no release binary at ' + BINARY);
   process.exit(0);
