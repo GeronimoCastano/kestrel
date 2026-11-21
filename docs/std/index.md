@@ -37,21 +37,21 @@ until a module has one; this table says which pages exist.
 | `std.toml` | TOML 1.0 configuration text to a `Toml` value. | planned |
 | `std.regex` | Regular expressions: match, search, replace, capture. | planned |
 | `std.encoding` | Base64, hex, CRC-32 and SHA-256 over the UTF-8 bytes of a string. | planned |
-| `std.kesdas` | Series and DataFrames with a pandas-shaped API: grouping, joins, rolling windows, plots. | planned |
+| `std.kesdas` | Series and DataFrames with a pandas-shaped API: grouping, joins, rolling windows, plots. | [documented](kesdas.md) |
 
 ## Numbers
 
 | Module | What it holds | Page |
 |---|---|---|
-| `std.math` | Elementary functions: `exp`, `log`, trigonometry, rounding. | planned |
-| `std.linalg` | Matrices, vectors, solves, decompositions. | planned |
-| `std.stats` | Statistics over tensors. | planned |
+| `std.math` | Elementary functions: `exp`, `log`, trigonometry, rounding. | [documented](math.md) |
+| `std.linalg` | Matrices, vectors, solves, decompositions. | [documented](linalg.md) |
+| `std.stats` | Statistics over tensors. | [documented](stats.md) |
 | `std.statistics` | Summaries of a `List` of doubles. | [documented](statistics.md) |
-| `std.prob` | Probability distributions and their sampling. | planned |
-| `std.random` | Random numbers and seeded generators. | planned |
-| `std.complex` | Double-precision complex numbers. | planned |
-| `std.kesnet` | Autograd, layers, training, convolution. | planned |
-| `std.ml` | Classical models: regression, classification, scaling. | planned |
+| `std.prob` | Probability distributions and their sampling. | [documented](prob.md) |
+| `std.random` | Random numbers and seeded generators. | [documented](random.md) |
+| `std.complex` | Double-precision complex numbers. | [documented](complex.md) |
+| `std.kesnet` | Autograd, layers, training, convolution. | [documented](kesnet.md) |
+| `std.ml` | Classical models: regression, classification, scaling. | [documented](ml.md) |
 
 ## System
 
