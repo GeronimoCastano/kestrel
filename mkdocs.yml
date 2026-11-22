@@ -121,6 +121,8 @@ nav:
 
   - Mathematics: math.md
   - Neural networks: kesnet.md
-  - Editor: editors/vscode.md
+  - Editor:
+      - VS Code: editors/vscode.md
+      - Jupyter: editors/jupyter.md
   - Contributing: https://github.com/GeronimoCastano/kestrel/blob/main/CONTRIBUTING.md
   - Changelog: changelog.md

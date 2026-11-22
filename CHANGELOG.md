@@ -18,6 +18,7 @@ bumps the minor number.
 - The VS Code extension registers a formatting provider, so
   `editor.formatOnSave` works. It runs the compiler with `fmt --stdin`.
 - CI checks every tracked `.kes` file with `kestrel fmt --check`.
+- `kestrel completions bash|zsh|fish` prints a shell completion script.
 - `kestrel new NAME` scaffolds a package: `kestrel.project`, an entry point, a
   module and a test that passes on the first run. `--lib` writes the module and
   test without an entry point; `--git` starts a repository.

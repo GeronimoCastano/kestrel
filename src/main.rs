@@ -97,6 +97,7 @@ fn run() -> Result<bool, String> {
             | "fetch"
             | "update"
             | "new"
+            | "completions"
             | "session"
             | "test"
             | "notebook"
@@ -505,6 +506,29 @@ fn run() -> Result<bool, String> {
             println!("{}", report.render());
         }
         return Ok(report.healthy());
+    }
+
+    if command == "completions" {
+        if project
+            || tree
+            || notebook
+            || output.is_some()
+            || emit_c.is_some()
+            || !libraries.is_empty()
+            || !script_args.is_empty()
+            || root_given
+        {
+            return Err("completions takes one shell name: bash, zsh or fish.".into());
+        }
+        if paths.len() != 1 {
+            return Err("completions takes one shell name: bash, zsh or fish.".into());
+        }
+        let shell = &paths[0];
+        let Some(script) = kestrel::completions::script(shell) else {
+            return Err(format!("Unknown shell `{shell}`. Use bash, zsh or fish."));
+        };
+        print!("{script}");
+        return Ok(true);
     }
 
     if command == "serve" {
@@ -932,7 +956,7 @@ fn help() {
     println!(
         "Kestrel compiler (compiler and native session)\n\nUsage:\n  kestrel session [--root DIRECTORY] [--link LIBRARY] [-- ARG...]\n  kestrel notebook [--root DIRECTORY] [--link LIBRARY]\n  kestrel serve [--root DIRECTORY]
   kestrel goals [--root DIRECTORY] [--line N] [--column N] [--json] FILE
-  kestrel doctor [--root DIRECTORY] [--json]\n  kestrel game [--port N] [--root DIRECTORY]\n  kestrel parse [--tree] [--project] FILE...\n  kestrel tokens FILE...\n  kestrel check [--root DIRECTORY] [--trusted] [--notebook] [--stdin-path FILE] FILE...\n  kestrel build [--root DIRECTORY] [-o EXECUTABLE] [--emit-c FILE] [--link LIBRARY] FILE\n  kestrel run [--root DIRECTORY] [--emit-c FILE] [--link LIBRARY] FILE [-- ARG...]\n  kestrel fetch [--root DIRECTORY]\n  kestrel update NAME [--root DIRECTORY]\n  kestrel new NAME [--lib] [--bin] [--git]\n  kestrel test [FOLDER] [--filter TEXT] [--jobs N] [--timeout SECONDS|none] [--link LIBRARY]\n  kestrel fmt [--check] [--diff] [--stdin] FILE...\n\nUse - as a file path to read standard input. --stdin-path FILE treats that
-input as an unsaved version of FILE, so project-local imports resolve.\n\nparse checks grammar only. check resolves imports and checks supported\nnames and types, effects, mutation permissions, moves, borrows, contracts,\nfiles and tasks. build and run compile the supported native subset using\nClang. session keeps live values and runs each entry once; :quit ends it.\n:test [FILTER] runs saved package tests without clearing session values.\ntest runs the @test functions in a package's tests folder, each in its own\nprocess. new writes a package folder with a manifest, an entry point, a module and a test. fmt rewrites files in place; --check names files that differ and\nexits 1, and --stdin reads standard input. doctor reports the tools, install layout, PATH, cache, lock and editor extension without changing anything.\nSee README.md for current limits."
+  kestrel doctor [--root DIRECTORY] [--json]\n  kestrel game [--port N] [--root DIRECTORY]\n  kestrel parse [--tree] [--project] FILE...\n  kestrel tokens FILE...\n  kestrel check [--root DIRECTORY] [--trusted] [--notebook] [--stdin-path FILE] FILE...\n  kestrel build [--root DIRECTORY] [-o EXECUTABLE] [--emit-c FILE] [--link LIBRARY] FILE\n  kestrel run [--root DIRECTORY] [--emit-c FILE] [--link LIBRARY] FILE [-- ARG...]\n  kestrel fetch [--root DIRECTORY]\n  kestrel update NAME [--root DIRECTORY]\n  kestrel new NAME [--lib] [--bin] [--git]\n  kestrel test [FOLDER] [--filter TEXT] [--jobs N] [--timeout SECONDS|none] [--link LIBRARY]\n  kestrel fmt [--check] [--diff] [--stdin] FILE...\n  kestrel completions bash|zsh|fish\n\nUse - as a file path to read standard input. --stdin-path FILE treats that
+input as an unsaved version of FILE, so project-local imports resolve.\n\nparse checks grammar only. check resolves imports and checks supported\nnames and types, effects, mutation permissions, moves, borrows, contracts,\nfiles and tasks. build and run compile the supported native subset using\nClang. session keeps live values and runs each entry once; :quit ends it.\n:test [FILTER] runs saved package tests without clearing session values.\ntest runs the @test functions in a package's tests folder, each in its own\nprocess. new writes a package folder with a manifest, an entry point, a module and a test. fmt rewrites files in place; --check names files that differ and\nexits 1, and --stdin reads standard input. completions prints a script for bash,\nzsh or fish. doctor reports the tools, install layout, PATH, cache, lock and editor extension without changing anything.\nSee README.md for current limits."
     );
 }

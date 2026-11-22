@@ -1,7 +1,7 @@
 {
   "name": "kestrel-language",
   "displayName": "Kestrel for VS Code",
-  "description": "Kestrel language support: highlighting, completion, diagnostics, inlay hints and a live proof state.",
+  "description": "Kestrel language support: highlighting, completion, formatting, diagnostics, inlay hints and a live proof state.",
   "version": "0.5.0",
   "publisher": "kestrel-lang",
   "license": "MIT",

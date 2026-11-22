@@ -1,5 +1,6 @@
 mod actions;
 pub mod checker;
+pub mod completions;
 pub mod contracts;
 pub mod core;
 pub mod diagnostic;

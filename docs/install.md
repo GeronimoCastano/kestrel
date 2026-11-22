@@ -127,6 +127,25 @@ it works without restarting the editor after an install. The
 [editor guide](editors/vscode.md) covers the compiler path, Code Runner and the
 settings.
 
+## Shell completions
+
+`kestrel completions SHELL` prints a completion script for bash, zsh or fish.
+
+```sh
+# bash, for the current shell only
+source <(kestrel completions bash)
+```
+
+```zsh
+# zsh: keep the file in a folder on fpath
+mkdir -p ~/.zsh/completions
+kestrel completions zsh > ~/.zsh/completions/_kestrel
+```
+
+```fish
+kestrel completions fish > ~/.config/fish/completions/kestrel.fish
+```
+
 ## Check the install
 
 ```sh

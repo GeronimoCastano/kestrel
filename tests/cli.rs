@@ -655,3 +655,36 @@ fn doctor_reports_a_missing_clang_on_path() {
     assert!(report.contains("not found"), "{report}");
     assert!(report.contains("1 required check failed"), "{report}");
 }
+
+#[test]
+fn completions_print_a_script_for_each_shell() {
+    for (shell, marker) in [
+        ("bash", "complete -o filenames"),
+        ("zsh", "#compdef kestrel"),
+        ("fish", "complete -c kestrel"),
+    ] {
+        let output = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+            .args(["completions", shell])
+            .output()
+            .unwrap();
+        assert!(output.status.success(), "{shell}");
+        let script = String::from_utf8(output.stdout).unwrap();
+        assert!(script.contains(marker), "{shell}: {script}");
+        assert!(script.contains("fmt"), "{shell}: {script}");
+        assert!(script.contains("doctor"), "{shell}: {script}");
+    }
+}
+
+#[test]
+fn completions_reject_an_unknown_shell() {
+    let output = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["completions", "tcsh"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    assert!(
+        String::from_utf8(output.stderr)
+            .unwrap()
+            .contains("Use bash, zsh or fish")
+    );
+}
