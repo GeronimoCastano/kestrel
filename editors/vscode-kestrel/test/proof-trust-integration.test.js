@@ -31,6 +31,11 @@ const daemon = new CheckDaemon(compiler, root);
     const hypotheses=result.goals.flatMap(goal=>goal.hypotheses.map(([name])=>name));
     assert(hypotheses.includes('iha')&&hypotheses.includes('ihb'),JSON.stringify(result));
     console.log('Real compiler proof-state trust and multi-field induction contexts pass');
-  // Windows keeps the folder busy until the disposed server has exited, so retry the removal.
-  } finally {daemon.dispose();fs.rmSync(root,{recursive:true,force:true,maxRetries:20,retryDelay:100});}
+  } finally {
+    // Windows keeps the folder busy while a process runs in it, so wait for the server to close.
+    // A solver it started can outlive it briefly; a folder left behind then is not a test failure.
+    await daemon.dispose();
+    try {fs.rmSync(root,{recursive:true,force:true,maxRetries:20,retryDelay:100});}
+    catch (error) {if (error.code !== 'EBUSY') throw error;console.log(`left ${root} for the system to remove: ${error.code}`);}
+  }
 })().catch(error=>{console.error(error);process.exitCode=1;});
