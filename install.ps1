@@ -112,7 +112,8 @@
         $ErrorActionPreference = 'Continue'
         $greeting = (& $kestrel run (Join-Path $check 'hello.kes') 2>&1 | ForEach-Object { "$_" }) -join "`n"
         $ErrorActionPreference = 'Stop'
-        if ($greeting -match 'Smart App Control') { $blocked = $true }
+        # Kestrel 0.3.0 and older print only the Windows error number.
+        if ($greeting -match 'Smart App Control|os error 4551') { $blocked = $true }
         elseif ($greeting.Trim() -ne 'Hello, Kestrel!') { throw "The installed compiler could not run a program: $greeting" }
     } finally {
         $ErrorActionPreference = 'Stop'

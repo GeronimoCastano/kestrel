@@ -27,6 +27,13 @@ In PowerShell:
 irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
 ```
 
+Check Smart App Control first: Windows Security > App & browser control > Smart
+App Control settings. When it says **On**, Windows blocks every program Kestrel
+builds. Install Kestrel in WSL instead, or turn Smart App Control off; the steps
+for both are under [Smart App Control](#smart-app-control). When it says **Off**
+or **Evaluation**, the installer works as is. In evaluation mode, Windows may
+turn it on later.
+
 The installer needs no administrator rights and no Visual Studio. It downloads the
 release zip, checks it against the release's `SHA256SUMS`, and unpacks it to
 `%LOCALAPPDATA%\Programs\Kestrel`:
