@@ -1,6 +1,10 @@
 [package]
 name = "kestrel"
+<<<<<<< HEAD
 version = "0.2.0"
+=======
+version = "0.1.4"
+>>>>>>> dsh-18d70d8a-0208
 edition = "2024"
 description = "Kestrel compiler and native session"
 publish = false

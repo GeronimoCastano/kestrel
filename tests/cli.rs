@@ -522,4 +522,135 @@ fn fmt_diff_reports_a_missing_final_newline() {
     assert!(result.status.success());
     let output = String::from_utf8(result.stdout).unwrap();
     assert!(output.contains("\\ No newline at end of file"), "{output}");
+
+/// Runs `kestrel doctor` with the `KESTREL_*` variables cleared first, so a
+/// developer's own settings cannot change the result.
+fn doctor(variables: &[(&str, &str)], arguments: &[&str]) -> Output {
+    let cache = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let mut command = Command::new(env!("CARGO_BIN_EXE_kestrel"));
+    command
+        .arg("doctor")
+        .args(arguments)
+        .env("XDG_CACHE_HOME", cache.path());
+    for name in ["KESTREL_CC", "KESTREL_Z3", "KESTREL_LAPACK"] {
+        command.env_remove(name);
+    }
+    for (name, value) in variables {
+        command.env(name, value);
+    }
+    command.output().unwrap()
+}
+
+fn text(output: &Output) -> String {
+    String::from_utf8_lossy(&output.stdout).into_owned()
+}
+
+#[test]
+fn doctor_reports_a_missing_clang() {
+    let output = doctor(&[("KESTREL_CC", "/nonexistent/kestrel-test-clang")], &[]);
+    assert_eq!(output.status.code(), Some(1));
+    let report = text(&output);
+    assert!(report.contains("fail  clang"), "{report}");
+    assert!(report.contains("KESTREL_CC"), "{report}");
+    assert!(report.contains("1 required check failed"), "{report}");
+}
+
+#[test]
+fn doctor_reports_a_missing_z3_without_failing() {
+    let output = doctor(&[("KESTREL_Z3", "/nonexistent/kestrel-test-z3")], &[]);
+    let report = text(&output);
+    assert!(report.contains("warn  z3"), "{report}");
+    assert!(report.contains("KESTREL_Z3"), "{report}");
+    if Command::new("clang").arg("--version").output().is_ok() {
+        assert_eq!(output.status.code(), Some(0), "{report}");
+    }
+}
+
+#[test]
+fn doctor_reports_a_broken_lapack() {
+    let directory = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let library = directory.path().join("libkestrel-test-lapack.so");
+    std::fs::write(&library, "this is not a library").unwrap();
+    let output = doctor(&[("KESTREL_LAPACK", library.to_str().unwrap())], &[]);
+    let report = text(&output);
+    assert!(report.contains("warn  lapack"), "{report}");
+    assert!(report.contains("does not load"), "{report}");
+}
+
+#[test]
+fn doctor_accepts_a_good_environment() {
+    if Command::new("clang").arg("--version").output().is_err() {
+        return;
+    }
+    let output = doctor(&[], &[]);
+    let report = text(&output);
+    assert_eq!(output.status.code(), Some(0), "{report}");
+    assert!(report.contains("ok    clang"), "{report}");
+    assert!(report.contains("all required checks passed"), "{report}");
+}
+
+#[test]
+fn doctor_json_is_one_object_with_counts() {
+    let output = doctor(
+        &[("KESTREL_CC", "/nonexistent/kestrel-test-clang")],
+        &["--json"],
+    );
+    let report = text(&output);
+    let value: serde_json::Value = serde_json::from_str(&report).unwrap();
+    assert_eq!(value["healthy"], false);
+    assert_eq!(value["failures"].as_u64(), Some(1));
+    let checks = value["checks"].as_array().unwrap();
+    assert!(checks.iter().any(|check| {
+        check["name"] == "clang" && check["status"] == "fail" && check["level"] == "required"
+    }));
+    assert!(report.ends_with('\n') && !report.contains("\n{"));
+}
+
+#[test]
+fn doctor_fails_on_a_malformed_lock() {
+    let directory = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    std::fs::write(
+        directory.path().join("kestrel.project"),
+        "package shop\ndepends prices from \"https://example.invalid/prices\" at \"v1\"\n",
+    )
+    .unwrap();
+    std::fs::write(directory.path().join("kestrel.lock"), "{ not json").unwrap();
+    let output = doctor(&[], &["--root", directory.path().to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(1));
+    let report = text(&output);
+    assert!(report.contains("fail  lock"), "{report}");
+    assert!(report.contains("not valid JSON"), "{report}");
+}
+
+#[test]
+fn doctor_usage_errors_exit_with_two() {
+    let option = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["doctor", "--bogus"])
+        .output()
+        .unwrap();
+    assert_eq!(option.status.code(), Some(2));
+    let file = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["doctor", "extra.kes"])
+        .output()
+        .unwrap();
+    assert_eq!(file.status.code(), Some(2));
+}
+
+#[test]
+fn doctor_reports_a_missing_clang_on_path() {
+    let empty = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("doctor")
+        .env_remove("KESTREL_CC")
+        .env_remove("KESTREL_Z3")
+        .env_remove("KESTREL_LAPACK")
+        .env("PATH", empty.path())
+        .env("XDG_CACHE_HOME", empty.path())
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    let report = String::from_utf8_lossy(&output.stdout);
+    assert!(report.contains("fail  clang"), "{report}");
+    assert!(report.contains("not found"), "{report}");
+    assert!(report.contains("1 required check failed"), "{report}");
 }

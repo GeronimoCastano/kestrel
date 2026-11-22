@@ -423,6 +423,39 @@ impl SyncState<'_> {
     }
 }
 
+/// One pin in `kestrel.lock`, and whether its source is already in the cache.
+pub(crate) struct PinnedPackage {
+    pub name: String,
+    pub url: String,
+    pub reference: String,
+    pub cached: bool,
+}
+
+/// Reads `kestrel.lock` without fetching or writing. `None` means the file is absent.
+pub(crate) fn inspect_lock(
+    root: &Path,
+    cache_root: Option<&Path>,
+) -> Result<Option<Vec<PinnedPackage>>, String> {
+    if !root.join(LOCK_FILE).is_file() {
+        return Ok(None);
+    }
+    let lock = Lockfile::read(root)?;
+    Ok(Some(
+        lock.packages
+            .values()
+            .map(|entry| PinnedPackage {
+                name: entry.name.clone(),
+                url: entry.url.clone(),
+                reference: entry.reference.clone(),
+                cached: cache_root.is_some_and(|root| {
+                    let directory = cache_path(root, &entry.name, &entry.url, &entry.commit);
+                    source_root(&directory).is_dir()
+                }),
+            })
+            .collect(),
+    ))
+}
+
 /// Loads source dependencies only from the committed lockfile and verified cache.
 pub fn load_packages(root: &Path) -> Result<Vec<Package>, String> {
     let root = root
@@ -665,21 +698,15 @@ fn validate_git_url(url: &str) -> Result<(), String> {
 }
 
 fn cache_root() -> Result<PathBuf, String> {
-    if let Some(path) = env::var_os("XDG_CACHE_HOME").filter(|path| !path.is_empty()) {
-        return Ok(PathBuf::from(path).join("kestrel/packages"));
-    }
-    #[cfg(target_os = "macos")]
-    if let Some(home) = env::var_os("HOME").filter(|path| !path.is_empty()) {
-        return Ok(PathBuf::from(home).join("Library/Caches/kestrel/packages"));
-    }
-    #[cfg(target_os = "windows")]
-    if let Some(local) = env::var_os("LOCALAPPDATA").filter(|path| !path.is_empty()) {
-        return Ok(PathBuf::from(local).join("Kestrel/cache/packages"));
-    }
-    if let Some(home) = env::var_os("HOME").filter(|path| !path.is_empty()) {
-        return Ok(PathBuf::from(home).join(".cache/kestrel/packages"));
-    }
-    Err("Cannot find the per-user cache folder (set XDG_CACHE_HOME or HOME).".into())
+    let xdg = env::var_os("XDG_CACHE_HOME").map(PathBuf::from);
+    let home = env::var_os("HOME").map(PathBuf::from);
+    let local = env::var_os("LOCALAPPDATA").map(PathBuf::from);
+    crate::paths::cache_root(
+        crate::paths::Platform::current(),
+        xdg.as_deref(),
+        home.as_deref(),
+        local.as_deref(),
+    )
 }
 
 fn cache_path(root: &Path, name: &str, url: &str, commit: &str) -> PathBuf {

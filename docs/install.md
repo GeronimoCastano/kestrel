@@ -4,7 +4,11 @@ One command installs Kestrel with everything it uses: the compiler, a C compiler
 for `kestrel build` and `kestrel run`, LAPACK for `std.linalg`, and Z3 for `smt`
 proofs. The standard library is inside the compiler.
 
+<<<<<<< HEAD
 The current release is **0.2.0**. CI runs the full test suite on macOS, Linux and
+=======
+The current release is **0.1.4**. CI runs the full test suite on macOS, Linux and
+>>>>>>> dsh-18d70d8a-0208
 Windows, and installs every release the way this page does.
 
 ## macOS and Linux
@@ -46,7 +50,11 @@ Kestrel, delete the folder and its `PATH` entry.
 install folder:
 
 ```powershell
+<<<<<<< HEAD
 $env:KESTREL_VERSION = '0.2.0'; irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
+=======
+$env:KESTREL_VERSION = '0.1.4'; irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
+>>>>>>> dsh-18d70d8a-0208
 ```
 
 Python interop is not available on Windows yet; it stops with an error that says
@@ -66,7 +74,11 @@ archives the commands above use, with `SHA256SUMS`:
 
 ```sh
 tar -xzf kestrel-aarch64-apple-darwin.tar.gz
+<<<<<<< HEAD
 sudo install kestrel-0.2.0-aarch64-apple-darwin/kestrel /usr/local/bin/
+=======
+sudo install kestrel-0.1.4-aarch64-apple-darwin/kestrel /usr/local/bin/
+>>>>>>> dsh-18d70d8a-0208
 ```
 
 An archive on its own needs Clang on `PATH`. On Linux, `std.linalg` also needs
@@ -127,7 +139,11 @@ kestrel --version
 ```
 
 ```text
+<<<<<<< HEAD
 kestrel 0.2.0 (compiler and native session)
+=======
+kestrel 0.1.4 (compiler and native session)
+>>>>>>> dsh-18d70d8a-0208
 ```
 
 Then compile something:
@@ -139,3 +155,8 @@ print("Hello, Kestrel!")
 ```sh
 kestrel run hello.kes
 ```
+
+For the whole installation, run `kestrel doctor`. It reports the tools, the
+layout, `PATH`, the package cache, `kestrel.lock` and the VS Code extension, and
+prints the command that fixes each problem. The [diagnosis page](doctor.md)
+documents every check.

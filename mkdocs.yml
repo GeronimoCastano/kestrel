@@ -64,6 +64,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Install: install.md
+  - Diagnose: doctor.md
   - Language:
       - Reference manual: manual.md
       - Formatter: formatter.md

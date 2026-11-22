@@ -383,6 +383,11 @@ cargo build --release
 `KESTREL_CC`, `KESTREL_LAPACK` and `KESTREL_Z3` name a C compiler, a LAPACK
 library and a Z3 executable when you want ones other than Kestrel would find.
 
+`kestrel doctor` reports what each tool resolves to, the install layout, `PATH`
+shadowing, the package cache, `kestrel.lock` and the VS Code extension. It takes
+`--json` for scripts and exits with 1 when a required check fails. See
+[docs/doctor.md](docs/doctor.md).
+
 ### Supported platforms
 
 CI runs the full test suite on macOS, Linux and Windows for every pull request,
@@ -401,8 +406,12 @@ and the Visual Studio Build Tools are on `PATH`.
 | `kestrel run FILE` | Compile and run in one step |
 | `kestrel build -o OUT FILE` | Save a standalone executable |
 | `kestrel check FILE...` | Names, types, effects, moves, contracts, files, tasks |
+<<<<<<< HEAD
 | `kestrel fmt FILE...` | Rewrite `.kes` files in one style |
 | `kestrel new NAME` | Scaffold a package; `--lib` for a library, `--git` for a repository |
+=======
+| `kestrel doctor` | Diagnose the installation: tools, layout, `PATH`, cache, lock, extension |
+>>>>>>> dsh-18d70d8a-0208
 | `kestrel test` | Run the `@test` functions in a package |
 | `kestrel session` | Keep values alive between entries |
 | `kestrel notebook` | Jupyter kernel for `.kes` cells |
