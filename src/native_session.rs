@@ -629,10 +629,9 @@ impl Runtime {
         if let Some(token) = &token {
             worker.env("KESTREL_SESSION_TOKEN", token);
         }
-        if std::env::var_os("KESTREL_SANITIZE").is_some() {
-            // Windows loads the sanitizer runtime DLL from PATH.
-            worker.envs(super::sanitizer_runtime_path().map(|path| ("PATH", path)));
-        }
+        // An entry may import Python later, and Windows loads its DLL from the PATH the
+        // worker started with.
+        worker.envs(super::program_path(true).map(|path| ("PATH", path)));
         let mut worker = worker
             .spawn()
             .map_err(|e| format!("Cannot start native session: {e}"))?;

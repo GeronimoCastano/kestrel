@@ -2705,12 +2705,20 @@ print(size("a\u0000b"))
     assert!(String::from_utf8_lossy(&output.stderr).contains("contains a NUL character"));
 }
 
+/// Whether a Python to embed exists. CI sets KESTREL_TEST_REQUIRE_PYTHON, so a missing
+/// Python fails the test there instead of skipping it.
+fn python_ready() -> bool {
+    let ready = kestrel::native::python_available();
+    assert!(
+        ready || std::env::var_os("KESTREL_TEST_REQUIRE_PYTHON").is_none(),
+        "KESTREL_TEST_REQUIRE_PYTHON is set, but no Python to embed was found"
+    );
+    ready
+}
+/// Whether a Python to embed exists and can import `module`.
 fn python_available(module: &str) -> bool {
-    Command::new("python3-config")
-        .arg("--includes")
-        .output()
-        .is_ok_and(|o| o.status.success())
-        && Command::new("python3")
+    python_ready()
+        && Command::new(if cfg!(windows) { "python" } else { "python3" })
             .args(["-c", &format!("import {module}")])
             .output()
             .is_ok_and(|o| o.status.success())
@@ -4776,14 +4784,22 @@ fn python_callback_reentry_reports_busy_and_allows_idle_or_same_thread_calls() {
     fs::write(
         dir.path().join("wait.c"),
         r#"
+#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+static int exists(const char *path) { return _access(path, 0) == 0; }
+static void pause_briefly(void) { Sleep(1); }
+#else
 #define _POSIX_C_SOURCE 200809L
-#include <stdio.h>
 #include <unistd.h>
 #include <time.h>
+static int exists(const char *path) { return access(path, F_OK) == 0; }
+static void pause_briefly(void) { struct timespec pause={0,1000000}; nanosleep(&pause,0); }
+#endif
+#include <stdio.h>
 int release_and_wait(const char *ready, const char *done) {
     FILE *file=fopen(ready,"w"); if (!file) return 0; fclose(file);
-    struct timespec pause={0,1000000};
-    for (int i=0;i<3000;++i) {if (access(done,F_OK)==0) return 1;nanosleep(&pause,0);}
+    for (int i=0;i<3000;++i) {if (exists(done)) return 1;pause_briefly();}
     return 0;
 }
 "#,

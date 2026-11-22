@@ -30,6 +30,9 @@ bumps the minor number.
   fails. Its only write is one temporary file in the package cache.
 - `kestrel session` loads project C files on Windows, with the bundled Clang
   and with Clang for MSVC.
+- Python interop works on Windows in `kestrel run`, `kestrel build` and
+  `kestrel session`. Kestrel embeds the CPython that `KESTREL_PYTHON` names, or
+  else the first usable one of `python.exe` on `PATH` and `py -3`.
 - The compiler reports version 0.2.0.
 
 ## 0.1.3 - 2026-11-21

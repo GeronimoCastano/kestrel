@@ -7,6 +7,10 @@ static pthread_mutex_t k_python_callback_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t k_python_callback_done = PTHREAD_COND_INITIALIZER;
 static size_t k_python_callbacks_active;
 static _Thread_local size_t k_python_callback_depth;
+/* Generated code reaches the depth through these: thread-local data cannot leave a
+   Windows DLL, so a session's entries cannot name it. */
+static size_t k_python_depth(void) { return k_python_callback_depth; }
+static void k_python_set_depth(size_t depth) { k_python_callback_depth = depth; }
 static pthread_mutex_t k_python_bridge;
 static void k_python_start(void) {
     pthread_mutexattr_t attributes;

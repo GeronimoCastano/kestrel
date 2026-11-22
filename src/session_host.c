@@ -136,6 +136,11 @@ int main(int argc,char **argv) {
     }
     if(libraries) {
         void (*close_callbacks)(void)=(void (*)(void))dlsym(handles[libraries-1],"k_python_close_callbacks");
+#ifdef _WIN32
+        /* GetProcAddress reads one DLL's exports, and the bridge lives in its own DLL. */
+        HMODULE bridge=GetModuleHandleA("kestrel_python.dll");
+        if(!close_callbacks&&bridge) close_callbacks=(void (*)(void))dlsym((void *)bridge,"k_python_close_callbacks");
+#endif
         if(close_callbacks) close_callbacks();
     }
     if(drop) drop(&globals);

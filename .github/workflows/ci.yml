@@ -70,7 +70,10 @@ jobs:
       - name: Cache the build
         uses: Swatinem/rust-cache@v2
 
+      # Python tests skip on a machine without Python; here a missing Python fails them.
       - name: Run the test suite
+        env:
+          KESTREL_TEST_REQUIRE_PYTHON: "1"
         run: cargo test --no-fail-fast
 
   windows:
@@ -100,6 +103,13 @@ jobs:
       - name: Cache the build
         uses: Swatinem/rust-cache@v2
 
+      # A python.org build, which carries the headers and import library that embedding
+      # needs.
+      - name: Install Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
       # Windows compiles code behind cfg(windows) that the macOS job never lints.
       - name: Check formatting
         run: cargo fmt --all --check
@@ -123,6 +133,8 @@ jobs:
         run: clang --version
 
       - name: Run the test suite
+        env:
+          KESTREL_TEST_REQUIRE_PYTHON: "1"
         run: cargo test --no-fail-fast
 
       - name: Build the compiler
@@ -166,6 +178,14 @@ jobs:
           printf '#include "counter.h"\nstatic int64_t count;\nint64_t next(void) { return ++count; }\n' > "$folder/counter.c"
           printf 'import c "counter.h"\nunsafe { next().toInt() }\nunsafe { next().toInt() }\n:quit\n' | "$kestrel" session --root "$folder" | tee "$folder/counter.txt"
           test "$(tr -d '\r' < "$folder/counter.txt")" = "$(printf '1\n2')"
+          # Python interop embeds the CPython on PATH, in run, build and session alike.
+          printf 'import python "math" as math\nfunction root() : double or Error with Effects = math.sqrt(16.0)\n' > "$folder/root.kes"
+          { cat "$folder/root.kes"; printf 'print(match root() { n => n.text(), _ => "error", })\n'; } > "$folder/python.kes"
+          test "$("$kestrel" run "$folder/python.kes" | tr -d '\r')" = 4.0
+          "$kestrel" build -o "$folder/python" "$folder/python.kes"
+          test "$("$folder/python.exe" | tr -d '\r')" = 4.0
+          { cat "$folder/root.kes"; printf 'match root() { n => n.text(), _ => "error", }\n:quit\n'; } | "$kestrel" session --root "$folder" | tee "$folder/python.txt"
+          test "$(tr -d '\r' < "$folder/python.txt")" = 4.0
           printf '{"id":1,"op":"ping"}\n{"id":2,"op":"shutdown"}\n' | "$kestrel" serve --root "$folder" | tee "$folder/serve.txt"
           grep -q '"id":1' "$folder/serve.txt"
 

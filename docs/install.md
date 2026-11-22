@@ -49,10 +49,16 @@ install folder:
 $env:KESTREL_VERSION = '0.2.0'; irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
 ```
 
-Python interop is not available on Windows yet; it stops with an error that says
-so. `kestrel run`, `kestrel build` and `kestrel session` compile project C files
-as on the other platforms.
-`kestrel build -o hello hello.kes` writes `hello.exe`.
+`kestrel run`, `kestrel build` and `kestrel session` compile project C files as
+on the other platforms. `kestrel build -o hello hello.kes` writes `hello.exe`.
+
+Python interop embeds a CPython from [python.org](https://www.python.org). Kestrel
+uses the one `KESTREL_PYTHON` names when it is set. Otherwise it tries
+`python.exe` on `PATH`, skipping the Microsoft Store alias, then `py -3`, and
+takes the first one that has `include\Python.h` and `libs\python3XY.lib`. A
+program from `kestrel build` loads `python3XY.dll` when it starts, so keep that
+Python's folder on `PATH` when you run it. `kestrel run`, `kestrel test` and
+`kestrel session` put it there for you.
 
 ## Release archives
 
@@ -100,6 +106,7 @@ out, then on `PATH`. These variables override that:
 | `KESTREL_CC` | the C compiler, a Clang |
 | `KESTREL_LAPACK` | the LAPACK library to load, such as `libopenblas.so` |
 | `KESTREL_Z3` | the Z3 executable |
+| `KESTREL_PYTHON` | on Windows, the `python.exe` whose CPython programs embed |
 
 `kestrel check` needs none of these. It only reads your files.
 
