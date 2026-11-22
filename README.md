@@ -366,7 +366,7 @@ workloads Kestrel still loses.
 | Windows 10 1903 or newer, x86_64 | `irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 \| iex` | The compiler with its own Clang (llvm-mingw), OpenBLAS and Z3. No Visual Studio, no administrator rights. |
 
 `brew upgrade kestrel` updates a Homebrew install; running the Windows command
-again updates a Windows one. The Windows installer writes to
+again updates a Windows one. [Upgrade](docs/install.md#upgrade) has the details. The Windows installer writes to
 `%LOCALAPPDATA%\Programs\Kestrel`, adds its `bin` folder to your user `PATH`, and
 installs the VS Code extension when `code` is on `PATH`. To remove it, delete that
 folder and its `PATH` entry. Windows 11's Smart App Control blocks the programs
@@ -426,7 +426,7 @@ and the Visual Studio Build Tools are on `PATH`.
 | `kestrel serve` | Editor server behind the VS Code extension |
 | `kestrel goals FILE --line N --column N` | Print the proof goals at a position |
 | `kestrel parse` / `kestrel tokens` | Stop after the grammar / after the lexer |
-| `kestrel fetch` / `kestrel update` | Dependencies pinned in `kestrel.lock` |
+| `kestrel fetch` / `kestrel update` | Dependencies pinned in `kestrel.lock` (not the compiler) |
 
 Any file argument accepts `-` for standard input. `check --stdin-path FILE -`
 treats that input as an unsaved version of `FILE`, which is how the editor checks
