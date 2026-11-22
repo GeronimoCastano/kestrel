@@ -1,7 +1,4 @@
-function add(a : Nat, b : Nat) : Nat = match a {
-    Zero => b,
-    Succ(k) => Succ(add(k, b)),
-}
+function add(a : Nat, b : Nat) : Nat = match a { Zero => b, Succ(k) => Succ(add(k, b)) }
 
 @simp
 theorem addEq(a : Nat, b : Nat) : add(a, b) = a + b by {

@@ -1,6 +1,6 @@
 // Probability distributions can be objects or used directly through static
 // methods. "shape" turns one draw into a tensor.
-import std.prob.{Normal, Bernoulli, Binomial, Poisson, Gamma}
+import std.prob.{Bernoulli, Binomial, Gamma, Normal, Poisson}
 import std.random.{Rng, seed}
 
 let normal := Normal.create(mean = 0.0, sigma = 1.0)

@@ -1,6 +1,6 @@
 // Laws relate several calls, so they go in a test file next to the trait.
-import testdata.language.rules.{Square, biggest}
 import std.test.{assertEq}
+import testdata.language.rules.{Square, biggest}
 
 @test
 function biggestIsSymmetric() : void {

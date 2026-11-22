@@ -4,8 +4,13 @@ import std.kesnet.{LSTM, Linear, mseLoss}
 import std.kesnet.optim.{Adam}
 
 Variable.seed(4)
-let sequence := Tensor.generate((16, 16, 32), (t, n, f) => (((t * 41 + n * 23 + f * 13) % 101).toDouble() - 50.0) / 50.0)
-let targets := Tensor.generate((16, 1), (i, j) => (((i * 37 + j * 11) % 89).toDouble() - 44.0) / 44.0)
+let sequence :=
+    Tensor.generate(
+        (16, 16, 32),
+        (t, n, f) => (((t * 41 + n * 23 + f * 13) % 101).toDouble() - 50.0) / 50.0,
+    )
+let targets :=
+    Tensor.generate((16, 1), (i, j) => (((i * 37 + j * 11) % 89).toDouble() - 44.0) / 44.0)
 let inputs := Variable.fromTensor(sequence)
 let expected := Variable.fromTensor(targets)
 

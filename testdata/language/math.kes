@@ -2,11 +2,11 @@
 // quantifiers, finite algebra, sets, functions, real numbers and complex
 // numbers. The proofs above `main` are checked at compile time and erased.
 
-import std.algebra.{Z2, Z2Group, z2Plus, z2Times, z2Neg, z2PlusAssoc, z2Distrib}
-import std.func.{identity, compose, constant}
-import std.nat.{plus, times, plusZeroR, timesZeroR}
-import std.real.{Real, PI, abs, sqrt}
-import std.set.{member, subset, properSubset, disjoint, cardinality}
+import std.algebra.{Z2, Z2Group, z2Distrib, z2Neg, z2Plus, z2PlusAssoc, z2Times}
+import std.func.{compose, constant, identity}
+import std.nat.{plus, plusZeroR, times, timesZeroR}
+import std.real.{PI, Real, abs, sqrt}
+import std.set.{cardinality, disjoint, member, properSubset, subset}
 
 theorem zeroTwice(n : Nat) : plus(plus(n, Zero), Zero) = n by {
     rw [plusZeroR]

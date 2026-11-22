@@ -98,7 +98,10 @@ public function parse(text : String, delimiter : String = ",") : List[List[Strin
 }
 
 // Rows as Maps from the header's names to the fields. Every row needs as many fields as the header.
-public function parseRecords(text : String, delimiter : String = ",") : List[Map[String, String]] or Error {
+public function parseRecords(
+    text : String,
+    delimiter : String = ",",
+) : List[Map[String, String]] or Error {
     let rows := parse(text, delimiter)?
     let header := rows.take(1).flatten()
     let records : Array[Map[String, String]] = Array.empty()
@@ -106,7 +109,9 @@ public function parseRecords(text : String, delimiter : String = ",") : List[Map
     for (row in rows.drop(1)) {
         number += 1
         if row.length() != header.length() {
-            return Error(f"CSV: row {number} has {row.length()} fields, but the header has {header.length()}")
+            return Error(
+                f"CSV: row {number} has {row.length()} fields, but the header has {header.length()}",
+            )
         }
         let mut entry : Map[String, String] = Map()
         for ((name, field) in header.zip(row)) {
@@ -118,9 +123,10 @@ public function parseRecords(text : String, delimiter : String = ",") : List[Map
 }
 
 function quoteField(field : String, delimiter : String) : String {
-    if field.contains(delimiter) || field.contains("\"") || field.contains("\n") || field.contains("\r") {
-        return "\"" + field.replace("\"", "\"\"") + "\""
-    }
+    if field.contains(delimiter) ||
+        field.contains("\"") || field.contains("\n") || field.contains("\r") {
+            return "\"" + field.replace("\"", "\"\"") + "\""
+        }
     return field
 }
 

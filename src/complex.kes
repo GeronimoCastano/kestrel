@@ -5,10 +5,20 @@ import std.math
 // A complex number is a pair of real components. It is immutable, so `re` and
 // `im` are final, and every operation returns a new value.
 public class Complex {
-    has (Addable, Subtractable, Multipliable, Divisible,
-        RightAddable[double], RightSubtractable[double],
-        RightMultipliable[double], RightDivisible[double],
-        Powerable, Negatable, Equals, Text)
+    has (
+        Addable,
+        Subtractable,
+        Multipliable,
+        Divisible,
+        RightAddable[double],
+        RightSubtractable[double],
+        RightMultipliable[double],
+        RightDivisible[double],
+        Powerable,
+        Negatable,
+        Equals,
+        Text,
+    )
 
     public final re : double
     public final im : double
@@ -22,24 +32,19 @@ public class Complex {
     public static function one() : Complex = Complex(1.0, 0.0)
     public static function i() : Complex = Complex(0.0, 1.0)
 
-    public function add(other : Complex) : Complex =
-        Complex(this.re + other.re, this.im + other.im)
+    public function add(other : Complex) : Complex = Complex(this.re + other.re, this.im + other.im)
 
-    public function add(other : double) : Complex =
-        Complex(this.re + other, this.im)
+    public function add(other : double) : Complex = Complex(this.re + other, this.im)
 
     public function subtract(other : Complex) : Complex =
         Complex(this.re - other.re, this.im - other.im)
 
-    public function subtract(other : double) : Complex =
-        Complex(this.re - other, this.im)
+    public function subtract(other : double) : Complex = Complex(this.re - other, this.im)
 
     public function multiply(other : Complex) : Complex =
-        Complex(this.re * other.re - this.im * other.im,
-                this.re * other.im + this.im * other.re)
+        Complex(this.re * other.re - this.im * other.im, this.re * other.im + this.im * other.re)
 
-    public function multiply(other : double) : Complex =
-        Complex(this.re * other, this.im * other)
+    public function multiply(other : double) : Complex = Complex(this.re * other, this.im * other)
 
     public function divide(other : Complex) : Complex {
         let a := this.re
@@ -52,29 +57,22 @@ public class Complex {
         if c.abs() >= d.abs() {
             let q := d / c
             let denominator := 1.0 + q * q
-            return Complex((a / c + (b / c) * q) / denominator,
-                           (b / c - (a / c) * q) / denominator)
+            return Complex((a / c + (b / c) * q) / denominator, (b / c - (a / c) * q) / denominator)
         }
         let q := c / d
         let denominator := 1.0 + q * q
-        return Complex(((a / d) * q + b / d) / denominator,
-                       ((b / d) * q - a / d) / denominator)
+        return Complex(((a / d) * q + b / d) / denominator, ((b / d) * q - a / d) / denominator)
     }
 
-    public function divide(other : double) : Complex =
-        Complex(this.re / other, this.im / other)
+    public function divide(other : double) : Complex = Complex(this.re / other, this.im / other)
 
-    public function rightAdd(left : double) : Complex =
-        Complex(left + this.re, this.im)
+    public function rightAdd(left : double) : Complex = Complex(left + this.re, this.im)
 
-    public function rightSubtract(left : double) : Complex =
-        Complex(left - this.re, -this.im)
+    public function rightSubtract(left : double) : Complex = Complex(left - this.re, -this.im)
 
-    public function rightMultiply(left : double) : Complex =
-        Complex(left * this.re, left * this.im)
+    public function rightMultiply(left : double) : Complex = Complex(left * this.re, left * this.im)
 
-    public function rightDivide(left : double) : Complex =
-        Complex(left, 0.0).divide(this)
+    public function rightDivide(left : double) : Complex = Complex(left, 0.0).divide(this)
 
     public function power(exponent : Int) : Complex {
         let mut power := exponent
@@ -94,11 +92,9 @@ public class Complex {
         return result
     }
 
-    public function conjugate() : Complex =
-        Complex(this.re, -this.im)
+    public function conjugate() : Complex = Complex(this.re, -this.im)
 
-    public function normSquared() : double =
-        this.re * this.re + this.im * this.im
+    public function normSquared() : double = this.re * this.re + this.im * this.im
 
     // Hypot-style magnitude: scale by the larger component first so large and
     // small components do not overflow or underflow.
@@ -123,15 +119,13 @@ public class Complex {
         return 0.0
     }
 
-    public function isFinite() : Bool =
-        this.re.isFinite() && this.im.isFinite()
+    public function isFinite() : Bool = this.re.isFinite() && this.im.isFinite()
 
     public function copy() : Complex = Complex(this.re, this.im)
 
     public function negate() : Complex = Complex(-this.re, -this.im)
 
-    public function equals(other : Complex) : Bool =
-        this.re == other.re && this.im == other.im
+    public function equals(other : Complex) : Bool = this.re == other.re && this.im == other.im
 
     public function text() : String {
         if this.im < 0.0 {

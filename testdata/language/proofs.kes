@@ -1,26 +1,17 @@
 // Stage 7: theorems about a pure function on the standard Nat. The kernel
 // checks each proof, and the compiler erases it.
 
-function add(a : Nat, b : Nat) : Nat = match a {
-    Zero    => b,
-    Succ(k) => Succ(add(k, b)),
-}
+function add(a : Nat, b : Nat) : Nat = match a { Zero => b, Succ(k) => Succ(add(k, b)) }
 
 theorem addZeroL(n : Nat) : add(Zero, n) = n { rfl }
 
 @simp
 theorem addZeroR(n : Nat) : add(n, Zero) = n {
-    match n {
-        Zero    => rfl,
-        Succ(k) => congrArg(Succ, addZeroR(k)),
-    }
+    match n { Zero => rfl, Succ(k) => congrArg(Succ, addZeroR(k)) }
 }
 
 theorem addZeroRInduction(n : Nat) : add(n, Zero) = n {
-    induction n {
-        Zero       => rfl,
-        Succ(k) ih => congrArg(Succ, ih),
-    }
+    induction n { Zero => rfl, Succ(k) ih => congrArg(Succ, ih) }
 }
 
 theorem addSucc(b : Nat) : add(Zero, Succ(b)) = Succ(b) { rfl }
@@ -31,32 +22,36 @@ theorem addTwo(n : Nat) : add(2, n) = Succ(Succ(n)) { rfl }
 // Succ(k) case, ih needs add(k, b) below the bound, which follows from
 // Succ(add(k, b)) being below it (Q81).
 theorem addSuccR(a : Nat, b : Nat) : add(a, Succ(b)) = Succ(add(a, b)) {
-    induction a {
-        Zero       => rfl,
-        Succ(k) ih => congrArg(Succ, ih),
-    }
+    induction a { Zero => rfl, Succ(k) ih => congrArg(Succ, ih) }
 }
+
 theorem flipped(n : Nat) : n = add(n, Zero) { symm(addZeroR(n)) }
+
 theorem both(n : Nat) : add(n, Zero) = n and add(Zero, n) = n { (addZeroR(n), addZeroL(n)) }
+
 theorem firstOf(n : Nat) : add(n, Zero) = n {
     let (p, q) := both(n)
     p
 }
+
 theorem closed() : 3 > 2 { decide }
+
 theorem notZeroSucc(k : Nat) : not (Zero = Succ(k)) { h => absurd(h) }
+
 theorem pick(n : Nat) : add(n, Zero) = n or n = Zero { Left(addZeroR(n)) }
+
 theorem chain(n : Nat) : add(add(n, Zero), Zero) = n {
     trans(addZeroR(add(n, Zero)), addZeroR(n))
 }
+
 theorem usesAssumption(n : Nat) : add(n, Zero) = Zero requires h : n = Zero {
     trans(addZeroR(n), h)
 }
+
 theorem citesAssumption(m : Nat) : add(m, Zero) = Zero requires e : m = Zero { usesAssumption(m) }
+
 theorem orCases(n : Nat) : add(n, Zero) = n requires h : n = Zero or not (n = Zero) {
-    match h {
-        Left(p)  => addZeroR(n),
-        Right(q) => addZeroR(n),
-    }
+    match h { Left(p) => addZeroR(n), Right(q) => addZeroR(n) }
 }
 
 theorem normalized(n : Nat) : add(add(n, Zero), Zero) = n { simp }

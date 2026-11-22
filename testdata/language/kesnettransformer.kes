@@ -1,17 +1,39 @@
 // A tiny transformer encoder classifier over two short sequences.
 // Run with: kestrel run examples/kesnettransformer.kes
-import std.kesnet.{TransformerEncoderLayer, Linear, CrossEntropyLoss, accuracy}
+import std.kesnet.{CrossEntropyLoss, Linear, TransformerEncoderLayer, accuracy}
 import std.kesnet.optim.{Adam}
 
 Variable.seed(9)
-let tokens := Tensor([
-    1.0, 0.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 0.0,
-    0.0, 0.0, 1.0, 0.0,
-    0.0, 0.0, 0.0, 1.0,
-    1.0, 0.0, 0.0, 0.0,
-    0.0, 1.0, 0.0, 0.0,
-], shape = (2, 3, 4))
+let tokens :=
+    Tensor(
+        [
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            1.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            1.0,
+            0.0,
+            0.0,
+        ],
+        shape = (2, 3, 4),
+    )
 let inputs := Variable.fromTensor(tokens)
 let labels := Variable.fromArray([0.0, 1.0].toArray(), (2,))
 let transformer := TransformerEncoderLayer(4, 2, 8, 0.0)

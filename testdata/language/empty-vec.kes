@@ -2,8 +2,7 @@ enum Vec[T](n : Nat) {
     Nil : Vec[T](0)
     Cons(x : T, xs : Vec[T](n)) : Vec[T](n + 1)
 }
-function head(v : Vec[T](n + 1)) : T = match v {
-    Cons(x, _) => x,
-}
+
+function head(v : Vec[T](n + 1)) : T = match v { Cons(x, _) => x, }
 let empty : Vec[Int](0) = Nil
 head(empty)

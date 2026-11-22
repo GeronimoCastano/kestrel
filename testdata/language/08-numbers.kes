@@ -1,9 +1,9 @@
 let million := 1_000_000
-let mask := 0xFF                       // hexadecimal
+let mask := 0xFF // hexadecimal
 let big : Int = 9223372036854775807
 let huge : BigInt = 1_000_000_000_000_000_000_000
 
-big + 1                                // stops: integer overflow
-let sum := big.checkedAdd(1)           // Int or Error, for when you want to handle it
-7 / 0                                  // stops: division by zero
-let quotient := 7.checkedDivide(0)     // Int or Error
+big + 1 // stops: integer overflow
+let sum := big.checkedAdd(1) // Int or Error, for when you want to handle it
+7 / 0 // stops: division by zero
+let quotient := 7.checkedDivide(0) // Int or Error

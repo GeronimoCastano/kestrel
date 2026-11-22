@@ -214,12 +214,23 @@ class CheckDaemon {
     }
   }
 
+  // Stops the server. The promise settles once its process has closed: Windows
+  // keeps the server's working folder busy until then, so a caller that removes
+  // the folder waits for it.
   dispose() {
-    if (this.state === 'closed') return;
+    if (this.state === 'closed') return this.closed ?? Promise.resolve();
     this.state = 'closed';
+    this.closed = Promise.resolve();
     if (this.child) {
+      const child = this.child;
+      this.closed = child.exitCode !== null || child.signalCode !== null
+        ? Promise.resolve()
+        : new Promise(resolve => child.once('close', () => resolve()));
+      // An idle server is unreferenced; hold it so the caller's process lives
+      // until the promise settles.
+      this.refChild();
       this.write({ id: 0, op: 'shutdown' });
-      this.child.kill();
+      child.kill();
       this.child = null;
     }
     const stopped = new Error('The checker server closed.');
@@ -227,6 +238,7 @@ class CheckDaemon {
     if (this.inFlight) this.inFlight.reject(stopped);
     this.pending = null;
     this.inFlight = null;
+    return this.closed;
   }
 }
 

@@ -1,9 +1,12 @@
-print([1,2,3].length())
-print(Map("a" => 1,"b" => 2,"a" => 3).length())
-print(Set(1,1,2).length())
-print(SortedSet(3,1,1).length())
+print([1, 2, 3].length())
+print(Map("a" => 1, "b" => 2, "a" => 3).length())
+print(Set(1, 1, 2).length())
+print(SortedSet(3, 1, 1).length())
 print("λ😀".length())
-function count(values : List[Int], size : Int = values.length()) : Int=size
-print(count([4,5]))
-function first(values : List[String], label : String = match values {[head,..]=>head,_=>""}) : String=label
-print(first(["kept"+" text"]))
+function count(values : List[Int], size : Int = values.length()) : Int = size
+print(count([4, 5]))
+function first(
+    values : List[String],
+    label : String = match values { [head, ..] => head, _ => "" },
+) : String = label
+print(first(["kept" + " text"]))

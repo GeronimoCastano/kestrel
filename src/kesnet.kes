@@ -87,7 +87,8 @@ public class Identity extends Module {
         this.registered = Array.empty()
         this.trainingMode = true
     }
-    @override public function forward(x : Variable) : Variable = x
+    @override
+    public function forward(x : Variable) : Variable = x
 }
 
 public class Linear extends Module {
@@ -104,12 +105,17 @@ public class Linear extends Module {
         this.outFeatures = outFeatures
         this.hasBias = bias
         let bound := 1.0 / inFeatures.toDouble().sqrt()
-        this.weight = Variable.uniform((outFeatures, inFeatures), 0.0 - bound, bound).requiresGrad_(true)
-        this.biasValue = if bias then Variable.uniform((outFeatures,), 0.0 - bound, bound).requiresGrad_(true) else Variable.zeros((outFeatures,))
-        this.registered = if bias then [this.weight, this.biasValue].toArray() else [this.weight].toArray()
+        this.weight =
+            Variable.uniform((outFeatures, inFeatures), 0.0 - bound, bound).requiresGrad_(true)
+        this.biasValue =
+            if bias then Variable.uniform((outFeatures,), 0.0 - bound, bound).requiresGrad_(true)
+            else Variable.zeros((outFeatures,))
+        this.registered =
+            if bias then [this.weight, this.biasValue].toArray() else [this.weight].toArray()
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         // A linear map accepts a matrix or a batched tensor whose last axis is
         // the feature axis. Leading axes are folded into rows and restored.
         let shape := x.shape()
@@ -136,7 +142,8 @@ public class ReLU extends Module {
         this.registered = Array.empty()
         this.trainingMode = true
     }
-    @override public function forward(x : Variable) : Variable = x.relu()
+    @override
+    public function forward(x : Variable) : Variable = x.relu()
 }
 
 public class LeakyReLU extends Module {
@@ -146,7 +153,8 @@ public class LeakyReLU extends Module {
         this.trainingMode = true
         this.slope = slope
     }
-    @override public function forward(x : Variable) : Variable = x.leakyRelu(this.slope)
+    @override
+    public function forward(x : Variable) : Variable = x.leakyRelu(this.slope)
 }
 
 public class ELU extends Module {
@@ -156,7 +164,8 @@ public class ELU extends Module {
         this.trainingMode = true
         this.alpha = alpha
     }
-    @override public function forward(x : Variable) : Variable = x.elu(this.alpha)
+    @override
+    public function forward(x : Variable) : Variable = x.elu(this.alpha)
 }
 
 public class GELU extends Module {
@@ -164,7 +173,8 @@ public class GELU extends Module {
         this.registered = Array.empty()
         this.trainingMode = true
     }
-    @override public function forward(x : Variable) : Variable = x.gelu()
+    @override
+    public function forward(x : Variable) : Variable = x.gelu()
 }
 
 public class SiLU extends Module {
@@ -172,7 +182,8 @@ public class SiLU extends Module {
         this.registered = Array.empty()
         this.trainingMode = true
     }
-    @override public function forward(x : Variable) : Variable = x.silu()
+    @override
+    public function forward(x : Variable) : Variable = x.silu()
 }
 
 public class Sigmoid extends Module {
@@ -180,7 +191,8 @@ public class Sigmoid extends Module {
         this.registered = Array.empty()
         this.trainingMode = true
     }
-    @override public function forward(x : Variable) : Variable = x.sigmoid()
+    @override
+    public function forward(x : Variable) : Variable = x.sigmoid()
 }
 
 public class Tanh extends Module {
@@ -188,7 +200,8 @@ public class Tanh extends Module {
         this.registered = Array.empty()
         this.trainingMode = true
     }
-    @override public function forward(x : Variable) : Variable = x.tanh()
+    @override
+    public function forward(x : Variable) : Variable = x.tanh()
 }
 
 public class Softmax extends Module {
@@ -198,7 +211,8 @@ public class Softmax extends Module {
         this.trainingMode = true
         this.axis = axis
     }
-    @override public function forward(x : Variable) : Variable = x.softmax(this.axis)
+    @override
+    public function forward(x : Variable) : Variable = x.softmax(this.axis)
 }
 
 public class LogSoftmax extends Module {
@@ -208,7 +222,8 @@ public class LogSoftmax extends Module {
         this.trainingMode = true
         this.axis = axis
     }
-    @override public function forward(x : Variable) : Variable = x.logSoftmax(this.axis)
+    @override
+    public function forward(x : Variable) : Variable = x.logSoftmax(this.axis)
 }
 
 public class Flatten extends Module {
@@ -218,7 +233,8 @@ public class Flatten extends Module {
         this.trainingMode = true
         this.startDim = startDim
     }
-    @override public function forward(x : Variable) : Variable = x.flatten(this.startDim)
+    @override
+    public function forward(x : Variable) : Variable = x.flatten(this.startDim)
 }
 
 public class Dropout extends Module {
@@ -228,7 +244,8 @@ public class Dropout extends Module {
         this.trainingMode = true
         this.probability = probability
     }
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         if !Variable.isTraining() || this.probability <= 0.0 {
             return x
         }
@@ -252,7 +269,8 @@ public class Sequential extends Module {
         }
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let mut value := x
         for (layer in this.layers) { value = layer.forward(value) }
         value
@@ -273,7 +291,8 @@ public class ModuleList extends Module {
         }
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let mut value := x
         for (layer in this.layers) { value = layer.forward(value) }
         value
@@ -289,8 +308,7 @@ public class MSELoss {
         let difference := prediction - target
         let squared := difference * difference
         if this.reduction == "sum" then squared.sum()
-        else if this.reduction == "none" then squared
-        else squared.mean()
+            else if this.reduction == "none" then squared else squared.mean()
     }
 }
 
@@ -300,8 +318,7 @@ public class L1Loss {
     public function forward(prediction : Variable, target : Variable) : Variable {
         let difference := (prediction - target).abs()
         if this.reduction == "sum" then difference.sum()
-        else if this.reduction == "none" then difference
-        else difference.mean()
+            else if this.reduction == "none" then difference else difference.mean()
     }
 }
 
@@ -326,18 +343,22 @@ public class BCEWithLogitsLoss {
 // ------------------------------------------------------------------ functional
 
 public function relu(x : Variable) : Variable = x.relu()
+
 public function sigmoid(x : Variable) : Variable = x.sigmoid()
+
 public function tanh(x : Variable) : Variable = x.tanh()
+
 public function gelu(x : Variable) : Variable = x.gelu()
+
 public function silu(x : Variable) : Variable = x.silu()
+
 public function softmax(x : Variable, axis : Int = 0 - 1) : Variable = x.softmax(axis)
+
 public function logSoftmax(x : Variable, axis : Int = 0 - 1) : Variable = x.logSoftmax(axis)
+
 public function linear(x : Variable, weight : Variable, bias : Option[Variable] = None) : Variable {
     let projected := x @ weight.transpose(0, 1)
-    match bias {
-        Some(value) => projected + value,
-        None => projected,
-    }
+    match bias { Some(value) => projected + value, None => projected }
 }
 
 public function mseLoss(prediction : Variable, target : Variable) : Variable =
@@ -355,7 +376,6 @@ public function nllLoss(logProbabilities : Variable, target : Variable) : Variab
 public function binaryCrossEntropy(logits : Variable, target : Variable) : Variable =
     logits.binaryCrossEntropy(target)
 
-
 // ------------------------------------------------------------------ convolution, pooling and normalisation
 
 public class Conv2d extends Module {
@@ -370,7 +390,16 @@ public class Conv2d extends Module {
     public var dilation : Int
     public var groups : Int
 
-    new(inChannels : Int, outChannels : Int, kernelSize : Int, stride : Int = 1, padding : Int = 0, dilation : Int = 1, groups : Int = 1, bias : Bool = true) {
+    new(
+        inChannels : Int,
+        outChannels : Int,
+        kernelSize : Int,
+        stride : Int = 1,
+        padding : Int = 0,
+        dilation : Int = 1,
+        groups : Int = 1,
+        bias : Bool = true,
+    ) {
         this.registered = Array.empty()
         this.trainingMode = true
         this.inChannels = inChannels
@@ -383,12 +412,21 @@ public class Conv2d extends Module {
         this.hasBias = bias
         let fanIn := (inChannels / groups) * kernelSize * kernelSize
         let bound := 1.0 / fanIn.toDouble().sqrt()
-        this.weight = Variable.uniform((outChannels, inChannels / groups, kernelSize, kernelSize), 0.0 - bound, bound).requiresGrad_(true)
-        this.biasValue = if bias then Variable.uniform((outChannels,), 0.0 - bound, bound).requiresGrad_(true) else Variable.empty()
-        this.registered = if bias then [this.weight, this.biasValue].toArray() else [this.weight].toArray()
+        this.weight =
+            Variable.uniform(
+                (outChannels, inChannels / groups, kernelSize, kernelSize),
+                0.0 - bound,
+                bound,
+            ).requiresGrad_(true)
+        this.biasValue =
+            if bias then Variable.uniform((outChannels,), 0.0 - bound, bound).requiresGrad_(true)
+            else Variable.empty()
+        this.registered =
+            if bias then [this.weight, this.biasValue].toArray() else [this.weight].toArray()
     }
 
-    @override public function forward(x : Variable) : Variable =
+    @override
+    public function forward(x : Variable) : Variable =
         x.conv2d(this.weight, this.biasValue, this.stride, this.padding, this.dilation, this.groups)
 }
 
@@ -403,7 +441,8 @@ public class MaxPool2d extends Module {
         this.stride = if stride == 0 then kernelSize else stride
         this.padding = padding
     }
-    @override public function forward(x : Variable) : Variable =
+    @override
+    public function forward(x : Variable) : Variable =
         x.maxPool2d(this.kernelSize, this.stride, this.padding)
 }
 
@@ -418,10 +457,10 @@ public class AvgPool2d extends Module {
         this.stride = if stride == 0 then kernelSize else stride
         this.padding = padding
     }
-    @override public function forward(x : Variable) : Variable =
+    @override
+    public function forward(x : Variable) : Variable =
         x.avgPool2d(this.kernelSize, this.stride, this.padding)
 }
-
 
 public class AdaptiveAvgPool2d extends Module {
     public var outHeight : Int
@@ -432,7 +471,8 @@ public class AdaptiveAvgPool2d extends Module {
         this.outHeight = outHeight
         this.outWidth = outWidth
     }
-    @override public function forward(x : Variable) : Variable =
+    @override
+    public function forward(x : Variable) : Variable =
         x.adaptiveAvgPool2d(this.outHeight, this.outWidth)
 }
 
@@ -445,32 +485,54 @@ public class BatchNorm2d extends Module {
     public var momentum : double
     public var affine : Bool
 
-    new(numFeatures : Int, epsilon : double = 0.00001, momentum : double = 0.1, affine : Bool = true) {
+    new(
+        numFeatures : Int,
+        epsilon : double = 0.00001,
+        momentum : double = 0.1,
+        affine : Bool = true,
+    ) {
         this.registered = Array.empty()
         this.trainingMode = true
         this.epsilon = epsilon
         this.momentum = momentum
         this.affine = affine
-        this.weight = if affine then Variable.ones((numFeatures,)).requiresGrad_(true) else Variable.empty()
-        this.biasValue = if affine then Variable.zeros((numFeatures,)).requiresGrad_(true) else Variable.empty()
+        this.weight =
+            if affine then Variable.ones((numFeatures,)).requiresGrad_(true) else Variable.empty()
+        this.biasValue =
+            if affine then Variable.zeros((numFeatures,)).requiresGrad_(true) else Variable.empty()
         this.runningMean = Variable.zeros((numFeatures,))
         this.runningVar = Variable.ones((numFeatures,))
         this.registered = if affine then [this.weight, this.biasValue].toArray() else Array.empty()
     }
 
-    @override public function forward(x : Variable) : Variable =
-        x.batchNorm(this.weight, this.biasValue, this.runningMean, this.runningVar, this.epsilon, this.momentum, Variable.isTraining())
+    @override
+    public function forward(x : Variable) : Variable =
+        x.batchNorm(
+            this.weight,
+            this.biasValue,
+            this.runningMean,
+            this.runningVar,
+            this.epsilon,
+            this.momentum,
+            Variable.isTraining(),
+        )
 }
 
 public class BatchNorm1d extends Module {
     public var inner : BatchNorm2d
-    new(numFeatures : Int, epsilon : double = 0.00001, momentum : double = 0.1, affine : Bool = true) {
+    new(
+        numFeatures : Int,
+        epsilon : double = 0.00001,
+        momentum : double = 0.1,
+        affine : Bool = true,
+    ) {
         this.registered = Array.empty()
         this.trainingMode = true
         this.inner = BatchNorm2d(numFeatures, epsilon, momentum, affine)
         for (parameter in this.inner.parameters()) { this.registered.append(parameter) }
     }
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let shape := x.shape()
         let batch := shape[0]
         let channels := shape[1]
@@ -489,14 +551,18 @@ public class LayerNorm extends Module {
         this.trainingMode = true
         this.epsilon = epsilon
         this.affine = affine
-        this.weight = if affine then Variable.ones((normalizedSize,)).requiresGrad_(true) else Variable.empty()
-        this.biasValue = if affine then Variable.zeros((normalizedSize,)).requiresGrad_(true) else Variable.empty()
+        this.weight =
+            if affine then Variable.ones((normalizedSize,)).requiresGrad_(true)
+            else Variable.empty()
+        this.biasValue =
+            if affine then Variable.zeros((normalizedSize,)).requiresGrad_(true)
+            else Variable.empty()
         this.registered = if affine then [this.weight, this.biasValue].toArray() else Array.empty()
     }
-    @override public function forward(x : Variable) : Variable =
+    @override
+    public function forward(x : Variable) : Variable =
         x.layerNorm(this.weight, this.biasValue, this.epsilon)
 }
-
 
 /// Group normalization: each sample's channels are split into equal groups and
 /// every group is normalized over its channels and spatial positions.
@@ -515,12 +581,15 @@ public class GroupNorm extends Module {
         this.numChannels = numChannels
         this.epsilon = epsilon
         this.affine = affine
-        this.weight = if affine then Variable.ones((numChannels,)).requiresGrad_(true) else Variable.empty()
-        this.biasValue = if affine then Variable.zeros((numChannels,)).requiresGrad_(true) else Variable.empty()
+        this.weight =
+            if affine then Variable.ones((numChannels,)).requiresGrad_(true) else Variable.empty()
+        this.biasValue =
+            if affine then Variable.zeros((numChannels,)).requiresGrad_(true) else Variable.empty()
         this.registered = if affine then [this.weight, this.biasValue].toArray() else Array.empty()
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let shape := x.shape()
         let batch := shape[0]
         let channels := shape[1]
@@ -529,10 +598,12 @@ public class GroupNorm extends Module {
         let groupSize := channels / this.numGroups
         let span := groupSize * height * width
         let flattened := x.reshape((batch, this.numGroups, span))
-        let normalized := flattened.layerNorm(Variable.ones((span,)), Variable.zeros((span,)), this.epsilon)
+        let normalized :=
+            flattened.layerNorm(Variable.ones((span,)), Variable.zeros((span,)), this.epsilon)
         let restored := normalized.reshape(shape)
         if this.affine {
-            restored * this.weight.reshape((1, this.numChannels, 1, 1)) + this.biasValue.reshape((1, this.numChannels, 1, 1))
+            restored * this.weight.reshape((1, this.numChannels, 1, 1)) +
+                this.biasValue.reshape((1, this.numChannels, 1, 1))
         } else {
             restored
         }
@@ -551,7 +622,8 @@ public class Embedding extends Module {
         this.weight = Variable.normal((numEmbeddings, embeddingDim), 0.0, 1.0).requiresGrad_(true)
         this.registered = [this.weight].toArray()
     }
-    @override public function forward(x : Variable) : Variable = Variable.embedding(this.weight, x)
+    @override
+    public function forward(x : Variable) : Variable = Variable.embedding(this.weight, x)
 }
 
 // ------------------------------------------------------------------ attention and transformers
@@ -583,18 +655,31 @@ public class MultiheadAttention extends Module {
         for (parameter in this.output.parameters()) { this.registered.append(parameter) }
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let shape := x.shape()
         let batch := shape[0]
         let steps := shape[1]
         let flatBatch := batch * this.heads
-        let q := this.query.forward(x).reshape((batch, steps, this.heads, this.headDim)).transpose(1, 2).reshape((flatBatch, steps, this.headDim))
-        let k := this.key.forward(x).reshape((batch, steps, this.heads, this.headDim)).transpose(1, 2).reshape((flatBatch, steps, this.headDim))
-        let v := this.value.forward(x).reshape((batch, steps, this.heads, this.headDim)).transpose(1, 2).reshape((flatBatch, steps, this.headDim))
+        let q :=
+            this.query.forward(x).reshape((batch, steps, this.heads, this.headDim)).transpose(1, 2).reshape(
+                (flatBatch, steps, this.headDim),
+            )
+        let k :=
+            this.key.forward(x).reshape((batch, steps, this.heads, this.headDim)).transpose(1, 2).reshape(
+                (flatBatch, steps, this.headDim),
+            )
+        let v :=
+            this.value.forward(x).reshape((batch, steps, this.heads, this.headDim)).transpose(1, 2).reshape(
+                (flatBatch, steps, this.headDim),
+            )
         let scale := 1.0 / this.headDim.toDouble().sqrt()
         let scores := q.bmm(k.transpose(1, 2)) * scale
         let weights := scores.softmax(0 - 1)
-        let attended := weights.bmm(v).reshape((batch, this.heads, steps, this.headDim)).transpose(1, 2).reshape((batch, steps, this.embedDim))
+        let attended :=
+            weights.bmm(v).reshape((batch, this.heads, steps, this.headDim)).transpose(1, 2).reshape(
+                (batch, steps, this.embedDim),
+            )
         this.output.forward(attended)
     }
 }
@@ -626,10 +711,14 @@ public class TransformerEncoderLayer extends Module {
         for (parameter in this.linear2.parameters()) { this.registered.append(parameter) }
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let attended := this.attention.forward(this.norm1.forward(x))
         let afterAttention := x + this.dropout.forward(attended)
-        let fed := this.linear2.forward(this.dropout.forward(this.linear1.forward(this.norm2.forward(afterAttention))))
+        let fed :=
+            this.linear2.forward(
+                this.dropout.forward(this.linear1.forward(this.norm2.forward(afterAttention))),
+            )
         afterAttention + this.dropout.forward(fed)
     }
 }
@@ -644,13 +733,13 @@ public class TransformerEncoder extends Module {
             for (parameter in layer.parameters()) { this.registered.append(parameter) }
         }
     }
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let mut value := x
         for (layer in this.layers) { value = layer.forward(value) }
         value
     }
 }
-
 
 // ------------------------------------------------------------------ recurrent layers
 
@@ -681,7 +770,11 @@ public class LSTMCell extends Module {
 
     // The caller may project every sequence position in one matrix product
     // and pass the row for this step.
-    public function stepProjected(projected : Variable, hidden : Variable, cell : Variable) : (Variable, Variable) {
+    public function stepProjected(
+        projected : Variable,
+        hidden : Variable,
+        cell : Variable,
+    ) : (Variable, Variable) {
         let combined := projected + this.hiddenGates.forward(hidden)
         let nextCell := combined.lstmCell(cell)
         let nextHidden := combined.lstmHidden(nextCell)
@@ -708,11 +801,16 @@ public class LSTM extends Module {
         for (parameter in this.cell.parameters()) { this.registered.append(parameter) }
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         // The sequence runs in one native op: the input projection is a single
         // product and the backward pass walks the hidden recurrence once.
-        x.lstmForward(this.cell.inputGates.weight, this.cell.inputGates.biasValue,
-            this.cell.hiddenGates.weight, this.cell.hiddenGates.biasValue)
+        x.lstmForward(
+            this.cell.inputGates.weight,
+            this.cell.inputGates.biasValue,
+            this.cell.hiddenGates.weight,
+            this.cell.hiddenGates.biasValue,
+        )
     }
 }
 
@@ -767,7 +865,8 @@ public class GRU extends Module {
         for (parameter in this.cell.parameters()) { this.registered.append(parameter) }
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let shape := x.shape()
         let steps := shape[0]
         let batch := shape[1]
@@ -822,7 +921,8 @@ public class RNN extends Module {
         for (parameter in this.cell.parameters()) { this.registered.append(parameter) }
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let shape := x.shape()
         let steps := shape[0]
         let batch := shape[1]
@@ -841,8 +941,6 @@ public class RNN extends Module {
         output
     }
 }
-
-
 
 /// Concatenates a nonempty list of Variables along an existing axis.
 public function cat(values : List[Variable], axis : Int) : Variable {
@@ -874,7 +972,6 @@ public function stack(values : List[Variable], axis : Int) : Variable {
     }
     result
 }
-
 
 // ------------------------------------------------------------------ state files
 
@@ -958,16 +1055,23 @@ public class MLP extends Module {
     public var second : Linear
     public var hidden : Box[dyn Network]
 
-    new(inputs : Int, hiddenSize : Int, outputs : Int, move activation : Box[dyn Network] = box(ReLU())) {
+    new(
+        inputs : Int,
+        hiddenSize : Int,
+        outputs : Int,
+        move activation : Box[dyn Network] = box(ReLU()),
+    ) {
         this.registered = Array.empty()
         this.trainingMode = true
         this.first = Linear(inputs, hiddenSize)
         this.second = Linear(hiddenSize, outputs)
         this.hidden = activation
-        this.registered = [this.first.weight, this.first.biasValue, this.second.weight, this.second.biasValue].toArray()
+        this.registered =
+            [this.first.weight, this.first.biasValue, this.second.weight, this.second.biasValue].toArray()
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         this.second.forward(this.hidden.forward(this.first.forward(x)))
     }
 }

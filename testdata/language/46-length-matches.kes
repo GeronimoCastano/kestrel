@@ -2,11 +2,11 @@ enum Vec[T](n : Nat) {
     Nil : Vec[T](0)
     Cons(x : T, xs : Vec[T](n)) : Vec[T](n + 1)
 }
-function rebuild(move xs : Vec[T](n + m), left : Vec[T](n), right : Vec[T](m)) : Vec[T](n + m) = match xs {
-    Nil => Nil,
-    Cons(x, rest) => Cons(x, rest),
-}
-function head(xs : Vec[T](n + 1)) : T = match xs {Cons(x, _) => x,}
+
+function rebuild(move xs : Vec[T](n + m), left : Vec[T](n), right : Vec[T](m)) : Vec[T](n + m) =
+    match xs { Nil => Nil, Cons(x, rest) => Cons(x, rest) }
+
+function head(xs : Vec[T](n + 1)) : T = match xs { Cons(x, _) => x, }
 let left : Vec[Int](1) = Cons(1, Nil)
 let right : Vec[Int](1) = Cons(2, Nil)
 let values : Vec[Int](2) = rebuild(Cons(4, Cons(5, Nil)), left, right)

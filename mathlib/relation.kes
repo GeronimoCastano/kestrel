@@ -2,11 +2,10 @@
 // named predicates, so a theorem can say `symmetric(r)` instead of repeating
 // the quantified body.
 
-import set.{subsetRefl, subsetTrans, subsetAntisymm}
+import set.{subsetAntisymm, subsetRefl, subsetTrans}
 
 /// A relation is reflexive when every element stands in it to itself.
-public function reflexive[U](r : (U, U) -> Prop) : Prop =
-    forall a : U, r(a, a)
+public function reflexive[U](r : (U, U) -> Prop) : Prop = forall a : U, r(a, a)
 
 /// A relation is symmetric when every pair can be read in both directions.
 public function symmetric[U](r : (U, U) -> Prop) : Prop =
@@ -17,113 +16,138 @@ public function transitive[U](r : (U, U) -> Prop) : Prop =
     forall a : U, forall b : U, forall c : U, r(a, b) -> r(b, c) -> r(a, c)
 
 /// The definition unfolds, so a named property is the quantified body.
-public theorem reflexiveUnfold[U](r : (U, U) -> Prop) :
-        reflexive(r) ↔ (forall a : U, r(a, a)) by {
+public theorem reflexiveUnfold[U](r : (U, U) -> Prop) : reflexive(r) ↔ (forall a : U, r(a, a)) by {
     rfl
 }
 
 /// A reflexive relation puts an element in its own class.
-public theorem classReflMem[U](r : (U, U) -> Prop, a : U) :
-        reflexive(r) -> a ∈ {x : U | r(a, x)} by {
-    intro hRefl
-    exact hRefl(a)
-}
+public theorem classReflMem[U](r : (U, U) -> Prop, a : U) : reflexive(r) ->
+    a ∈ { x : U | r(a, x) } by {
+        intro hRefl
+        exact hRefl(a)
+    }
 
 /// A symmetric relation puts the partner in the class.
-public theorem classSymm[U](r : (U, U) -> Prop, a : U, b : U) :
-        symmetric(r) -> r(a, b) -> b ∈ {x : U | r(a, x)} by {
-    intro hSymm
-    intro h
-    exact h
-}
+public theorem classSymm[U](r : (U, U) -> Prop, a : U, b : U) : symmetric(r) ->
+    r(a, b) -> b ∈ { x : U | r(a, x) } by {
+        intro hSymm
+        intro h
+        exact h
+    }
 
 /// Equal-related elements have equal classes when the relation is an
 /// equivalence: $r(a,b) \to \{x \mid r(a,x)\} = \{x \mid r(b,x)\}$.
-public theorem classWellDefined[U](r : (U, U) -> Prop, a : U, b : U) :
-        symmetric(r) -> transitive(r) ->
-        r(a, b) -> {x : U | r(a, x)} = {x : U | r(b, x)} by {
+public theorem classWellDefined[U](
+    r : (U, U) -> Prop,
+    a : U,
+    b : U,
+) : symmetric(r) -> transitive(r) -> r(a, b) -> { x : U | r(a, x) } = { x : U | r(b, x) } by {
     intro hSymm
     intro hTrans
     intro h
     ext
-    { intro x
-      intro hx
-      have hs := hSymm(a, b)
-      have hba := hs(h)
-      have ht := hTrans(b, a, x)
-      have hbax := ht(hba)
-      exact hbax(hx) }
-    { intro x
-      intro hx
-      have ht := hTrans(a, b, x)
-      have hab := ht(h)
-      exact hab(hx) }
+    {
+        intro x
+        intro hx
+        have hs := hSymm(a, b)
+        have hba := hs(h)
+        have ht := hTrans(b, a, x)
+        have hbax := ht(hba)
+        exact hbax(hx)
+    }
+    {
+        intro x
+        intro hx
+        have ht := hTrans(a, b, x)
+        have hab := ht(h)
+        exact hab(hx)
+    }
 }
 
 /// Classes of unrelated elements are disjoint.
-public theorem classDisjoint[U](r : (U, U) -> Prop, a : U, b : U) :
-        symmetric(r) -> transitive(r) ->
-        not (r(a, b)) -> {x : U | r(a, x)} ∩ {x : U | r(b, x)} = ∅ by {
-    intro hSymm
-    intro hTrans
-    intro h
-    ext
-    { intro x
-      intro hx
-      have hax := hx.left
-      have hbx := hx.right
-      have hs := hSymm(b, x)
-      have hxb := hs(hbx)
-      have ht := hTrans(a, x, b)
-      have hab := ht(hax)
-      have habx := hab(hxb)
-      exact absurd(h(habx)) }
-    { intro x
-      intro hx
-      exfalso
-      exact hx }
-}
+public theorem classDisjoint[U](
+    r : (U, U) -> Prop,
+    a : U,
+    b : U,
+) : symmetric(r) -> transitive(r) -> not (r(a, b)) -> { x : U | r(a, x) } ∩ { x : U | r(b, x) } =
+    ∅ by {
+        intro hSymm
+        intro hTrans
+        intro h
+        ext
+        {
+            intro x
+            intro hx
+            have hax := hx.left
+            have hbx := hx.right
+            have hs := hSymm(b, x)
+            have hxb := hs(hbx)
+            have ht := hTrans(a, x, b)
+            have hab := ht(hax)
+            have habx := hab(hxb)
+            exact absurd(h(habx))
+        }
+        {
+            intro x
+            intro hx
+            exfalso
+            exact hx
+        }
+    }
 
 /// Subset is a partial order.
-public theorem subsetPartialOrder[U]() :
-        (forall A : Set[U], A ⊆ A) and
-        (forall A : Set[U], forall B : Set[U], forall C : Set[U],
-         A ⊆ B -> B ⊆ C -> A ⊆ C) and
-        (forall A : Set[U], forall B : Set[U], A ⊆ B -> B ⊆ A -> A = B) by {
-    constructor
-    { constructor
-      { intro A
-        exact subsetRefl(A) }
-      { intro A
-        intro B
-        intro C
-        intro h1
-        intro h2
-        exact subsetTrans(A, B, C) } }
-    { intro A
-      intro B
-      intro h1
-      intro h2
-      exact subsetAntisymm(A, B) }
-}
+public theorem subsetPartialOrder[U]() : (forall A : Set[U], A ⊆ A) and
+    (forall A : Set[U], forall B : Set[U], forall C : Set[U], A ⊆ B -> B ⊆ C -> A ⊆ C) and
+    (forall A : Set[U], forall B : Set[U], A ⊆ B -> B ⊆ A -> A = B) by {
+        constructor
+        {
+            constructor
+            {
+                intro A
+                exact subsetRefl(A)
+            }
+            {
+                intro A
+                intro B
+                intro C
+                intro h1
+                intro h2
+                exact subsetTrans(A, B, C)
+            }
+        }
+        {
+            intro A
+            intro B
+            intro h1
+            intro h2
+            exact subsetAntisymm(A, B)
+        }
+    }
 
 /// Equality is an equivalence relation.
-public theorem eqEquivalence[U]() :
-        (forall a : U, a = a) and
-        (forall a : U, forall b : U, a = b -> b = a) and
-        (forall a : U, forall b : U, forall c : U, a = b -> b = c -> a = c) by {
-    constructor
-    { constructor
-      { intro a
-        rfl }
-      { intro a
-        intro b
-        intro h
-        exact symm(h) } }
-    { intro a
-      intro b
-      intro c
-      intro h1
-      intro h2
-      exact trans(h1, h2) }
-}
+public theorem eqEquivalence[U]() : (forall a : U, a = a) and
+    (forall a : U, forall b : U, a = b -> b = a) and
+    (forall a : U, forall b : U, forall c : U, a = b -> b = c -> a = c) by {
+        constructor
+        {
+            constructor
+            {
+                intro a
+                rfl
+            }
+            {
+                intro a
+                intro b
+                intro h
+                exact symm(h)
+            }
+        }
+        {
+            intro a
+            intro b
+            intro c
+            intro h1
+            intro h2
+            exact trans(h1, h2)
+        }
+    }

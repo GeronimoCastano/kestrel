@@ -366,3 +366,292 @@ fn scripts_run_from_folders_with_capitals_and_hyphens() {
     );
     assert_eq!(output.stdout, b"P(x = 1)\n");
 }
+
+#[test]
+fn fmt_from_standard_input_prints_the_formatted_text() {
+    let result = stdin(&["fmt", "--stdin"], "let  x:=1\n");
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert_eq!(String::from_utf8(result.stdout).unwrap(), "let x := 1\n");
+    assert!(result.stderr.is_empty());
+}
+
+#[test]
+fn fmt_check_names_unformatted_files_and_exits_one() {
+    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let file = dir.path().join("check.kes");
+    std::fs::write(&file, "let  x:=1\n").unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg("--check")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert_eq!(result.status.code(), Some(1));
+    assert!(
+        String::from_utf8(result.stdout)
+            .unwrap()
+            .contains("check.kes")
+    );
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "let  x:=1\n");
+
+    std::fs::write(&file, "let x := 1\n").unwrap();
+    let clean = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg("--check")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert_eq!(clean.status.code(), Some(0));
+    assert!(clean.stdout.is_empty());
+}
+
+#[test]
+fn fmt_writes_in_place_and_a_second_run_changes_nothing() {
+    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let file = dir.path().join("write.kes");
+    std::fs::write(
+        &file,
+        "function  f( a:Int ) : Int {\nlet x:=a\nreturn x\n}\n",
+    )
+    .unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert!(
+        result.status.success(),
+        "{}",
+        String::from_utf8_lossy(&result.stderr)
+    );
+    assert!(result.stdout.is_empty());
+    let once = std::fs::read_to_string(&file).unwrap();
+    assert_eq!(
+        once,
+        "function f(a : Int) : Int {\n    let x := a\n    return x\n}\n"
+    );
+    let again = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert!(again.status.success());
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), once);
+}
+
+#[test]
+fn fmt_diff_prints_a_unified_diff_without_writing() {
+    let dir = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let file = dir.path().join("diff.kes");
+    std::fs::write(&file, "let  x:=1\n").unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("fmt")
+        .arg("--diff")
+        .arg(&file)
+        .output()
+        .unwrap();
+    assert!(result.status.success());
+    let output = String::from_utf8(result.stdout).unwrap();
+    assert!(
+        output.starts_with("--- ") && output.contains("+++ "),
+        "{output}"
+    );
+    assert!(
+        output.contains("@@") && output.contains("+let x := 1"),
+        "{output}"
+    );
+    assert_eq!(std::fs::read_to_string(&file).unwrap(), "let  x:=1\n");
+}
+
+#[test]
+fn fmt_check_with_diff_exits_one() {
+    let result = stdin(&["fmt", "--stdin", "--check", "--diff"], "let  x:=1\n");
+    assert_eq!(result.status.code(), Some(1));
+    let output = String::from_utf8(result.stdout).unwrap();
+    assert!(
+        output.contains("--- -") && output.contains("+let x := 1"),
+        "{output}"
+    );
+}
+
+#[test]
+fn fmt_refuses_a_lexical_error() {
+    let result = stdin(&["fmt", "--stdin"], "let x := \"unclosed\n");
+    assert_eq!(result.status.code(), Some(2));
+    assert!(result.stdout.is_empty());
+    assert!(
+        String::from_utf8(result.stderr)
+            .unwrap()
+            .contains("E_UNCLOSED_STRING")
+    );
+}
+
+#[test]
+fn fmt_reports_the_formatter_revision() {
+    let output = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["fmt", "--version"])
+        .output()
+        .unwrap();
+    assert!(output.status.success());
+    let text = String::from_utf8(output.stdout).unwrap();
+    assert!(text.contains("formatter revision 1"), "{text}");
+    assert!(text.contains(env!("CARGO_PKG_VERSION")), "{text}");
+}
+
+#[test]
+fn fmt_rejects_unknown_flags_and_extra_guards() {
+    let output = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["fmt", "--root", ".", "x.kes"])
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(2));
+    assert!(
+        String::from_utf8(output.stderr)
+            .unwrap()
+            .contains("fmt takes files")
+    );
+}
+
+#[test]
+fn fmt_diff_reports_a_missing_final_newline() {
+    let result = stdin(&["fmt", "--stdin", "--diff"], "let x := 1");
+    assert!(result.status.success());
+    let output = String::from_utf8(result.stdout).unwrap();
+    assert!(output.contains("\\ No newline at end of file"), "{output}");
+}
+
+/// Runs `kestrel doctor` with the `KESTREL_*` variables cleared first, so a
+/// developer's own settings cannot change the result.
+fn doctor(variables: &[(&str, &str)], arguments: &[&str]) -> Output {
+    let cache = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let mut command = Command::new(env!("CARGO_BIN_EXE_kestrel"));
+    command
+        .arg("doctor")
+        .args(arguments)
+        .env("XDG_CACHE_HOME", cache.path());
+    for name in ["KESTREL_CC", "KESTREL_Z3", "KESTREL_LAPACK"] {
+        command.env_remove(name);
+    }
+    for (name, value) in variables {
+        command.env(name, value);
+    }
+    command.output().unwrap()
+}
+
+fn text(output: &Output) -> String {
+    String::from_utf8_lossy(&output.stdout).into_owned()
+}
+
+#[test]
+fn doctor_reports_a_missing_clang() {
+    let output = doctor(&[("KESTREL_CC", "/nonexistent/kestrel-test-clang")], &[]);
+    assert_eq!(output.status.code(), Some(1));
+    let report = text(&output);
+    assert!(report.contains("fail  clang"), "{report}");
+    assert!(report.contains("KESTREL_CC"), "{report}");
+    assert!(report.contains("1 required check failed"), "{report}");
+}
+
+#[test]
+fn doctor_reports_a_missing_z3_without_failing() {
+    let output = doctor(&[("KESTREL_Z3", "/nonexistent/kestrel-test-z3")], &[]);
+    let report = text(&output);
+    assert!(report.contains("warn  z3"), "{report}");
+    assert!(report.contains("KESTREL_Z3"), "{report}");
+    if Command::new("clang").arg("--version").output().is_ok() {
+        assert_eq!(output.status.code(), Some(0), "{report}");
+    }
+}
+
+#[test]
+fn doctor_reports_a_broken_lapack() {
+    let directory = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let library = directory.path().join("libkestrel-test-lapack.so");
+    std::fs::write(&library, "this is not a library").unwrap();
+    let output = doctor(&[("KESTREL_LAPACK", library.to_str().unwrap())], &[]);
+    let report = text(&output);
+    assert!(report.contains("warn  lapack"), "{report}");
+    assert!(report.contains("does not load"), "{report}");
+}
+
+#[test]
+fn doctor_accepts_a_good_environment() {
+    if Command::new("clang").arg("--version").output().is_err() {
+        return;
+    }
+    let output = doctor(&[], &[]);
+    let report = text(&output);
+    assert_eq!(output.status.code(), Some(0), "{report}");
+    assert!(report.contains("ok    clang"), "{report}");
+    assert!(report.contains("all required checks passed"), "{report}");
+}
+
+#[test]
+fn doctor_json_is_one_object_with_counts() {
+    let output = doctor(
+        &[("KESTREL_CC", "/nonexistent/kestrel-test-clang")],
+        &["--json"],
+    );
+    let report = text(&output);
+    let value: serde_json::Value = serde_json::from_str(&report).unwrap();
+    assert_eq!(value["healthy"], false);
+    assert_eq!(value["failures"].as_u64(), Some(1));
+    let checks = value["checks"].as_array().unwrap();
+    assert!(checks.iter().any(|check| {
+        check["name"] == "clang" && check["status"] == "fail" && check["level"] == "required"
+    }));
+    assert!(report.ends_with('\n') && !report.contains("\n{"));
+}
+
+#[test]
+fn doctor_fails_on_a_malformed_lock() {
+    let directory = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    std::fs::write(
+        directory.path().join("kestrel.project"),
+        "package shop\ndepends prices from \"https://example.invalid/prices\" at \"v1\"\n",
+    )
+    .unwrap();
+    std::fs::write(directory.path().join("kestrel.lock"), "{ not json").unwrap();
+    let output = doctor(&[], &["--root", directory.path().to_str().unwrap()]);
+    assert_eq!(output.status.code(), Some(1));
+    let report = text(&output);
+    assert!(report.contains("fail  lock"), "{report}");
+    assert!(report.contains("not valid JSON"), "{report}");
+}
+
+#[test]
+fn doctor_usage_errors_exit_with_two() {
+    let option = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["doctor", "--bogus"])
+        .output()
+        .unwrap();
+    assert_eq!(option.status.code(), Some(2));
+    let file = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .args(["doctor", "extra.kes"])
+        .output()
+        .unwrap();
+    assert_eq!(file.status.code(), Some(2));
+}
+
+#[test]
+fn doctor_reports_a_missing_clang_on_path() {
+    let empty = kestrel::native::TemporaryDirectory::new(&std::env::temp_dir()).unwrap();
+    let output = Command::new(env!("CARGO_BIN_EXE_kestrel"))
+        .arg("doctor")
+        .env_remove("KESTREL_CC")
+        .env_remove("KESTREL_Z3")
+        .env_remove("KESTREL_LAPACK")
+        .env("PATH", empty.path())
+        .env("XDG_CACHE_HOME", empty.path())
+        .output()
+        .unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    let report = String::from_utf8_lossy(&output.stdout);
+    assert!(report.contains("fail  clang"), "{report}");
+    assert!(report.contains("not found"), "{report}");
+    assert!(report.contains("1 required check failed"), "{report}");
+}

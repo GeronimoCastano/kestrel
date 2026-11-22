@@ -1,6 +1,6 @@
 // hist1m: histogram of 1,000,000 deterministic values in [0, 100), 50 bins.
-import std.kesplot as plt
 import c "stdlib.h"
+import std.kesplot as plt
 
 function quote(text : String) : String = "'" + text.replace("'", "'\\''") + "'"
 
@@ -8,7 +8,7 @@ function reportSize(path : String) : void or Error with Effects {
     let sizePath := path + ".size"
     let status := unsafe { system("wc -c < " + quote(path) + " > " + quote(sizePath)) }
     if status.toInt() != 0 { return Error("cannot measure " + path) }
-    using reader := open(sizePath)? {
+    using reader := open(sizePath)?{
         let line := reader.readLine()?
         print(parseInt(line.trim())?)
     }

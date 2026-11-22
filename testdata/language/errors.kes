@@ -2,19 +2,19 @@ enum ParseError extends Error {
     Parse(String)
     NotFound(String)
 }
+
 function parse(s : String) : Int or ParseError {
     if s == "" { return Parse(s) }
     42
 }
+
 function total(a : String, b : String) : Int or Error {
     let x := parse(a)?
     let y := parse(b)?
     x + y
 }
-function totalOrZero(a : String) : Int = match parse(a) {
-    Parse(msg) => 0,
-    NotFound(msg) => 0,
-    n => n,
-}
+
+function totalOrZero(a : String) : Int =
+    match parse(a) { Parse(msg) => 0, NotFound(msg) => 0, n => n }
 let _ := total("", "1")
 totalOrZero("")

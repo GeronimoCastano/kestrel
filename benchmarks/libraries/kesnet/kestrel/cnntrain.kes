@@ -1,21 +1,29 @@
 // CNN training benchmark: 1x28x28 -> Conv2d(1,8,3) -> ReLU -> MaxPool2d(2)
 // -> Flatten -> Linear(1568, 10), Adam, MSE against a fixed target.
-import std.kesnet.{Conv2d, ReLU, MaxPool2d, Flatten, Linear, Sequential, mseLoss}
+import std.kesnet.{Conv2d, Flatten, Linear, MaxPool2d, ReLU, Sequential, mseLoss}
 import std.kesnet.optim.{Adam}
 
 Variable.seed(2)
-let images := Tensor.generate((32, 1, 28, 28), (n, c, i, j) => (((n * 31 + i * 17 + j * 13) % 101).toDouble() - 50.0) / 50.0)
-let targets := Tensor.generate((32, 10), (i, j) => (((i * 43 + j * 19) % 89).toDouble() - 44.0) / 44.0)
+let images :=
+    Tensor.generate(
+        (32, 1, 28, 28),
+        (n, c, i, j) => (((n * 31 + i * 17 + j * 13) % 101).toDouble() - 50.0) / 50.0,
+    )
+let targets :=
+    Tensor.generate((32, 10), (i, j) => (((i * 43 + j * 19) % 89).toDouble() - 44.0) / 44.0)
 let inputs := Variable.fromTensor(images)
 let expected := Variable.fromTensor(targets)
 
-let model := Sequential([
-    box(Conv2d(1, 8, 3, 1, 1)),
-    box(ReLU()),
-    box(MaxPool2d(2, 2)),
-    box(Flatten(1)),
-    box(Linear(8 * 14 * 14, 10)),
-])
+let model :=
+    Sequential(
+        [
+            box(Conv2d(1, 8, 3, 1, 1)),
+            box(ReLU()),
+            box(MaxPool2d(2, 2)),
+            box(Flatten(1)),
+            box(Linear(8 * 14 * 14, 10)),
+        ],
+    )
 let mut optimizer := Adam(model.parameters(), 0.001)
 let mut finalLoss := 0.0
 

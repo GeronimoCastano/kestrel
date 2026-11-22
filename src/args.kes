@@ -25,20 +25,20 @@ public class Parsed {
     public function option(name : String) : Option[String] = this.options.get(name)
 
     // The value, or a fallback when the option is missing.
-    public function optionOr(name : String, fallback : String) : String = this.options.get(name).unwrapOr(fallback)
+    public function optionOr(name : String, fallback : String) : String =
+        this.options.get(name).unwrapOr(fallback)
 
     // An option read as an Int.
-    public function intOption(name : String) : Option[Int] or Error = match this.options.get(name) {
-        Some(text) => Some(parseInt(text)?),
-        None => None,
-    }
+    public function intOption(name : String) : Option[Int] or Error =
+        match this.options.get(name) { Some(text) => Some(parseInt(text)?), None => None }
 
     // The words that are neither flags nor option values, in order.
     public function positional() : List[String] = this.words
 }
 
 function optionName(word : String) : String =
-    if word.startsWith("--") then word.substring(2, word.length()) else word.substring(1, word.length())
+    if word.startsWith("--") then word.substring(2, word.length())
+    else word.substring(1, word.length())
 
 function isOption(word : String) : Bool = word.length() > 1 && word.startsWith("-") && word != "--"
 
@@ -73,7 +73,11 @@ public function parse(words : List[String], valued : List[String] = []) : Parsed
             let name := optionName(word)
             let equals := name.find("=")
             if equals >= 0 {
-                options = options.put(name.substring(0, equals), name.substring(equals + 1, name.length()))
+                options =
+                    options.put(
+                        name.substring(0, equals),
+                        name.substring(equals + 1, name.length()),
+                    )
             } else if valued.contains(name) {
                 pending = Some(name)
             } else {

@@ -6,7 +6,8 @@ import std.time
 
 public record DateTime(year : Int, month : Int, day : Int, hour : Int, minute : Int, second : Int)
 
-public function isLeapYear(year : Int) : Bool = year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
+public function isLeapYear(year : Int) : Bool =
+    year % 4 == 0 && (year % 100 != 0 || year % 400 == 0)
 
 public function daysInMonth(year : Int, month : Int) : Int {
     if month == 2 {
@@ -47,10 +48,7 @@ public function toUnix(t : DateTime) : Int =
 
 // The current UTC time, to the second.
 public function now() : DateTime with Effects {
-    let seconds := match time.now().floor().checkedToInt() {
-        n => n,
-        _ => 0,
-    }
+    let seconds := match time.now().floor().checkedToInt() { n => n, _ => 0 }
     return fromUnix(seconds)
 }
 
@@ -96,9 +94,10 @@ public function parse(text : String) : DateTime or Error {
     let hour := digits(text, 11, 2)?
     let minute := digits(text, 14, 2)?
     let second := digits(text, 17, 2)?
-    if text.substring(13, 14) != ":" || text.substring(16, 17) != ":" || hour > 23 || minute > 59 || second > 59 {
-        return Error(f"\"{text}\" has no valid HH:MM:SS time.")
-    }
+    if text.substring(13, 14) != ":" ||
+        text.substring(16, 17) != ":" || hour > 23 || minute > 59 || second > 59 {
+            return Error(f"\"{text}\" has no valid HH:MM:SS time.")
+        }
     let local := DateTime(year, month, day, hour, minute, second)
     let zone := text.substring(19, text.length())
     if zone == "" || zone == "Z" {

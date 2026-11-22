@@ -11,8 +11,8 @@
 //         ...
 //     }
 
-import std.random.{Rng}
 import std.kesdas.{DataFrame, Series}
+import std.random.{Rng}
 
 /// Rows of features and targets, both numeric. Features are rank 2 (rows by
 /// columns); targets are rank 1 (labels) or rank 2 (one-hot/regression values).
@@ -55,7 +55,11 @@ function slicePositions(order : Array[Int], start : Int, stop : Int) : Array[Int
 
 /// One batch built from the selected row positions. Targets keep their rank:
 /// labels become `(batch,)`, matrices become `(batch, columns)`.
-function gatherBatch(features : DynTensor[double], targets : DynTensor[double], rows : Array[Int]) : (Variable, Variable) {
+function gatherBatch(
+    features : DynTensor[double],
+    targets : DynTensor[double],
+    rows : Array[Int],
+) : (Variable, Variable) {
     let featureShape := features.shape()
     let columns := featureShape[1]
     let count := rows.length()
@@ -94,7 +98,13 @@ public class DataLoader {
     public var seed : Int
     public var epoch : Int
 
-    new(move dataset : TensorDataset, batchSize : Int = 32, shuffle : Bool = false, dropLast : Bool = false, seed : Int = 0) {
+    new(
+        move dataset : TensorDataset,
+        batchSize : Int = 32,
+        shuffle : Bool = false,
+        dropLast : Bool = false,
+        seed : Int = 0,
+    ) {
         this.dataset = dataset
         this.batchSize = if batchSize < 1 then 1 else batchSize
         this.shuffle = shuffle
@@ -116,7 +126,13 @@ public class DataLoader {
             if this.dropLast && stop - start < this.batchSize {
                 start = count
             } else {
-                result.append(gatherBatch(this.dataset.features, this.dataset.targets, slicePositions(order, start, stop)))
+                result.append(
+                    gatherBatch(
+                        this.dataset.features,
+                        this.dataset.targets,
+                        slicePositions(order, start, stop),
+                    ),
+                )
                 start = stop
             }
         }
@@ -125,7 +141,8 @@ public class DataLoader {
 
     public function length() : Int {
         let count := this.dataset.length()
-        if this.dropLast then count / this.batchSize else (count + this.batchSize - 1) / this.batchSize
+        if this.dropLast then count / this.batchSize
+            else (count + this.batchSize - 1) / this.batchSize
     }
 
     public mut function reset() : void { this.epoch = 0 }
@@ -133,7 +150,11 @@ public class DataLoader {
 
 /// Builds a dataset from named DataFrame columns. All columns must be numeric;
 /// kesdas reports a missing column as Error before any tensor is made.
-public function fromDataFrame(frame : DataFrame, features : List[String], target : String) : TensorDataset or Error {
+public function fromDataFrame(
+    frame : DataFrame,
+    features : List[String],
+    target : String,
+) : TensorDataset or Error {
     let selected := frame.select(features)?
     let labels := frame.col(target)?
     TensorDataset(selected.toTensor(), labels.toTensor())
@@ -141,14 +162,27 @@ public function fromDataFrame(frame : DataFrame, features : List[String], target
 
 /// Splits rows into training and testing datasets. The first `testCount` rows
 /// after a seeded shuffle are held out; a negative count holds out nothing.
-public function trainTestSplit(dataset : TensorDataset, testCount : Int, seed : Int = 0) : (TensorDataset, TensorDataset) {
+public function trainTestSplit(
+    dataset : TensorDataset,
+    testCount : Int,
+    seed : Int = 0,
+) : (TensorDataset, TensorDataset) {
     let count := dataset.length()
     let held := if testCount < 0 then 0 else if testCount > count then count else testCount
     let order := shuffled(count, Rng.seeded(seed))
     let split := count - held
     let trainingRows := slicePositions(order, 0, split)
     let testingRows := slicePositions(order, split, count)
-    (TensorDataset(takeFeatures(dataset.features, trainingRows), takeTargets(dataset.targets, trainingRows)), TensorDataset(takeFeatures(dataset.features, testingRows), takeTargets(dataset.targets, testingRows)))
+    (
+        TensorDataset(
+            takeFeatures(dataset.features, trainingRows),
+            takeTargets(dataset.targets, trainingRows),
+        ),
+        TensorDataset(
+            takeFeatures(dataset.features, testingRows),
+            takeTargets(dataset.targets, testingRows),
+        ),
+    )
 }
 
 function takeFeatures(features : DynTensor[double], rows : Array[Int]) : DynTensor[double] {

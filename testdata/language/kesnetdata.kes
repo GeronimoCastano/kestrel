@@ -1,14 +1,17 @@
 // Training from a kesdas DataFrame. Run with: kestrel run examples/kesnetdata.kes
 import std.kesdas.{DataFrame, Series}
 import std.kesnet.{Linear, ReLU, Sequential, mseLoss}
-import std.kesnet.data.{fromDataFrame, DataLoader}
+import std.kesnet.data.{DataLoader, fromDataFrame}
 import std.kesnet.optim.{Adam}
 
-let frame := DataFrame([
-    Series([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], name = "height"),
-    Series([2.0, 1.0, 3.0, 2.0, 4.0, 3.0], name = "width"),
-    Series([0.0, 1.0, 0.0, 1.0, 0.0, 1.0], name = "label"),
-])
+let frame :=
+    DataFrame(
+        [
+            Series([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], name = "height"),
+            Series([2.0, 1.0, 3.0, 2.0, 4.0, 3.0], name = "width"),
+            Series([0.0, 1.0, 0.0, 1.0, 0.0, 1.0], name = "label"),
+        ],
+    )
 
 function main(move frame : DataFrame) : void or Error with Effects {
     let dataset := fromDataFrame(frame, ["height", "width"], "label")?
@@ -26,7 +29,9 @@ function main(move frame : DataFrame) : void or Error with Effects {
     }
     print(f"rows {loader.dataset.length()}")
     print(f"features {loader.dataset.featureCount()}")
-    print(f"loss {mseLoss(model.forward(Variable.fromTensor(loader.dataset.features)), Variable.fromTensor(loader.dataset.targets)).item()}")
+    print(
+        f"loss {mseLoss(model.forward(Variable.fromTensor(loader.dataset.features)), Variable.fromTensor(loader.dataset.targets)).item()}",
+    )
 }
 
 main(frame)?

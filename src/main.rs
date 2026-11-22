@@ -1,3 +1,4 @@
+use kestrel::formatter::{FORMAT_REVISION, format_text};
 use kestrel::paths::CanonicalPath;
 use kestrel::{
     lexer::{TokenKind, lex},
@@ -95,12 +96,15 @@ fn run() -> Result<bool, String> {
             | "run"
             | "fetch"
             | "update"
+            | "new"
             | "session"
             | "test"
             | "notebook"
             | "serve"
             | "goals"
+            | "doctor"
             | "game"
+            | "fmt"
     ) {
         return Err(format!(
             "Unknown command `{command}`. Use `kestrel --help`."
@@ -115,6 +119,9 @@ fn run() -> Result<bool, String> {
     let mut output: Option<PathBuf> = None;
     let mut emit_c: Option<PathBuf> = None;
     let mut libraries = vec![];
+    let mut lib_template = false;
+    let mut bin_template = false;
+    let mut git = false;
     let mut filter = None;
     let mut jobs = None;
     let mut timeout = None;
@@ -126,6 +133,10 @@ fn run() -> Result<bool, String> {
     let mut root = std::env::current_dir().map_err(|e| e.to_string())?;
     let mut root_given = false;
     let mut stdin_path: Option<PathBuf> = None;
+    let mut check = false;
+    let mut diff = false;
+    let mut stdin_flag = false;
+    let mut format_version = false;
     while let Some(arg) = args.next() {
         match arg.as_str() {
             "--filter" if command == "test" => {
@@ -169,8 +180,15 @@ fn run() -> Result<bool, String> {
             }
             "--project" => project = true,
             "--tree" => tree = true,
+            "--check" if command == "fmt" => check = true,
+            "--diff" if command == "fmt" => diff = true,
+            "--stdin" if command == "fmt" => stdin_flag = true,
+            "--version" | "-V" if command == "fmt" => format_version = true,
             "--notebook" if command == "check" => notebook = true,
             "--trusted" if command == "check" => trusted = true,
+            "--lib" if command == "new" => lib_template = true,
+            "--bin" if command == "new" => bin_template = true,
+            "--git" if command == "new" => git = true,
             "--stdin-path" if command == "check" => {
                 stdin_path = Some(args.next().ok_or("--stdin-path needs a file path.")?.into())
             }
@@ -190,7 +208,7 @@ fn run() -> Result<bool, String> {
                         .map_err(|_| "--column needs a positive number.")?,
                 )
             }
-            "--json" if command == "goals" => json = true,
+            "--json" if matches!(command.as_str(), "goals" | "doctor") => json = true,
             "--port" if command == "game" => {
                 port = Some(
                     args.next()
@@ -226,6 +244,35 @@ fn run() -> Result<bool, String> {
             _ => paths.push(arg),
         }
     }
+    if command == "fmt" {
+        if project
+            || tree
+            || notebook
+            || output.is_some()
+            || emit_c.is_some()
+            || !libraries.is_empty()
+            || !script_args.is_empty()
+            || root_given
+            || filter.is_some()
+            || jobs.is_some()
+            || timeout_given
+            || line.is_some()
+            || column.is_some()
+            || json
+            || port.is_some()
+            || stdin_path.is_some()
+        {
+            return Err("fmt takes files, --check, --diff, --stdin and --version.".into());
+        }
+        if format_version {
+            println!(
+                "kestrel formatter revision {FORMAT_REVISION} (compiler {})",
+                env!("CARGO_PKG_VERSION")
+            );
+            return Ok(true);
+        }
+        return format_command(&paths, check, diff, stdin_flag);
+    }
     if matches!(command.as_str(), "fetch" | "update") {
         if project
             || tree
@@ -255,6 +302,46 @@ fn run() -> Result<bool, String> {
             let count = kestrel::modules::update_package(&root, name)?;
             println!("Updated `{name}`; {count} Git package(s) are locked.");
         }
+        return Ok(true);
+    }
+    if command == "new" {
+        if project
+            || tree
+            || output.is_some()
+            || emit_c.is_some()
+            || !libraries.is_empty()
+            || !script_args.is_empty()
+            || root_given
+        {
+            return Err("new takes one package name and the flags --lib, --bin and --git.".into());
+        }
+        if paths.len() != 1 {
+            return Err("new takes one package name.".into());
+        }
+        if lib_template && bin_template {
+            return Err("`--lib` and `--bin` exclude each other.".into());
+        }
+        let template = if lib_template {
+            kestrel::scaffold::Template::Lib
+        } else {
+            kestrel::scaffold::Template::Bin
+        };
+        let created = kestrel::scaffold::create(Path::new(&paths[0]), template, git)?;
+        if created.folder == Path::new(&created.name) {
+            println!("Created package `{}`.", created.name);
+        } else {
+            println!(
+                "Created package `{}` in {}.",
+                created.name,
+                created.folder.display()
+            );
+        }
+        println!();
+        println!("  cd {}", created.folder.display());
+        if created.template == kestrel::scaffold::Template::Bin {
+            println!("  kestrel run main.kes");
+        }
+        println!("  kestrel test");
         return Ok(true);
     }
     if command == "test" {
@@ -397,6 +484,27 @@ fn run() -> Result<bool, String> {
             }
         }
         return Ok(report.error.is_none());
+    }
+
+    if command == "doctor" {
+        if project
+            || tree
+            || notebook
+            || !paths.is_empty()
+            || output.is_some()
+            || emit_c.is_some()
+            || !libraries.is_empty()
+            || !script_args.is_empty()
+        {
+            return Err("doctor takes optional --root and --json.".into());
+        }
+        let report = kestrel::doctor::run(&root)?;
+        if json {
+            println!("{}", report.json());
+        } else {
+            println!("{}", report.render());
+        }
+        return Ok(report.healthy());
     }
 
     if command == "serve" {
@@ -551,6 +659,167 @@ fn run() -> Result<bool, String> {
     Ok(success)
 }
 
+fn format_command(
+    paths: &[String],
+    check: bool,
+    diff: bool,
+    stdin_flag: bool,
+) -> Result<bool, String> {
+    if stdin_flag {
+        if !paths.is_empty() {
+            return Err("--stdin reads standard input, so it takes no file paths.".into());
+        }
+        let mut text = String::new();
+        io::stdin()
+            .read_to_string(&mut text)
+            .map_err(|e| format!("Cannot read standard input: {e}"))?;
+        return format_one("-", &text, None, check, diff);
+    }
+    if paths.is_empty() {
+        return Err("Supply a file path, or `-` to read standard input.".into());
+    }
+    if paths.iter().any(|path| path == "-") && paths.len() > 1 {
+        return Err("Standard input can be read only once, on its own.".into());
+    }
+    let mut success = true;
+    for path in paths {
+        if path == "-" {
+            let mut text = String::new();
+            io::stdin()
+                .read_to_string(&mut text)
+                .map_err(|e| format!("Cannot read standard input: {e}"))?;
+            success &= format_one("-", &text, None, check, diff)?;
+            continue;
+        }
+        let text = fs::read_to_string(path).map_err(|e| format!("Cannot read {path}: {e}"))?;
+        success &= format_one(path, &text, Some(Path::new(path)), check, diff)?;
+    }
+    Ok(success)
+}
+
+fn format_one(
+    name: &str,
+    text: &str,
+    path: Option<&Path>,
+    check: bool,
+    diff: bool,
+) -> Result<bool, String> {
+    let formatted = match format_text(text) {
+        Ok(formatted) => formatted,
+        Err(diagnostics) => {
+            let source = SourceFile::new(name, text);
+            for diagnostic in &diagnostics {
+                eprint!("{}", diagnostic.render(&source));
+            }
+            return Err(format!("{name} has errors, so it was not formatted."));
+        }
+    };
+    let changed = formatted != text;
+    if diff && changed {
+        print_diff(name, text, &formatted);
+    }
+    if check {
+        if changed && !diff {
+            println!("{name}");
+        }
+        return Ok(!changed);
+    }
+    if diff {
+        return Ok(true);
+    }
+    match path {
+        Some(path) => {
+            if changed {
+                fs::write(path, formatted)
+                    .map_err(|e| format!("Cannot write {}: {e}", path.display()))?;
+            }
+            Ok(true)
+        }
+        None => {
+            print!("{formatted}");
+            Ok(true)
+        }
+    }
+}
+
+fn diff_lines(text: &str) -> Vec<&str> {
+    let mut lines: Vec<&str> = text.split('\n').collect();
+    if text.ends_with('\n') {
+        lines.pop();
+    }
+    lines
+}
+
+fn print_diff(name: &str, old: &str, new: &str) {
+    let old_lines = diff_lines(old);
+    let new_lines = diff_lines(new);
+    if old_lines == new_lines {
+        // The lines match, so only the final newline differs.
+        if old_lines.is_empty() {
+            return;
+        }
+        let line = old_lines.len();
+        println!("--- {name}");
+        println!("+++ {name}");
+        println!("@@ -{line},1 +{line},1 @@");
+        println!("-{}", old_lines[line - 1]);
+        if !old.ends_with('\n') {
+            println!("\\ No newline at end of file");
+        }
+        println!("+{}", new_lines[line - 1]);
+        if !new.ends_with('\n') {
+            println!("\\ No newline at end of file");
+        }
+        return;
+    }
+    let mut prefix = 0;
+    while prefix < old_lines.len()
+        && prefix < new_lines.len()
+        && old_lines[prefix] == new_lines[prefix]
+    {
+        prefix += 1;
+    }
+    let mut suffix = 0;
+    while suffix < old_lines.len() - prefix
+        && suffix < new_lines.len() - prefix
+        && old_lines[old_lines.len() - 1 - suffix] == new_lines[new_lines.len() - 1 - suffix]
+    {
+        suffix += 1;
+    }
+    let context = 3;
+    let old_start = prefix.saturating_sub(context);
+    let new_start = prefix.saturating_sub(context);
+    let old_end = (old_lines.len() - suffix + context).min(old_lines.len());
+    let new_end = (new_lines.len() - suffix + context).min(new_lines.len());
+    let old_count = old_end - old_start;
+    let new_count = new_end - new_start;
+    let old_line = if old_count == 0 {
+        old_start
+    } else {
+        old_start + 1
+    };
+    let new_line = if new_count == 0 {
+        new_start
+    } else {
+        new_start + 1
+    };
+    println!("--- {name}");
+    println!("+++ {name}");
+    println!("@@ -{old_line},{old_count} +{new_line},{new_count} @@");
+    for line in &old_lines[old_start..prefix] {
+        println!(" {line}");
+    }
+    for line in &old_lines[prefix..old_lines.len() - suffix] {
+        println!("-{line}");
+    }
+    for line in &new_lines[prefix..new_lines.len() - suffix] {
+        println!("+{line}");
+    }
+    for line in &old_lines[old_lines.len() - suffix..old_end] {
+        println!(" {line}");
+    }
+}
+
 fn print_module_trusted(module: &kestrel::modules::ModuleCheck) {
     for theorem in kestrel::proof::trusted_theorems(&module.parsed, &module.checked) {
         let (line, column) = module.parsed.source.position(theorem.span.start);
@@ -663,7 +932,7 @@ fn help() {
     println!(
         "Kestrel compiler (compiler and native session)\n\nUsage:\n  kestrel session [--root DIRECTORY] [--link LIBRARY] [-- ARG...]\n  kestrel notebook [--root DIRECTORY] [--link LIBRARY]\n  kestrel serve [--root DIRECTORY]
   kestrel goals [--root DIRECTORY] [--line N] [--column N] [--json] FILE
-  kestrel game [--port N] [--root DIRECTORY]\n  kestrel parse [--tree] [--project] FILE...\n  kestrel tokens FILE...\n  kestrel check [--root DIRECTORY] [--trusted] [--notebook] [--stdin-path FILE] FILE...\n  kestrel build [--root DIRECTORY] [-o EXECUTABLE] [--emit-c FILE] [--link LIBRARY] FILE\n  kestrel run [--root DIRECTORY] [--emit-c FILE] [--link LIBRARY] FILE [-- ARG...]\n  kestrel fetch [--root DIRECTORY]\n  kestrel update NAME [--root DIRECTORY]\n  kestrel test [FOLDER] [--filter TEXT] [--jobs N] [--timeout SECONDS|none] [--link LIBRARY]\n\nUse - as a file path to read standard input. --stdin-path FILE treats that
-input as an unsaved version of FILE, so project-local imports resolve.\n\nparse checks grammar only. check resolves imports and checks supported\nnames and types, effects, mutation permissions, moves, borrows, contracts,\nfiles and tasks. build and run compile the supported native subset using\nClang. session keeps live values and runs each entry once; :quit ends it.\n:test [FILTER] runs saved package tests without clearing session values.\ntest runs the @test functions in a package's tests folder, each in its own\nprocess. See README.md for current limits."
+  kestrel doctor [--root DIRECTORY] [--json]\n  kestrel game [--port N] [--root DIRECTORY]\n  kestrel parse [--tree] [--project] FILE...\n  kestrel tokens FILE...\n  kestrel check [--root DIRECTORY] [--trusted] [--notebook] [--stdin-path FILE] FILE...\n  kestrel build [--root DIRECTORY] [-o EXECUTABLE] [--emit-c FILE] [--link LIBRARY] FILE\n  kestrel run [--root DIRECTORY] [--emit-c FILE] [--link LIBRARY] FILE [-- ARG...]\n  kestrel fetch [--root DIRECTORY]\n  kestrel update NAME [--root DIRECTORY]\n  kestrel new NAME [--lib] [--bin] [--git]\n  kestrel test [FOLDER] [--filter TEXT] [--jobs N] [--timeout SECONDS|none] [--link LIBRARY]\n  kestrel fmt [--check] [--diff] [--stdin] FILE...\n\nUse - as a file path to read standard input. --stdin-path FILE treats that
+input as an unsaved version of FILE, so project-local imports resolve.\n\nparse checks grammar only. check resolves imports and checks supported\nnames and types, effects, mutation permissions, moves, borrows, contracts,\nfiles and tasks. build and run compile the supported native subset using\nClang. session keeps live values and runs each entry once; :quit ends it.\n:test [FILTER] runs saved package tests without clearing session values.\ntest runs the @test functions in a package's tests folder, each in its own\nprocess. new writes a package folder with a manifest, an entry point, a module and a test. fmt rewrites files in place; --check names files that differ and\nexits 1, and --stdin reads standard input. doctor reports the tools, install layout, PATH, cache, lock and editor extension without changing anything.\nSee README.md for current limits."
     );
 }

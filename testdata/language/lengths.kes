@@ -3,20 +3,12 @@ enum Vec[T](n : Nat) {
     Cons(x : T, xs : Vec[T](n)) : Vec[T](n + 1)
 }
 
-function duplicate(move xs : Vec[Int](n)) : Vec[Int](2 * n) = match xs {
-    Nil => Nil,
-    Cons(x, rest) => Cons(x, Cons(x, duplicate(rest))),
-}
+function duplicate(move xs : Vec[Int](n)) : Vec[Int](2 * n) =
+    match xs { Nil => Nil, Cons(x, rest) => Cons(x, Cons(x, duplicate(rest))) }
 
-function size(xs : Vec[T](n)) : Nat = match xs {
-    Nil => 0,
-    Cons(_, rest) => size(rest) + 1,
-}
+function size(xs : Vec[T](n)) : Nat = match xs { Nil => 0, Cons(_, rest) => size(rest) + 1 }
 
-function sum(xs : Vec[Int](n)) : Int = match xs {
-    Nil => 0,
-    Cons(x, rest) => x + sum(rest),
-}
+function sum(xs : Vec[Int](n)) : Int = match xs { Nil => 0, Cons(x, rest) => x + sum(rest) }
 
 let values : Vec[Int](3) = Cons(1, Cons(2, Cons(3, Nil)))
 let doubled : Vec[Int](6) = duplicate(values)

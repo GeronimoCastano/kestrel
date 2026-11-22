@@ -6,7 +6,9 @@ import std.ml.{PolynomialFeatures}
 
 import std.process.{args}
 
-let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 800 }) else 800
+let REPETITIONS :=
+    if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 800 })
+    else 800
 const OUTPUT_COLUMNS : Int = 66
 
 let X := Tensor.generate((20000, 10), (i, j) => ((i * 17 + j * 11) % 100).toDouble() / 10.0)

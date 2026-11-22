@@ -7,7 +7,4 @@ public enum Expr {
     Group(Block)
 }
 
-public function eval(e : Expr) : Int = match e {
-    Lit(n)   => n,
-    Group(b) => sum(b),
-}
+public function eval(e : Expr) : Int = match e { Lit(n) => n, Group(b) => sum(b) }

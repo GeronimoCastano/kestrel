@@ -7,4 +7,4 @@ class Registry {
 
 print(Registry.name)
 print(Registry.limits.length())
-print(match Registry.lookup.get("a") {Some(v) => v, None => 0})
+print(match Registry.lookup.get("a") { Some(v) => v, None => 0 })

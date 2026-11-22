@@ -13,9 +13,9 @@ function twice(x : double) : double = x * SCALE_FACTOR
 
 // `_` leaves a slot open. A call with open slots is a function.
 public function pipesAndCurrying() : double {
-    let addOne := add(1.0, _)                     // a function
-    let total : double = 3.0 |> addOne |> twice   // 3.0 -> 4.0 -> 8.0
-    let sum := 3.0 |> add(_, 1.0)                 // the piped value fills `_`: 4.0
+    let addOne := add(1.0, _) // a function
+    let total : double = 3.0 |> addOne |> twice // 3.0 -> 4.0 -> 8.0
+    let sum := 3.0 |> add(_, 1.0) // the piped value fills `_`: 4.0
     total + sum
 }
 
@@ -47,8 +47,9 @@ public class Square extends Figure {
 
     public static function unit() : Square = Square(1.0)
 
-    @override public function area() : double = this.side * this.side
-    public function fits(other : Square) : Bool = this.area() <= other.area()   // overload: no keyword
+    @override
+    public function area() : double = this.side * this.side
+    public function fits(other : Square) : Bool = this.area() <= other.area() // overload: no keyword
 
     // rejected (Ov1): @override public function area() : Int
 }
@@ -68,5 +69,4 @@ public class Account {
 }
 
 // The bound is declared once. The body can call area() because S : Shape.
-public function biggest[S : Shape](a : S, b : S) : S =
-    if a.area() >= b.area() then a else b
+public function biggest[S : Shape](a : S, b : S) : S = if a.area() >= b.area() then a else b

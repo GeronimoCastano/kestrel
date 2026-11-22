@@ -7,10 +7,7 @@ enum Tree {
 function make(depth : Int) : Tree =
     if depth == 0 then Node(Leaf, Leaf) else Node(make(depth - 1), make(depth - 1))
 
-function check(t : Tree) : Int = match t {
-    Leaf => 0,
-    Node(l, r) => 1 + check(l) + check(r),
-}
+function check(t : Tree) : Int = match t { Leaf => 0, Node(l, r) => 1 + check(l) + check(r) }
 
 function power(n : Int) : Int {
     let mut result := 1

@@ -3,6 +3,7 @@ class Square {
     new(side : double) { this.side = side }
     public function area() : double = this.side * this.side
 }
+
 class Panel {
     public final square : &Square
     new(square : Square) { this.square = square }

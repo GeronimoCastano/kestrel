@@ -1,5 +1,5 @@
-import std.c.{CUInt64}
 import c "stdlib.h"
+import std.c.{CUInt64}
 
 function allocate() : void or Error with Effects {
     let memory := unsafe { malloc(CUInt64(64)?) }
@@ -8,7 +8,4 @@ function allocate() : void or Error with Effects {
     print("released")
 }
 
-match allocate() {
-    RuntimeError.Io(message) => print(message),
-    _ => {},
-}
+match allocate() { RuntimeError.Io(message) => print(message), _ => {} }

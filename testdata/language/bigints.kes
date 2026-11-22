@@ -1,9 +1,10 @@
 import std.math.{max}
-let huge : BigInt=1_000_000_000_000_000_000_000+1
+
+let huge : BigInt = 1_000_000_000_000_000_000_000 + 1
 print(huge)
-print(huge/3)
-print(max(2,huge))
-print(match huge.checkedToInt() {RuntimeError.Arithmetic(_)=>"outside Int",_=>"wrong"})
-print(match parseBigInt("-12345678901234567890") {value=>value.text(),_=>"invalid"})
-let values : SortedSet[BigInt]=SortedSet(huge,2,-3,2)
-for (value in values) {print(value)}
+print(huge / 3)
+print(max(2, huge))
+print(match huge.checkedToInt() { RuntimeError.Arithmetic(_) => "outside Int", _ => "wrong" })
+print(match parseBigInt("-12345678901234567890") { value => value.text(), _ => "invalid" })
+let values : SortedSet[BigInt] = SortedSet(huge, 2, -3, 2)
+for (value in values) { print(value) }

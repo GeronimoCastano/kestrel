@@ -19,8 +19,7 @@ theorem dogSubsetRefl(A : Set[Dog]) : A ⊆ A by {
     exact subsetRefl(A)
 }
 
-theorem dogSubsetTrans(A : Set[Dog], B : Set[Dog], C : Set[Dog],
-                       h1 : A ⊆ B, h2 : B ⊆ C) : A ⊆ C by {
+theorem dogSubsetTrans(A : Set[Dog], B : Set[Dog], C : Set[Dog], h1 : A ⊆ B, h2 : B ⊆ C) : A ⊆ C by {
     intro d
     intro h3
     have h4 := h1(h3)
