@@ -4,6 +4,7 @@ public trait Named {
 }
 
 public trait Labelled { has Named }
+
 public trait Tagged { has Named }
 
 public class User {
@@ -16,7 +17,8 @@ public class CustomUser {
     has Named
     new() {}
     public function value() : String = "Grace"
-    @override public function name() : String = "CustomUser"
+    @override
+    public function name() : String = "CustomUser"
 }
 
 let user := User()

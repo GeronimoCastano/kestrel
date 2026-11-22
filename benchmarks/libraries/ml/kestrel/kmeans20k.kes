@@ -6,16 +6,21 @@ import std.ml.{KMeans}
 
 import std.process.{args}
 
-let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 400 }) else 400
+let REPETITIONS :=
+    if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 400 })
+    else 400
 
-let X := Tensor.generate((20000, 12), (i, j) => {
-    let cluster := i % 3
-    let first := if cluster == 0 then -3.0 else if cluster == 1 then 3.0 else 0.0
-    let second := if cluster == 0 then -3.0 else if cluster == 1 then -3.0 else 3.0
-    let center := if j == 0 then first else if j == 1 then second else 0.0
-    let noise := (((i * 37 + j * 53 + 11) % 200).toDouble() - 100.0) / 200.0
-    center + noise
-})
+let X := Tensor.generate(
+    (20000, 12),
+    (i, j) => {
+        let cluster := i % 3
+        let first := if cluster == 0 then -3.0 else if cluster == 1 then 3.0 else 0.0
+        let second := if cluster == 0 then -3.0 else if cluster == 1 then -3.0 else 3.0
+        let center := if j == 0 then first else if j == 1 then second else 0.0
+        let noise := (((i * 37 + j * 53 + 11) % 200).toDouble() - 100.0) / 200.0
+        center + noise
+    },
+)
 let mut totalCounts := Array.generate(4, index => 0)
 let mut totalLabels := 0.0
 for (step in range(REPETITIONS)) {
@@ -39,4 +44,6 @@ for (let left = 0; left < 4; left++) {
         }
     }
 }
-print(f"{sorted[0].toDouble():.6f} {sorted[1].toDouble():.6f} {sorted[2].toDouble():.6f} {sorted[3].toDouble():.6f} {totalLabels:.6f}")
+print(
+    f"{sorted[0].toDouble():.6f} {sorted[1].toDouble():.6f} {sorted[2].toDouble():.6f} {sorted[3].toDouble():.6f} {totalLabels:.6f}",
+)

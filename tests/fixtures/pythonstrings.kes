@@ -542,22 +542,53 @@ print(("aaa".count("l")).text())
 print(("aaa".count("")).text())
 print(("aaa".find("")).text())
 print(("aaa".find("zz")).text())
-print(("a,b,c".partition(","))[0] + "|" + ("a,b,c".partition(","))[1] + "|" + ("a,b,c".partition(","))[2])
-print(("a,b,c".rpartition(","))[0] + "|" + ("a,b,c".rpartition(","))[1] + "|" + ("a,b,c".rpartition(","))[2])
-print(("a,b,c".partition("--"))[0] + "|" + ("a,b,c".partition("--"))[1] + "|" + ("a,b,c".partition("--"))[2])
-print(("a,b,c".rpartition("--"))[0] + "|" + ("a,b,c".rpartition("--"))[1] + "|" + ("a,b,c".rpartition("--"))[2])
+print(
+    ("a,b,c".partition(","))[0] +
+        "|" + ("a,b,c".partition(","))[1] + "|" + ("a,b,c".partition(","))[2],
+)
+print(
+    ("a,b,c".rpartition(","))[0] +
+        "|" + ("a,b,c".rpartition(","))[1] + "|" + ("a,b,c".rpartition(","))[2],
+)
+print(
+    ("a,b,c".partition("--"))[0] +
+        "|" + ("a,b,c".partition("--"))[1] + "|" + ("a,b,c".partition("--"))[2],
+)
+print(
+    ("a,b,c".rpartition("--"))[0] +
+        "|" + ("a,b,c".rpartition("--"))[1] + "|" + ("a,b,c".rpartition("--"))[2],
+)
 print(("one".partition(","))[0] + "|" + ("one".partition(","))[1] + "|" + ("one".partition(","))[2])
-print(("one".rpartition(","))[0] + "|" + ("one".rpartition(","))[1] + "|" + ("one".rpartition(","))[2])
-print(("one".partition("--"))[0] + "|" + ("one".partition("--"))[1] + "|" + ("one".partition("--"))[2])
-print(("one".rpartition("--"))[0] + "|" + ("one".rpartition("--"))[1] + "|" + ("one".rpartition("--"))[2])
+print(
+    ("one".rpartition(","))[0] + "|" + ("one".rpartition(","))[1] + "|" + ("one".rpartition(","))[2],
+)
+print(
+    ("one".partition("--"))[0] + "|" + ("one".partition("--"))[1] + "|" + ("one".partition("--"))[2],
+)
+print(
+    ("one".rpartition("--"))[0] +
+        "|" + ("one".rpartition("--"))[1] + "|" + ("one".rpartition("--"))[2],
+)
 print(("".partition(","))[0] + "|" + ("".partition(","))[1] + "|" + ("".partition(","))[2])
 print(("".rpartition(","))[0] + "|" + ("".rpartition(","))[1] + "|" + ("".rpartition(","))[2])
 print(("".partition("--"))[0] + "|" + ("".partition("--"))[1] + "|" + ("".partition("--"))[2])
 print(("".rpartition("--"))[0] + "|" + ("".rpartition("--"))[1] + "|" + ("".rpartition("--"))[2])
-print(("a--b--c".partition(","))[0] + "|" + ("a--b--c".partition(","))[1] + "|" + ("a--b--c".partition(","))[2])
-print(("a--b--c".rpartition(","))[0] + "|" + ("a--b--c".rpartition(","))[1] + "|" + ("a--b--c".rpartition(","))[2])
-print(("a--b--c".partition("--"))[0] + "|" + ("a--b--c".partition("--"))[1] + "|" + ("a--b--c".partition("--"))[2])
-print(("a--b--c".rpartition("--"))[0] + "|" + ("a--b--c".rpartition("--"))[1] + "|" + ("a--b--c".rpartition("--"))[2])
+print(
+    ("a--b--c".partition(","))[0] +
+        "|" + ("a--b--c".partition(","))[1] + "|" + ("a--b--c".partition(","))[2],
+)
+print(
+    ("a--b--c".rpartition(","))[0] +
+        "|" + ("a--b--c".rpartition(","))[1] + "|" + ("a--b--c".rpartition(","))[2],
+)
+print(
+    ("a--b--c".partition("--"))[0] +
+        "|" + ("a--b--c".partition("--"))[1] + "|" + ("a--b--c".partition("--"))[2],
+)
+print(
+    ("a--b--c".rpartition("--"))[0] +
+        "|" + ("a--b--c".rpartition("--"))[1] + "|" + ("a--b--c".rpartition("--"))[2],
+)
 print(("a-b-c".replace("-", "+")).replace("\u000a", "|NL|"))
 print(("a-b-c".replace("a", "bb")).replace("\u000a", "|NL|"))
 print(("a-b-c".replace("", ".")).replace("\u000a", "|NL|"))

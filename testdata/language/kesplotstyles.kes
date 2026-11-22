@@ -2,7 +2,7 @@
 //     kestrel run examples/kesplotstyles.kes
 // It writes kesplot-style-*.svg in the current directory.
 import std.kesplot.{Figure, Style}
-import std.math.{sin, cos}
+import std.math.{cos, sin}
 
 function fileName(name : String) : String =
     name.replace("+", "-plus-").replace("/", "-").replace(" ", "-")

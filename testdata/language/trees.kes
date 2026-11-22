@@ -9,10 +9,7 @@ class Link {
     }
 }
 
-function sum(l : Link) : Int = match l.next {
-    Some(rest) => l.value + sum(rest),
-    None => l.value,
-}
+function sum(l : Link) : Int = match l.next { Some(rest) => l.value + sum(rest), None => l.value }
 
 class Tree {
     public final value : Int
@@ -48,7 +45,8 @@ function total(n : Node) : Int {
     s
 }
 
-function chain(n : Int) : Node = if n == 0 then Node(1, []) else Node(1, [chain(n - 1), Node(2, [])])
+function chain(n : Int) : Node =
+    if n == 0 then Node(1, []) else Node(1, [chain(n - 1), Node(2, [])])
 
 print(sum(Link(1, Some(Link(2, Some(Link(3, None)))))))
 print(depth(Tree(1, Some(Tree(2, Some(Tree(3, None, None)), None)), Some(Tree(4, None, None)))))

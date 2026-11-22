@@ -96,5 +96,5 @@ Hello, Kestrel!
 
 ## Status
 
-Kestrel is version 0.1. It runs on macOS, Linux and Windows, and CI tests all
+Kestrel is version 0.2. It runs on macOS, Linux and Windows, and CI tests all
 three on every pull request. [Install](install.md) has the details.

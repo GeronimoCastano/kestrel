@@ -1,14 +1,15 @@
-class Countdown { has Iterator
+class Countdown {
+    has Iterator
     public var nextValue : Int
     new(n : Int) { this.nextValue = n }
-    public mut function next() : Option[Int] =
-        if this.nextValue == 0 then None else {
-            this.nextValue = this.nextValue - 1
-            Some(this.nextValue)
-        }
+    public mut function next() : Option[Int] = if this.nextValue == 0 then None else {
+        this.nextValue = this.nextValue - 1
+        Some(this.nextValue)
+    }
 }
 
-class Range { has Iterable
+class Range {
+    has Iterable
     public final count : Int
     new(count : Int) { this.count = count }
     public function items() : Countdown = Countdown(this.count)

@@ -3434,7 +3434,8 @@ fn documented(kind: K) -> bool {
     )
 }
 
-fn reserved(word: &str) -> bool {
+/// Whether `word` is a keyword that cannot name a binding or a package.
+pub(crate) fn reserved(word: &str) -> bool {
     matches!(
         word,
         "function"

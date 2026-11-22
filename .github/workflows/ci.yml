@@ -47,6 +47,9 @@ jobs:
       - name: Run the test suite
         run: cargo test
 
+      - name: Check Kestrel formatting
+        run: git ls-files -z '*.kes' | xargs -0 ./target/debug/kestrel fmt --check
+
       - name: Check mathlib
         run: ./tools/check_mathlib.sh
 

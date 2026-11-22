@@ -26,10 +26,7 @@ public function quantile(xs : List[double], q : double) : double or Error {
     let sorted := xs.sorted()
     let position := q * (sorted.length() - 1).toDouble()
     let below := position.floor()
-    let index := match below.checkedToInt() {
-        n => n,
-        _ => 0,
-    }
+    let index := match below.checkedToInt() { n => n, _ => 0 }
     let low := sorted.slice(index, index + 1).sum()
     let high := sorted.slice(index + 1, index + 2).sum()
     if index + 1 >= sorted.length() {
@@ -40,7 +37,8 @@ public function quantile(xs : List[double], q : double) : double or Error {
 
 public function median(xs : List[double]) : double or Error = quantile(xs, 0.5)
 
-public function percentile(xs : List[double], p : double) : double or Error = quantile(xs, p / 100.0)
+public function percentile(xs : List[double], p : double) : double or Error =
+    quantile(xs, p / 100.0)
 
 // The most frequent value; the smallest one when several tie.
 public function mode(xs : List[double]) : double or Error {
@@ -77,10 +75,8 @@ public function histogram(xs : List[double], bins : Int) : List[Int] or Error {
     let width := if high > low then (high - low) / bins.toDouble() else 1.0
     let counts : Array[Int] = Array(bins, 0)
     for (x in xs) {
-        let slot := match ((x - low) / width).floor().checkedToInt() {
-            n => n.clamp(0, bins - 1),
-            _ => 0,
-        }
+        let slot :=
+            match ((x - low) / width).floor().checkedToInt() { n => n.clamp(0, bins - 1), _ => 0 }
         counts[slot] = counts[slot] + 1
     }
     return counts.toList()

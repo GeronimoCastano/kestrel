@@ -6,41 +6,42 @@ enum Chain[T] {
     Link(T, Chain[T])
 }
 
-function append(move xs : Chain[T], move ys : Chain[T]) : Chain[T] = match xs {
-    End           => ys,
-    Link(x, rest) => Link(x, append(rest, ys)),
-}
+function append(move xs : Chain[T], move ys : Chain[T]) : Chain[T] =
+    match xs { End => ys, Link(x, rest) => Link(x, append(rest, ys)) }
 
-function reverse(move xs : Chain[T]) : Chain[T] = match xs {
-    End           => End,
-    Link(x, rest) => append(reverse(rest), Link(x, End)),
-}
+function reverse(move xs : Chain[T]) : Chain[T] =
+    match xs { End => End, Link(x, rest) => append(reverse(rest), Link(x, End)) }
 
 @simp
 theorem appendEnd(xs : Chain[T]) : append(xs, End) = xs {
-    induction xs {
-        End              => rfl,
-        Link(x, rest) ih => congrArg(r => Link(x, r), ih),
-    }
+    induction xs { End => rfl, Link(x, rest) ih => congrArg(r => Link(x, r), ih) }
 }
 
-theorem appendAssoc(xs : Chain[T], ys : Chain[T], zs : Chain[T]) : append(append(xs, ys), zs) = append(xs, append(ys, zs)) {
-    induction xs {
-        End              => rfl,
-        Link(x, rest) ih => congrArg(r => Link(x, r), ih),
-    }
+theorem appendAssoc(
+    xs : Chain[T],
+    ys : Chain[T],
+    zs : Chain[T],
+) : append(append(xs, ys), zs) = append(xs, append(ys, zs)) {
+    induction xs { End => rfl, Link(x, rest) ih => congrArg(r => Link(x, r), ih) }
 }
 
-theorem reverseAppend(xs : Chain[T], ys : Chain[T]) : reverse(append(xs, ys)) = append(reverse(ys), reverse(xs)) {
+theorem reverseAppend(
+    xs : Chain[T],
+    ys : Chain[T],
+) : reverse(append(xs, ys)) = append(reverse(ys), reverse(xs)) {
     induction xs {
-        End              => symm(appendEnd(reverse(ys))),
-        Link(x, rest) ih => trans(
-            congrArg(s => append(s, Link(x, End)), ih),
-            appendAssoc(reverse(ys), reverse(rest), Link(x, End)),
-        ),
+        End => symm(appendEnd(reverse(ys))),
+        Link(x, rest) ih =>
+            trans(
+                congrArg(s => append(s, Link(x, End)), ih),
+                appendAssoc(reverse(ys), reverse(rest), Link(x, End)),
+            ),
     }
 }
 
 // A generic theorem applies at a concrete element type.
-theorem reverseTwo(a : Nat, b : Nat) : reverse(Link(a, Link(b, End))) = Link(b, Link(a, End)) { rfl }
+theorem reverseTwo(a : Nat, b : Nat) : reverse(Link(a, Link(b, End))) = Link(b, Link(a, End)) {
+    rfl
+}
+
 theorem appendNats(xs : Chain[Nat]) : append(append(xs, End), End) = xs { simp }

@@ -70,6 +70,7 @@ const vscode = {
   CompletionItem, CompletionItemKind, SnippetString, MarkdownString,
   SignatureHelp, SignatureInformation, ParameterInformation, Hover, Location, Uri,
   Range, Position, DocumentSymbol, SymbolKind, InlayHint, InlayHintKind,
+  TextEdit: { replace(range, newText) { return { range, newText }; } },
   SemanticTokensLegend, SemanticTokensBuilder,
   Diagnostic: class Diagnostic { constructor(range, message, severity) { this.range = range; this.message = message; this.severity = severity; } },
   DiagnosticSeverity: { Error: 0, Warning: 1 },
@@ -77,7 +78,8 @@ const vscode = {
     activeTextEditor: undefined,
     createOutputChannel() { return { appendLine() {}, dispose() {} }; },
     onDidChangeTextEditorSelection() { return { dispose() {} }; },
-    setStatusBarMessage() { return { dispose() {} }; }
+    setStatusBarMessage() { return { dispose() {} }; },
+    showErrorMessage() { return Promise.resolve(); }
   },
   commands: { registerCommand() { return { dispose() {} }; } },
   workspace: {
@@ -105,7 +107,8 @@ const vscode = {
     registerDocumentSymbolProvider(selector, provider) { registered.symbols = provider; return {}; },
     registerInlayHintsProvider(selector, provider) { registered.inlay = provider; return {}; },
     registerDocumentSemanticTokensProvider(selector, provider, legend) { registered.semantic = provider; registered.legend = legend; return {}; },
-    registerCodeActionsProvider(selector, provider) { registered.codeActions = provider; return {}; }
+    registerCodeActionsProvider(selector, provider) { registered.codeActions = provider; return {}; },
+    registerDocumentFormattingEditProvider(selector, provider) { registered.format = provider; return {}; }
   }
 };
 const load = Module._load;
@@ -116,7 +119,7 @@ Module._load = function (request, parent, isMain) {
 
 const extension = require(path.join(__dirname, '..', 'out', 'extension.js'));
 extension.activate({ subscriptions: { push() {} } });
-assert(registered.completion && registered.signature && registered.hover && registered.definition && registered.symbols && registered.inlay);
+assert(registered.completion && registered.signature && registered.hover && registered.definition && registered.symbols && registered.inlay && registered.format);
 
 const source = `function greet(name : String) : void with Effects {
     print(f"Hello {name}")

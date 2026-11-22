@@ -1,7 +1,7 @@
 # Kestrel for VS Code
 
 Support for `.kes` files: highlighting, completion, hover, inlay hints,
-diagnostics, and a live proof state.
+diagnostics, formatting and a live proof state.
 
 ![Hover showing a signature and a typeset formula](https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/docs/editors/images/hover.png)
 
@@ -42,6 +42,8 @@ truth for types, effects and ownership, so every error you see comes from
   the cursor's line.
 - Quick fixes for a class's missing trait methods, uncovered `match` arms and
   missing proof cases.
+- Formatting with `kestrel fmt`, on save or with **Format Document**. The
+  extension formats an unsaved buffer through `kestrel fmt --stdin`.
 
 ### Proving
 

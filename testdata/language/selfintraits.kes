@@ -11,16 +11,20 @@ class Query {
     public final text : String
     new() { this.text = "" }
     new(text : String) { this.text = text }
-    @override public function reset() : Query = Query()
-    @override public function named(name : String) : Query = Query(name)
+    @override
+    public function reset() : Query = Query()
+    @override
+    public function named(name : String) : Query = Query(name)
 }
 
 class Form {
     has Builder
     public final label : String
     new(label : String) { this.label = label }
-    @override public function reset() : Form = Form("")
-    @override public function named(name : String) : Form = Form(name)
+    @override
+    public function reset() : Form = Form("")
+    @override
+    public function named(name : String) : Form = Form(name)
 }
 
 // The bound binds Self to T, so the whole chain keeps type T.
@@ -42,8 +46,10 @@ class Counter {
 class SubQuery extends Query {
     new() { super() }
     new(text : String) { super(text) }
-    @override public function reset() : SubQuery = SubQuery()
-    @override public function named(name : String) : SubQuery = SubQuery(name)
+    @override
+    public function reset() : SubQuery = SubQuery()
+    @override
+    public function named(name : String) : SubQuery = SubQuery(name)
 }
 
 // Self also names the class in a parameter and in a field type.

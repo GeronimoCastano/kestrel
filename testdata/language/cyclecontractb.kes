@@ -1,5 +1,9 @@
-import testdata.language.cyclecontracta.{checked, Gate}
+import testdata.language.cyclecontracta.{Gate, checked}
+
 public function base() : Int = 1
+
 public function value(n : Int) : Int or Error = checked(n)
+
 public function zero() : Int or Error = checked(0)
+
 public function gate(gate : Gate, n : Int) : Int or Error = gate.check(n)

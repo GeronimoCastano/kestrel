@@ -268,10 +268,7 @@ public class Counter[T : Equals + Copy] {
         }
     }
 
-    public function count(item : T) : Int = match this.counts.get(item) {
-        Some(n) => n,
-        None => 0,
-    }
+    public function count(item : T) : Int = match this.counts.get(item) { Some(n) => n, None => 0 }
 
     public function distinctCount() : Int = this.order.length()
 

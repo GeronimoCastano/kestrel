@@ -1,12 +1,16 @@
 public function isEmpty[T : Equals](s : Set[T]) : Bool = s.length() == 0
+
 public function member[T : Equals](s : Set[T], value : T) : Bool = s.contains(value)
+
 public function subset[T : Equals](a : Set[T], b : Set[T]) : Bool {
     for (x in a) {
         if !b.contains(x) { return false }
     }
     return true
 }
-public function properSubset[T : Equals](a : Set[T], b : Set[T]) : Bool = subset(a, b) && a.length() < b.length()
+
+public function properSubset[T : Equals](a : Set[T], b : Set[T]) : Bool =
+    subset(a, b) && a.length() < b.length()
 
 public function disjoint[T : Equals](a : Set[T], b : Set[T]) : Bool {
     for (x in a) {

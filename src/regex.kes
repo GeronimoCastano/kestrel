@@ -13,10 +13,20 @@ import std.rx
 
 // One match. `start` and `end` count characters, as substring does; `startByte` and
 // `endByte` are the same span in bytes, for byteSlice.
-public record Match(text : String, start : Int, end : Int, startByte : Int, endByte : Int, groups : List[String], present : List[Bool]) {
+public record Match(
+    text : String,
+    start : Int,
+    end : Int,
+    startByte : Int,
+    endByte : Int,
+    groups : List[String],
+    present : List[Bool],
+) {
     // Group 0 is the whole match; a group that took no part gives None.
     public function group(index : Int) : Option[String] =
-        if index < 0 || index >= this.groups.length() || !this.present.slice(index, index + 1).all(p => p) then None
+        if index < 0 ||
+            index >= this.groups.length() ||
+            !this.present.slice(index, index + 1).all(p => p) then None
         else Some(this.groups.slice(index, index + 1).join(""))
 }
 
@@ -89,10 +99,12 @@ public class Regex {
 
     // `text` with every match replaced. In `replacement`, `$0` to `$9` insert a group and
     // `$$` a dollar sign.
-    public function replace(text : String, replacement : String) : String = this.replaceUpTo(text, replacement, -1)
+    public function replace(text : String, replacement : String) : String =
+        this.replaceUpTo(text, replacement, -1)
 
     // `text` with the first match replaced.
-    public function replaceFirst(text : String, replacement : String) : String = this.replaceUpTo(text, replacement, 1)
+    public function replaceFirst(text : String, replacement : String) : String =
+        this.replaceUpTo(text, replacement, 1)
 
     function replaceUpTo(text : String, replacement : String, limit : Int) : String {
         let parts : Array[String] = Array.empty()
@@ -108,7 +120,9 @@ public class Regex {
             let startByte := at(found, 0)
             let endByte := at(found, 1)
             parts.append(text.byteSlice(copied, startByte))
-            parts.append(if groupsUsed then expand(replacement, build(text, found, 0)) else replacement)
+            parts.append(
+                if groupsUsed then expand(replacement, build(text, found, 0)) else replacement,
+            )
             copied = endByte
             count += 1
             from = this.after(text, startByte, endByte)
@@ -146,7 +160,12 @@ function at(raw : List[Int], index : Int) : Int = raw.slice(index, index + 1).su
 function build(text : String, raw : List[Int], startChar : Int) : Match {
     let startByte := at(raw, 0)
     let endByte := at(raw, 1)
-    let groups := [if at(raw, 2 * g) >= 0 && at(raw, 2 * g + 1) >= 0 then text.byteSlice(at(raw, 2 * g), at(raw, 2 * g + 1)) else "" for g in range(raw.length() / 2)]
+    let groups :=
+        [
+            if at(raw, 2 * g) >= 0 &&
+                    at(raw, 2 * g + 1) >= 0 then text.byteSlice(at(raw, 2 * g), at(raw, 2 * g + 1))
+                else "" for g in range(raw.length() / 2)
+        ]
     let present := [at(raw, 2 * g) >= 0 && at(raw, 2 * g + 1) >= 0 for g in range(raw.length() / 2)]
     let piece := text.byteSlice(startByte, endByte)
     return Match(piece, startChar, startChar + piece.length(), startByte, endByte, groups, present)

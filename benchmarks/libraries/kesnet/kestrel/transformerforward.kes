@@ -1,6 +1,6 @@
 // Transformer forward/backward benchmark: MultiheadAttention(64, 2) -> residual
 // -> LayerNorm -> Linear(64, 64). Backward on the output sum, 1600 iterations.
-import std.kesnet.{Module, MultiheadAttention, LayerNorm, Linear}
+import std.kesnet.{LayerNorm, Linear, Module, MultiheadAttention}
 
 public class AttentionBlock extends Module {
     public var attention : MultiheadAttention
@@ -18,7 +18,8 @@ public class AttentionBlock extends Module {
         for (parameter in this.projection.parameters()) { this.registered.append(parameter) }
     }
 
-    @override public function forward(x : Variable) : Variable {
+    @override
+    public function forward(x : Variable) : Variable {
         let attended := this.attention.forward(x)
         let normalized := this.norm.forward(attended + x)
         this.projection.forward(normalized)
@@ -26,7 +27,11 @@ public class AttentionBlock extends Module {
 }
 
 Variable.seed(3)
-let tokens := Tensor.generate((8, 32, 64), (n, t, f) => (((n * 29 + t * 47 + f * 11) % 101).toDouble() - 50.0) / 50.0)
+let tokens :=
+    Tensor.generate(
+        (8, 32, 64),
+        (n, t, f) => (((n * 29 + t * 47 + f * 11) % 101).toDouble() - 50.0) / 50.0,
+    )
 let inputs := Variable.fromTensor(tokens)
 
 let block := AttentionBlock(64, 2)

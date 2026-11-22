@@ -1,13 +1,36 @@
 # Changelog
 
-All notable changes to Kestrel. Versions follow the policy in the README: within
-`0.1`, a patch release fixes bugs; a syntax or feature change bumps the minor
-number.
+All notable changes to Kestrel. Versions follow the policy in the README:
+within a minor line, a patch release fixes bugs; a syntax or feature change
+bumps the minor number.
 
-## Unreleased
+## 0.2.0 - 2026-11-21
 
+- `kestrel fmt` formats `.kes` source in place. It works from the token stream,
+  so comments, literals and the written form of `x++`, `x += 1` and grouped
+  parameters survive. A second run produces the same bytes.
+- The style is four spaces and 100 columns. Long calls, lists, parameters and
+  match arms go one item per line with a trailing comma. Binary expressions
+  break after the loosest operator first. Imports sort within a run and their
+  names sort inside `{...}`.
+- `--check` reports files that need formatting and exits 1. `--diff` prints a
+  unified diff. `--stdin` formats an unsaved buffer.
+- The VS Code extension registers a formatting provider, so
+  `editor.formatOnSave` works. It runs the compiler with `fmt --stdin`.
+- CI checks every tracked `.kes` file with `kestrel fmt --check`.
+- `kestrel new NAME` scaffolds a package: `kestrel.project`, an entry point, a
+  module and a test that passes on the first run. `--lib` writes the module and
+  test without an entry point; `--git` starts a repository.
+- A Packages page documents the project file, dependencies, tests and the
+  scaffold command.
+- `kestrel doctor` diagnoses an installation: the compiler's version and
+  commit, the platform and install layout, Clang, LAPACK, Z3, `PATH` shadowing,
+  the package cache, `kestrel.lock` and the VS Code extension. It prints a fix
+  next to each problem, takes `--json`, and exits with 1 when a required check
+  fails. Its only write is one temporary file in the package cache.
 - `kestrel session` loads project C files on Windows, with the bundled Clang
   and with Clang for MSVC.
+- The compiler reports version 0.2.0.
 
 ## 0.1.3 - 2026-11-21
 

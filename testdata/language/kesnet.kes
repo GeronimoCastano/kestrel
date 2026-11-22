@@ -1,6 +1,6 @@
 // KesNet end-to-end regression: a two-layer network, Adam and mean squared error.
 // Run with: kestrel run examples/kesnet.kes
-import std.kesnet.{Linear, ReLU, Sequential, mseLoss, meanSquaredError}
+import std.kesnet.{Linear, ReLU, Sequential, meanSquaredError, mseLoss}
 import std.kesnet.optim.{Adam, StepLR}
 
 Variable.seed(11)

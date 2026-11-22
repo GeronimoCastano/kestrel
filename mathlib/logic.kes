@@ -4,315 +4,473 @@
 /// Conjunction commutes: $(P \land Q) \leftrightarrow (Q \land P)$.
 public theorem andComm(P : Prop, Q : Prop) : (P and Q) ↔ (Q and P) by {
     constructor
-    { intro h
-      constructor
-      exact h.right
-      exact h.left }
-    { intro h
-      constructor
-      exact h.right
-      exact h.left }
+    {
+        intro h
+        constructor
+        exact h.right
+        exact h.left
+    }
+    {
+        intro h
+        constructor
+        exact h.right
+        exact h.left
+    }
 }
 
 /// Conjunction associates: $(P \land Q) \land R \leftrightarrow P \land (Q \land R)$.
-public theorem andAssoc(P : Prop, Q : Prop, R : Prop) :
-        ((P and Q) and R) ↔ (P and (Q and R)) by {
+public theorem andAssoc(P : Prop, Q : Prop, R : Prop) : ((P and Q) and R) ↔ (P and (Q and R)) by {
     constructor
-    { intro h
-      constructor
-      exact h.left.left
-      constructor
-      exact h.left.right
-      exact h.right }
-    { intro h
-      constructor
-      constructor
-      exact h.left
-      exact h.right.left
-      exact h.right.right }
+    {
+        intro h
+        constructor
+        exact h.left.left
+        constructor
+        exact h.left.right
+        exact h.right
+    }
+    {
+        intro h
+        constructor
+        constructor
+        exact h.left
+        exact h.right.left
+        exact h.right.right
+    }
 }
 
 /// Conjunction is idempotent: $P \land P \leftrightarrow P$.
 public theorem andIdem(P : Prop) : (P and P) ↔ P by {
     constructor
-    { intro h
-      exact h.left }
-    { intro h
-      constructor
-      exact h
-      exact h }
+    {
+        intro h
+        exact h.left
+    }
+    {
+        intro h
+        constructor
+        exact h
+        exact h
+    }
 }
 
 /// True is the left identity of conjunction: $P \land \top \leftrightarrow P$.
 public theorem andTrueL(P : Prop) : (P and true) ↔ P by {
     constructor
-    { intro h
-      exact h.left }
-    { intro h
-      exact And(h, True) }
+    {
+        intro h
+        exact h.left
+    }
+    {
+        intro h
+        exact And(h, True)
+    }
 }
 
 /// True is the right identity of conjunction: $\top \land P \leftrightarrow P$.
 public theorem andTrueR(P : Prop) : (true and P) ↔ P by {
     constructor
-    { intro h
-      exact h.right }
-    { intro h
-      exact And(True, h) }
+    {
+        intro h
+        exact h.right
+    }
+    {
+        intro h
+        exact And(True, h)
+    }
 }
 
 /// False absorbs conjunction on the left: $P \land \bot \leftrightarrow \bot$.
 public theorem andFalseL(P : Prop) : (P and false) ↔ false by {
     constructor
-    { intro h
-      exact h.right }
-    { intro h
-      exact absurd(h) }
+    {
+        intro h
+        exact h.right
+    }
+    {
+        intro h
+        exact absurd(h)
+    }
 }
 
 /// False absorbs conjunction on the right: $\bot \land P \leftrightarrow \bot$.
 public theorem andFalseR(P : Prop) : (false and P) ↔ false by {
     constructor
-    { intro h
-      exact h.left }
-    { intro h
-      exact absurd(h) }
+    {
+        intro h
+        exact h.left
+    }
+    {
+        intro h
+        exact absurd(h)
+    }
 }
 
 /// Disjunction commutes: $(P \lor Q) \leftrightarrow (Q \lor P)$.
 public theorem orComm(P : Prop, Q : Prop) : (P or Q) ↔ (Q or P) by {
     constructor
-    { intro h
-      cases h
-      { right
-        exact hl }
-      { left
-        exact hr } }
-    { intro h
-      cases h
-      { right
-        exact hl }
-      { left
-        exact hr } }
+    {
+        intro h
+        cases h
+        {
+            right
+            exact hl
+        }
+        {
+            left
+            exact hr
+        }
+    }
+    {
+        intro h
+        cases h
+        {
+            right
+            exact hl
+        }
+        {
+            left
+            exact hr
+        }
+    }
 }
 
 /// Disjunction associates: $(P \lor Q) \lor R \leftrightarrow P \lor (Q \lor R)$.
-public theorem orAssoc(P : Prop, Q : Prop, R : Prop) :
-        ((P or Q) or R) ↔ (P or (Q or R)) by {
+public theorem orAssoc(P : Prop, Q : Prop, R : Prop) : ((P or Q) or R) ↔ (P or (Q or R)) by {
     constructor
-    { intro h
-      cases h
-      { cases hl
-        { left
-          exact hll }
-        { right
-          left
-          exact hlr } }
-      { right
-        right
-        exact hr } }
-    { intro h
-      cases h
-      { left
-        left
-        exact hl }
-      { cases hr
-        { left
-          right
-          exact hrl }
-        { right
-          exact hrr } } }
+    {
+        intro h
+        cases h
+        {
+            cases hl
+            {
+                left
+                exact hll
+            }
+            {
+                right
+                left
+                exact hlr
+            }
+        }
+        {
+            right
+            right
+            exact hr
+        }
+    }
+    {
+        intro h
+        cases h
+        {
+            left
+            left
+            exact hl
+        }
+        {
+            cases hr
+            {
+                left
+                right
+                exact hrl
+            }
+            {
+                right
+                exact hrr
+            }
+        }
+    }
 }
 
 /// Disjunction is idempotent: $P \lor P \leftrightarrow P$.
 public theorem orIdem(P : Prop) : (P or P) ↔ P by {
     constructor
-    { intro h
-      cases h
-      { exact hl }
-      { exact hr } }
-    { intro h
-      left
-      exact h }
+    {
+        intro h
+        cases h
+        { exact hl }
+        { exact hr }
+    }
+    {
+        intro h
+        left
+        exact h
+    }
 }
 
 /// False is the left identity of disjunction: $P \lor \bot \leftrightarrow P$.
 public theorem orFalseL(P : Prop) : (P or false) ↔ P by {
     constructor
-    { intro h
-      cases h
-      { exact hl }
-      { exact absurd(hr) } }
-    { intro h
-      left
-      exact h }
+    {
+        intro h
+        cases h
+        { exact hl }
+        { exact absurd(hr) }
+    }
+    {
+        intro h
+        left
+        exact h
+    }
 }
 
 /// False is the right identity of disjunction: $\bot \lor P \leftrightarrow P$.
 public theorem orFalseR(P : Prop) : (false or P) ↔ P by {
     constructor
-    { intro h
-      cases h
-      { exact absurd(hl) }
-      { exact hr } }
-    { intro h
-      right
-      exact h }
+    {
+        intro h
+        cases h
+        { exact absurd(hl) }
+        { exact hr }
+    }
+    {
+        intro h
+        right
+        exact h
+    }
 }
 
 /// True absorbs disjunction on the left: $P \lor \top \leftrightarrow \top$.
 public theorem orTrueL(P : Prop) : (P or true) ↔ true by {
     constructor
-    { intro h
-      exact True }
-    { intro h
-      right
-      exact True }
+    {
+        intro h
+        exact True
+    }
+    {
+        intro h
+        right
+        exact True
+    }
 }
 
 /// True absorbs disjunction on the right: $\top \lor P \leftrightarrow \top$.
 public theorem orTrueR(P : Prop) : (true or P) ↔ true by {
     constructor
-    { intro h
-      exact True }
-    { intro h
-      left
-      exact True }
+    {
+        intro h
+        exact True
+    }
+    {
+        intro h
+        left
+        exact True
+    }
 }
 
 /// Conjunction distributes over disjunction: $P \land (Q \lor R) \leftrightarrow (P \land Q) \lor (P \land R)$.
-public theorem andOrDistribL(P : Prop, Q : Prop, R : Prop) :
-        (P and (Q or R)) ↔ ((P and Q) or (P and R)) by {
+public theorem andOrDistribL(
+    P : Prop,
+    Q : Prop,
+    R : Prop,
+) : (P and (Q or R)) ↔ ((P and Q) or (P and R)) by {
     constructor
-    { intro h
-      have hq := h.right
-      cases hq
-      { left
-        exact And(h.left, hql) }
-      { right
-        exact And(h.left, hqr) } }
-    { intro h
-      cases h
-      { constructor
-        exact hl.left
-        left
-        exact hl.right }
-      { constructor
-        exact hr.left
-        right
-        exact hr.right } }
+    {
+        intro h
+        have hq := h.right
+        cases hq
+        {
+            left
+            exact And(h.left, hql)
+        }
+        {
+            right
+            exact And(h.left, hqr)
+        }
+    }
+    {
+        intro h
+        cases h
+        {
+            constructor
+            exact hl.left
+            left
+            exact hl.right
+        }
+        {
+            constructor
+            exact hr.left
+            right
+            exact hr.right
+        }
+    }
 }
 
 /// Conjunction distributes over disjunction on the right: $(Q \lor R) \land P \leftrightarrow (Q \land P) \lor (R \land P)$.
-public theorem andOrDistribR(P : Prop, Q : Prop, R : Prop) :
-        ((Q or R) and P) ↔ ((Q and P) or (R and P)) by {
+public theorem andOrDistribR(
+    P : Prop,
+    Q : Prop,
+    R : Prop,
+) : ((Q or R) and P) ↔ ((Q and P) or (R and P)) by {
     constructor
-    { intro h
-      have hq := h.left
-      cases hq
-      { left
-        exact And(hql, h.right) }
-      { right
-        exact And(hqr, h.right) } }
-    { intro h
-      cases h
-      { constructor
-        left
-        exact hl.left
-        exact hl.right }
-      { constructor
-        right
-        exact hr.left
-        exact hr.right } }
+    {
+        intro h
+        have hq := h.left
+        cases hq
+        {
+            left
+            exact And(hql, h.right)
+        }
+        {
+            right
+            exact And(hqr, h.right)
+        }
+    }
+    {
+        intro h
+        cases h
+        {
+            constructor
+            left
+            exact hl.left
+            exact hl.right
+        }
+        {
+            constructor
+            right
+            exact hr.left
+            exact hr.right
+        }
+    }
 }
 
 /// Disjunction distributes over conjunction: $P \lor (Q \land R) \leftrightarrow (P \lor Q) \land (P \lor R)$.
-public theorem orAndDistribL(P : Prop, Q : Prop, R : Prop) :
-        (P or (Q and R)) ↔ ((P or Q) and (P or R)) by {
+public theorem orAndDistribL(
+    P : Prop,
+    Q : Prop,
+    R : Prop,
+) : (P or (Q and R)) ↔ ((P or Q) and (P or R)) by {
     constructor
-    { intro h
-      cases h
-      { constructor
-        left
-        exact hl
-        left
-        exact hl }
-      { constructor
-        right
-        exact hr.left
-        right
-        exact hr.right } }
-    { intro h
-      have hpq := h.left
-      have hpr := h.right
-      cases hpq
-      { cases hpr
-        { left
-          exact hpql }
-        { left
-          exact hpql } }
-      { cases hpr
-        { left
-          exact hprl }
-        { right
-          constructor
-          exact hpqr
-          exact hprr } } }
+    {
+        intro h
+        cases h
+        {
+            constructor
+            left
+            exact hl
+            left
+            exact hl
+        }
+        {
+            constructor
+            right
+            exact hr.left
+            right
+            exact hr.right
+        }
+    }
+    {
+        intro h
+        have hpq := h.left
+        have hpr := h.right
+        cases hpq
+        {
+            cases hpr
+            {
+                left
+                exact hpql
+            }
+            {
+                left
+                exact hpql
+            }
+        }
+        {
+            cases hpr
+            {
+                left
+                exact hprl
+            }
+            {
+                right
+                constructor
+                exact hpqr
+                exact hprr
+            }
+        }
+    }
 }
 
 /// Disjunction distributes over conjunction on the right: $(Q \land R) \lor P \leftrightarrow (Q \lor P) \land (R \lor P)$.
-public theorem orAndDistribR(P : Prop, Q : Prop, R : Prop) :
-        ((Q and R) or P) ↔ ((Q or P) and (R or P)) by {
+public theorem orAndDistribR(
+    P : Prop,
+    Q : Prop,
+    R : Prop,
+) : ((Q and R) or P) ↔ ((Q or P) and (R or P)) by {
     constructor
-    { intro h
-      cases h
-      { constructor
-        left
-        exact hl.left
-        left
-        exact hl.right }
-      { constructor
-        right
-        exact hr
-        right
-        exact hr } }
-    { intro h
-      have hq := h.left
-      have hr := h.right
-      cases hq
-      { cases hr
-        { left
-          constructor
-          exact hql
-          exact hrl }
-        { right
-          exact hrr } }
-      { right
-        exact hqr } }
+    {
+        intro h
+        cases h
+        {
+            constructor
+            left
+            exact hl.left
+            left
+            exact hl.right
+        }
+        {
+            constructor
+            right
+            exact hr
+            right
+            exact hr
+        }
+    }
+    {
+        intro h
+        have hq := h.left
+        have hr := h.right
+        cases hq
+        {
+            cases hr
+            {
+                left
+                constructor
+                exact hql
+                exact hrl
+            }
+            {
+                right
+                exact hrr
+            }
+        }
+        {
+            right
+            exact hqr
+        }
+    }
 }
 
 /// Conjunction absorbs disjunction: $P \land (P \lor Q) \leftrightarrow P$.
 public theorem andAbsorb(P : Prop, Q : Prop) : (P and (P or Q)) ↔ P by {
     constructor
-    { intro h
-      exact h.left }
-    { intro h
-      constructor
-      exact h
-      left
-      exact h }
+    {
+        intro h
+        exact h.left
+    }
+    {
+        intro h
+        constructor
+        exact h
+        left
+        exact h
+    }
 }
 
 /// Disjunction absorbs conjunction: $P \lor (P \land Q) \leftrightarrow P$.
 public theorem orAbsorb(P : Prop, Q : Prop) : (P or (P and Q)) ↔ P by {
     constructor
-    { intro h
-      cases h
-      { exact hl }
-      { exact hr.left } }
-    { intro h
-      left
-      exact h }
+    {
+        intro h
+        cases h
+        { exact hl }
+        { exact hr.left }
+    }
+    {
+        intro h
+        left
+        exact h
+    }
 }
 
 /// False is not true: $\lnot \bot$.
@@ -324,124 +482,156 @@ public theorem notFalse() : not false by {
 /// True is false when negated: $\lnot \top \leftrightarrow \bot$.
 public theorem notTrue() : not true ↔ false by {
     constructor
-    { intro h
-      apply h
-      exact True }
-    { intro h
-      exact absurd(h) }
+    {
+        intro h
+        apply h
+        exact True
+    }
+    {
+        intro h
+        exact absurd(h)
+    }
 }
 
 /// Double negation cancels classically: $\lnot \lnot P \leftrightarrow P$.
 public theorem notNot(P : Prop) : (not (not P)) ↔ P by {
     constructor
-    { intro h
-      byContra hn
-      exact h(hn) }
-    { intro h
-      intro hn
-      exact hn(h) }
+    {
+        intro h
+        byContra hn
+        exact h(hn)
+    }
+    {
+        intro h
+        intro hn
+        exact hn(h)
+    }
 }
 
 /// De Morgan for conjunction: $\lnot (P \land Q) \leftrightarrow \lnot P \lor \lnot Q$.
-public theorem notAnd(P : Prop, Q : Prop) :
-        (not (P and Q)) ↔ ((not P) or (not Q)) by {
+public theorem notAnd(P : Prop, Q : Prop) : (not (P and Q)) ↔ ((not P) or (not Q)) by {
     constructor
-    { intro h
-      byContra hc
-      have hp : P by {
-          byContra hnp
-          apply hc
-          left
-          exact hnp
-      }
-      have hq : Q by {
-          byContra hnq
-          apply hc
-          right
-          exact hnq
-      }
-      apply h
-      constructor
-      exact hp
-      exact hq }
-    { intro h
-      intro hpq
-      cases h
-      { have hp := hpq.left
-        exact hl(hp) }
-      { have hq := hpq.right
-        exact hr(hq) } }
+    {
+        intro h
+        byContra hc
+        have hp : P by {
+            byContra hnp
+            apply hc
+            left
+            exact hnp
+        }
+        have hq : Q by {
+            byContra hnq
+            apply hc
+            right
+            exact hnq
+        }
+        apply h
+        constructor
+        exact hp
+        exact hq
+    }
+    {
+        intro h
+        intro hpq
+        cases h
+        {
+            have hp := hpq.left
+            exact hl(hp)
+        }
+        {
+            have hq := hpq.right
+            exact hr(hq)
+        }
+    }
 }
 
 /// De Morgan for disjunction: $\lnot (P \lor Q) \leftrightarrow \lnot P \land \lnot Q$.
-public theorem notOr(P : Prop, Q : Prop) :
-        (not (P or Q)) ↔ ((not P) and (not Q)) by {
+public theorem notOr(P : Prop, Q : Prop) : (not (P or Q)) ↔ ((not P) and (not Q)) by {
     constructor
-    { intro h
-      constructor
-      { intro hp
-        apply h
-        left
-        exact hp }
-      { intro hq
-        apply h
-        right
-        exact hq } }
-    { intro h
-      intro hpq
-      cases hpq
-      { exact h.left(hpql) }
-      { exact h.right(hpqr) } }
+    {
+        intro h
+        constructor
+        {
+            intro hp
+            apply h
+            left
+            exact hp
+        }
+        {
+            intro hq
+            apply h
+            right
+            exact hq
+        }
+    }
+    {
+        intro h
+        intro hpq
+        cases hpq
+        { exact h.left(hpql) }
+        { exact h.right(hpqr) }
+    }
 }
 
 /// Contraposition: $(P \to Q) \leftrightarrow (\lnot Q \to \lnot P)$.
-public theorem contrapositive(P : Prop, Q : Prop) :
-        (P -> Q) ↔ ((not Q) -> (not P)) by {
+public theorem contrapositive(P : Prop, Q : Prop) : (P -> Q) ↔ ((not Q) -> (not P)) by {
     constructor
-    { intro h
-      intro hnq
-      intro hp
-      exact hnq(h(hp)) }
-    { intro h
-      intro hp
-      byContra hnq
-      have hq := h(hnq)
-      exact hq(hp) }
+    {
+        intro h
+        intro hnq
+        intro hp
+        exact hnq(h(hp))
+    }
+    {
+        intro h
+        intro hp
+        byContra hnq
+        have hq := h(hnq)
+        exact hq(hp)
+    }
 }
 
 /// Negated implication: $\lnot (P \to Q) \leftrightarrow P \land \lnot Q$.
-public theorem notImplies(P : Prop, Q : Prop) :
-        (not (P -> Q)) ↔ (P and (not Q)) by {
+public theorem notImplies(P : Prop, Q : Prop) : (not (P -> Q)) ↔ (P and (not Q)) by {
     constructor
-    { intro h
-      have hp : P by {
-          byContra hnp
-          apply h
-          intro p
-          exact absurd(hnp(p))
-      }
-      have hq : not Q by {
-          intro q
-          apply h
-          intro _
-          exact q
-      }
-      constructor
-      exact hp
-      exact hq }
-    { intro h
-      intro hpq
-      have hp := hpq(h.left)
-      exact h.right(hp) }
+    {
+        intro h
+        have hp : P by {
+            byContra hnp
+            apply h
+            intro p
+            exact absurd(hnp(p))
+        }
+        have hq : not Q by {
+            intro q
+            apply h
+            intro _
+            exact q
+        }
+        constructor
+        exact hp
+        exact hq
+    }
+    {
+        intro h
+        intro hpq
+        have hp := hpq(h.left)
+        exact h.right(hp)
+    }
 }
 
 /// Iff is reflexive: $P \leftrightarrow P$.
 public theorem iffRefl(P : Prop) : P ↔ P by {
     constructor
-    { intro h
-      exact h }
-    { intro h
-      exact h }
+    {
+        intro h
+        exact h
+    }
+    {
+        intro h
+        exact h
+    }
 }
 
 /// Iff is symmetric: $(P \leftrightarrow Q) \to (Q \leftrightarrow P)$.
@@ -454,137 +644,182 @@ public theorem iffSymm(P : Prop, Q : Prop) : (P ↔ Q) -> (Q ↔ P) by {
 }
 
 /// Iff is transitive: $(P \leftrightarrow Q) \to (Q \leftrightarrow R) \to (P \leftrightarrow R)$.
-public theorem iffTrans(P : Prop, Q : Prop, R : Prop) :
-        (P ↔ Q) -> (Q ↔ R) -> (P ↔ R) by {
+public theorem iffTrans(P : Prop, Q : Prop, R : Prop) : (P ↔ Q) -> (Q ↔ R) -> (P ↔ R) by {
     intro h1
     intro h2
     cases h1
     cases h2
     constructor
-    { intro hp
-      have hq := h1mp(hp)
-      exact h2mp(hq) }
-    { intro hr
-      have hq := h2mpr(hr)
-      exact h1mpr(hq) }
+    {
+        intro hp
+        have hq := h1mp(hp)
+        exact h2mp(hq)
+    }
+    {
+        intro hr
+        have hq := h2mpr(hr)
+        exact h1mpr(hq)
+    }
 }
 
 /// Iff commutes: $(P \leftrightarrow Q) \leftrightarrow (Q \leftrightarrow P)$.
-public theorem iffComm(P : Prop, Q : Prop) :
-        (P ↔ Q) ↔ (Q ↔ P) by {
+public theorem iffComm(P : Prop, Q : Prop) : (P ↔ Q) ↔ (Q ↔ P) by {
     constructor
-    { intro h
-      have hs := iffSymm(P, Q)
-      exact hs(h) }
-    { intro h
-      have hs := iffSymm(Q, P)
-      exact hs(h) }
+    {
+        intro h
+        have hs := iffSymm(P, Q)
+        exact hs(h)
+    }
+    {
+        intro h
+        have hs := iffSymm(Q, P)
+        exact hs(h)
+    }
 }
 
 /// Iff commutes with negation on both sides: $(P \leftrightarrow Q) \leftrightarrow (\lnot P \leftrightarrow \lnot Q)$.
-public theorem iffNot(P : Prop, Q : Prop) :
-        (P ↔ Q) ↔ ((not P) ↔ (not Q)) by {
+public theorem iffNot(P : Prop, Q : Prop) : (P ↔ Q) ↔ ((not P) ↔ (not Q)) by {
     constructor
-    { intro h
-      cases h
-      constructor
-      { intro hnp
-        intro hq
-        have hqmp := hmpr(hq)
-        exact hnp(hqmp) }
-      { intro hnq
-        intro hp
-        have hpmp := hmp(hp)
-        exact hnq(hpmp) } }
-    { intro h
-      cases h
-      constructor
-      { intro hp
-        byContra hnq
-        have hnp := hmpr(hnq)
-        exact hnp(hp) }
-      { intro hq
-        byContra hnp
-        have hnq := hmp(hnp)
-        exact hnq(hq) } }
+    {
+        intro h
+        cases h
+        constructor
+        {
+            intro hnp
+            intro hq
+            have hqmp := hmpr(hq)
+            exact hnp(hqmp)
+        }
+        {
+            intro hnq
+            intro hp
+            have hpmp := hmp(hp)
+            exact hnq(hpmp)
+        }
+    }
+    {
+        intro h
+        cases h
+        constructor
+        {
+            intro hp
+            byContra hnq
+            have hnp := hmpr(hnq)
+            exact hnp(hp)
+        }
+        {
+            intro hq
+            byContra hnp
+            have hnq := hmp(hnp)
+            exact hnq(hq)
+        }
+    }
 }
 
 /// A universal conjunction splits: $(\forall x, P x \land Q x) \leftrightarrow (\forall x, P x) \land (\forall x, Q x)$.
-public theorem forallAnd[U](p : (U) -> Prop, q : (U) -> Prop) :
-        (forall x : U, p(x) and q(x)) ↔
-        ((forall x : U, p(x)) and (forall x : U, q(x))) by {
+public theorem forallAnd[U](p : (U) -> Prop, q : (U) -> Prop) : (forall x : U, p(x) and q(x)) ↔
+((forall x : U, p(x)) and (forall x : U, q(x))) by {
     constructor
-    { intro h
-      constructor
-      { intro x
-        exact(h(x)).left }
-      { intro x
-        exact(h(x)).right } }
-    { intro h
-      intro x
-      constructor
-      exact h.left(x)
-      exact h.right(x) }
+    {
+        intro h
+        constructor
+        {
+            intro x
+            exact(h(x)).left
+        }
+        {
+            intro x
+            exact(h(x)).right
+        }
+    }
+    {
+        intro h
+        intro x
+        constructor
+        exact h.left(x)
+        exact h.right(x)
+    }
 }
 
 /// An existential disjunction splits: $(\exists x, P x \lor Q x) \leftrightarrow (\exists x, P x) \lor (\exists x, Q x)$.
-public theorem existsOr[U](p : (U) -> Prop, q : (U) -> Prop) :
-        (exists x : U, p(x) or q(x)) ↔
-        ((exists x : U, p(x)) or (exists x : U, q(x))) by {
+public theorem existsOr[U](p : (U) -> Prop, q : (U) -> Prop) : (exists x : U, p(x) or q(x)) ↔
+((exists x : U, p(x)) or (exists x : U, q(x))) by {
     constructor
-    { intro h
-      cases h
-      cases hw
-      { left
-        exists x
-        exact hwl }
-      { right
-        exists x
-        exact hwr } }
-    { intro h
-      cases h
-      { cases hl
-        exists x
-        left
-        exact hlw }
-      { cases hr
-        exists x
-        right
-        exact hrw } }
+    {
+        intro h
+        cases h
+        cases hw
+        {
+            left
+            exists x
+            exact hwl
+        }
+        {
+            right
+            exists x
+            exact hwr
+        }
+    }
+    {
+        intro h
+        cases h
+        {
+            cases hl
+            exists x
+            left
+            exact hlw
+        }
+        {
+            cases hr
+            exists x
+            right
+            exact hrw
+        }
+    }
 }
 
 /// A negated universal is an existential: $\lnot (\forall x, P x) \leftrightarrow \exists x, \lnot P x$.
-public theorem notForall[U](p : (U) -> Prop) :
-        (not (forall x : U, p(x))) ↔ (exists x : U, not p(x)) by {
+public theorem notForall[U](
+    p : (U) -> Prop,
+) : (not (forall x : U, p(x))) ↔ (exists x : U, not p(x)) by {
     constructor
-    { intro h
-      byContra hc
-      apply h
-      intro x
-      byContra hnx
-      apply hc
-      exists x
-      exact hnx }
-    { intro h
-      intro hall
-      cases h
-      have hx := hall(x)
-      exact hw(hx) }
+    {
+        intro h
+        byContra hc
+        apply h
+        intro x
+        byContra hnx
+        apply hc
+        exists x
+        exact hnx
+    }
+    {
+        intro h
+        intro hall
+        cases h
+        have hx := hall(x)
+        exact hw(hx)
+    }
 }
 
 /// A negated existential is a universal: $\lnot (\exists x, P x) \leftrightarrow \forall x, \lnot P x$.
-public theorem notExists[U](p : (U) -> Prop) :
-        (not (exists x : U, p(x))) ↔ (forall x : U, not p(x)) by {
+public theorem notExists[U](
+    p : (U) -> Prop,
+) : (not (exists x : U, p(x))) ↔ (forall x : U, not p(x)) by {
     constructor
-    { intro h
-      intro x
-      intro hp
-      apply h
-      exists x
-      exact hp }
-    { intro h
-      intro he
-      cases he
-      have hx := h(x)
-      exact hx(hew) }
+    {
+        intro h
+        intro x
+        intro hp
+        apply h
+        exists x
+        exact hp
+    }
+    {
+        intro h
+        intro he
+        cases he
+        have hx := h(x)
+        exact hx(hew)
+    }
 }

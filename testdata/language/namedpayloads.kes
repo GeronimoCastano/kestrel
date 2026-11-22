@@ -5,15 +5,10 @@ enum Move {
     Wait
 }
 
-function describe(m : Move) : String = match m {
-    Jump(speed = s, height = h) => f"jump {h} by {s}",
-    Wait => "wait",
-}
+function describe(m : Move) : String =
+    match m { Jump(speed = s, height = h) => f"jump {h} by {s}", Wait => "wait" }
 
-function total(m : Move) : Int = match m {
-    Jump(h, s) => h + s,
-    Wait => 0,
-}
+function total(m : Move) : Int = match m { Jump(h, s) => h + s, Wait => 0 }
 
 print(describe(Jump(height = 2, speed = 3)))
 print(describe(Jump(2, 3)))

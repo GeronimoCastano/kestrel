@@ -1,10 +1,10 @@
 // A small, classical machine-learning layer. Models are fitted values: a
 // static fit method returns an immutable-in-spirit object with learned state.
 import std.linalg
-import std.stats
 import std.math
-import std.random.{Rng}
 import std.mlrt.{knnPredict}
+import std.random.{Rng}
+import std.stats
 
 public class FittedStandardScaler {
     public var means : DynTensor[double]
@@ -56,7 +56,11 @@ public class FittedLinearRegression {
 public class LinearRegression {
     new() {}
 
-    public static function fit(X : DynTensor[double], y : DynTensor[double], fitIntercept : Bool = true) : FittedLinearRegression {
+    public static function fit(
+        X : DynTensor[double],
+        y : DynTensor[double],
+        fitIntercept : Bool = true,
+    ) : FittedLinearRegression {
         if fitIntercept {
             let meanX := stats.mean(X, axis = 0)
             let meanY := stats.mean(y)
@@ -81,7 +85,10 @@ public function meanSquaredError(actual : DynTensor[double], predicted : DynTens
     return stats.mean(difference * difference)
 }
 
-public function meanAbsoluteError(actual : DynTensor[double], predicted : DynTensor[double]) : double {
+public function meanAbsoluteError(
+    actual : DynTensor[double],
+    predicted : DynTensor[double],
+) : double {
     let difference := actual - predicted
     return stats.mean(difference.map(value => value.abs()))
 }
@@ -191,7 +198,9 @@ public class PolynomialFeatures {
         return FittedPolynomialFeatures(X.shape()[1], bias)
     }
 
-    public static function fitTransform(X : DynTensor[double], bias : Bool = false) : DynTensor[double] {
+    public static function fitTransform(X : DynTensor[double], bias : Bool = false) : DynTensor[
+        double
+    ] {
         let features := PolynomialFeatures.fit(X, bias = bias)
         return features.transform(X)
     }
@@ -237,12 +246,22 @@ public function takeValues(y : DynTensor[double], indices : Array[Int]) : DynTen
     return Tensor.fromArray(values)
 }
 
-public function trainTestSplit(X : DynTensor[double], y : DynTensor[double], testCount : Int, mut rng : Rng) : (DynTensor[double], DynTensor[double], DynTensor[double], DynTensor[double]) {
+public function trainTestSplit(
+    X : DynTensor[double],
+    y : DynTensor[double],
+    testCount : Int,
+    mut rng : Rng,
+) : (DynTensor[double], DynTensor[double], DynTensor[double], DynTensor[double]) {
     let rows := X.shape()[0]
     let count := if testCount < 0 then 0 else if testCount > rows then rows else testCount
     let order := shuffleIndices(rows, rng)
     let split := rows - count
-    return (takeRows(X, sliceIndices(order, 0, split)), takeRows(X, sliceIndices(order, split, rows)), takeValues(y, sliceIndices(order, 0, split)), takeValues(y, sliceIndices(order, split, rows)))
+    return (
+        takeRows(X, sliceIndices(order, 0, split)),
+        takeRows(X, sliceIndices(order, split, rows)),
+        takeValues(y, sliceIndices(order, 0, split)),
+        takeValues(y, sliceIndices(order, split, rows)),
+    )
 }
 
 public class FittedKNeighborsClassifier {
@@ -264,7 +283,11 @@ public class FittedKNeighborsClassifier {
 public class KNeighborsClassifier {
     new() {}
 
-    public static function fit(X : DynTensor[double], y : DynTensor[double], neighbors : Int = 5) : FittedKNeighborsClassifier {
+    public static function fit(
+        X : DynTensor[double],
+        y : DynTensor[double],
+        neighbors : Int = 5,
+    ) : FittedKNeighborsClassifier {
         let count := if neighbors < 1 then 1 else neighbors
         return FittedKNeighborsClassifier(X.copy(), y.copy(), count)
     }
@@ -296,16 +319,28 @@ public class LogisticRegression {
     // Newton step, which reaches the same optimum in a handful of iterations.
     // "gradient" keeps the explicit batch gradient loop, and "auto" uses Newton
     // for up to 256 features and gradient descent beyond that.
-    public static function fit(X : DynTensor[double], y : DynTensor[double], learningRate : double = 0.1, iterations : Int = 1000, fitIntercept : Bool = true, solver : String = "auto") : FittedLogisticRegression {
+    public static function fit(
+        X : DynTensor[double],
+        y : DynTensor[double],
+        learningRate : double = 0.1,
+        iterations : Int = 1000,
+        fitIntercept : Bool = true,
+        solver : String = "auto",
+    ) : FittedLogisticRegression {
         let dimensions := X.shape()
         let rows := dimensions[0]
         let features := dimensions[1]
         let rowCount := rows.toDouble()
-        let useNewton := (solver == "newton" || solver == "auto") && features <= 256 && iterations > 0
+        let useNewton :=
+            (solver == "newton" || solver == "auto") && features <= 256 && iterations > 0
         if useNewton {
             let terms := if fitIntercept then features + 1 else features
             let offset := if fitIntercept then 1 else 0
-            let design := Tensor.generate((rows, terms), (i, j) => if fitIntercept && j == 0 then 1.0 else X[i, j - offset])
+            let design :=
+                Tensor.generate(
+                    (rows, terms),
+                    (i, j) => if fitIntercept && j == 0 then 1.0 else X[i, j - offset],
+                )
             let ridge := Tensor.generate((terms, terms), (i, j) => if i == j then 1.0e-3 else 0.0)
             let limit := if iterations < 10 then iterations else 10
             let mut theta := Tensor.filled((terms,), 0.0)
@@ -328,7 +363,7 @@ public class LogisticRegression {
                 }
             }
             if fitIntercept {
-                return FittedLogisticRegression(theta[1:terms], theta[0])
+                return FittedLogisticRegression(theta[1 : terms], theta[0])
             }
             return FittedLogisticRegression(theta, 0.0)
         }
@@ -386,7 +421,11 @@ public class FittedKMeans {
 public class KMeans {
     new() {}
 
-    public static function fit(X : DynTensor[double], clusters : Int = 3, iterations : Int = 100) : FittedKMeans {
+    public static function fit(
+        X : DynTensor[double],
+        clusters : Int = 3,
+        iterations : Int = 100,
+    ) : FittedKMeans {
         let dimensions := X.shape()
         let rows := dimensions[0]
         let features := dimensions[1]
@@ -455,7 +494,11 @@ public class FittedPCA {
     public var components : DynTensor[double]
     public var explainedVariance : DynTensor[double]
 
-    new(move means : DynTensor[double], move components : DynTensor[double], move explainedVariance : DynTensor[double]) {
+    new(
+        move means : DynTensor[double],
+        move components : DynTensor[double],
+        move explainedVariance : DynTensor[double],
+    ) {
         this.means = means
         this.components = components
         this.explainedVariance = explainedVariance
@@ -475,7 +518,9 @@ public class PCA {
         let rows := dimensions[0]
         let features := dimensions[1]
         let available := if rows < features then rows else features
-        let count := if nComponents < 1 then 1 else if nComponents > available then available else nComponents
+        let count :=
+            if nComponents < 1 then 1
+            else if nComponents > available then available else nComponents
         let means := stats.mean(X, axis = 0)
         // A covariance eigenproblem is much cheaper than a full SVD when the
         // feature count is small, which is the usual tabular case. The raw
@@ -496,7 +541,11 @@ public class PCA {
             }
             varianceValues.append(decomposition.values[source])
         }
-        return FittedPCA(means, Tensor.fromArray(componentValues).reshape((count, features)), Tensor.fromArray(varianceValues))
+        return FittedPCA(
+            means,
+            Tensor.fromArray(componentValues).reshape((count, features)),
+            Tensor.fromArray(varianceValues),
+        )
     }
 }
 
@@ -517,7 +566,10 @@ public function foldIndices(count : Int, folds : Int, fold : Int) : (Array[Int],
     return (training, testing)
 }
 
-public function confusionMatrix(actual : DynTensor[double], predicted : DynTensor[double]) : (double, double, double, double) {
+public function confusionMatrix(
+    actual : DynTensor[double],
+    predicted : DynTensor[double],
+) : (double, double, double, double) {
     let count := actual.count()
     let mut trueNegative := 0
     let mut falsePositive := 0
@@ -536,17 +588,24 @@ public function confusionMatrix(actual : DynTensor[double], predicted : DynTenso
             truePositive++
         }
     }
-    return (trueNegative.toDouble(), falsePositive.toDouble(), falseNegative.toDouble(), truePositive.toDouble())
+    return (
+        trueNegative.toDouble(),
+        falsePositive.toDouble(),
+        falseNegative.toDouble(),
+        truePositive.toDouble(),
+    )
 }
 
 public function precision(actual : DynTensor[double], predicted : DynTensor[double]) : double {
-    let (trueNegative, falsePositive, falseNegative, truePositive) := confusionMatrix(actual, predicted)
+    let (trueNegative, falsePositive, falseNegative, truePositive) :=
+        confusionMatrix(actual, predicted)
     let denominator := truePositive + falsePositive
     return if denominator == 0.0 then 0.0 else truePositive / denominator
 }
 
 public function recall(actual : DynTensor[double], predicted : DynTensor[double]) : double {
-    let (trueNegative, falsePositive, falseNegative, truePositive) := confusionMatrix(actual, predicted)
+    let (trueNegative, falsePositive, falseNegative, truePositive) :=
+        confusionMatrix(actual, predicted)
     let denominator := truePositive + falseNegative
     return if denominator == 0.0 then 0.0 else truePositive / denominator
 }

@@ -3,10 +3,8 @@ enum Tree {
     Node(Tree, Tree)
 }
 
-function mirror(t : Tree) : Tree = match t {
-    Leaf => Leaf,
-    Node(a, b) => Node(mirror(b), mirror(a)),
-}
+function mirror(t : Tree) : Tree =
+    match t { Leaf => Leaf, Node(a, b) => Node(mirror(b), mirror(a)) }
 
 theorem mirrorTwice(t : Tree) : mirror(mirror(t)) = t by {
     induction t {
@@ -20,19 +18,10 @@ enum Expr {
     Add(Expr, Expr)
 }
 
-function eval(e : Expr) : Int = match e {
-    Lit(n) => n,
-    Add(a, b) => eval(a) + eval(b),
-}
+function eval(e : Expr) : Int = match e { Lit(n) => n, Add(a, b) => eval(a) + eval(b) }
 
-function fold(e : Expr) : Expr = match e {
-    Lit(n) => Lit(n),
-    Add(a, b) => Add(fold(a), fold(b)),
-}
+function fold(e : Expr) : Expr = match e { Lit(n) => Lit(n), Add(a, b) => Add(fold(a), fold(b)) }
 
 theorem foldPreserves(e : Expr) : eval(fold(e)) = eval(e) {
-    induction e {
-        Lit(n) => rfl,
-        Add(a, b) iha ihb => simp [iha, ihb],
-    }
+    induction e { Lit(n) => rfl, Add(a, b) iha ihb => simp [iha, ihb] }
 }

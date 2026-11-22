@@ -1,6 +1,11 @@
-import testdata.language.cycledefaulta.{Token, value, read}
+import testdata.language.cycledefaulta.{Token, read, value}
+
 public function base() : Int = 41
+
 public function label() : String = "cyclic" + " default"
+
 public function total() : Int = value()
+
 public function token() : Token = Token()
+
 public function name() : String = read()

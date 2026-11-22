@@ -5,14 +5,23 @@ import std.ml.{LogisticRegression, accuracy}
 
 import std.process.{args}
 
-let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 150 }) else 150
+let REPETITIONS :=
+    if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 150 })
+    else 150
 
-let X := Tensor.generate((20000, 10), (i, j) => (((i * 1103515245 + j * 12345 + 7) % 2001) - 1000).toDouble() / 1000.0)
-let labels := Tensor.generate((20000,), i => {
-    let score := X[i, 0] + 0.8 * X[i, 1] - 0.6 * X[i, 2] + 0.4 * X[i, 3]
-    let boundary := if score > 0.0 then 1.0 else 0.0
-    if i % 41 == 0 then 1.0 - boundary else boundary
-})
+let X :=
+    Tensor.generate(
+        (20000, 10),
+        (i, j) => (((i * 1103515245 + j * 12345 + 7) % 2001) - 1000).toDouble() / 1000.0,
+    )
+let labels := Tensor.generate(
+    (20000,),
+    i => {
+        let score := X[i, 0] + 0.8 * X[i, 1] - 0.6 * X[i, 2] + 0.4 * X[i, 3]
+        let boundary := if score > 0.0 then 1.0 else 0.0
+        if i % 41 == 0 then 1.0 - boundary else boundary
+    },
+)
 
 let mut totalAccuracy := 0.0
 for (step in range(REPETITIONS)) {

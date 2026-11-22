@@ -383,6 +383,11 @@ cargo build --release
 `KESTREL_CC`, `KESTREL_LAPACK` and `KESTREL_Z3` name a C compiler, a LAPACK
 library and a Z3 executable when you want ones other than Kestrel would find.
 
+`kestrel doctor` reports what each tool resolves to, the install layout, `PATH`
+shadowing, the package cache, `kestrel.lock` and the VS Code extension. It takes
+`--json` for scripts and exits with 1 when a required check fails. See
+[docs/doctor.md](docs/doctor.md).
+
 ### Supported platforms
 
 CI runs the full test suite on macOS, Linux and Windows for every pull request,
@@ -401,6 +406,9 @@ and the Visual Studio Build Tools are on `PATH`.
 | `kestrel run FILE` | Compile and run in one step |
 | `kestrel build -o OUT FILE` | Save a standalone executable |
 | `kestrel check FILE...` | Names, types, effects, moves, contracts, files, tasks |
+| `kestrel fmt FILE...` | Rewrite `.kes` files in one style |
+| `kestrel new NAME` | Scaffold a package; `--lib` for a library, `--git` for a repository |
+| `kestrel doctor` | Diagnose the installation: tools, layout, `PATH`, cache, lock, extension |
 | `kestrel test` | Run the `@test` functions in a package |
 | `kestrel session` | Keep values alive between entries |
 | `kestrel notebook` | Jupyter kernel for `.kes` cells |
@@ -412,7 +420,8 @@ and the Visual Studio Build Tools are on `PATH`.
 Any file argument accepts `-` for standard input. `check --stdin-path FILE -`
 treats that input as an unsaved version of `FILE`, which is how the editor checks
 a buffer you have not saved. `--emit-c PATH` keeps the generated C for
-inspection.
+inspection. `kestrel fmt --check FILE...` reports files that need formatting and
+exits 1; see [the formatter page](docs/formatter.md).
 
 ## A project is a folder
 
@@ -449,6 +458,18 @@ its dependencies:
 package demo
 depends geometry
 ```
+
+`kestrel new hello` writes the manifest, an entry point, a module and a test
+that passes on the first run:
+
+```sh
+kestrel new hello
+cd hello
+kestrel run main.kes
+```
+
+[docs/packages.md](docs/packages.md) covers the project file, dependencies,
+templates and the naming rules.
 
 `kestrel test` runs the `@test` functions under the package's `tests` folder, one
 process per test, several at once.
@@ -501,14 +522,14 @@ under `testdata/`.
 
 ## Versioning
 
-Kestrel is pre-1.0. Within `0.1`, a patch release such as `0.1.3` fixes bugs and
-leaves the language alone. A new form, a changed rule or a new language feature
-bumps the minor number: `0.2.0`. Every release is listed in
+Kestrel is pre-1.0. Within a minor line, a patch release fixes bugs and leaves
+the language and the formatter output alone. A new form, a changed rule or a new
+feature bumps the minor number: `0.2.0`. Every release is listed in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Limits
 
-Kestrel is version 0.1. It refuses some programs on purpose. Each refusal comes
+Kestrel is version 0.2. It refuses some programs on purpose. Each refusal comes
 with a named diagnostic such as `E_NATIVE_OWNERSHIP` or `E_TRAIT_CONFLICT`,
 never with silent bad output. The short list:
 
@@ -529,6 +550,7 @@ that pin it down.
 | [SYNTAX.md](SYNTAX.md) | The language, form by form, with an example for each |
 | [MATH.md](MATH.md) | Proof kernel, tactics, and how to add a theory |
 | [KESNET.md](KESNET.md) | Deep learning library |
+| [docs/packages.md](docs/packages.md) | Packages, `kestrel.project` and `kestrel new` |
 | [docs/editors/vscode.md](docs/editors/vscode.md) | VS Code, Code Runner and Jupyter setup |
 | [mathlib/README.md](mathlib/README.md) | A checked library of basic mathematics |
 | [KESDAS_BENCHMARKS.md](KESDAS_BENCHMARKS.md) | Data frames against pandas |

@@ -11,7 +11,12 @@ function run(w : Int, iterations : Int) : double {
     for (let iteration : Int = 0; iteration < iterations; iteration = iteration + 1) {
         for (let i : Int = 1; i < w - 1; i = i + 1) {
             for (let j : Int = 1; j < w - 1; j = j + 1) {
-                b[i * w + j] = 0.25 * (a[(i - 1) * w + j] + a[(i + 1) * w + j] + a[i * w + j - 1] + a[i * w + j + 1])
+                b[i * w + j] =
+                    0.25 *
+                        (
+                            a[(i - 1) * w + j] +
+                                a[(i + 1) * w + j] + a[i * w + j - 1] + a[i * w + j + 1]
+                        )
             }
         }
         for (let j : Int = 0; j < w; j = j + 1) {
