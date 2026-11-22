@@ -26,6 +26,14 @@ bumps the minor number.
 - `kestrel session` loads project C files on Windows, with the bundled Clang
   and with Clang for MSVC.
 
+## 0.2.0 - 2026-11-21
+
+- `kestrel new NAME` scaffolds a package: `kestrel.project`, an entry point, a
+  module and a test that passes on the first run. `--lib` writes the module and
+  test without an entry point; `--git` starts a repository.
+- A Packages page documents the project file, dependencies, tests and the
+  scaffold command.
+
 ## 0.1.3 - 2026-11-21
 
 - Windows is supported. One PowerShell command installs the compiler with its

@@ -1007,7 +1007,8 @@ impl GitClone {
     }
 }
 
-fn clean_git_command() -> Command {
+/// A Git command that ignores the environment of a running hook or worktree.
+pub(crate) fn clean_git_command() -> Command {
     let mut command = Command::new("git");
     for variable in [
         "GIT_CONFIG_COUNT",

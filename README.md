@@ -402,6 +402,7 @@ and the Visual Studio Build Tools are on `PATH`.
 | `kestrel build -o OUT FILE` | Save a standalone executable |
 | `kestrel check FILE...` | Names, types, effects, moves, contracts, files, tasks |
 | `kestrel fmt FILE...` | Rewrite `.kes` files in one style |
+| `kestrel new NAME` | Scaffold a package; `--lib` for a library, `--git` for a repository |
 | `kestrel test` | Run the `@test` functions in a package |
 | `kestrel session` | Keep values alive between entries |
 | `kestrel notebook` | Jupyter kernel for `.kes` cells |
@@ -451,6 +452,18 @@ its dependencies:
 package demo
 depends geometry
 ```
+
+`kestrel new hello` writes the manifest, an entry point, a module and a test
+that passes on the first run:
+
+```sh
+kestrel new hello
+cd hello
+kestrel run main.kes
+```
+
+[docs/packages.md](docs/packages.md) covers the project file, dependencies,
+templates and the naming rules.
 
 `kestrel test` runs the `@test` functions under the package's `tests` folder, one
 process per test, several at once.
@@ -531,6 +544,7 @@ that pin it down.
 | [SYNTAX.md](SYNTAX.md) | The language, form by form, with an example for each |
 | [MATH.md](MATH.md) | Proof kernel, tactics, and how to add a theory |
 | [KESNET.md](KESNET.md) | Deep learning library |
+| [docs/packages.md](docs/packages.md) | Packages, `kestrel.project` and `kestrel new` |
 | [docs/editors/vscode.md](docs/editors/vscode.md) | VS Code, Code Runner and Jupyter setup |
 | [mathlib/README.md](mathlib/README.md) | A checked library of basic mathematics |
 | [KESDAS_BENCHMARKS.md](KESDAS_BENCHMARKS.md) | Data frames against pandas |
