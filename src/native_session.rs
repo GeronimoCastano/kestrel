@@ -301,13 +301,11 @@ fn compile(command: &mut Command) -> Result<(), String> {
     }
     Ok(())
 }
-/// Clang for one session module. On Windows every module links the DLL C runtime, so the
-/// host, the runtime and each entry share one heap and one standard output buffer.
+/// Clang for one session module that Kestrel generates, under the generated code's
+/// warning policy.
 fn clang(shared: bool) -> Command {
-    let mut command = super::clang_command();
+    let mut command = toolchain(shared);
     command.args([
-        "-std=c11",
-        "-O2",
         "-Wall",
         "-Wextra",
         "-Werror",
@@ -317,6 +315,20 @@ fn clang(shared: bool) -> Command {
         "-Wno-unused-but-set-variable",
         "-Wno-unused-label",
     ]);
+    if ["KESTREL_LEAK_CHECK", "KESTREL_NO_POOL"]
+        .iter()
+        .any(|n| std::env::var_os(n).is_some())
+    {
+        command.arg("-DK_NO_POOL");
+    }
+    command
+}
+/// Clang with the flags every module in one session shares, project C files included. On
+/// Windows every module links the DLL C runtime, so the host, the runtime, project C code
+/// and each entry share one heap and one standard output buffer.
+fn toolchain(shared: bool) -> Command {
+    let mut command = super::clang_command();
+    command.args(["-std=c11", "-O2"]);
     command.args(super::thread_flags());
     if cfg!(target_os = "linux") {
         command.arg("-ldl");
@@ -340,12 +352,6 @@ fn clang(shared: bool) -> Command {
             "-fsanitize=address,undefined",
             "-fno-sanitize-recover=undefined",
         ]);
-    }
-    if ["KESTREL_LEAK_CHECK", "KESTREL_NO_POOL"]
-        .iter()
-        .any(|n| std::env::var_os(n).is_some())
-    {
-        command.arg("-DK_NO_POOL");
     }
     command
 }
@@ -378,6 +384,127 @@ fn link_runtime(command: &mut Command, folder: &Path) {
             .arg(format!("-Wl,-rpath,{}", folder.display()))
             .arg("-lm");
     }
+}
+
+/// Builds one project C file into a shared library, so its state lives once and every
+/// later entry calls into the same copy. Returns the file those entries link against,
+/// or `None` when the file exports nothing.
+///
+/// A Windows DLL exports only the symbols it marks, and project C code marks none. The
+/// MinGW linker exports every external symbol on request; the MSVC linker exports what a
+/// module-definition file lists, so the session lists the object's external symbols.
+fn project_library<'a>(
+    folder: &Path,
+    index: usize,
+    source: &Path,
+    program: &Program,
+    earlier: impl Iterator<Item = &'a PathBuf>,
+) -> Result<Option<PathBuf>, String> {
+    let name = format!("foreign{index}");
+    let library = folder.join(dylib(&name));
+    let includes = || {
+        program
+            .c_include_dirs
+            .iter()
+            .flat_map(|d| [std::ffi::OsStr::new("-I"), d.as_os_str()])
+    };
+    let mut command = toolchain(true);
+    let link = if !cfg!(windows) {
+        command.arg(source);
+        library.clone()
+    } else if super::mingw() {
+        let implib = folder.join(format!("lib{name}.dll.a"));
+        let mut flag = std::ffi::OsString::from("-Wl,--out-implib,");
+        flag.push(&implib);
+        command
+            .arg(source)
+            .arg("-Wl,--export-all-symbols")
+            .arg(flag);
+        implib
+    } else {
+        let object = folder.join(format!("{name}.o"));
+        compile(
+            toolchain(false)
+                .arg("-c")
+                .arg(source)
+                .args(includes())
+                .arg("-o")
+                .arg(&object),
+        )?;
+        let definition = folder.join(format!("{name}.def"));
+        fs::write(
+            &definition,
+            module_definition(&dylib(&name), &external_symbols(&object)?),
+        )
+        .map_err(|e| e.to_string())?;
+        command
+            .arg(&object)
+            .arg("-Xlinker")
+            .arg(format!("/DEF:{}", definition.display()));
+        folder.join(format!("{name}.lib"))
+    };
+    command
+        .args(includes())
+        .args(earlier)
+        .args(program.c_libraries.iter().map(|name| format!("-l{name}")))
+        .args(super::system_libraries())
+        .arg("-o")
+        .arg(&library);
+    compile(&mut command)?;
+    // The MSVC linker writes no import library for a DLL without exports.
+    Ok(link.exists().then_some(link))
+}
+
+/// The external symbols an object file defines, as `llvm-nm` reports them: each name with
+/// whether it names data rather than code.
+fn external_symbols(object: &Path) -> Result<Vec<(String, bool)>, String> {
+    let output = super::clang_command()
+        .arg("-print-prog-name=llvm-nm")
+        .output()
+        .ok()
+        .map(|output| String::from_utf8_lossy(&output.stdout).trim().to_owned())
+        .filter(|tool| !tool.is_empty())
+        .and_then(|tool| {
+            Command::new(tool)
+                .args(["--extern-only", "--defined-only"])
+                .arg(object)
+                .output()
+                .ok()
+        })
+        .filter(|output| output.status.success())
+        .ok_or_else(|| {
+            format!(
+                "Cannot find llvm-nm beside clang ({}); a session needs it to export project C functions under MSVC. Install the full LLVM package or set KESTREL_CC to the bundled Clang.",
+                super::c_compiler().display()
+            )
+        })?;
+    Ok(parse_symbols(&String::from_utf8_lossy(&output.stdout)))
+}
+
+/// Reads `llvm-nm` lines such as `0000000000000000 T next`. Only names a C declaration can
+/// spell are kept; the compiler's own constants, such as `__real@...`, stay private.
+fn parse_symbols(listing: &str) -> Vec<(String, bool)> {
+    listing
+        .lines()
+        .filter_map(|line| {
+            let mut words = line.split_whitespace().rev();
+            let name = words.next()?;
+            let kind = words.next()?;
+            let spelled = name.starts_with(|c: char| c.is_ascii_alphabetic() || c == '_')
+                && name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_');
+            spelled.then(|| (name.to_owned(), !kind.eq_ignore_ascii_case("t")))
+        })
+        .collect()
+}
+
+/// A module-definition file exporting `symbols` from `library`. Data goes out as `DATA`,
+/// so code that reaches it without `dllimport` fails to link instead of reading a thunk.
+fn module_definition(library: &str, symbols: &[(String, bool)]) -> String {
+    let mut text = format!("LIBRARY {library}\nEXPORTS\n");
+    for (name, data) in symbols {
+        writeln!(text, "    {name}{}", if *data { " DATA" } else { "" }).unwrap();
+    }
+    text
 }
 
 #[cfg(unix)]
@@ -419,7 +546,9 @@ pub struct Runtime {
     control: BufReader<Control>,
     python: bool,
     entries: usize,
-    c_sources: BTreeMap<PathBuf, PathBuf>,
+    /// Each project C file loaded so far, with the file later entries link to reach it.
+    /// A file that exports nothing has none.
+    c_sources: BTreeMap<PathBuf, Option<PathBuf>>,
 }
 impl Runtime {
     pub fn new(arguments: &[String], null_input: bool, marked: bool) -> Result<Self, String> {
@@ -500,6 +629,10 @@ impl Runtime {
         if let Some(token) = &token {
             worker.env("KESTREL_SESSION_TOKEN", token);
         }
+        if std::env::var_os("KESTREL_SANITIZE").is_some() {
+            // Windows loads the sanitizer runtime DLL from PATH.
+            worker.envs(super::sanitizer_runtime_path().map(|path| ("PATH", path)));
+        }
         let mut worker = worker
             .spawn()
             .map_err(|e| format!("Cannot start native session: {e}"))?;
@@ -577,36 +710,14 @@ impl Runtime {
             if self.c_sources.contains_key(source) {
                 continue;
             }
-            if cfg!(windows) {
-                // A Windows DLL exports only the functions it marks, and project C files
-                // do not mark theirs.
-                return Err(format!(
-                    "Sessions on Windows cannot load project C files yet ({}); use kestrel run or kestrel build.",
-                    source.display()
-                ));
-            }
-            let library = path.join(dylib(&format!("foreign{}", self.c_sources.len())));
-            let mut command = super::clang_command();
-            command.args(["-std=c11", "-O2", "-pthread"]);
-            command.args(shared_flags());
-            if std::env::var_os("KESTREL_SANITIZE").is_some() {
-                command.args([
-                    "-fsanitize=address,undefined",
-                    "-fno-sanitize-recover=undefined",
-                ]);
-            }
-            command.arg(source);
-            for folder in &program.c_include_dirs {
-                command.arg("-I").arg(folder);
-            }
-            command
-                .args(self.c_sources.values())
-                .args(program.c_libraries.iter().map(|name| format!("-l{name}")))
-                .arg("-lm")
-                .arg("-o")
-                .arg(&library);
-            compile(&mut command)?;
-            self.c_sources.insert(source.clone(), library);
+            let link = project_library(
+                path,
+                self.c_sources.len(),
+                source,
+                program,
+                self.c_sources.values().flatten(),
+            )?;
+            self.c_sources.insert(source.clone(), link);
         }
         let source = path.join(format!("cell{}.c", self.entries));
         let library = path.join(format!(
@@ -628,7 +739,7 @@ impl Runtime {
                 program
                     .c_sources
                     .iter()
-                    .filter_map(|source| self.c_sources.get(source)),
+                    .filter_map(|source| self.c_sources.get(source).and_then(Option::as_ref)),
             )
             .arg("-I")
             .arg(path);
@@ -693,7 +804,7 @@ impl Drop for Runtime {
 
 #[cfg(test)]
 mod tests {
-    use super::{declares_function, runtime_parts};
+    use super::{declares_function, module_definition, parse_symbols, runtime_parts};
     #[test]
     fn shared_runtime_header_keeps_types_and_erases_bodies_and_initializers() {
         let source = "typedef struct { int n; } Value;\nstatic const Value empty = {0};\nstatic int value(int n) { static int once; return n + once++; }\n";
@@ -725,5 +836,22 @@ mod tests {
         assert!(!declares_function(
             "static pthread_t k_thread __attribute__((unused))"
         ));
+    }
+    #[test]
+    fn msvc_exports_list_c_names_and_mark_data() {
+        let listing = "0000000000000000 T next\n0000000000000008 B count\n0000000000000000 R __real@4010000000000000\n0000000000000010 D table_2\n";
+        let symbols = parse_symbols(listing);
+        assert_eq!(
+            symbols,
+            [
+                ("next".to_owned(), false),
+                ("count".to_owned(), true),
+                ("table_2".to_owned(), true)
+            ]
+        );
+        assert_eq!(
+            module_definition("foreign0.dll", &symbols),
+            "LIBRARY foreign0.dll\nEXPORTS\n    next\n    count DATA\n    table_2 DATA\n"
+        );
     }
 }

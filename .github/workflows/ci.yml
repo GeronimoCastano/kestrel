@@ -91,9 +91,18 @@ jobs:
 
       - name: Install Rust
         uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          components: rustfmt, clippy
 
       - name: Cache the build
         uses: Swatinem/rust-cache@v2
+
+      # Windows compiles code behind cfg(windows) that the macOS job never lints.
+      - name: Check formatting
+        run: cargo fmt --all --check
+
+      - name: Run Clippy
+        run: cargo clippy --all-targets -- -D warnings
 
       # The suite's own Clang, Z3 and OpenBLAS calls find the bundle through PATH. The
       # MSVC job keeps the runner's LLVM and the Visual Studio linker.
@@ -115,6 +124,12 @@ jobs:
 
       - name: Build the compiler
         run: cargo build --release
+
+      - name: Check mathlib
+        shell: bash
+        env:
+          KESTREL: target/release/kestrel.exe
+        run: ./tools/check_mathlib.sh
 
       # The installed layout on its own: kestrel.exe finds Clang, Z3 and OpenBLAS beside
       # itself, with no other compiler, solver or LAPACK on PATH.
@@ -143,6 +158,11 @@ jobs:
           test "$("$kestrel" run "$folder/batteries.kes")" = true
           printf 'let n := 40\nprint(n + 2)\n:quit\n' | "$kestrel" session --root "$folder" | tee "$folder/session.txt"
           grep -qx 42 "$folder/session.txt"
+          # A project C file loads once per session, so its state carries across entries.
+          printf '#include <stdint.h>\nint64_t next(void);\n' > "$folder/counter.h"
+          printf '#include "counter.h"\nstatic int64_t count;\nint64_t next(void) { return ++count; }\n' > "$folder/counter.c"
+          printf 'import c "counter.h"\nunsafe { next().toInt() }\nunsafe { next().toInt() }\n:quit\n' | "$kestrel" session --root "$folder" | tee "$folder/counter.txt"
+          test "$(tr -d '\r' < "$folder/counter.txt")" = "$(printf '1\n2')"
           printf '{"id":1,"op":"ping"}\n{"id":2,"op":"shutdown"}\n' | "$kestrel" serve --root "$folder" | tee "$folder/serve.txt"
           grep -q '"id":1' "$folder/serve.txt"
 
