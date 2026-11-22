@@ -273,7 +273,7 @@ jobs:
         uses: Swatinem/rust-cache@v2
 
       - name: Compare with the recorded results
-        run: python3 tools/check_benchmarks.py --runs 3 --current benchmarks/current.json
+        run: python3 tools/check_benchmarks.py --runs 5 --current benchmarks/current.json
 
       - uses: actions/upload-artifact@v4
         if: always()

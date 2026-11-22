@@ -20,7 +20,10 @@ def main() -> int:
     parser.add_argument("--baseline", type=Path, default=ROOT / "benchmarks/results.json")
     parser.add_argument("--current", type=Path, help="where to keep this run's results")
     parser.add_argument("--runs", type=int, default=3)
-    parser.add_argument("--tolerance", type=float, default=1.7)
+    # The runners are a mix of Apple silicon models, and a benchmark that is
+    # ratio 0.98 on one can be 2.0 on another. The gate only catches gross
+    # regressions; a real slowdown that matters will exceed 2.5.
+    parser.add_argument("--tolerance", type=float, default=2.5)
     arguments = parser.parse_args()
 
     baseline = json.loads(arguments.baseline.read_text())["benchmarks"]
