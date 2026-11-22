@@ -9,6 +9,7 @@
 # Layout:
 #   bin/kestrel.exe, bin/libopenblas.dll
 #   toolchain/   llvm-mingw: Clang, lld and the MinGW headers and libraries, x86_64 only
+#   python/      CPython 3.13 with headers, import library and standard library
 #   z3/          z3.exe with the runtime DLLs it ships with
 #   licenses/    the licenses of the bundled parts that do not carry their own
 set -euo pipefail
@@ -21,6 +22,7 @@ trap 'rm -rf "$work"' EXIT
 LLVM_MINGW=llvm-mingw-20261117-ucrt-x86_64
 OPENBLAS=OpenBLAS-0.3.34-x64
 Z3=z3-5.3.3-x64-win
+PYTHON=3.13.17
 
 # Downloads one release asset and checks it against its pinned SHA-256.
 fetch() {
@@ -31,6 +33,14 @@ fetch() {
 fetch mstorsjo/llvm-mingw 20261117 "$LLVM_MINGW.zip" 4d002e330a0f703625aa5ccbc37e96f8f824413e163bfc7336774aabd2c3a412
 fetch OpenMathLib/OpenBLAS v0.3.34 "$OPENBLAS.zip" e9cb6134541f36c27346d5fc5995652f060fba227cebbbabcbda5a5a44d7c76b
 fetch Z3Prover/z3 z3-5.3.3 "$Z3.zip" 4e48624a6895b49606b3cf91ca4fbcc069fb2973b9706532170a144baa3fd798
+
+# The python.org NuGet package is a complete CPython: python.exe, the DLL, the
+# headers, the import library and the standard library. python.org publishes it for
+# embedding, and its license is in tools/LICENSE.txt.
+PYTHON_SUM=dce409744b088f94c6e37ba41f8100c384c27e029e843237364c602d30d475e5
+curl -fsSL -o "$work/python.nupkg" \
+    "https://api.nuget.org/v3-flatcontainer/python/$PYTHON/python.$PYTHON.nupkg"
+echo "$PYTHON_SUM  $work/python.nupkg" | sha256sum -c - > /dev/null
 
 mkdir -p "$out/bin" "$out/licenses" "$out/z3"
 if [ "$executable" != - ]; then
@@ -62,6 +72,13 @@ gh api "repos/OpenMathLib/OpenBLAS/contents/LICENSE?ref=v0.3.34" -q .content | b
     > "$out/licenses/OpenBLAS.txt"
 
 # Z3 for `smt` proofs. z3.exe loads the C++ runtime DLLs from its own folder.
+# CPython for Python interop, in the layout the compiler looks for beside bin.
+7z x -o"$work/python" "$work/python.nupkg" tools/ > /dev/null
+rm -rf "$out/python"
+mv "$work/python/tools" "$out/python"
+rm -rf "$out/python/Lib/test" "$out/python/Lib/idlelib" "$out/python/Lib/turtledemo" \
+    "$out/python/Lib/ensurepip"
+
 7z x -o"$work" "$work/$Z3.zip" > /dev/null
 cp "$work/$Z3/LICENSE.txt" "$out/z3/"
 cp "$work/$Z3/bin/z3.exe" "$work/$Z3/bin/"msvcp140*.dll "$work/$Z3/bin/"vcruntime140*.dll \

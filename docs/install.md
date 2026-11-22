@@ -37,10 +37,11 @@ release zip, checks it against the release's `SHA256SUMS`, and unpacks it to
 | `toolchain` | Clang and the Windows headers and libraries, from llvm-mingw |
 | `z3` | Z3 for `smt` proofs |
 
-It adds `bin` to your user `PATH`, runs a first program to check the install, and
+It adds `bin` and, when the archive carries it, `python` to your user `PATH`,
+runs a first program to check the install, and
 installs the VS Code extension when `code` is on `PATH`. Open a new terminal
 afterwards so it sees the new `PATH`. Run the command again to update. To remove
-Kestrel, delete the folder and its `PATH` entry.
+Kestrel, delete the folder and its `PATH` entries.
 
 `KESTREL_VERSION` picks a release instead of the latest, and `KESTREL_HOME` another
 install folder:
@@ -52,13 +53,15 @@ $env:KESTREL_VERSION = '0.2.0'; irm https://raw.githubusercontent.com/GeronimoCa
 `kestrel run`, `kestrel build` and `kestrel session` compile project C files as
 on the other platforms. `kestrel build -o hello hello.kes` writes `hello.exe`.
 
-Python interop embeds a CPython from [python.org](https://www.python.org). Kestrel
-uses the one `KESTREL_PYTHON` names when it is set. Otherwise it tries
-`python.exe` on `PATH`, skipping the Microsoft Store alias, then `py -3`, and
-takes the first one that has `include\Python.h` and `libs\python3XY.lib`. A
-program from `kestrel build` loads `python3XY.dll` when it starts, so keep that
-Python's folder on `PATH` when you run it. `kestrel run`, `kestrel test` and
-`kestrel session` put it there for you.
+Python interop embeds CPython 3.13, which the installer ships in `python` beside
+`bin`: the interpreter, its DLL, the headers, the import library and the standard
+library. `KESTREL_PYTHON` names another `python.exe` when you want it. The
+installer appends the bundled folder to your user `PATH`, so a program from
+`kestrel build` finds `python313.dll` when it starts.
+
+A source build has no bundled interpreter. It uses `python.exe` on `PATH`,
+skipping the Microsoft Store alias, then `py -3`, and takes the first one that has
+`include\Python.h` and `libs\python3XY.lib`.
 
 ## Release archives
 
@@ -129,7 +132,8 @@ settings.
 
 ## Shell completions
 
-`kestrel completions SHELL` prints a completion script for bash, zsh or fish.
+Homebrew installs completion scripts for bash, zsh and fish. Elsewhere,
+`kestrel completions SHELL` prints one.
 
 ```sh
 # bash, for the current shell only

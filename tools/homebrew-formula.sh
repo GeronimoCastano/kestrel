@@ -64,6 +64,8 @@ class Kestrel < Formula
     else
       bin.install "kestrel"
     end
+
+    generate_completions_from_executable(bin/"kestrel", "completions", shells: [:bash, :zsh, :fish])
   end
 
   test do

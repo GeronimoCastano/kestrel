@@ -382,7 +382,8 @@ cargo build --release
 
 `KESTREL_CC`, `KESTREL_LAPACK` and `KESTREL_Z3` name a C compiler, a LAPACK
 library and a Z3 executable when you want ones other than Kestrel would find.
-On Windows, `KESTREL_PYTHON` names the `python.exe` whose CPython programs embed.
+On Windows, the installer ships CPython 3.13; `KESTREL_PYTHON` names another
+`python.exe` when you want it.
 
 `kestrel doctor` reports what each tool resolves to, the install layout, `PATH`
 shadowing, the package cache, `kestrel.lock` and the VS Code extension. It takes
@@ -396,8 +397,9 @@ installs each release the way the commands above do, and checks that a program
 using Clang, LAPACK and Z3 runs. Kestrel is benchmarked on macOS.
 
 On Windows, `kestrel run`, `kestrel build` and `kestrel session` compile project
-C files and embed Python as on the other platforms; Python interop needs a
-CPython from python.org. Kestrel also runs with Clang for MSVC when LLVM
+C files and embed Python as on the other platforms. The installer carries the
+CPython it embeds; a source build needs one from python.org. Kestrel also runs
+with Clang for MSVC when LLVM
 and the Visual Studio Build Tools are on `PATH`.
 
 ## Commands

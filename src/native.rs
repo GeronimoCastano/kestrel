@@ -2891,6 +2891,11 @@ fn find_windows_python() -> Result<WindowsPython, String> {
             )
         });
     }
+    if let Some(python) = bundled_python()
+        && let Some(found) = ask_python(Command::new(python))
+    {
+        return Ok(found);
+    }
     let on_path = std::env::var_os("PATH").and_then(|path| {
         std::env::split_paths(&path)
             .filter(|folder| {
@@ -2912,6 +2917,14 @@ fn find_windows_python() -> Result<WindowsPython, String> {
         .ok_or_else(|| {
             "Cannot find a Python to embed. Tried KESTREL_PYTHON, python.exe on PATH and py -3; none has include\\Python.h and libs\\python3XY.lib. Install CPython from python.org or set KESTREL_PYTHON to its python.exe.".to_owned()
         })
+}
+
+/// The CPython that the Windows install ships in `python` beside `bin`.
+fn bundled_python() -> Option<PathBuf> {
+    let executable = std::env::current_exe().ok()?;
+    let root = executable.parent()?.parent()?;
+    let python = root.join("python").join("python.exe");
+    python.is_file().then_some(python)
 }
 
 /// Asks one Python where its headers and import library are. `-I` keeps the current

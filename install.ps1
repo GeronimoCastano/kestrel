@@ -83,6 +83,20 @@
     }
     if (($env:Path -split ';') -notcontains $bin) { $env:Path = "$bin;$env:Path" }
 
+    # Programs built with Python interop load python313.dll when they start, so the
+    # bundled CPython joins PATH too. It goes last, so a Python the user installed
+    # still wins on `python`.
+    $python = Join-Path $root 'python'
+    if (Test-Path $python) {
+        $userPath = [Environment]::GetEnvironmentVariable('Path', 'User')
+        $entries = @($userPath -split ';' | Where-Object { $_ })
+        if ($entries -notcontains $python) {
+            [Environment]::SetEnvironmentVariable('Path', (@($entries) + $python) -join ';', 'User')
+            Step "Added $python to your PATH"
+        }
+        if (($env:Path -split ';') -notcontains $python) { $env:Path = "$env:Path;$python" }
+    }
+
     $kestrel = Join-Path $bin 'kestrel.exe'
     $installed = (& $kestrel --version)
 
