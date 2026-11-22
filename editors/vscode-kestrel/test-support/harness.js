@@ -150,12 +150,14 @@ function loadExtension(configuration = {}) {
       build() { return {}; }
     },
     EventEmitter,
+    TextEdit: { replace: (range, newText) => ({ range, newText }) },
     Range,
     ConfigurationTarget: { Global: 1 },
     window: {
       createOutputChannel: () => ({ appendLine() {}, dispose() {} }),
       onDidChangeTextEditorSelection: stub,
       setStatusBarMessage: stub,
+      showErrorMessage: stub,
       activeTextEditor: undefined
     },
     commands: { registerCommand: stub },
@@ -206,6 +208,10 @@ function loadExtension(configuration = {}) {
       },
       registerCodeActionsProvider: (selector, provider) => {
         providers.codeActions = provider;
+        return disposable();
+      },
+      registerDocumentFormattingEditProvider: (selector, provider) => {
+        providers.format = provider;
         return disposable();
       }
     }, {

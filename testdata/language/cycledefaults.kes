@@ -1,5 +1,6 @@
 import testdata.language.cycledefaulta as a
 import testdata.language.cycledefaultb as b
+
 print(a.value())
 print(b.total())
 print(b.token().name)

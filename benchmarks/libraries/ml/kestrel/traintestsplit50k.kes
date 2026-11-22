@@ -8,9 +8,15 @@ import std.random.{Rng}
 
 import std.process.{args}
 
-let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 1500 }) else 1500
+let REPETITIONS :=
+    if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 1500 })
+    else 1500
 
-let X := Tensor.generate((50000, 6), (i, j) => ((i * 1103515245 + j * 12345 + 7) % 2147483648).toDouble() / 2147483648.0)
+let X :=
+    Tensor.generate(
+        (50000, 6),
+        (i, j) => ((i * 1103515245 + j * 12345 + 7) % 2147483648).toDouble() / 2147483648.0,
+    )
 let y := Tensor.generate((50000,), i => X[i, 0] + X[i, 1] + X[i, 2] + X[i, 3] + X[i, 4] + X[i, 5])
 let mut total0 := 0.0
 let mut total1 := 0.0

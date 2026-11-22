@@ -1,10 +1,36 @@
 // A compact tour of std.ml: preprocessing, regression, classification,
 // clustering, decomposition, splitting and evaluation.
-import std.ml.{StandardScaler, MinMaxScaler, PolynomialFeatures, LinearRegression, KNeighborsClassifier, LogisticRegression, KMeans, PCA, trainTestSplit, foldIndices, meanSquaredError, accuracy, confusionMatrix, precision, recall, f1Score}
+import std.ml.{
+    KMeans,
+    KNeighborsClassifier,
+    LinearRegression,
+    LogisticRegression,
+    MinMaxScaler,
+    PCA,
+    PolynomialFeatures,
+    StandardScaler,
+    accuracy,
+    confusionMatrix,
+    f1Score,
+    foldIndices,
+    meanSquaredError,
+    precision,
+    recall,
+    trainTestSplit,
+}
 import std.random.{Rng}
 
 let X := Tensor([1.0, 2.0, 2.0, 1.0, 4.0, 3.0, 5.0, 6.0], shape = (4, 2))
-let y := Tensor([2.0 * 1.0 + 3.0 * 2.0 + 1.0, 2.0 * 2.0 + 3.0 * 1.0 + 1.0, 2.0 * 4.0 + 3.0 * 3.0 + 1.0, 2.0 * 5.0 + 3.0 * 6.0 + 1.0], shape = (4,))
+let y :=
+    Tensor(
+        [
+            2.0 * 1.0 + 3.0 * 2.0 + 1.0,
+            2.0 * 2.0 + 3.0 * 1.0 + 1.0,
+            2.0 * 4.0 + 3.0 * 3.0 + 1.0,
+            2.0 * 5.0 + 3.0 * 6.0 + 1.0,
+        ],
+        shape = (4,),
+    )
 
 let scaler := StandardScaler.fit(X)
 print(scaler.means)
@@ -35,8 +61,17 @@ let logistic := LogisticRegression.fit(X, labels, 0.5, 2000)
 print(logistic.predict(X))
 print(accuracy(labels, logistic.predict(X)))
 
-let groups := KMeans.fit(Tensor([0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 5.0, 5.0, 5.1, 5.0, 5.0, 5.1], shape = (6, 2)), 2, 50)
-print(groups.predict(Tensor([0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 5.0, 5.0, 5.1, 5.0, 5.0, 5.1], shape = (6, 2))))
+let groups :=
+    KMeans.fit(
+        Tensor([0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 5.0, 5.0, 5.1, 5.0, 5.0, 5.1], shape = (6, 2)),
+        2,
+        50,
+    )
+print(
+    groups.predict(
+        Tensor([0.0, 0.0, 0.1, 0.0, 0.0, 0.1, 5.0, 5.0, 5.1, 5.0, 5.0, 5.1], shape = (6, 2)),
+    ),
+)
 
 let pca := PCA.fit(X, 1)
 print(pca.transform(X).shape())

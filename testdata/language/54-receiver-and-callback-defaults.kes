@@ -2,20 +2,24 @@ trait Measured {
     function width() : Int
     function area(height : Int = this.width()) : Int
 }
+
 class Square {
     has Measured
     public final side : Int
-    new(side : Int) {this.side=side}
-    public function width() : Int=this.side
-    public function area(height : Int = this.side) : Int=this.side*height
+    new(side : Int) { this.side = side }
+    public function width() : Int = this.side
+    public function area(height : Int = this.side) : Int = this.side * height
 }
-function measure(shape : &dyn Measured) : Int=shape.area()
-function count(shapes : List[Square],n : Int = shapes.length()) : Int=n
-function value(read : () -> Int,n : Int = read()) : Int=n
-let square:=Square(3)
+
+function measure(shape : &dyn Measured) : Int = shape.area()
+
+function count(shapes : List[Square], n : Int = shapes.length()) : Int = n
+
+function value(read : () -> Int, n : Int = read()) : Int = n
+let square := Square(3)
 print(square.area())
-let area:=square.area(_)
+let area := square.area(_)
 print(area(2))
 print(measure(square))
-print(count([Square(1),Square(2)]))
+print(count([Square(1), Square(2)]))
 print(value(square.width))

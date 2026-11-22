@@ -1,8 +1,8 @@
 // Comparison cases for tools/compare_kesplot.py. Writes PNGs to
 // /tmp/kesplot-compare; Python creates that directory first.
+import std.kesdas.{DataFrame, Series}
 import std.kesplot as plt
-import std.kesdas.{Series, DataFrame}
-import std.math.{sin, cos, sqrt}
+import std.math.{cos, sin, sqrt}
 
 function base() : plt.Figure {
     let fig := plt.Figure(style = plt.Style.science())
@@ -38,11 +38,14 @@ function scatter(out : String) : void or Error with Effects {
 }
 
 function bars(out : String) : void or Error with Effects {
-    let frame := DataFrame([
-        Series(["alpha", "beta", "gamma", "delta"], name = "category"),
-        Series([12, 8, 15, 10], name = "north"),
-        Series([9, 14, 7, 12], name = "south"),
-    ])
+    let frame :=
+        DataFrame(
+            [
+                Series(["alpha", "beta", "gamma", "delta"], name = "category"),
+                Series([12, 8, 15, 10], name = "north"),
+                Series([9, 14, 7, 12], name = "south"),
+            ],
+        )
     let fig := base()
     fig.barFrame(frame, x = "category", y = ["north", "south"])?
     fig.title("Grouped bars")
@@ -74,11 +77,14 @@ function histogram(out : String) : void or Error with Effects {
 }
 
 function boxCases(out : String) : void or Error with Effects {
-    let frame := DataFrame([
-        Series([1.0, 2.0, 2.2, 3.0, 4.0, 10.0, 2.5, 2.8], name = "A"),
-        Series([2.0, 3.0, 3.4, 4.0, 5.0, 6.0, 3.2, 3.8], name = "B"),
-        Series([0.5, 1.0, 1.1, 1.5, 2.0, 4.5, 1.2, 1.4], name = "C"),
-    ])
+    let frame :=
+        DataFrame(
+            [
+                Series([1.0, 2.0, 2.2, 3.0, 4.0, 10.0, 2.5, 2.8], name = "A"),
+                Series([2.0, 3.0, 3.4, 4.0, 5.0, 6.0, 3.2, 3.8], name = "B"),
+                Series([0.5, 1.0, 1.1, 1.5, 2.0, 4.5, 1.2, 1.4], name = "C"),
+            ],
+        )
     let fig := base()
     fig.boxFrame(frame)?
     fig.title("Box plots")
@@ -115,22 +121,37 @@ function fill(out : String) : void or Error with Effects {
 
 function pieCases(out : String) : void or Error with Effects {
     let fig := base()
-    fig.pie([35.0, 25.0, 20.0, 12.0, 8.0], ["North", "South", "East", "West", "Other"], startAngle = 90.0, autoPercent = true, donut = 0.4)
+    fig.pie(
+        [35.0, 25.0, 20.0, 12.0, 8.0],
+        ["North", "South", "East", "West", "Other"],
+        startAngle = 90.0,
+        autoPercent = true,
+        donut = 0.4,
+    )
     fig.title("Share of sales")
     fig.legend("outside right")
     fig.save(out + "/kesplot-pie.png")?
 }
 
 function heatmap(out : String) : void or Error with Effects {
-    let matrix := [[sin(r.toDouble() * 0.8) * cos(c.toDouble() * 0.6) for c in range(6)] for r in range(7)]
+    let matrix :=
+        [[sin(r.toDouble() * 0.8) * cos(c.toDouble() * 0.6) for c in range(6)] for r in range(7)]
     let fig := base()
-    fig.heatmap(matrix, ["r" + r.text() for r in range(7)], ["c" + c.text() for c in range(6)], "viridis", true, "value")
+    fig.heatmap(
+        matrix,
+        ["r" + r.text() for r in range(7)],
+        ["c" + c.text() for c in range(6)],
+        "viridis",
+        true,
+        "value",
+    )
     fig.title("Heatmap")
     fig.save(out + "/kesplot-heatmap.png")?
 }
 
 function contour(out : String) : void or Error with Effects {
-    let matrix := [[sin(r.toDouble() / 3.0) * cos(c.toDouble() / 4.0) for c in range(40)] for r in range(24)]
+    let matrix :=
+        [[sin(r.toDouble() / 3.0) * cos(c.toDouble() / 4.0) for c in range(40)] for r in range(24)]
     let fig := base()
     fig.contour(matrix, 7, "viridis", 1.0, [], [], true, "z")
     fig.title("Contour lines")

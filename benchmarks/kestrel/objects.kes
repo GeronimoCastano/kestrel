@@ -17,7 +17,8 @@ class Rectangle extends Shape {
         this.height = height
         this.scale = 1.0
     }
-    @override public function area() : double = this.width * this.height * this.scale
+    @override
+    public function area() : double = this.width * this.height * this.scale
 }
 
 class Square extends Rectangle {
@@ -26,13 +27,13 @@ class Square extends Rectangle {
         this.height = side
         this.scale = 1.0
     }
-    @override public function area() : double = this.width * this.width * this.scale
+    @override
+    public function area() : double = this.width * this.width * this.scale
 }
 
 function make(i : Int) : Box[dyn Measured] =
     if i % 3 == 0 then box(Shape(1.0))
-    else if i % 3 == 1 then box(Rectangle(2.0, 3.0))
-    else box(Square(4.0))
+    else if i % 3 == 1 then box(Rectangle(2.0, 3.0)) else box(Square(4.0))
 
 let shapes := Array.generate(2000000, i => make(i))
 let mut total := 0.0

@@ -4,10 +4,20 @@ import std.ml.{KNeighborsClassifier, accuracy}
 
 import std.process.{args}
 
-let REPETITIONS := if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 10 }) else 10
+let REPETITIONS :=
+    if args.toArray().length() > 0 then (match parseInt(args.toArray()[0]) { n => n, _ => 10 })
+    else 10
 
-let training := Tensor.generate((20000, 8), (i, j) => ((i * 1103515245 + j * 12345 + 12345) % 2147483648).toDouble() / 2147483648.0)
-let testing := Tensor.generate((2000, 8), (i, j) => ((i * 1103515245 + j * 12345 + 987654321) % 2147483648).toDouble() / 2147483648.0)
+let training :=
+    Tensor.generate(
+        (20000, 8),
+        (i, j) => ((i * 1103515245 + j * 12345 + 12345) % 2147483648).toDouble() / 2147483648.0,
+    )
+let testing :=
+    Tensor.generate(
+        (2000, 8),
+        (i, j) => ((i * 1103515245 + j * 12345 + 987654321) % 2147483648).toDouble() / 2147483648.0,
+    )
 let labels := Tensor.generate((20000,), i => if training[i, 0] > 0.5 then 1.0 else 0.0)
 let expected := Tensor.generate((2000,), i => if testing[i, 0] > 0.5 then 1.0 else 0.0)
 

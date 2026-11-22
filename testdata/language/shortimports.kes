@@ -1,7 +1,7 @@
 // The `std.` prefix is optional for standard modules. A local module with the
 // same name would win; write `std.math` when you need the standard one.
-import math.{max}
-import kesdas.{Series, DataFrame}
+import kesdas.{DataFrame, Series}
 import kesnet.optim.{Adam}
+import math.{max}
 
 function shortImports() : Int = max(2, 3)

@@ -1,14 +1,11 @@
 // A tour of the tactic language. Every theorem here is checked by the kernel
 // and erased before the program runs.
 
-function add(a : Nat, b : Nat) : Nat = match a {
-    Zero    => b,
-    Succ(k) => Succ(add(k, b)),
-}
+function add(a : Nat, b : Nat) : Nat = match a { Zero => b, Succ(k) => Succ(add(k, b)) }
 
 theorem addZeroR(n : Nat) : add(n, Zero) = n by {
     induction n {
-        Zero       => { rfl }
+        Zero => { rfl }
         Succ(k) ih => { simp [ih] }
     }
 }

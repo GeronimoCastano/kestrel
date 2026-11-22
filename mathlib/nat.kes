@@ -6,62 +6,38 @@
 /// Truncated subtraction: $a - b$ with a floor at zero.
 public function subNat(a : Nat, b : Nat) : Nat = match b {
     Zero => a,
-    Succ(k) => match a {
-        Zero => Zero,
-        Succ(j) => subNat(j, k),
-    },
+    Succ(k) => match a { Zero => Zero, Succ(j) => subNat(j, k) },
 }
 
 /// Exponentiation by repeated multiplication.
-public function powNat(x : Nat, n : Nat) : Nat = match n {
-    Zero => 1,
-    Succ(k) => x * powNat(x, k),
-}
+public function powNat(x : Nat, n : Nat) : Nat = match n { Zero => 1, Succ(k) => x * powNat(x, k) }
 
 /// The Boolean order: `leNat(a, b)` is true exactly when $a \le b$.
 public function leNat(a : Nat, b : Nat) : Bool = match b {
-    Zero => match a {
-        Zero => true,
-        Succ(_) => false,
-    },
-    Succ(j) => match a {
-        Zero => true,
-        Succ(k) => leNat(k, j),
-    },
+    Zero => match a { Zero => true, Succ(_) => false },
+    Succ(j) => match a { Zero => true, Succ(k) => leNat(k, j) },
 }
 
 /// The Boolean strict order: `ltNat(a, b)` is true exactly when $a < b$.
 public function ltNat(a : Nat, b : Nat) : Bool = match b {
     Zero => false,
-    Succ(j) => match a {
-        Zero => true,
-        Succ(k) => ltNat(k, j),
-    },
+    Succ(j) => match a { Zero => true, Succ(k) => ltNat(k, j) },
 }
 
 /// The smaller of two naturals, by cases on both arguments.
 public function minNat(a : Nat, b : Nat) : Nat = match a {
     Zero => Zero,
-    Succ(k) => match b {
-        Zero => Zero,
-        Succ(j) => Succ(minNat(k, j)),
-    },
+    Succ(k) => match b { Zero => Zero, Succ(j) => Succ(minNat(k, j)) },
 }
 
 /// The larger of two naturals, by cases on both arguments.
 public function maxNat(a : Nat, b : Nat) : Nat = match a {
     Zero => b,
-    Succ(k) => match b {
-        Zero => Succ(k),
-        Succ(j) => Succ(maxNat(k, j)),
-    },
+    Succ(k) => match b { Zero => Succ(k), Succ(j) => Succ(maxNat(k, j)) },
 }
 
 /// The predecessor, with a floor at zero.
-public function predNat(n : Nat) : Nat = match n {
-    Zero => Zero,
-    Succ(k) => k,
-}
+public function predNat(n : Nat) : Nat = match n { Zero => Zero, Succ(k) => k }
 
 /// Zero is the left identity of addition: $0 + n = n$.
 public theorem addZeroL(n : Nat) : Zero + n = n by {
@@ -112,11 +88,12 @@ public theorem addComm(a : Nat, b : Nat) : a + b = b + a by {
 }
 
 /// Addition is cancellative on the left: $a + b = a + c \to b = c$.
-public theorem addCancelL(a : Nat, b : Nat, c : Nat) :
-        a + b = a + c -> b = c by {
+public theorem addCancelL(a : Nat, b : Nat, c : Nat) : a + b = a + c -> b = c by {
     induction a {
-        Zero => { intro h
-                  exact h }
+        Zero => {
+            intro h
+            exact h
+        }
         Succ(k) ih => {
             intro h
             cases h
@@ -126,8 +103,7 @@ public theorem addCancelL(a : Nat, b : Nat, c : Nat) :
 }
 
 /// Addition is cancellative on the right: $b + a = c + a \to b = c$.
-public theorem addCancelR(a : Nat, b : Nat, c : Nat) :
-        b + a = c + a -> b = c by {
+public theorem addCancelR(a : Nat, b : Nat, c : Nat) : b + a = c + a -> b = c by {
     intro h
     have h1 := addComm(b, a)
     have h2 := addComm(c, a)
@@ -180,8 +156,7 @@ public theorem mulSuccR(a : Nat, b : Nat) : a * Succ(b) = a + a * b by {
 }
 
 /// Multiplication distributes over addition on the right: $(a+b) \cdot c = a \cdot c + b \cdot c$.
-public theorem mulDistribRight(a : Nat, b : Nat, c : Nat) :
-        (a + b) * c = a * c + b * c by {
+public theorem mulDistribRight(a : Nat, b : Nat, c : Nat) : (a + b) * c = a * c + b * c by {
     induction a {
         Zero => { rfl }
         Succ(k) ih => {
@@ -205,8 +180,7 @@ public theorem mulComm(a : Nat, b : Nat) : a * b = b * a by {
 }
 
 /// Multiplication associates: $(a \cdot b) \cdot c = a \cdot (b \cdot c)$.
-public theorem mulAssoc(a : Nat, b : Nat, c : Nat) :
-        (a * b) * c = a * (b * c) by {
+public theorem mulAssoc(a : Nat, b : Nat, c : Nat) : (a * b) * c = a * (b * c) by {
     induction a {
         Zero => { rfl }
         Succ(k) ih => {
@@ -218,8 +192,7 @@ public theorem mulAssoc(a : Nat, b : Nat, c : Nat) :
 }
 
 /// Multiplication distributes over addition on the left: $a \cdot (b+c) = a \cdot b + a \cdot c$.
-public theorem mulDistribLeft(a : Nat, b : Nat, c : Nat) :
-        a * (b + c) = a * b + a * c by {
+public theorem mulDistribLeft(a : Nat, b : Nat, c : Nat) : a * (b + c) = a * b + a * c by {
     trans ((b + c) * a)
     { exact mulComm(a, b + c) }
     trans (b * a + c * a)
@@ -237,8 +210,7 @@ public theorem powNatZero(x : Nat) : powNat(x, Zero) = 1 by {
 }
 
 /// The successor power equation: $x^{n+1} = x \cdot x^n$.
-public theorem powNatSucc(x : Nat, n : Nat) :
-        powNat(x, Succ(n)) = x * powNat(x, n) by {
+public theorem powNatSucc(x : Nat, n : Nat) : powNat(x, Succ(n)) = x * powNat(x, n) by {
     rfl
 }
 
@@ -248,8 +220,11 @@ public theorem powNatOne(x : Nat) : powNat(x, 1) = x by {
 }
 
 /// Powers add: $x^{m+n} = x^m \cdot x^n$.
-public theorem powNatAdd(x : Nat, m : Nat, n : Nat) :
-        powNat(x, m + n) = powNat(x, m) * powNat(x, n) by {
+public theorem powNatAdd(
+    x : Nat,
+    m : Nat,
+    n : Nat,
+) : powNat(x, m + n) = powNat(x, m) * powNat(x, n) by {
     induction m {
         Zero => { simp }
         Succ(k) ih => {
@@ -261,11 +236,12 @@ public theorem powNatAdd(x : Nat, m : Nat, n : Nat) :
 }
 
 /// Powers multiply: $(x^m)^n = x^{m \cdot n}$.
-public theorem powNatMul(x : Nat, m : Nat, n : Nat) :
-        powNat(powNat(x, m), n) = powNat(x, m * n) by {
+public theorem powNatMul(x : Nat, m : Nat, n : Nat) : powNat(powNat(x, m), n) = powNat(x, m * n) by {
     induction n {
-        Zero => { rw [mulZeroR]
-                  rfl }
+        Zero => {
+            rw [mulZeroR]
+            rfl
+        }
         Succ(k) ih => {
             rw [ih]
             rw [mulSuccR]
@@ -323,8 +299,7 @@ public theorem leNatZeroL(b : Nat) : leNat(Zero, b) = true by {
 }
 
 /// The Boolean order peels a successor from both sides: $\mathrm{leNat}(a+1,b+1) = \mathrm{leNat}(a,b)$.
-public theorem leNatSuccR(a : Nat, b : Nat) :
-        leNat(Succ(a), Succ(b)) = leNat(a, b) by {
+public theorem leNatSuccR(a : Nat, b : Nat) : leNat(Succ(a), Succ(b)) = leNat(a, b) by {
     rfl
 }
 
@@ -352,8 +327,11 @@ public theorem leNatTotal(a : Nat, b : Nat) : (leNat(a, b) || leNat(b, a)) = tru
 }
 
 /// The Boolean order is transitive.
-public theorem leNatTrans(a : Nat, b : Nat, c : Nat) :
-        leNat(a, b) = true -> leNat(b, c) = true -> leNat(a, c) = true by {
+public theorem leNatTrans(
+    a : Nat,
+    b : Nat,
+    c : Nat,
+) : leNat(a, b) = true -> leNat(b, c) = true -> leNat(a, c) = true by {
     induction a generalizing b, c {
         Zero => {
             intro h1
@@ -388,8 +366,10 @@ public theorem leNatTrans(a : Nat, b : Nat, c : Nat) :
 }
 
 /// The Boolean order is antisymmetric.
-public theorem leNatAntisymm(a : Nat, b : Nat) :
-        leNat(a, b) = true -> leNat(b, a) = true -> a = b by {
+public theorem leNatAntisymm(
+    a : Nat,
+    b : Nat,
+) : leNat(a, b) = true -> leNat(b, a) = true -> a = b by {
     induction a generalizing b {
         Zero => {
             intro b

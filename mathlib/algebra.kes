@@ -2,21 +2,22 @@
 // forall-typed parameter per law. No trait method is read by the kernel, so
 // every structure states its laws explicitly.
 
-import nat.{mulZeroR, mulSuccR}
+import nat.{mulSuccR, mulZeroR}
 
 /// Repeated application of a binary operation.
-public function power[T](op : (T, T) -> T, e : T, x : T, n : Nat) : T = match n {
-    Zero => e,
-    Succ(k) => op(x, power(op, e, x, k)),
-}
+public function power[T](op : (T, T) -> T, e : T, x : T, n : Nat) : T =
+    match n { Zero => e, Succ(k) => op(x, power(op, e, x, k)) }
 
 /// Powers add in a monoid: $x^{m+n} = x^m \cdot x^n$.
-public theorem powerAdd[T](op : (T, T) -> T, e : T, x : T,
-                           hIdL : forall a : T, op(e, a) = a,
-                           hAssoc : forall a : T, forall b : T, forall c : T,
-                                    op(op(a, b), c) = op(a, op(b, c)),
-                           m : Nat, n : Nat) :
-        power(op, e, x, m + n) = op(power(op, e, x, m), power(op, e, x, n)) by {
+public theorem powerAdd[T](
+    op : (T, T) -> T,
+    e : T,
+    x : T,
+    hIdL : forall a : T, op(e, a) = a,
+    hAssoc : forall a : T, forall b : T, forall c : T, op(op(a, b), c) = op(a, op(b, c)),
+    m : Nat,
+    n : Nat,
+) : power(op, e, x, m + n) = op(power(op, e, x, m), power(op, e, x, n)) by {
     induction m {
         Zero => { simp [hIdL] }
         Succ(k) ih => { simp [hAssoc, ih] }
@@ -24,13 +25,15 @@ public theorem powerAdd[T](op : (T, T) -> T, e : T, x : T,
 }
 
 /// Powers multiply in a monoid: $(x^m)^n = x^{m \cdot n}$.
-public theorem powerMul[T](op : (T, T) -> T, e : T, x : T,
-                           hIdL : forall a : T, op(e, a) = a,
-                           hAssoc : forall a : T, forall b : T, forall c : T,
-                                    op(op(a, b), c) = op(a, op(b, c)),
-                           m : Nat, n : Nat) :
-        power(op, e, power(op, e, x, m), n) =
-        power(op, e, x, m * n) by {
+public theorem powerMul[T](
+    op : (T, T) -> T,
+    e : T,
+    x : T,
+    hIdL : forall a : T, op(e, a) = a,
+    hAssoc : forall a : T, forall b : T, forall c : T, op(op(a, b), c) = op(a, op(b, c)),
+    m : Nat,
+    n : Nat,
+) : power(op, e, power(op, e, x, m), n) = power(op, e, x, m * n) by {
     induction n {
         Zero => { simp [mulZeroR] }
         Succ(k) ih => { simp [mulSuccR, powerAdd, ih] }
@@ -38,20 +41,27 @@ public theorem powerMul[T](op : (T, T) -> T, e : T, x : T,
 }
 
 /// The first power is the element itself: $x^1 = x$.
-public theorem powerOne[T](op : (T, T) -> T, e : T, x : T,
-                           hIdR : forall a : T, op(a, e) = a) :
-        power(op, e, x, 1) = x by {
+public theorem powerOne[T](
+    op : (T, T) -> T,
+    e : T,
+    x : T,
+    hIdR : forall a : T, op(a, e) = a,
+) : power(op, e, x, 1) = x by {
     simp [hIdR]
 }
 
 /// Left cancellation in a group: $a b = a c \to b = c$.
-public theorem groupCancelL[T](op : (T, T) -> T, e : T, inv : (T) -> T,
-                               hAssoc : forall a : T, forall b : T, forall c : T,
-                                        op(op(a, b), c) = op(a, op(b, c)),
-                               hIdL : forall a : T, op(e, a) = a,
-                               hInvL : forall a : T, op(inv(a), a) = e,
-                               a : T, b : T, c : T) :
-        op(a, b) = op(a, c) -> b = c by {
+public theorem groupCancelL[T](
+    op : (T, T) -> T,
+    e : T,
+    inv : (T) -> T,
+    hAssoc : forall a : T, forall b : T, forall c : T, op(op(a, b), c) = op(a, op(b, c)),
+    hIdL : forall a : T, op(e, a) = a,
+    hInvL : forall a : T, op(inv(a), a) = e,
+    a : T,
+    b : T,
+    c : T,
+) : op(a, b) = op(a, c) -> b = c by {
     intro h
     have hboth := congrArg(x => op(inv(a), x), h)
     have hleft : op(inv(a), op(a, b)) = b by {
@@ -68,14 +78,17 @@ public theorem groupCancelL[T](op : (T, T) -> T, e : T, inv : (T) -> T,
 }
 
 /// A right inverse is unique: $a b = e \to b = a^{-1}$.
-public theorem groupInvUnique[T](op : (T, T) -> T, e : T, inv : (T) -> T,
-                                 hAssoc : forall a : T, forall b : T, forall c : T,
-                                          op(op(a, b), c) = op(a, op(b, c)),
-                                 hIdL : forall a : T, op(e, a) = a,
-                                 hIdR : forall a : T, op(a, e) = a,
-                                 hInvL : forall a : T, op(inv(a), a) = e,
-                                 a : T, b : T) :
-        op(a, b) = e -> b = inv(a) by {
+public theorem groupInvUnique[T](
+    op : (T, T) -> T,
+    e : T,
+    inv : (T) -> T,
+    hAssoc : forall a : T, forall b : T, forall c : T, op(op(a, b), c) = op(a, op(b, c)),
+    hIdL : forall a : T, op(e, a) = a,
+    hIdR : forall a : T, op(a, e) = a,
+    hInvL : forall a : T, op(inv(a), a) = e,
+    a : T,
+    b : T,
+) : op(a, b) = e -> b = inv(a) by {
     intro h
     have hboth := congrArg(x => op(inv(a), x), h)
     have hleft : op(inv(a), op(a, b)) = b by {
@@ -92,55 +105,62 @@ public theorem groupInvUnique[T](op : (T, T) -> T, e : T, inv : (T) -> T,
 }
 
 /// The inverse is an involution: $(a^{-1})^{-1} = a$.
-public theorem groupInvInv[T](op : (T, T) -> T, e : T, inv : (T) -> T,
-                              hAssoc : forall a : T, forall b : T, forall c : T,
-                                       op(op(a, b), c) = op(a, op(b, c)),
-                              hIdL : forall a : T, op(e, a) = a,
-                              hIdR : forall a : T, op(a, e) = a,
-                              hInvL : forall a : T, op(inv(a), a) = e,
-                              hInvR : forall a : T, op(a, inv(a)) = e,
-                              a : T) :
-        inv(inv(a)) = a by {
+public theorem groupInvInv[T](
+    op : (T, T) -> T,
+    e : T,
+    inv : (T) -> T,
+    hAssoc : forall a : T, forall b : T, forall c : T, op(op(a, b), c) = op(a, op(b, c)),
+    hIdL : forall a : T, op(e, a) = a,
+    hIdR : forall a : T, op(a, e) = a,
+    hInvL : forall a : T, op(inv(a), a) = e,
+    hInvR : forall a : T, op(a, inv(a)) = e,
+    a : T,
+) : inv(inv(a)) = a by {
     have h := groupInvUnique(op, e, inv, inv(a), a)
     have h2 := h(hInvL(a))
     exact symm(h2)
 }
 
 /// Zero times anything is zero: $0 \cdot a = 0$ in a ring.
-public theorem ringMulZeroL[T](add : (T, T) -> T, zero : T, neg : (T) -> T,
-                               mul : (T, T) -> T,
-                               hAddAssoc : forall a : T, forall b : T, forall c : T,
-                                            add(add(a, b), c) = add(a, add(b, c)),
-                               hAddIdL : forall a : T, add(zero, a) = a,
-                               hAddIdR : forall a : T, add(a, zero) = a,
-                               hAddInvL : forall a : T, add(neg(a), a) = zero,
-                               hMulDistribR : forall a : T, forall b : T, forall c : T,
-                                              mul(add(a, b), c) = add(mul(a, c), mul(b, c)),
-                               a : T) : mul(zero, a) = zero by {
+public theorem ringMulZeroL[T](
+    add : (T, T) -> T,
+    zero : T,
+    neg : (T) -> T,
+    mul : (T, T) -> T,
+    hAddAssoc : forall a : T, forall b : T, forall c : T, add(add(a, b), c) = add(a, add(b, c)),
+    hAddIdL : forall a : T, add(zero, a) = a,
+    hAddIdR : forall a : T, add(a, zero) = a,
+    hAddInvL : forall a : T, add(neg(a), a) = zero,
+    hMulDistribR : forall a : T, forall b : T, forall c : T, mul(add(a, b), c) =
+        add(mul(a, c), mul(b, c)),
+    a : T,
+) : mul(zero, a) = zero by {
     have hzero : add(zero, zero) = zero := hAddIdL(zero)
     have hcong := congrArg(x => mul(x, a), hzero)
     have hdist := hMulDistribR(zero, zero, a)
-    have h2 : mul(zero, a) = add(mul(zero, a), mul(zero, a)) :=
-        trans(symm(hcong), hdist)
+    have h2 : mul(zero, a) = add(mul(zero, a), mul(zero, a)) := trans(symm(hcong), hdist)
     have hrr := hAddIdR(mul(zero, a))
-    have hprem : add(mul(zero, a), mul(zero, a)) = add(mul(zero, a), zero) :=
-        trans(symm(h2), symm(hrr))
+    have hprem : add(mul(zero, a), mul(zero, a)) =
+        add(mul(zero, a), zero) := trans(symm(h2), symm(hrr))
     have hcancel := groupCancelL(add, zero, neg, mul(zero, a), mul(zero, a), zero)
     exact hcancel(hprem)
 }
 
 /// Anything times zero is zero: $a \cdot 0 = 0$ in a ring.
-public theorem ringMulZeroR[T](add : (T, T) -> T, zero : T, neg : (T) -> T,
-                               mul : (T, T) -> T,
-                               hAddAssoc : forall a : T, forall b : T, forall c : T,
-                                            add(add(a, b), c) = add(a, add(b, c)),
-                               hAddIdL : forall a : T, add(zero, a) = a,
-                               hAddIdR : forall a : T, add(a, zero) = a,
-                               hAddInvL : forall a : T, add(neg(a), a) = zero,
-                               hMulDistribR : forall a : T, forall b : T, forall c : T,
-                                              mul(add(a, b), c) = add(mul(a, c), mul(b, c)),
-                               hMulComm : forall a : T, forall b : T, mul(a, b) = mul(b, a),
-                               a : T) : mul(a, zero) = zero by {
+public theorem ringMulZeroR[T](
+    add : (T, T) -> T,
+    zero : T,
+    neg : (T) -> T,
+    mul : (T, T) -> T,
+    hAddAssoc : forall a : T, forall b : T, forall c : T, add(add(a, b), c) = add(a, add(b, c)),
+    hAddIdL : forall a : T, add(zero, a) = a,
+    hAddIdR : forall a : T, add(a, zero) = a,
+    hAddInvL : forall a : T, add(neg(a), a) = zero,
+    hMulDistribR : forall a : T, forall b : T, forall c : T, mul(add(a, b), c) =
+        add(mul(a, c), mul(b, c)),
+    hMulComm : forall a : T, forall b : T, mul(a, b) = mul(b, a),
+    a : T,
+) : mul(a, zero) = zero by {
     have hc := hMulComm(a, zero)
     have hz := ringMulZeroL(add, zero, neg, mul, a)
     trans (mul(zero, a))
@@ -149,23 +169,25 @@ public theorem ringMulZeroR[T](add : (T, T) -> T, zero : T, neg : (T) -> T,
 }
 
 /// A negative on the left: $(-a) \cdot b = -(a \cdot b)$.
-public theorem ringMulNegL[T](add : (T, T) -> T, zero : T, neg : (T) -> T,
-                              mul : (T, T) -> T,
-                              hAddAssoc : forall a : T, forall b : T, forall c : T,
-                                           add(add(a, b), c) = add(a, add(b, c)),
-                              hAddIdL : forall a : T, add(zero, a) = a,
-                              hAddIdR : forall a : T, add(a, zero) = a,
-                              hAddInvL : forall a : T, add(neg(a), a) = zero,
-                              hAddInvR : forall a : T, add(a, neg(a)) = zero,
-                              hMulDistribR : forall a : T, forall b : T, forall c : T,
-                                             mul(add(a, b), c) = add(mul(a, c), mul(b, c)),
-                              a : T, b : T) :
-        mul(neg(a), b) = neg(mul(a, b)) by {
+public theorem ringMulNegL[T](
+    add : (T, T) -> T,
+    zero : T,
+    neg : (T) -> T,
+    mul : (T, T) -> T,
+    hAddAssoc : forall a : T, forall b : T, forall c : T, add(add(a, b), c) = add(a, add(b, c)),
+    hAddIdL : forall a : T, add(zero, a) = a,
+    hAddIdR : forall a : T, add(a, zero) = a,
+    hAddInvL : forall a : T, add(neg(a), a) = zero,
+    hAddInvR : forall a : T, add(a, neg(a)) = zero,
+    hMulDistribR : forall a : T, forall b : T, forall c : T, mul(add(a, b), c) =
+        add(mul(a, c), mul(b, c)),
+    a : T,
+    b : T,
+) : mul(neg(a), b) = neg(mul(a, b)) by {
     have hzero := hAddInvR(a)
     have hcong := congrArg(x => mul(x, b), hzero)
     have hdist := hMulDistribR(a, neg(a), b)
-    have hsum0 : add(mul(a, b), mul(neg(a), b)) = mul(zero, b) :=
-        trans(symm(hdist), hcong)
+    have hsum0 : add(mul(a, b), mul(neg(a), b)) = mul(zero, b) := trans(symm(hdist), hcong)
     have hz := ringMulZeroL(add, zero, neg, mul, b)
     have hsum : add(mul(a, b), mul(neg(a), b)) = zero := trans(hsum0, hz)
     have hui := groupInvUnique(add, zero, neg, mul(a, b), mul(neg(a), b))
@@ -173,26 +195,28 @@ public theorem ringMulNegL[T](add : (T, T) -> T, zero : T, neg : (T) -> T,
 }
 
 /// A negative on the right: $a \cdot (-b) = -(a \cdot b)$.
-public theorem ringMulNegR[T](add : (T, T) -> T, zero : T, neg : (T) -> T,
-                              mul : (T, T) -> T,
-                              hAddAssoc : forall a : T, forall b : T, forall c : T,
-                                           add(add(a, b), c) = add(a, add(b, c)),
-                              hAddIdL : forall a : T, add(zero, a) = a,
-                              hAddIdR : forall a : T, add(a, zero) = a,
-                              hAddInvL : forall a : T, add(neg(a), a) = zero,
-                              hAddInvR : forall a : T, add(a, neg(a)) = zero,
-                              hMulDistribL : forall a : T, forall b : T, forall c : T,
-                                             mul(a, add(b, c)) = add(mul(a, b), mul(a, c)),
-                              hMulDistribR : forall a : T, forall b : T, forall c : T,
-                                             mul(add(a, b), c) = add(mul(a, c), mul(b, c)),
-                              hMulComm : forall a : T, forall b : T, mul(a, b) = mul(b, a),
-                              a : T, b : T) :
-        mul(a, neg(b)) = neg(mul(a, b)) by {
+public theorem ringMulNegR[T](
+    add : (T, T) -> T,
+    zero : T,
+    neg : (T) -> T,
+    mul : (T, T) -> T,
+    hAddAssoc : forall a : T, forall b : T, forall c : T, add(add(a, b), c) = add(a, add(b, c)),
+    hAddIdL : forall a : T, add(zero, a) = a,
+    hAddIdR : forall a : T, add(a, zero) = a,
+    hAddInvL : forall a : T, add(neg(a), a) = zero,
+    hAddInvR : forall a : T, add(a, neg(a)) = zero,
+    hMulDistribL : forall a : T, forall b : T, forall c : T, mul(a, add(b, c)) =
+        add(mul(a, b), mul(a, c)),
+    hMulDistribR : forall a : T, forall b : T, forall c : T, mul(add(a, b), c) =
+        add(mul(a, c), mul(b, c)),
+    hMulComm : forall a : T, forall b : T, mul(a, b) = mul(b, a),
+    a : T,
+    b : T,
+) : mul(a, neg(b)) = neg(mul(a, b)) by {
     have hzero := hAddInvR(b)
     have hcong := congrArg(x => mul(a, x), hzero)
     have hdist := hMulDistribL(a, b, neg(b))
-    have hsum0 : add(mul(a, b), mul(a, neg(b))) = mul(a, zero) :=
-        trans(symm(hdist), hcong)
+    have hsum0 : add(mul(a, b), mul(a, neg(b))) = mul(a, zero) := trans(symm(hdist), hcong)
     have hz := ringMulZeroR(add, zero, neg, mul, a)
     have hsum : add(mul(a, b), mul(a, neg(b))) = zero := trans(hsum0, hz)
     have hui := groupInvUnique(add, zero, neg, mul(a, b), mul(a, neg(b)))
@@ -200,14 +224,17 @@ public theorem ringMulNegR[T](add : (T, T) -> T, zero : T, neg : (T) -> T,
 }
 
 /// Negation is an involution in a ring: $-(-a) = a$.
-public theorem ringNegNeg[T](add : (T, T) -> T, zero : T, neg : (T) -> T,
-                             hAddAssoc : forall a : T, forall b : T, forall c : T,
-                                          add(add(a, b), c) = add(a, add(b, c)),
-                             hAddIdL : forall a : T, add(zero, a) = a,
-                             hAddIdR : forall a : T, add(a, zero) = a,
-                             hAddInvL : forall a : T, add(neg(a), a) = zero,
-                             hAddInvR : forall a : T, add(a, neg(a)) = zero,
-                             a : T) : neg(neg(a)) = a by {
+public theorem ringNegNeg[T](
+    add : (T, T) -> T,
+    zero : T,
+    neg : (T) -> T,
+    hAddAssoc : forall a : T, forall b : T, forall c : T, add(add(a, b), c) = add(a, add(b, c)),
+    hAddIdL : forall a : T, add(zero, a) = a,
+    hAddIdR : forall a : T, add(a, zero) = a,
+    hAddInvL : forall a : T, add(neg(a), a) = zero,
+    hAddInvR : forall a : T, add(a, neg(a)) = zero,
+    a : T,
+) : neg(neg(a)) = a by {
     have h := groupInvInv(add, zero, neg, a)
     exact h
 }

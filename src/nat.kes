@@ -1,15 +1,10 @@
 // Natural-number arithmetic as ordinary structural functions, with the first
 // identities checked by the proof kernel. The built-in `+` and `*` stay
 // available; these names give proofs something to unfold.
-public function plus(a : Nat, b : Nat) : Nat = match a {
-    Zero => b,
-    Succ(k) => Succ(plus(k, b)),
-}
+public function plus(a : Nat, b : Nat) : Nat = match a { Zero => b, Succ(k) => Succ(plus(k, b)) }
 
-public function times(a : Nat, b : Nat) : Nat = match a {
-    Zero => Zero,
-    Succ(k) => plus(b, times(k, b)),
-}
+public function times(a : Nat, b : Nat) : Nat =
+    match a { Zero => Zero, Succ(k) => plus(b, times(k, b)) }
 
 @simp
 public theorem plusZeroR(n : Nat) : plus(n, Zero) = n by {

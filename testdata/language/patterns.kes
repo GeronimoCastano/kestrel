@@ -1,16 +1,15 @@
 // Alternatives and ranges in patterns: one arm body for several shapes, and
 // integer intervals with `..` (half-open) and `..=` (closed).
 
-function classOf(b : Int) : String = match b {
-    48..=57 => "digit",
-    65..=90 | 97..=122 => "letter",
-    32 | 9 | 10 | 13 => "space",
-    _ => "other",
-}
+function classOf(b : Int) : String =
+    match b {
+        48..=57 => "digit",
+        65..=90 | 97..=122 => "letter",
+        32 | 9 | 10 | 13 => "space",
+        _ => "other",
+    }
 
-function everyBool(b : Bool) : Int = match b {
-    true | false => 1,
-}
+function everyBool(b : Bool) : Int = match b { true | false => 1, }
 
 enum Direction {
     North
@@ -19,17 +18,10 @@ enum Direction {
     West
 }
 
-function vertical(d : Direction) : Bool = match d {
-    North | South => true,
-    East | West => false,
-}
+function vertical(d : Direction) : Bool = match d { North | South => true, East | West => false }
 
-function sign(n : Int) : String = match n {
-    -10..0 => "negative",
-    0 => "zero",
-    1..=9 => "small",
-    _ => "large",
-}
+function sign(n : Int) : String =
+    match n { -10..0 => "negative", 0 => "zero", 1..=9 => "small", _ => "large" }
 
 function described(n : Int, loud : Bool) : String = match n {
     -5..0 | 100..=200 if loud => "loud edge",

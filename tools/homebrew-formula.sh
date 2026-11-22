@@ -2,7 +2,7 @@
 # Prints the Homebrew formula for a release from its SHA256SUMS, for the tap at
 # github.com/GeronimoCastano/homebrew-kestrel:
 #
-#   tools/homebrew-formula.sh 0.1.3 SHA256SUMS > Formula/kestrel.rb
+#   tools/homebrew-formula.sh 0.2.0 SHA256SUMS > Formula/kestrel.rb
 #
 # A third argument replaces the download location, so CI can install a build that is
 # not released yet.

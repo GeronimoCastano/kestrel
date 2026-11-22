@@ -2,31 +2,44 @@
 // The theorems mirror the FamUnion, FamInter and FamCombo worlds: membership
 // unfolds to ordinary quantifiers, so the usual logical tactics apply.
 
-theorem familyUnionIntro[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F,
-                            x : U, hx : x ∈ A) : x ∈ ⋃₀ F by {
+theorem familyUnionIntro[U](
+    F : Set[Set[U]],
+    A : Set[U],
+    hF : A ∈ F,
+    x : U,
+    hx : x ∈ A,
+) : x ∈ ⋃₀ F by {
     exists A
     constructor
     exact hF
     exact hx
 }
 
-theorem familyUnionElim[U](F : Set[Set[U]], x : U, h : x ∈ ⋃₀ F) :
-        exists A : Set[U], A ∈ F and x ∈ A by {
+theorem familyUnionElim[U](
+    F : Set[Set[U]],
+    x : U,
+    h : x ∈ ⋃₀ F,
+) : exists A : Set[U], A ∈ F and x ∈ A by {
     exact h
 }
 
-theorem familyInterIntro[U](F : Set[Set[U]], x : U,
-                            h : forall A : Set[U], A ∈ F -> x ∈ A) : x ∈ ⋂₀ F by {
+theorem familyInterIntro[U](
+    F : Set[Set[U]],
+    x : U,
+    h : forall A : Set[U], A ∈ F -> x ∈ A,
+) : x ∈ ⋂₀ F by {
     exact h
 }
 
-theorem familyInterElim[U](F : Set[Set[U]], x : U, h : x ∈ ⋂₀ F) :
-        forall A : Set[U], A ∈ F -> x ∈ A by {
+theorem familyInterElim[U](
+    F : Set[Set[U]],
+    x : U,
+    h : x ∈ ⋂₀ F,
+) : forall A : Set[U], A ∈ F -> x ∈ A by {
     exact h
 }
 
-theorem familyUnionMono[U](F : Set[Set[U]], G : Set[Set[U]], h : F ⊆ G) :
-        ⋃₀ F ⊆ ⋃₀ G by {
+theorem familyUnionMono[U](F : Set[Set[U]], G : Set[Set[U]], h : F ⊆ G) : ⋃₀ F ⊆ ⋃₀ G by {
     intro x
     intro hx
     cases hx
@@ -38,8 +51,7 @@ theorem familyUnionMono[U](F : Set[Set[U]], G : Set[Set[U]], h : F ⊆ G) :
     exact hxwr
 }
 
-theorem memberSubsetUnion[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F) :
-        A ⊆ ⋃₀ F by {
+theorem memberSubsetUnion[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F) : A ⊆ ⋃₀ F by {
     intro x
     intro hx
     exists A
@@ -48,15 +60,14 @@ theorem memberSubsetUnion[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F) :
     exact hx
 }
 
-theorem familyInterSubset[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F) :
-        ⋂₀ F ⊆ A by {
+theorem familyInterSubset[U](F : Set[Set[U]], A : Set[U], hF : A ∈ F) : ⋂₀ F ⊆ A by {
     intro x
     intro hx
     apply hx
     exact hF
 }
 
-theorem unionPair[U](A : Set[U], B : Set[U]) : ⋃₀ {A, B} = A ∪ B by {
+theorem unionPair[U](A : Set[U], B : Set[U]) : ⋃₀ { A, B } = A ∪ B by {
     ext
     intro x
     intro hx
@@ -86,7 +97,7 @@ theorem unionPair[U](A : Set[U], B : Set[U]) : ⋃₀ {A, B} = A ∪ B by {
     exact hxr
 }
 
-theorem interPair[U](A : Set[U], B : Set[U]) : ⋂₀ {A, B} = A ∩ B by {
+theorem interPair[U](A : Set[U], B : Set[U]) : ⋂₀ { A, B } = A ∩ B by {
     ext
     intro x
     intro hx
@@ -109,29 +120,29 @@ theorem interPair[U](A : Set[U], B : Set[U]) : ⋂₀ {A, B} = A ∩ B by {
     exact hxr
 }
 
-theorem familyDeMorgan[U](F : Set[Set[U]]) :
-        (⋃₀ F)ᶜ = {x : U | forall A : Set[U], A ∈ F -> x ∉ A} by {
-    ext
-    intro x
-    intro h
-    intro A
-    intro hAF
-    intro hxA
-    apply h
-    exists A
-    constructor
-    exact hAF
-    exact hxA
-    intro x
-    intro h
-    intro hx
-    cases hx
-    cases hxw
-    have hs := h(s)
-    exact hs(hxwl, hxwr)
-}
+theorem familyDeMorgan[U](F : Set[Set[U]]) : (⋃₀ F)ᶜ =
+    { x : U | forall A : Set[U], A ∈ F -> x ∉ A } by {
+        ext
+        intro x
+        intro h
+        intro A
+        intro hAF
+        intro hxA
+        apply h
+        exists A
+        constructor
+        exact hAF
+        exact hxA
+        intro x
+        intro h
+        intro hx
+        cases hx
+        cases hxw
+        have hs := h(s)
+        exact hs(hxwl, hxwr)
+    }
 
-theorem builderSingleton[U](a : U) : {x : U | x = a} = {a} by {
+theorem builderSingleton[U](a : U) : { x : U | x = a } = { a } by {
     ext
     intro x
     intro h
@@ -153,7 +164,6 @@ theorem emptyElim[U](x : U) : x ∈ ∅ -> false by {
     exact h
 }
 
-theorem aliasSpelling[U](F : Set[Set[U]], x : U, h : x ∈ \union0 F) :
-        x ∈ ⋃₀ F by {
+theorem aliasSpelling[U](F : Set[Set[U]], x : U, h : x ∈ \union0 F) : x ∈ ⋃₀ F by {
     exact h
 }

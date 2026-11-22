@@ -35,7 +35,8 @@ class TomlReader {
         this.arrays = Map()
     }
 
-    public function peek() : Int = if this.at < this.text.byteLength() then this.text.byteAt(this.at) else -1
+    public function peek() : Int =
+        if this.at < this.text.byteLength() then this.text.byteAt(this.at) else -1
 
     public function peekAt(offset : Int) : Int =
         if this.at + offset < this.text.byteLength() then this.text.byteAt(this.at + offset) else -1
@@ -73,13 +74,12 @@ class TomlReader {
     }
 }
 
-function bareKeyByte(b : Int) : Bool = b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 95 || b == 45
+function bareKeyByte(b : Int) : Bool =
+    b >= 65 && b <= 90 || b >= 97 && b <= 122 || b >= 48 && b <= 57 || b == 95 || b == 45
 
 function hexDigit(b : Int) : Int =
     if b >= 48 && b <= 57 then b - 48
-    else if b >= 97 && b <= 102 then b - 87
-    else if b >= 65 && b <= 70 then b - 55
-    else -1
+    else if b >= 97 && b <= 102 then b - 87 else if b >= 65 && b <= 70 then b - 55 else -1
 
 function readEscape(mut r : TomlReader, digits : Int) : String or Error {
     let mut code := 0
@@ -118,7 +118,10 @@ function readBasic(mut r : TomlReader, multi : Bool) : String or Error {
             }
             break
         }
-        if (b < 32 && b != 9 && b != 10 && b != 13) || b == 127 || (b == 13 && (!multi || r.peekAt(1) != 10)) { return r.fail("a string contains a control character") }
+        if (b < 32 && b != 9 && b != 10 && b != 13) ||
+            b == 127 || (b == 13 && (!multi || r.peekAt(1) != 10)) {
+                return r.fail("a string contains a control character")
+            }
         if b == 10 {
             if !multi {
                 return r.fail("a line break inside a one-line string")
@@ -152,7 +155,9 @@ function readBasic(mut r : TomlReader, multi : Bool) : String or Error {
                 // A backslash at the end of a line joins it to the next text.
                 r.at -= 1
                 r.skipBlank()
-                if r.peek() != 10 && !r.startsWith("\r\n") { return r.fail("a continuation needs a line break") }
+                if r.peek() != 10 && !r.startsWith("\r\n") {
+                    return r.fail("a continuation needs a line break")
+                }
                 while r.peek() == 32 || r.peek() == 9 || r.peek() == 10 || r.peek() == 13 {
                     if r.peek() == 10 { r.line += 1 }
                     r.at += 1
@@ -183,7 +188,10 @@ function readLiteral(mut r : TomlReader, multi : Bool) : String or Error {
             while multi && r.peek() == 39 && extra < 2 { text = text + "'"; r.at += 1; extra += 1 }
             return text.replace("\r\n", "\n")
         }
-        if (b < 32 && b != 9 && b != 10 && b != 13) || b == 127 || (b == 13 && (!multi || r.peekAt(1) != 10)) { return r.fail("a string contains a control character") }
+        if (b < 32 && b != 9 && b != 10 && b != 13) ||
+            b == 127 || (b == 13 && (!multi || r.peekAt(1) != 10)) {
+                return r.fail("a string contains a control character")
+            }
         if b == 10 {
             if !multi {
                 return r.fail("a line break inside a one-line string")
@@ -271,13 +279,15 @@ function digitsOnly(text : String) : Bool {
 }
 
 function looksLikeDate(token : String) : Bool =
-    token.byteLength() >= 10 && digitsOnly(token.byteSlice(0, 4)) && token.byteAt(4) == 45 && token.byteAt(7) == 45 ||
+    token.byteLength() >= 10 &&
+            digitsOnly(token.byteSlice(0, 4)) && token.byteAt(4) == 45 && token.byteAt(7) == 45 ||
         token.byteLength() >= 8 && digitsOnly(token.byteSlice(0, 2)) && token.byteAt(2) == 58
 
 function validTime(text : String) : Bool {
     let n := text.byteLength()
     if n < 8 || text.byteAt(2) != 58 || text.byteAt(5) != 58 { return false }
-    if !digitsOnly(text.byteSlice(0, 2)) || !digitsOnly(text.byteSlice(3, 5)) || !digitsOnly(text.byteSlice(6, 8)) { return false }
+    if !digitsOnly(text.byteSlice(0, 2)) ||
+        !digitsOnly(text.byteSlice(3, 5)) || !digitsOnly(text.byteSlice(6, 8)) { return false }
     let h := match parseInt(text.byteSlice(0, 2)) { value => value, _ => 99 }
     let m := match parseInt(text.byteSlice(3, 5)) { value => value, _ => 99 }
     let second := match parseInt(text.byteSlice(6, 8)) { value => value, _ => 99 }
@@ -297,13 +307,13 @@ function validDate(text : String) : Bool {
     let separator := text.byteAt(10)
     if separator != 84 && separator != 116 && separator != 32 { return false }
     let mut end := n
-    if text.endsWith("Z") || text.endsWith("z") { end -= 1 }
-    else if n >= 25 && (text.byteAt(n - 6) == 43 || text.byteAt(n - 6) == 45) {
-        let zone := text.byteSlice(n - 6, n)
-        let ok := match datetime.parse(date + "T00:00:00" + zone) { value => true, _ => false }
-        if !ok { return false }
-        end -= 6
-    }
+    if text.endsWith("Z") || text.endsWith("z") { end -= 1 } else if n >= 25 &&
+        (text.byteAt(n - 6) == 43 || text.byteAt(n - 6) == 45) {
+            let zone := text.byteSlice(n - 6, n)
+            let ok := match datetime.parse(date + "T00:00:00" + zone) { value => true, _ => false }
+            if !ok { return false }
+            end -= 6
+        }
     return validTime(text.byteSlice(11, end))
 }
 
@@ -311,7 +321,13 @@ function validDecimal(token : String) : Bool {
     let n := token.byteLength()
     let mut at := if token.startsWith("+") || token.startsWith("-") then 1 else 0
     for (i in range(n)) {
-        if token.byteAt(i) == 95 && (i == 0 || i + 1 == n || !digitsOnly(token.byteSlice(i - 1, i)) || !digitsOnly(token.byteSlice(i + 1, i + 2))) { return false }
+        if token.byteAt(i) == 95 &&
+            (
+                i == 0 ||
+                    i + 1 == n ||
+                    !digitsOnly(token.byteSlice(i - 1, i)) ||
+                    !digitsOnly(token.byteSlice(i + 1, i + 2))
+            ) { return false }
     }
     let plain := token.replace("_", "")
     let size := plain.byteLength()
@@ -356,9 +372,10 @@ function readScalar(mut r : TomlReader) : Toml or Error {
     let start := r.at
     while true {
         let b := r.peek()
-        if b < 0 || b == 32 || b == 9 || b == 10 || b == 13 || b == 44 || b == 93 || b == 125 || b == 35 {
-            break
-        }
+        if b < 0 ||
+            b == 32 || b == 9 || b == 10 || b == 13 || b == 44 || b == 93 || b == 125 || b == 35 {
+                break
+            }
         r.at += 1
     }
     let mut token := r.text.byteSlice(start, r.at)
@@ -376,15 +393,18 @@ function readScalar(mut r : TomlReader) : Toml or Error {
         if token.byteLength() == 10 && r.peek() == 32 && r.peekAt(1) >= 48 && r.peekAt(1) <= 57 {
             r.at += 1
             let rest := r.at
-            while r.peek() > 32 && r.peek() != 44 && r.peek() != 93 && r.peek() != 125 && r.peek() != 35 {
-                r.at += 1
-            }
+            while r.peek() > 32 &&
+                r.peek() != 44 && r.peek() != 93 && r.peek() != 125 && r.peek() != 35 {
+                    r.at += 1
+                }
             token = token + " " + r.text.byteSlice(rest, r.at)
         }
         if !validDate(token) { return r.fail("invalid date or time") }
         return TDateTime(token)
     }
-    let unsigned := if token.startsWith("+") || token.startsWith("-") then token.substring(1, token.length()) else token
+    let unsigned :=
+        if token.startsWith("+") || token.startsWith("-") then token.substring(1, token.length())
+        else token
     let negative := token.startsWith("-")
     if unsigned == "inf" || unsigned == "nan" {
         let value := if unsigned == "inf" then 1.0 / 0.0 else 0.0 / 0.0
@@ -396,7 +416,9 @@ function readScalar(mut r : TomlReader) : Toml or Error {
         }
     }
     let decimal := unsigned.replace("_", "")
-    if decimal.byteLength() > 1 && decimal.startsWith("0") && digitsOnly(decimal.byteSlice(1, 2)) { return r.fail(f"`{token}` has a leading zero") }
+    if decimal.byteLength() > 1 && decimal.startsWith("0") && digitsOnly(decimal.byteSlice(1, 2)) {
+        return r.fail(f"`{token}` has a leading zero")
+    }
     if !validDecimal(token) { return r.fail(f"`{token}` is not a TOML number") }
     let plain := token.replace("_", "")
     let isFloat := plain.contains(".") || (plain.contains("e") || plain.contains("E"))
@@ -409,10 +431,7 @@ function readScalar(mut r : TomlReader) : Toml or Error {
     if unsigned.length() > 1 && unsigned.startsWith("0") {
         return r.fail(f"`{token}` has a leading zero")
     }
-    return match parseInt(plain) {
-        n => TInt(n),
-        _ => r.fail(f"`{token}` is not a value"),
-    }
+    return match parseInt(plain) { n => TInt(n), _ => r.fail(f"`{token}` is not a value") }
 }
 
 function readValue(mut r : TomlReader, depth : Int) : Toml or Error {
@@ -463,8 +482,14 @@ function readValue(mut r : TomlReader, depth : Int) : Toml or Error {
             }
             r.at += 1
             let value := readValue(r, depth + 1)?
-            for (i in range(1, key.length() + 1)) { if closedTables.contains(joinKey(key.take(i))) { return r.fail("an inline table cannot be extended") } }
-            if match value { TTable(inner) => true, _ => false } { closedTables = closedTables.add(joinKey(key)) }
+            for (i in range(1, key.length() + 1)) {
+                if closedTables.contains(joinKey(key.take(i))) {
+                    return r.fail("an inline table cannot be extended")
+                }
+            }
+            if match value { TTable(inner) => true, _ => false } {
+                closedTables = closedTables.add(joinKey(key))
+            }
             fields = setAt(r, fields, key, value)?
             r.skipBlank()
             if r.peek() == 44 {
@@ -484,7 +509,12 @@ function readValue(mut r : TomlReader, depth : Int) : Toml or Error {
 function joinKey(path : List[String]) : String = path.join(".")
 
 // `table` with `value` stored at `path`, creating the tables on the way.
-function setAt(r : TomlReader, table : List[(String, Toml)], path : List[String], move value : Toml) : List[(String, Toml)] or Error {
+function setAt(
+    r : TomlReader,
+    table : List[(String, Toml)],
+    path : List[String],
+    move value : Toml,
+) : List[(String, Toml)] or Error {
     let head := path.take(1).join("")
     let rest := path.drop(1)
     let mut index := 0
@@ -521,14 +551,19 @@ function setAt(r : TomlReader, table : List[(String, Toml)], path : List[String]
 }
 
 // `[a.b]` makes sure the table exists; a table made earlier by a dotted key may be reopened.
-function ensureTable(r : TomlReader, table : List[(String, Toml)], path : List[String]) : List[(String, Toml)] or Error {
+function ensureTable(
+    r : TomlReader,
+    table : List[(String, Toml)],
+    path : List[String],
+) : List[(String, Toml)] or Error {
     let head := path.take(1).join("")
     let rest := path.drop(1)
     let mut index := 0
     for ((key, existing) in table) {
         if key == head {
             let replaced := match existing {
-                TTable(inner) => if rest.isEmpty() then TTable(inner) else TTable(ensureTable(r, inner, rest)?),
+                TTable(inner) =>
+                    if rest.isEmpty() then TTable(inner) else TTable(ensureTable(r, inner, rest)?),
                 TArray(items) => {
                     if rest.isEmpty() {
                         return r.fail(f"`{head}` is already an array of tables")
@@ -556,7 +591,11 @@ function ensureTable(r : TomlReader, table : List[(String, Toml)], path : List[S
 }
 
 // `[[a.b]]` adds a new empty table at the end of the array of tables at the path.
-function appendTable(r : TomlReader, table : List[(String, Toml)], path : List[String]) : List[(String, Toml)] or Error {
+function appendTable(
+    r : TomlReader,
+    table : List[(String, Toml)],
+    path : List[String],
+) : List[(String, Toml)] or Error {
     let head := path.take(1).join("")
     let rest := path.drop(1)
     let fresh : List[(String, Toml)] = []
@@ -592,7 +631,8 @@ function appendTable(r : TomlReader, table : List[(String, Toml)], path : List[S
         }
         index += 1
     }
-    let made := if rest.isEmpty() then TArray([TTable(fresh)]) else TTable(appendTable(r, fresh, rest)?)
+    let made :=
+        if rest.isEmpty() then TArray([TTable(fresh)]) else TTable(appendTable(r, fresh, rest)?)
     return table + [(head, made)]
 }
 
@@ -618,14 +658,19 @@ function tableId(r : TomlReader, path : List[String]) : String {
     let mut id := ""
     for (part in path) {
         id = id + f"/{part.byteLength()}:{part}"
-        match r.arrays.get(id) { Some(n) => { id = id + f"[{n}]" }, None => {} }
+        match r.arrays.get(id) {
+            Some(n) => { id = id + f"[{n}]" },
+            None => {},
+        }
     }
     return id
 }
 
 function checkSealed(r : TomlReader, path : List[String]) : void or Error {
     for (i in range(1, path.length() + 1)) {
-        if r.closedTables.contains(tableId(r, path.take(i))) { return r.fail("an inline table cannot be extended") }
+        if r.closedTables.contains(tableId(r, path.take(i))) {
+            return r.fail("an inline table cannot be extended")
+        }
     }
 }
 
@@ -634,7 +679,10 @@ public function parse(text : String) : Toml or Error {
     // Raw controls and bare CR are never valid anywhere in a TOML document.
     for (i in range(text.byteLength())) {
         let b := text.byteAt(i)
-        if (b < 32 && b != 9 && b != 10 && b != 13) || b == 127 || b == 13 && (i + 1 == text.byteLength() || text.byteAt(i + 1) != 10) { return Error("TOML contains an invalid control character.") }
+        if (b < 32 && b != 9 && b != 10 && b != 13) ||
+            b == 127 || b == 13 && (i + 1 == text.byteLength() || text.byteAt(i + 1) != 10) {
+                return Error("TOML contains an invalid control character.")
+            }
     }
     let r := TomlReader(text)
     let mut root : List[(String, Toml)] = []
@@ -674,8 +722,12 @@ public function parse(text : String) : Toml or Error {
             let value := readValue(r, 0)?
             let path := current + key
             checkSealed(r, path)?
-            for (i in range(1, key.length())) { r.declarations = r.declarations.add(tableId(r, current + key.take(i))) }
-            if match value { TTable(fields) => true, _ => false } { r.closedTables = r.closedTables.add(tableId(r, path)) }
+            for (i in range(1, key.length())) {
+                r.declarations = r.declarations.add(tableId(r, current + key.take(i)))
+            }
+            if match value { TTable(fields) => true, _ => false } {
+                r.closedTables = r.closedTables.add(tableId(r, path))
+            }
             root = setAt(r, root, path, value)?
         }
         endLine(r)?
@@ -718,26 +770,21 @@ function find(value : Toml, parts : List[String], wanted : Int) : Option[String]
 }
 
 // The String or date-time text at a dotted path such as "server.host".
-public function getString(doc : Toml, path : String) : Option[String] = find(doc, path.split("."), 0)
+public function getString(doc : Toml, path : String) : Option[String] =
+    find(doc, path.split("."), 0)
 
-public function getInt(doc : Toml, path : String) : Option[Int] = match find(doc, path.split("."), 1) {
-    Some(text) => match parseInt(text) {
-        n => Some(n),
-        _ => None,
-    },
-    None => None,
-}
+public function getInt(doc : Toml, path : String) : Option[Int] =
+    match find(doc, path.split("."), 1) {
+        Some(text) => match parseInt(text) { n => Some(n), _ => None },
+        None => None,
+    }
 
 // A float, or an integer read as one.
-public function getFloat(doc : Toml, path : String) : Option[double] = match find(doc, path.split("."), 2) {
-    Some(text) => match parseDouble(text) {
-        x => Some(x),
-        _ => None,
-    },
-    None => None,
-}
+public function getFloat(doc : Toml, path : String) : Option[double] =
+    match find(doc, path.split("."), 2) {
+        Some(text) => match parseDouble(text) { x => Some(x), _ => None },
+        None => None,
+    }
 
-public function getBool(doc : Toml, path : String) : Option[Bool] = match find(doc, path.split("."), 3) {
-    Some(text) => Some(text == "true"),
-    None => None,
-}
+public function getBool(doc : Toml, path : String) : Option[Bool] =
+    match find(doc, path.split("."), 3) { Some(text) => Some(text == "true"), None => None }

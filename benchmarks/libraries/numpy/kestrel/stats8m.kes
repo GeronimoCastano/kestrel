@@ -4,7 +4,11 @@ let n := 8000000
 let reps := 6
 let x := Tensor.generate((n,), i => (i % 1000).toDouble())
 let y := Tensor.generate((n,), i => ((i * 7) % 1000).toDouble())
-let data := Tensor.generate((n, 2), (i, j) => if j == 0 then (i % 1000).toDouble() else ((i * 7) % 1000).toDouble())
+let data :=
+    Tensor.generate(
+        (n, 2),
+        (i, j) => if j == 0 then (i % 1000).toDouble() else ((i * 7) % 1000).toDouble(),
+    )
 let mut meanTotal := 0.0
 let mut varianceTotal := 0.0
 let mut stddevTotal := 0.0

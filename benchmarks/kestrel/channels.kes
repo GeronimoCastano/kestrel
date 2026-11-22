@@ -28,4 +28,4 @@ function run(n : Int) : Int or Error with Effects {
     total.load()
 }
 
-print(match run(5000000) { n => n.text(), _ => "error", })
+print(match run(5000000) { n => n.text(), _ => "error" })

@@ -13,6 +13,7 @@ const project = require('./project');
 const projectImports = require('./imports');
 const { CheckDaemon } = require('./daemon');
 const { resolveCompiler, compilerStamp } = require('./compiler');
+const { startFormat } = require('./format');
 const path = require('path');
 const docMath = require('./documentation');
 
@@ -1917,6 +1918,37 @@ class KestrelCodeActionProvider {
   }
 }
 
+// Formatting goes through `kestrel fmt --stdin`, so an unsaved buffer is
+// formatted without a save. Registering the provider is enough for VS Code's
+// `editor.formatOnSave` setting to work.
+class KestrelFormattingProvider {
+  async provideDocumentFormattingEdits(document) {
+    const chosen = resolveCompiler(
+      vscode.workspace.getConfiguration('kestrel').get('compilerPath') || ''
+    );
+    const text = document.getText();
+    const version = document.version;
+    let result;
+    try {
+      result = await startFormat(chosen.command, text).promise;
+    } catch (error) {
+      vscode.window.showErrorMessage(`Kestrel formatter is unavailable: ${error.message}`);
+      return [];
+    }
+    if (result.code !== 0) {
+      const detail = result.output.trim();
+      vscode.window.showErrorMessage(
+        `Kestrel could not format this file${detail ? `: ${detail}` : '.'}`
+      );
+      return [];
+    }
+    if (result.output === text) return [];
+    if (document.version !== undefined && document.version !== version) return [];
+    const range = new vscode.Range(document.positionAt(0), document.positionAt(text.length));
+    return [vscode.TextEdit.replace(range, result.output)];
+  }
+}
+
 function activate(context) {
   docMath.configure(context.globalStorageUri?.fsPath);
   syncMathButton();
@@ -1957,7 +1989,11 @@ function activate(context) {
     vscode.languages.registerHoverProvider(selector, new KestrelHoverProvider()),
     vscode.languages.registerDefinitionProvider(selector, new KestrelDefinitionProvider()),
     vscode.languages.registerInlayHintsProvider(selector, inlay),
-    vscode.languages.registerDocumentSymbolProvider(selector, new KestrelSymbolProvider())
+    vscode.languages.registerDocumentSymbolProvider(selector, new KestrelSymbolProvider()),
+    vscode.languages.registerDocumentFormattingEditProvider(
+      selector,
+      new KestrelFormattingProvider()
+    )
   );
   if (vscode.workspace.onDidChangeTextDocument) {
     const symbols = vscode.workspace.onDidChangeTextDocument(async event => {
@@ -2007,6 +2043,7 @@ module.exports = {
   escapeHtml,
   ProofStateView,
   KestrelCodeActionProvider,
+  KestrelFormattingProvider,
   expandSymbols,
   symbolEdit
 };

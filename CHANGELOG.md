@@ -1,8 +1,25 @@
 # Changelog
 
-All notable changes to Kestrel. Versions follow the policy in the README: within
-`0.1`, a patch release fixes bugs; a syntax or feature change bumps the minor
-number.
+All notable changes to Kestrel. Versions follow the policy in the README:
+within a minor line, a patch release fixes bugs; a syntax or feature change
+bumps the minor number.
+
+## 0.2.0 - 2026-11-21
+
+- `kestrel fmt` formats `.kes` source in place. It works from the token stream,
+  so comments, literals and the written form of `x++`, `x += 1` and grouped
+  parameters survive. A second run produces the same bytes.
+- The style is four spaces and 100 columns. Long calls, lists, parameters and
+  match arms go one item per line with a trailing comma. Binary expressions
+  break after the loosest operator first. Imports sort within a run and their
+  names sort inside `{...}`.
+- `--check` reports files that need formatting and exits 1. `--diff` prints a
+  unified diff. `--stdin` formats an unsaved buffer. `--version` reports the
+  formatter revision.
+- The VS Code extension registers a formatting provider, so
+  `editor.formatOnSave` works. It runs the compiler with `fmt --stdin`.
+- CI checks every tracked `.kes` file with `kestrel fmt --check`.
+- The compiler reports version 0.2.0.
 
 ## Unreleased
 

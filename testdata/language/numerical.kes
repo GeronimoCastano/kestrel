@@ -1,9 +1,9 @@
 // Native numerical modules, a rank-1 vector in @, and seeded sampling.
 import std.linalg
 import std.math
-import std.stats
-import std.random.{Rng}
 import std.prob.{Normal}
+import std.random.{Rng}
+import std.stats
 
 let A := Tensor([1.0, 2.0, 3.0, 4.0], shape = (2, 2))
 let x := Tensor([1.0, 2.0])

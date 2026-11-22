@@ -1,5 +1,5 @@
 // An example is checked and then forgotten. It has no name and cannot be cited.
-example[U](A : Set[U]) : A ⊆ A by {
+example [U](A : Set[U]) : A ⊆ A by {
     intro x
     intro h
     exact h

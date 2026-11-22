@@ -45,7 +45,10 @@ function pipeline(frame : kd.DataFrame, name : String) : double or Error {
         let weights := kd.Series([1.0, 0.9, 1.1, 1.2, 0.8, 1.05, 0.95, 1.15], name = "weight")
         let lookup := kd.DataFrame([regions, weights])
         let merged := frame.merge(lookup, on = "region", how = "left")?
-        let weighted := merged.assign("weighted", merged.col("units")? * merged.col("weight")?).select(["region", "weighted"])?
+        let weighted :=
+            merged.assign("weighted", merged.col("units")?* merged.col("weight")?).select(
+                ["region", "weighted"],
+            )?
         return weighted.groupBy("region")?.sum().select(["weighted"])?.sum().sum().asDouble()
     }
 

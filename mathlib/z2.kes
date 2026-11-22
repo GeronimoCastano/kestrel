@@ -11,17 +11,10 @@ public function zAdd(a : Z2, b : Z2) : Z2 = match a {
 }
 
 /// Negation modulo two: both elements are their own negative.
-public function zNeg(a : Z2) : Z2 = match a {
-    Z => Z,
-    O => O,
-}
+public function zNeg(a : Z2) : Z2 = match a { Z => Z, O => O }
 
 /// Multiplication modulo two.
-public function zMul(a : Z2, b : Z2) : Z2 = match a {
-    Z => Z,
-    O => b,
-}
-
+public function zMul(a : Z2, b : Z2) : Z2 = match a { Z => Z, O => b }
 
 /// The zAddComm law.
 public theorem zAddComm(a : Z2, b : Z2) : zAdd(a, b) = zAdd(b, a) by {
@@ -280,7 +273,11 @@ public theorem zMulZeroR(a : Z2) : zMul(a, Z) = Z by {
 }
 
 /// The zMulDistribL law.
-public theorem zMulDistribL(a : Z2, b : Z2, c : Z2) : zMul(a, zAdd(b, c)) = zAdd(zMul(a, b), zMul(a, c)) by {
+public theorem zMulDistribL(
+    a : Z2,
+    b : Z2,
+    c : Z2,
+) : zMul(a, zAdd(b, c)) = zAdd(zMul(a, b), zMul(a, c)) by {
     cases a {
         Z => {
             cases b {
@@ -334,7 +331,11 @@ public theorem zMulDistribL(a : Z2, b : Z2, c : Z2) : zMul(a, zAdd(b, c)) = zAdd
 }
 
 /// The zMulDistribR law.
-public theorem zMulDistribR(a : Z2, b : Z2, c : Z2) : zMul(zAdd(a, b), c) = zAdd(zMul(a, c), zMul(b, c)) by {
+public theorem zMulDistribR(
+    a : Z2,
+    b : Z2,
+    c : Z2,
+) : zMul(zAdd(a, b), c) = zAdd(zMul(a, c), zMul(b, c)) by {
     cases a {
         Z => {
             cases b {
@@ -388,23 +389,26 @@ public theorem zMulDistribR(a : Z2, b : Z2, c : Z2) : zMul(zAdd(a, b), c) = zAdd
 }
 
 /// The commutative-ring laws of Z2.
-public theorem z2Ring() :
-        (forall a : Z2, forall b : Z2, zAdd(a, b) = zAdd(b, a)) and
-        (forall a : Z2, forall b : Z2, forall c : Z2, zAdd(zAdd(a, b), c) = zAdd(a, zAdd(b, c))) and
-        (forall a : Z2, zAdd(Z, a) = a) and
-        (forall a : Z2, zAdd(a, Z) = a) and
-        (forall a : Z2, zAdd(zNeg(a), a) = Z) and
-        (forall a : Z2, zAdd(a, zNeg(a)) = Z) and
-        (forall a : Z2, forall b : Z2, zMul(a, b) = zMul(b, a)) and
-        (forall a : Z2, forall b : Z2, forall c : Z2, zMul(zMul(a, b), c) = zMul(a, zMul(b, c))) and
-        (forall a : Z2, zMul(O, a) = a) and
-        (forall a : Z2, zMul(a, O) = a) and
-        (forall a : Z2, zMul(Z, a) = Z) and
-        (forall a : Z2, zMul(a, Z) = Z) and
-        (forall a : Z2, forall b : Z2, forall c : Z2, zMul(a, zAdd(b, c)) = zAdd(zMul(a, b), zMul(a, c))) and
-        (forall a : Z2, forall b : Z2, forall c : Z2, zMul(zAdd(a, b), c) = zAdd(zMul(a, c), zMul(b, c))) by {
-    constructor
-    {
+public theorem z2Ring() : (forall a : Z2, forall b : Z2, zAdd(a, b) = zAdd(b, a)) and
+    (forall a : Z2, forall b : Z2, forall c : Z2, zAdd(zAdd(a, b), c) = zAdd(a, zAdd(b, c))) and
+    (forall a : Z2, zAdd(Z, a) = a) and
+    (forall a : Z2, zAdd(a, Z) = a) and
+    (forall a : Z2, zAdd(zNeg(a), a) = Z) and
+    (forall a : Z2, zAdd(a, zNeg(a)) = Z) and
+    (forall a : Z2, forall b : Z2, zMul(a, b) = zMul(b, a)) and
+    (forall a : Z2, forall b : Z2, forall c : Z2, zMul(zMul(a, b), c) = zMul(a, zMul(b, c))) and
+    (forall a : Z2, zMul(O, a) = a) and
+    (forall a : Z2, zMul(a, O) = a) and
+    (forall a : Z2, zMul(Z, a) = Z) and
+    (forall a : Z2, zMul(a, Z) = Z) and
+    (
+        forall a : Z2, forall b : Z2, forall c : Z2, zMul(a, zAdd(b, c)) =
+            zAdd(zMul(a, b), zMul(a, c))
+    ) and
+    (
+        forall a : Z2, forall b : Z2, forall c : Z2, zMul(zAdd(a, b), c) =
+            zAdd(zMul(a, c), zMul(b, c))
+    ) by {
         constructor
         {
             constructor
@@ -429,81 +433,83 @@ public theorem z2Ring() :
                                                 {
                                                     constructor
                                                     {
-                                                        intro a
-                                                        intro b
-                                                        exact zAddComm(a, b)
+                                                        constructor
+                                                        {
+                                                            intro a
+                                                            intro b
+                                                            exact zAddComm(a, b)
+                                                        }
+                                                        {
+                                                            intro a
+                                                            intro b
+                                                            intro c
+                                                            exact zAddAssoc(a, b, c)
+                                                        }
                                                     }
                                                     {
                                                         intro a
-                                                        intro b
-                                                        intro c
-                                                        exact zAddAssoc(a, b, c)
+                                                        exact zAddZeroL(a)
                                                     }
                                                 }
                                                 {
                                                     intro a
-                                                    exact zAddZeroL(a)
+                                                    exact zAddZeroR(a)
                                                 }
                                             }
                                             {
                                                 intro a
-                                                exact zAddZeroR(a)
+                                                exact zAddNegL(a)
                                             }
                                         }
                                         {
                                             intro a
-                                            exact zAddNegL(a)
+                                            exact zAddNegR(a)
                                         }
                                     }
                                     {
                                         intro a
-                                        exact zAddNegR(a)
+                                        intro b
+                                        exact zMulComm(a, b)
                                     }
                                 }
                                 {
                                     intro a
                                     intro b
-                                    exact zMulComm(a, b)
+                                    intro c
+                                    exact zMulAssoc(a, b, c)
                                 }
                             }
                             {
                                 intro a
-                                intro b
-                                intro c
-                                exact zMulAssoc(a, b, c)
+                                exact zMulOneL(a)
                             }
                         }
                         {
                             intro a
-                            exact zMulOneL(a)
+                            exact zMulOneR(a)
                         }
                     }
                     {
                         intro a
-                        exact zMulOneR(a)
+                        exact zMulZeroL(a)
                     }
                 }
                 {
                     intro a
-                    exact zMulZeroL(a)
+                    exact zMulZeroR(a)
                 }
             }
             {
                 intro a
-                exact zMulZeroR(a)
+                intro b
+                intro c
+                exact zMulDistribL(a, b, c)
             }
         }
         {
             intro a
             intro b
             intro c
-            exact zMulDistribL(a, b, c)
+            exact zMulDistribR(a, b, c)
         }
     }
-    {
-        intro a
-        intro b
-        intro c
-        exact zMulDistribR(a, b, c)
-    }
-}

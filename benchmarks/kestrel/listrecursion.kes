@@ -1,18 +1,13 @@
 // Preserve the existing cost of list-pattern tails and concatenation.
-function sum(xs : List[Int]) : Int = match xs {
-    [] => 0,
-    [x, ..rest] => x + sum(rest),
-}
+function sum(xs : List[Int]) : Int = match xs { [] => 0, [x, ..rest] => x + sum(rest) }
 
 function insert(x : Int, xs : List[Int]) : List[Int] = match xs {
     [] => [x],
     [y, ..rest] => if x <= y { [x] + xs } else { [y] + insert(x, rest) },
 }
 
-function insertionSort(xs : List[Int]) : List[Int] = match xs {
-    [] => [],
-    [x, ..rest] => insert(x, insertionSort(rest)),
-}
+function insertionSort(xs : List[Int]) : List[Int] =
+    match xs { [] => [], [x, ..rest] => insert(x, insertionSort(rest)) }
 
 let values := [i for i in range(1200)]
 let descending := [255 - i for i in range(256)]

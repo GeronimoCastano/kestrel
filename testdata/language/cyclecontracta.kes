@@ -1,7 +1,9 @@
 import testdata.language.cyclecontractb.{base}
+
 public function checked(n : Int = base()) : Int or Error requires n > 0 ensures result > 0 = n
+
 public class Gate {
     public final threshold : Int
-    new(threshold : Int = base()) {this.threshold=threshold}
+    new(threshold : Int = base()) { this.threshold = threshold }
     public function check(n : Int) : Int or Error requires n > this.threshold = n
 }
