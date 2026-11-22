@@ -87,7 +87,10 @@ async function main() {
   assert(results[0].cancelled === true || results[0].ok === true);
   assert.deepStrictEqual(results[1].diagnostics, []);
 
-  daemon.dispose();
+  // The server has closed once dispose settles, so its working folder can go.
+  await daemon.dispose();
+  assert.strictEqual(daemon.child, null);
+  fs.rmSync(folder, { recursive: true, force: true });
   console.log('kestrel daemon tests pass');
 }
 
