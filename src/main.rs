@@ -100,6 +100,7 @@ fn run() -> Result<bool, String> {
             | "notebook"
             | "serve"
             | "goals"
+            | "doctor"
             | "game"
     ) {
         return Err(format!(
@@ -190,7 +191,7 @@ fn run() -> Result<bool, String> {
                         .map_err(|_| "--column needs a positive number.")?,
                 )
             }
-            "--json" if command == "goals" => json = true,
+            "--json" if matches!(command.as_str(), "goals" | "doctor") => json = true,
             "--port" if command == "game" => {
                 port = Some(
                     args.next()
@@ -397,6 +398,27 @@ fn run() -> Result<bool, String> {
             }
         }
         return Ok(report.error.is_none());
+    }
+
+    if command == "doctor" {
+        if project
+            || tree
+            || notebook
+            || !paths.is_empty()
+            || output.is_some()
+            || emit_c.is_some()
+            || !libraries.is_empty()
+            || !script_args.is_empty()
+        {
+            return Err("doctor takes optional --root and --json.".into());
+        }
+        let report = kestrel::doctor::run(&root)?;
+        if json {
+            println!("{}", report.json());
+        } else {
+            println!("{}", report.render());
+        }
+        return Ok(report.healthy());
     }
 
     if command == "serve" {
@@ -663,7 +685,7 @@ fn help() {
     println!(
         "Kestrel compiler (compiler and native session)\n\nUsage:\n  kestrel session [--root DIRECTORY] [--link LIBRARY] [-- ARG...]\n  kestrel notebook [--root DIRECTORY] [--link LIBRARY]\n  kestrel serve [--root DIRECTORY]
   kestrel goals [--root DIRECTORY] [--line N] [--column N] [--json] FILE
-  kestrel game [--port N] [--root DIRECTORY]\n  kestrel parse [--tree] [--project] FILE...\n  kestrel tokens FILE...\n  kestrel check [--root DIRECTORY] [--trusted] [--notebook] [--stdin-path FILE] FILE...\n  kestrel build [--root DIRECTORY] [-o EXECUTABLE] [--emit-c FILE] [--link LIBRARY] FILE\n  kestrel run [--root DIRECTORY] [--emit-c FILE] [--link LIBRARY] FILE [-- ARG...]\n  kestrel fetch [--root DIRECTORY]\n  kestrel update NAME [--root DIRECTORY]\n  kestrel test [FOLDER] [--filter TEXT] [--jobs N] [--timeout SECONDS|none] [--link LIBRARY]\n\nUse - as a file path to read standard input. --stdin-path FILE treats that
-input as an unsaved version of FILE, so project-local imports resolve.\n\nparse checks grammar only. check resolves imports and checks supported\nnames and types, effects, mutation permissions, moves, borrows, contracts,\nfiles and tasks. build and run compile the supported native subset using\nClang. session keeps live values and runs each entry once; :quit ends it.\n:test [FILTER] runs saved package tests without clearing session values.\ntest runs the @test functions in a package's tests folder, each in its own\nprocess. See README.md for current limits."
+  kestrel doctor [--root DIRECTORY] [--json]\n  kestrel game [--port N] [--root DIRECTORY]\n  kestrel parse [--tree] [--project] FILE...\n  kestrel tokens FILE...\n  kestrel check [--root DIRECTORY] [--trusted] [--notebook] [--stdin-path FILE] FILE...\n  kestrel build [--root DIRECTORY] [-o EXECUTABLE] [--emit-c FILE] [--link LIBRARY] FILE\n  kestrel run [--root DIRECTORY] [--emit-c FILE] [--link LIBRARY] FILE [-- ARG...]\n  kestrel fetch [--root DIRECTORY]\n  kestrel update NAME [--root DIRECTORY]\n  kestrel test [FOLDER] [--filter TEXT] [--jobs N] [--timeout SECONDS|none] [--link LIBRARY]\n\nUse - as a file path to read standard input. --stdin-path FILE treats that
+input as an unsaved version of FILE, so project-local imports resolve.\n\nparse checks grammar only. check resolves imports and checks supported\nnames and types, effects, mutation permissions, moves, borrows, contracts,\nfiles and tasks. build and run compile the supported native subset using\nClang. session keeps live values and runs each entry once; :quit ends it.\n:test [FILTER] runs saved package tests without clearing session values.\ntest runs the @test functions in a package's tests folder, each in its own\nprocess. doctor reports the tools, install layout, PATH, cache, lock and\neditor extension without changing anything. See README.md for current limits."
     );
 }

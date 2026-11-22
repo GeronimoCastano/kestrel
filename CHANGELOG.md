@@ -4,6 +4,15 @@ All notable changes to Kestrel. Versions follow the policy in the README: within
 `0.1`, a patch release fixes bugs; a syntax or feature change bumps the minor
 number.
 
+## 0.1.4 - 2026-11-21
+
+- `kestrel doctor` diagnoses an installation: the compiler's version and commit,
+  the platform and install layout, Clang, LAPACK, Z3, `PATH` shadowing, the
+  package cache, `kestrel.lock` and the VS Code extension.
+- It prints a fix next to each problem, takes `--json`, and exits with 1 when a
+  required check fails. The only write is one temporary file in the package
+  cache, removed before it returns.
+
 ## 0.1.3 - 2026-11-21
 
 - Windows is supported. One PowerShell command installs the compiler with its

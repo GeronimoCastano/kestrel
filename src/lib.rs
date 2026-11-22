@@ -3,6 +3,7 @@ pub mod checker;
 pub mod contracts;
 pub mod core;
 pub mod diagnostic;
+pub mod doctor;
 pub mod game;
 mod identifiers;
 pub mod interop;
