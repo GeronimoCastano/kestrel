@@ -4,12 +4,13 @@ All notable changes to Kestrel. Versions follow the policy in the README:
 within a minor line, a patch release fixes bugs; a syntax or feature change
 bumps the minor number.
 
-## Unreleased
+## 0.3.0 - 2026-11-22
 
 - The Windows installer ships CPython 3.13, so Python interop needs no separate
   install. It appends the bundled folder to `PATH`, and a source build still
   takes a python.org CPython.
 - Homebrew installs the bash, zsh and fish completion scripts.
+- The compiler reports 0.3.0.
 
 ## 0.2.0 - 2026-11-21
 

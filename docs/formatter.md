@@ -109,7 +109,7 @@ formatter revision. These stay true across releases:
 `kestrel fmt --version` reports the revision:
 
 ```text
-kestrel formatter revision 1 (compiler 0.2.0)
+kestrel formatter revision 1 (compiler 0.3.0)
 ```
 
 CI runs the formatter in check mode over every tracked `.kes` file:

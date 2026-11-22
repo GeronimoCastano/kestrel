@@ -528,7 +528,7 @@ under `testdata/`.
 
 Kestrel is pre-1.0. Within a minor line, a patch release fixes bugs and leaves
 the language and the formatter output alone. A new form, a changed rule or a new
-feature bumps the minor number: `0.2.0`. Every release is listed in
+feature bumps the minor number: `0.3.0`. Every release is listed in
 [CHANGELOG.md](CHANGELOG.md).
 
 ## Limits
