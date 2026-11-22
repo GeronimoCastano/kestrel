@@ -4,6 +4,13 @@ All notable changes to Kestrel. Versions follow the policy in the README:
 within a minor line, a patch release fixes bugs; a syntax or feature change
 bumps the minor number.
 
+## Unreleased
+
+- When Windows Smart App Control blocks a program Kestrel built, `kestrel run`,
+  `kestrel test` and `kestrel session` say what blocked it and how to allow it,
+  instead of passing on the bare error 4551. The Windows installer finishes the
+  install and explains the block instead of stopping.
+
 ## 0.3.0 - 2026-11-22
 
 - The Windows installer ships CPython 3.13, so Python interop needs no separate

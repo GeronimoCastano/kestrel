@@ -502,7 +502,13 @@ fn run_all(cases: &[Case], jobs: usize, timeout: Option<Duration>) -> Vec<Outcom
                                 Ok(outcome) => outcome,
                                 Err(error) => Outcome {
                                     passed: false,
-                                    output: format!("Cannot run the test program: {error}\n"),
+                                    output: format!(
+                                        "{}\n",
+                                        crate::native::launch_failure(
+                                            "Cannot run the test program",
+                                            &error
+                                        )
+                                    ),
                                 },
                             },
                             (None, None) => Outcome {

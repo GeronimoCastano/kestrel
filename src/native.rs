@@ -3113,6 +3113,28 @@ pub fn missing_clang(error: &io::Error) -> String {
     )
 }
 
+/// Windows error 4551: an Application Control policy refused to start a file.
+const APPLICATION_CONTROL_BLOCK: i32 = 4551;
+
+/// The message for a built program that would not start. Smart App Control, and
+/// any App Control policy like it, refuses an unsigned program it has not seen
+/// before, and every program Kestrel builds is new to it. The bare Windows message
+/// does not say what to do, so this one adds it.
+pub fn launch_failure(context: &str, error: &io::Error) -> String {
+    let mut message = format!("{context}: {error}");
+    if cfg!(windows) && error.raw_os_error() == Some(APPLICATION_CONTROL_BLOCK) {
+        message.push_str(
+            "\nWindows Smart App Control, or another App Control policy, blocks unsigned \
+             programs it has not seen before, and every program Kestrel builds is new. \
+             `kestrel check` still works. To run programs, install Kestrel in WSL, or turn \
+             Smart App Control off in Windows Security > App & browser control > Smart App \
+             Control settings. \
+             See https://github.com/GeronimoCastano/kestrel/blob/main/docs/install.md#smart-app-control.",
+        );
+    }
+    message
+}
+
 /// What Clang and the linker said about a failed build. The MSVC linker writes its
 /// errors to standard output, so both streams count.
 fn compiler_messages(output: &std::process::Output) -> String {
@@ -3254,7 +3276,7 @@ pub fn run_with_args(program: &Program, arguments: &[String]) -> Result<ExitStat
         .args(arguments)
         .envs(program_path(!program.python_sites.is_empty()).map(|path| ("PATH", path)))
         .status()
-        .map_err(|e| format!("Cannot execute compiled program: {e}"))
+        .map_err(|e| launch_failure("Cannot execute compiled program", &e))
 }
 
 /// Copy a static field value out of its storage. Counted values retain their

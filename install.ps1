@@ -100,14 +100,22 @@
     $kestrel = Join-Path $bin 'kestrel.exe'
     $installed = (& $kestrel --version)
 
-    # A first program proves the toolchain works and leaves nothing behind.
+    # A first program proves the toolchain works and leaves nothing behind. Smart App
+    # Control blocks unsigned programs it has never seen, and every program Kestrel
+    # builds is one. The compiler still installs; the summary says what to change.
+    $blocked = $false
     $check = Join-Path ([IO.Path]::GetTempPath()) ("kestrel-check-" + [Guid]::NewGuid())
     New-Item -ItemType Directory -Path $check | Out-Null
     try {
         Set-Content -Path (Join-Path $check 'hello.kes') -Value 'print("Hello, Kestrel!")' -Encoding ascii
-        $greeting = (& $kestrel run (Join-Path $check 'hello.kes'))
-        if ($greeting -ne 'Hello, Kestrel!') { throw "The installed compiler could not run a program: $greeting" }
+        # Windows PowerShell turns a native command's stderr into errors, which 'Stop' would throw.
+        $ErrorActionPreference = 'Continue'
+        $greeting = (& $kestrel run (Join-Path $check 'hello.kes') 2>&1 | ForEach-Object { "$_" }) -join "`n"
+        $ErrorActionPreference = 'Stop'
+        if ($greeting -match 'Smart App Control') { $blocked = $true }
+        elseif ($greeting.Trim() -ne 'Hello, Kestrel!') { throw "The installed compiler could not run a program: $greeting" }
     } finally {
+        $ErrorActionPreference = 'Stop'
         Remove-Item -Recurse -Force $check -ErrorAction SilentlyContinue
     }
 
@@ -131,8 +139,18 @@
     }
 
     Write-Host ''
-    Write-Host "$installed is ready."
-    Write-Host 'Try it in a new terminal:  kestrel run hello.kes'
+    if ($blocked) {
+        Write-Host "$installed is installed, but Windows blocked the first program it built." -ForegroundColor Yellow
+        Write-Host 'Smart App Control, or another App Control policy on this computer, blocks unsigned'
+        Write-Host 'programs it has not seen before, and every program Kestrel builds is new.'
+        Write-Host '`kestrel check` works. To run programs, install Kestrel in WSL, which Smart App Control'
+        Write-Host 'leaves alone, or turn Smart App Control off in Windows Security > App & browser control >'
+        Write-Host 'Smart App Control settings. Steps for both:'
+        Write-Host '  https://github.com/GeronimoCastano/kestrel/blob/main/docs/install.md#smart-app-control'
+    } else {
+        Write-Host "$installed is ready."
+        Write-Host 'Try it in a new terminal:  kestrel run hello.kes'
+    }
     if (-not $code) {
         Write-Host 'For editor support, install "Kestrel for VS Code" from the Extensions view.'
     }

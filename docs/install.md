@@ -63,6 +63,55 @@ A source build has no bundled interpreter. It uses `python.exe` on `PATH`,
 skipping the Microsoft Store alias, then `py -3`, and takes the first one that has
 `include\Python.h` and `libs\python3XY.lib`.
 
+### Smart App Control
+
+Windows 11 can block every program Kestrel builds. Smart App Control lets a
+program start only when it carries a trusted signature or Microsoft's cloud
+service already knows it. A program you just compiled has neither, so Windows
+refuses it with error 4551, "An Application Control policy has blocked this
+file". Programs from Visual Studio and other compilers meet the same block. An App Control
+policy that an organization sets on its computers does the same.
+
+When the installer's first program is blocked, it still installs Kestrel and
+says so at the end. `kestrel check` works, because it builds nothing.
+`kestrel run`, `kestrel build`, `kestrel test` and `kestrel session` print the
+same explanation when Windows stops their program.
+
+Smart App Control has no per-program exception. You have two ways to run Kestrel
+programs on such a computer.
+
+**Keep Smart App Control on and use WSL.** The Windows Subsystem for Linux runs
+Linux programs in a light virtual machine, and Smart App Control does not apply
+to them. Kestrel installs there as on any Linux. In PowerShell as administrator:
+
+```powershell
+wsl --install
+```
+
+Restart when it asks, open Ubuntu from the Start menu, and run:
+
+```sh
+sudo apt-get update && sudo apt-get install -y build-essential curl git
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+```
+
+Run the two commands Homebrew prints under "Next steps", which put `brew` on
+`PATH`, then:
+
+```sh
+brew install GeronimoCastano/kestrel/kestrel
+```
+
+In VS Code, install the WSL extension and open your folder with **WSL: Open
+Folder in WSL**. Then install Kestrel for VS Code in that window, so it runs
+beside the compiler.
+
+**Turn Smart App Control off.** Windows Security > App & browser control > Smart
+App Control settings > Off. Microsoft's
+[Smart App Control FAQ](https://support.microsoft.com/kb/5008908) covers what
+that changes and how to turn it back on. On a computer an organization manages,
+ask its administrator to allow the programs instead.
+
 ## Release archives
 
 Every [release](https://github.com/GeronimoCastano/kestrel/releases) has the
