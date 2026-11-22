@@ -8832,3 +8832,16 @@ fn trait_defaults_on_records_release_copied_receivers() {
         "4000\nbird\n",
     );
 }
+
+#[test]
+fn a_blocked_launch_says_what_blocked_it() {
+    let blocked = std::io::Error::from_raw_os_error(4551);
+    let message = native::launch_failure("Cannot execute compiled program", &blocked);
+    assert!(message.starts_with("Cannot execute compiled program: "));
+    // Only Windows gives 4551 that meaning; elsewhere the message stays as it was.
+    assert_eq!(message.contains("Smart App Control"), cfg!(windows));
+
+    let missing = std::io::Error::from(std::io::ErrorKind::NotFound);
+    let message = native::launch_failure("Cannot execute compiled program", &missing);
+    assert!(!message.contains("Smart App Control"));
+}

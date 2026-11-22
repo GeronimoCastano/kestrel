@@ -48,7 +48,12 @@ Windows, in PowerShell:
 irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
 ```
 
-Both bring everything Kestrel uses: a C compiler, LAPACK for linear algebra and
+On Windows 11 with Smart App Control on, Windows blocks the programs Kestrel
+builds, and the installer tells you when it does. Install Kestrel in WSL
+instead, or turn Smart App Control off once in Windows Security. The steps for
+both are under [Smart App Control](docs/install.md#smart-app-control).
+
+Both commands bring everything Kestrel uses: a C compiler, LAPACK for linear algebra and
 Z3 for `smt` proofs. Hello world is a single line. Save it as `hello.kes`:
 
 ```kestrel
@@ -364,7 +369,9 @@ workloads Kestrel still loses.
 again updates a Windows one. The Windows installer writes to
 `%LOCALAPPDATA%\Programs\Kestrel`, adds its `bin` folder to your user `PATH`, and
 installs the VS Code extension when `code` is on `PATH`. To remove it, delete that
-folder and its `PATH` entry.
+folder and its `PATH` entry. Windows 11's Smart App Control blocks the programs
+Kestrel builds; [Smart App Control](docs/install.md#smart-app-control) gives two
+ways around it.
 
 Every [release](https://github.com/GeronimoCastano/kestrel/releases) also has the
 archives these commands use: `kestrel-<target>.tar.gz` for macOS and Linux, and a

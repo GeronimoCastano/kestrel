@@ -634,7 +634,7 @@ impl Runtime {
         worker.envs(super::program_path(true).map(|path| ("PATH", path)));
         let mut worker = worker
             .spawn()
-            .map_err(|e| format!("Cannot start native session: {e}"))?;
+            .map_err(|e| super::launch_failure("Cannot start native session", &e))?;
         // The worker connects before it loads user code. A short timeout catches startup failure.
         listener.set_nonblocking(true).map_err(|e| e.to_string())?;
         let deadline = std::time::Instant::now() + std::time::Duration::from_secs(10);
