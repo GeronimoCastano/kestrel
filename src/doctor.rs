@@ -1457,7 +1457,8 @@ mod tests {
             probe.asked.borrow().first().map(String::as_str),
             Some(
                 install
-                    .join("bin/libopenblas.dll")
+                    .join("bin")
+                    .join("libopenblas.dll")
                     .to_string_lossy()
                     .as_ref()
             )
