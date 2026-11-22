@@ -949,9 +949,9 @@ fn elements_doc_inner(elements: &[Element], allow_force: bool) -> Doc {
                     atom.text == "=" && previous.as_ref().is_some_and(|prev| prev.text == "..");
                 after_parameter_group = false;
                 if atom.text == "else"
-                    && !previous
+                    && previous
                         .as_ref()
-                        .is_some_and(|previous| previous.text == "}")
+                        .is_none_or(|previous| previous.text != "}")
                 {
                     current.push(Doc::Break(0));
                     after_break = true;

@@ -522,6 +522,7 @@ fn fmt_diff_reports_a_missing_final_newline() {
     assert!(result.status.success());
     let output = String::from_utf8(result.stdout).unwrap();
     assert!(output.contains("\\ No newline at end of file"), "{output}");
+}
 
 /// Runs `kestrel doctor` with the `KESTREL_*` variables cleared first, so a
 /// developer's own settings cannot change the result.

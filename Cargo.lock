@@ -64,11 +64,7 @@ checksum = "3bd1574e617a9a6c1f8f8181bd7e841e1f20e4277607ef28945765188d6284d4"
 
 [[package]]
 name = "kestrel"
-<<<<<<< HEAD
 version = "0.2.0"
-=======
-version = "0.1.4"
->>>>>>> dsh-18d70d8a-0208
 dependencies = [
  "serde_json",
  "sha2",

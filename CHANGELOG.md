@@ -14,34 +14,23 @@ bumps the minor number.
   break after the loosest operator first. Imports sort within a run and their
   names sort inside `{...}`.
 - `--check` reports files that need formatting and exits 1. `--diff` prints a
-  unified diff. `--stdin` formats an unsaved buffer. `--version` reports the
-  formatter revision.
+  unified diff. `--stdin` formats an unsaved buffer.
 - The VS Code extension registers a formatting provider, so
   `editor.formatOnSave` works. It runs the compiler with `fmt --stdin`.
 - CI checks every tracked `.kes` file with `kestrel fmt --check`.
-- The compiler reports version 0.2.0.
-
-## Unreleased
-
-- `kestrel session` loads project C files on Windows, with the bundled Clang
-  and with Clang for MSVC.
-
-## 0.2.0 - 2026-11-21
-
 - `kestrel new NAME` scaffolds a package: `kestrel.project`, an entry point, a
   module and a test that passes on the first run. `--lib` writes the module and
   test without an entry point; `--git` starts a repository.
 - A Packages page documents the project file, dependencies, tests and the
   scaffold command.
-
-## 0.1.4 - 2026-11-21
-
-- `kestrel doctor` diagnoses an installation: the compiler's version and commit,
-  the platform and install layout, Clang, LAPACK, Z3, `PATH` shadowing, the
-  package cache, `kestrel.lock` and the VS Code extension.
-- It prints a fix next to each problem, takes `--json`, and exits with 1 when a
-  required check fails. The only write is one temporary file in the package
-  cache, removed before it returns.
+- `kestrel doctor` diagnoses an installation: the compiler's version and
+  commit, the platform and install layout, Clang, LAPACK, Z3, `PATH` shadowing,
+  the package cache, `kestrel.lock` and the VS Code extension. It prints a fix
+  next to each problem, takes `--json`, and exits with 1 when a required check
+  fails. Its only write is one temporary file in the package cache.
+- `kestrel session` loads project C files on Windows, with the bundled Clang
+  and with Clang for MSVC.
+- The compiler reports version 0.2.0.
 
 ## 0.1.3 - 2026-11-21
 
