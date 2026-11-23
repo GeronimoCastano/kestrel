@@ -6,7 +6,7 @@
 # It needs no administrator rights. It writes to %LOCALAPPDATA%\Programs\Kestrel, adds
 # that folder's bin to your user PATH, and installs the VS Code extension when VS Code is
 # on PATH. Run it again to update. Settings, all optional:
-#   KESTREL_VERSION   a release such as 0.3.0, instead of the latest
+#   KESTREL_VERSION   a release such as 0.3.1, instead of the latest
 #   KESTREL_HOME      the install folder
 #   KESTREL_ARCHIVE   a downloaded release zip to install instead of fetching one
 
