@@ -119,6 +119,26 @@ App Control settings > Off. Microsoft's
 that changes and how to turn it back on. On a computer an organization manages,
 ask its administrator to allow the programs instead.
 
+## Upgrade
+
+Upgrade Kestrel the way you installed it, then run `kestrel --version` to see
+the version you have.
+
+| Installed with | Upgrade with |
+|---|---|
+| Homebrew on macOS, Linux or WSL | `brew upgrade kestrel` |
+| `install.ps1` on Windows | the same `irm ... \| iex` command again |
+| A source build | `git pull`, then `cargo build --release` and the `install` line again |
+
+On Windows, the installer replaces the install folder and keeps your `PATH`
+entries. You don't need to close VS Code first: the installer stops the
+`kestrel serve` that VS Code keeps running, and reinstalls the extension to
+match the new compiler. On macOS and Linux, VS Code updates the extension from
+the Marketplace.
+
+`kestrel update` doesn't upgrade Kestrel. It moves a project's dependency pins in
+`kestrel.lock`.
+
 ## Release archives
 
 Every [release](https://github.com/GeronimoCastano/kestrel/releases) has the
