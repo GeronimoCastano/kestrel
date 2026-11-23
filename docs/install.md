@@ -4,7 +4,7 @@ One command installs Kestrel with everything it uses: the compiler, a C compiler
 for `kestrel build` and `kestrel run`, LAPACK for `std.linalg`, and Z3 for `smt`
 proofs. The standard library is inside the compiler.
 
-The current release is **0.3.0**. CI runs the full test suite on macOS, Linux and
+The current release is **0.3.1**. CI runs the full test suite on macOS, Linux and
 Windows, and installs every release the way this page does.
 
 ## macOS and Linux
@@ -54,7 +54,7 @@ Kestrel, delete the folder and its `PATH` entries.
 install folder:
 
 ```powershell
-$env:KESTREL_VERSION = '0.3.0'; irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
+$env:KESTREL_VERSION = '0.3.1'; irm https://raw.githubusercontent.com/GeronimoCastano/kestrel/main/install.ps1 | iex
 ```
 
 `kestrel run`, `kestrel build` and `kestrel session` compile project C files as
@@ -151,7 +151,7 @@ archives the commands above use, with `SHA256SUMS`:
 
 ```sh
 tar -xzf kestrel-aarch64-apple-darwin.tar.gz
-sudo install kestrel-0.3.0-aarch64-apple-darwin/kestrel /usr/local/bin/
+sudo install kestrel-0.3.1-aarch64-apple-darwin/kestrel /usr/local/bin/
 ```
 
 An archive on its own needs Clang on `PATH`. On Linux, `std.linalg` also needs
@@ -233,7 +233,7 @@ kestrel --version
 ```
 
 ```text
-kestrel 0.3.0 (compiler and native session)
+kestrel 0.3.1 (compiler and native session)
 ```
 
 Then compile something:

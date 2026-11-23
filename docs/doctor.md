@@ -7,7 +7,7 @@ kestrel doctor
 ```
 
 ```text
-kestrel doctor 0.3.0 on macOS (aarch64-apple-darwin)
+kestrel doctor 0.3.1 on macOS (aarch64-apple-darwin)
 
 ok    commit      4f2a9c1d7e30
 ok    layout      Homebrew install at /opt/homebrew
@@ -55,7 +55,7 @@ A malformed `kestrel.lock` fails the check when the project declares dependencie
 The JSON object carries the version, commit, platform, target, layout, install root, project and cache. Its `checks` array gives each check a `name`, `level`, `status`, `detail` and `fix`. The object ends with the warning count, the failure count and `healthy`. The example below keeps one check and drops the rest.
 
 ```json
-{"version":"0.3.0","commit":"4f2a9c1d7e30","platform":"macOS","target":"aarch64-apple-darwin","layout":"homebrew","installRoot":"/opt/homebrew","project":"/Users/ana/code/shop","cache":"/Users/ana/Library/Caches/kestrel/packages","checks":[{"name":"z3","level":"warning","status":"warn","detail":"not found, so `smt` proofs will fail","fix":"install it with `brew install z3`, or set KESTREL_Z3"}],"warnings":1,"failures":0,"healthy":true}
+{"version":"0.3.1","commit":"4f2a9c1d7e30","platform":"macOS","target":"aarch64-apple-darwin","layout":"homebrew","installRoot":"/opt/homebrew","project":"/Users/ana/code/shop","cache":"/Users/ana/Library/Caches/kestrel/packages","checks":[{"name":"z3","level":"warning","status":"warn","detail":"not found, so `smt` proofs will fail","fix":"install it with `brew install z3`, or set KESTREL_Z3"}],"warnings":1,"failures":0,"healthy":true}
 ```
 
 ## Exit codes

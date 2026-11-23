@@ -4,12 +4,18 @@ All notable changes to Kestrel. Versions follow the policy in the README:
 within a minor line, a patch release fixes bugs; a syntax or feature change
 bumps the minor number.
 
-## Unreleased
+## 0.3.1 - 2026-11-23
 
 - When Windows Smart App Control blocks a program Kestrel built, `kestrel run`,
   `kestrel test` and `kestrel session` say what blocked it and how to allow it,
   instead of passing on the bare error 4551. The Windows installer finishes the
-  install and explains the block instead of stopping.
+  install and explains the block instead of stopping, and it recognizes the bare
+  error that 0.3.0 prints.
+- The README and the install guide tell Windows users to check Smart App Control
+  before they install, and give two ways around it: WSL, or turning it off.
+- The install guide has an Upgrade section with the command for each install
+  method.
+- The compiler reports 0.3.1.
 
 ## 0.3.0 - 2026-11-22
 
